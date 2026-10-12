@@ -18,6 +18,6 @@ Canonical facts. Workspaces read these; nothing here points to a workspace. Stag
 | `risks.md` | Risk list, reviewed at every milestone exit |
 | `catalogs/CONTEXT.md` | Methods, indicators, integrators, systems, module `Status` |
 | `bibliography/CONTEXT.md` | Verified references, benchmarks, UNVERIFIED list |
-| `setup-guides/` | `julia.md`, `rebound.md`, `latex.md` |
+| `setup-guides/` | `julia.md`, `python-and-git.md`, `rebound.md`, `latex.md` |
 
 Gated writes: only literature-review/05 (bibliography, catalog `?` keys) and module-build/05 (catalog `Status`) change these files, after human approval.

@@ -14,7 +14,7 @@ Adversarial review and citation check, then revise.
 1. Adversarial review (fresh Sonnet subagent, ARS `/ars-reviewer`): correctness, overclaiming, missing prior work.
 2. Citation check (ARS `/ars-citation-check`) against `references.bib`.
 3. **[Checkpoint]** Present the findings and a proposed change list.
-4. Apply the approved changes; write the revised draft and the response table.
+4. Apply the approved changes; run the audit; write the revised draft and the response table.
 
 ## Checkpoints
 

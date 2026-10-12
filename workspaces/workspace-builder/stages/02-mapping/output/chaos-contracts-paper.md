@@ -54,7 +54,15 @@ DRAFT (Stage 02). One run per paper. `[paper]` is a slug such as `p1-le-algorith
 ### Process
 
 1. Draft section by section (Sonnet subagent), copying numbers from results files only.
-2. Run the audit, write the output. No checkpoint (review is stage 03).
+2. Run the audit; list any number or claim that could not be traced.
+3. **[Checkpoint]** Present the draft and the untraced items.
+4. Write the output.
+
+### Checkpoints
+
+| After Step | Agent Presents | Human Decides |
+|------------|---------------|---------------|
+| 2 | Draft and untraced items | Proceed to review, or redirect sections |
 
 ### Audit
 
@@ -84,7 +92,7 @@ DRAFT (Stage 02). One run per paper. `[paper]` is a slug such as `p1-le-algorith
 1. Adversarial review (fresh Sonnet subagent, ARS `/ars-reviewer`): correctness, overclaiming, missing prior work.
 2. Citation check (ARS `/ars-citation-check`) against `references.bib`.
 3. **[Checkpoint]** Present the findings and a proposed change list.
-4. Apply the approved changes; write the revised draft and the response table.
+4. Apply the approved changes; run the audit; write the revised draft and the response table.
 
 ### Checkpoints
 

@@ -89,7 +89,7 @@ DRAFT (Stage 02). One run per study. `[study]` is a slug such as `p1-le-benchmar
 ### Process
 
 1. Record the preregistration SHA-256 in the manifest, then run `julia --project bin/chaoslab.jl run` (no AI): chunked, resumable, health checks on every chunk. N-body studies first run the Python adapters in `/python/nbody/`, which write HDF5 per the schema.
-2. Rerun failed chunks once; log any that fail again.
+2. Rerun failed chunks once; log any that fail again; run the audit.
 3. **[Checkpoint]** Present the health summary.
 
 ### Checkpoints

@@ -1,6 +1,6 @@
 # Environment
 
-Layer 3, canonical. Filled once by `setup`. Read by study/01 (budget) and study/03 (run).
+Layer 3, canonical. Filled once by `setup`.
 
 ## Compute
 

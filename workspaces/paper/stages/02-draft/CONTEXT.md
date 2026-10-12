@@ -14,7 +14,15 @@ Draft the manuscript from results and verified citations only.
 ## Process
 
 1. Draft section by section (Sonnet subagent), copying numbers from results files only.
-2. Run the audit, write the output. No checkpoint (review is stage 03).
+2. Run the audit; list any number or claim that could not be traced.
+3. **[Checkpoint]** Present the draft and the untraced items.
+4. Write the output.
+
+## Checkpoints
+
+| After Step | Agent Presents | Human Decides |
+|------------|---------------|---------------|
+| 2 | Draft and untraced items | Proceed to review, or redirect sections |
 
 ## Audit
 

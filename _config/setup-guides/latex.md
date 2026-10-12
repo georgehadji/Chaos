@@ -12,4 +12,4 @@ Windows: MiKTeX (https://miktex.org/) or TeX Live (https://tug.org/texlive/). Al
 
 ## How this repo uses it
 
-paper/04 converts the revised draft to the journal template and builds the PDF in `workspaces/paper/stages/04-finalize/output/[paper]/`.
+The final paper stage converts the revised draft to the journal template and builds the PDF in its own output folder.

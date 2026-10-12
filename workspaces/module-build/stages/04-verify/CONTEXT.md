@@ -14,7 +14,7 @@ Prove the module against oracles and an independent review.
 
 1. Run the oracle cross-check at each precision the spec names; make the convergence or order plot.
 2. Independent review (fresh Sonnet subagent, given the spec and the code, not the notes): math versus code, numerical traps.
-3. Write the verification report: evidence for each acceptance criterion, review findings and their fixes.
+3. Run the audit, then write the verification report: evidence for each acceptance criterion, review findings and their fixes.
 4. **[Checkpoint]** Present the report.
 
 ## Checkpoints

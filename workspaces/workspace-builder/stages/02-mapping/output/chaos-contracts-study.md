@@ -14,6 +14,8 @@ DRAFT (Stage 02). One run per study. `[study]` is a slug such as `p1-le-benchmar
 | Config | `/_config/value-types.md` | Full file | agree the value the study delivers (Pattern 13) |
 | Config | `/_config/numerics-defaults.toml` | Full file | defaults the study may override |
 | Config | `/_config/research-ideas.md` | the idea row this study serves | scope |
+| Config | `/_config/environment.md` | Full file | compute limits for the budget |
+| Reference | `references/preregistration-format.md` | Full file | required sections |
 
 ### Process
 
@@ -36,7 +38,7 @@ DRAFT (Stage 02). One run per study. `[study]` is a slug such as `p1-le-benchmar
 | Verified methods | Every method in scope has catalog `Status` = `verified` |
 | Decidable | Every hypothesis has a metric and a numeric decision rule |
 | Single home | Thresholds appear only in this file |
-| Budget | Estimated CPU hours fit `{{COMPUTE_TARGET}}` and `{{MAX_CORES}}` |
+| Budget | Estimated CPU hours fit the limits in `/_config/environment.md` |
 
 ### Outputs
 
@@ -81,6 +83,8 @@ DRAFT (Stage 02). One run per study. `[study]` is a slug such as `p1-le-benchmar
 | Stage 02 | `../02-panel/output/[study]-panel.toml` | Full file (or the grid spec in 01) | where to run |
 | Schema | `/schema/run-store.md` | Full file | HDF5 layout |
 | Config | `/_config/numerics-defaults.toml` | Full file | health thresholds |
+| Config | `/_config/environment.md` | Full file | data root, cores |
+| Guide | `/_config/setup-guides/julia.md`, `/_config/setup-guides/rebound.md` | Full files, first run only | install and run commands (rebound only for N-body) |
 
 ### Process
 

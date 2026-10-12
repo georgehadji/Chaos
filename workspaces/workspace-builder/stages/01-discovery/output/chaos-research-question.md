@@ -1,5 +1,7 @@
 # Chaos: Research Question and Study Design
 
+> Promoted to `/_config/research-question.md` on 2026-10-12; that copy is canonical. This file is a Stage 01 record.
+
 Layer 3 draft (becomes `_config/research-question.md` at scaffolding). Canonical home for the research framing. Method details live in the catalogs; citations live in the bibliography.
 
 ## Primary question

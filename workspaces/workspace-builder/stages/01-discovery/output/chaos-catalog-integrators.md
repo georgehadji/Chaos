@@ -1,5 +1,7 @@
 # Catalog: Integrators
 
+> Promoted to `/_config/catalogs/integrators.md` on 2026-10-12; that copy is canonical. This file is a Stage 01 record.
+
 Layer 3 draft. Orders are the classical orders of each scheme; stage counts and coefficients are NOT given here and must be copied from the cited source during module-build/01-spec (Pattern 5: the paper is the canonical home of coefficients). Keys with `?` are pending verification.
 
 Implementation rule (see architecture): every explicit splitting/composition method is a coefficient table run by ONE generic stepper. Adding a method = adding a cited table + an order test, no new loop. Where OrdinaryDiffEqSymplecticRK ships the method (SymplecticEuler, VelocityVerlet, VerletLeapfrog, PseudoVerletLeapfrog, McAte2-8, Ruth3, CandyRoz4, CalvoSanz4, Yoshida6, KahanLi6, KahanLi8, SofSpa10), its solver is an oracle for our table; it lacks Forest-Ruth, PEFRL, Blanes-Moan, SABA/SBAB, ABA864, Tao and WH. REBOUND ships leapfrog orders 2/4/6/8 and SABA2-4, SABA(10,4), SABA(8,6,4), SABA(10,6,4), SABAH variants.

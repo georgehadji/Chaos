@@ -1,5 +1,7 @@
 # Verified annotated bibliography: Hamiltonian chaos, chaos indicators, symplectic maps and integrators, Solar System dynamics
 
+> Promoted to `/_config/bibliography/ (split by section)` on 2026-10-12; that copy is canonical. This file is a Stage 01 record.
+
 Verification method: each entry checked against Crossref (DOI resolves, title, authors, volume, pages) by script (check.py), plus arXiv/OJS pages and full texts where benchmark values were read. Entries tagged [verified-secondary] have no DOI and were confirmed only through independent reference lists or a library/registry record. Nothing is cited from memory alone; items I could not confirm are in UNVERIFIED.
 
 Totals: 180 entries (173 verified by DOI/arXiv/DataCite record, 7 verified-secondary without DOI), 14 UNVERIFIED/caveat items.

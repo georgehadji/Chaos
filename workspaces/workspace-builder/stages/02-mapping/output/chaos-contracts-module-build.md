@@ -11,7 +11,9 @@ DRAFT (Stage 02). One run per library module. `[module]` is a slug from `/_confi
 | User | conversation | module slug | per-run input |
 | Config | `/_config/build-order.md` | the milestone row naming this module | scope and prerequisites |
 | Config | `/_config/catalogs/` | this module's rows only | what to build, sources |
-| Config | `/_config/bibliography/` | entries for the rows' keys, "Benchmark values" | equations and reference numbers |
+| Config | `/_config/bibliography/` | section entries for the rows' keys | sources |
+| Config | `/_config/bibliography/benchmarks.md` | rows for these methods | reference numbers |
+| Reference | `references/spec-format.md` | Full file | required spec sections |
 | Config | `/_config/architecture.md` | "Module map" row, "Layering" | where it sits, what it may import |
 | Config | `/_config/numerics-policy.md` | Full file | precision, coordinates, renormalization rules |
 | Sources | `data/literature/` | papers cited by the rows | equations and coefficient tables |
@@ -54,6 +56,7 @@ DRAFT (Stage 02). One run per library module. `[module]` is a slug from `/_confi
 | Config | `/_config/numerics-policy.md`, `/_config/numerics-defaults.toml` | Full files | tolerances and seeds |
 | Config | `/_config/coding-conventions.md` | "Tests" section | test style |
 | Code | `/test/runtests.jl` | Full file | how suites are registered |
+| Guide | `/_config/setup-guides/julia.md` | Full file, first run only | install and test commands |
 
 ### Process
 
@@ -93,7 +96,7 @@ DRAFT (Stage 02). One run per library module. `[module]` is a slug from `/_confi
 |--------|--------------|---------------|-----|
 | Stage 01 | `../01-spec/output/[module]-spec.md` | Full file | what to build |
 | Stage 02 | `../02-tests/output/[module]-test-plan.md`, `/test/<module>/` | Full | the target |
-| Config | `/_config/architecture.md` | "Module map", "Layering", rules line | structure |
+| Config | `/_config/architecture.md` | "Module map", "Layering" | structure |
 | Config | `/_config/coding-conventions.md` | Full file | code rules |
 | Code | `/src/` | exported names of lower layers only | what to reuse |
 

@@ -1,5 +1,7 @@
 # Chaos: Workflow Map (ICM Stage 01 Discovery)
 
+> Promoted to `/_config/build-order.md (Section 11 only)` on 2026-10-12; that copy is canonical. This file is a Stage 01 record.
+
 Output of `workspace-builder/stages/01-discovery`. Input to Stage 02 (mapping). Status: APPROVED at the Stage 01 checkpoint (2026-10-12): Julia core, GPL-3.0-or-later, initial commit pushed to georgehadji/Chaos. Local path: `E:\Documents\Vibe-Coding\Chaos Research Orchestrator`.
 
 Companion artifacts in this folder:

@@ -1,1 +1,8 @@
 .claude/claudex/
+data/
+__pycache__/
+.venv*/
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+.ruff_cache/

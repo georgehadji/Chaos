@@ -1,5 +1,7 @@
 # Catalog: Chaos Indicators
 
+> Promoted to `/_config/catalogs/indicators.md` on 2026-10-12; that copy is canonical. This file is a Stage 01 record.
+
 Layer 3 draft. Indicators classify finite-time dynamics; they are not LE estimators (claim C3). Keys with `?` are pending verification. Decision rules are typical behaviour from the literature; the thresholds actually used are pre-registered per study, never taken from this table.
 
 ## A. Variational, deviation-vector based

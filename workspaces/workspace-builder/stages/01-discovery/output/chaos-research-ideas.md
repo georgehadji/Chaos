@@ -1,5 +1,7 @@
 # Chaos: Research Idea Backlog
 
+> Promoted to `/_config/research-ideas.md` on 2026-10-12; that copy is canonical. This file is a Stage 01 record.
+
 Layer 3 draft (becomes `_config/research-ideas.md`). Source: user-supplied scoping reviews (2026-10-12). Every cited claim here is UNVERIFIED until it passes literature-review/03-verify; keys with `?` must not be cited yet. Each idea maps to a research line in `chaos-research-question.md` (R1 LE vs indicators, R2 shadow-Hamiltonian transport, R3 scalable computation) and to a paper slot.
 
 ## Ranking rule

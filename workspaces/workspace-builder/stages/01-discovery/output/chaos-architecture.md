@@ -1,5 +1,7 @@
 # Chaos: Architecture, Languages, Patterns
 
+> Promoted to `/_config/architecture.md, numerics-policy.md, coding-conventions.md` on 2026-10-12; that copy is canonical. This file is a Stage 01 record.
+
 Layer 3 draft (becomes `_config/architecture.md` + `_config/numerics-policy.md`). Facts about libraries come from the tooling check of 2026-10-11/12 (primary sources: GitHub, PyPI, JuliaHub docs).
 
 ## 1. Decision

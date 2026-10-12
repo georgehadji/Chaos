@@ -1,5 +1,7 @@
 # Catalog: Lyapunov-Exponent Algorithms
 
+> Promoted to `/_config/catalogs/lyapunov.md` on 2026-10-12; that copy is canonical. This file is a Stage 01 record.
+
 Layer 3 draft. One row per algorithm. `Phase` = milestone that builds it (see `_config/build-order.md`). `Source` keys resolve in `references.bib`; a key marked `?` is pending verification and must not be cited until verified.
 
 Every variational method below consumes the same tangent stream from `chaoslab.tangent.propagate` (analytic tangent map for maps, variational equations integrated with the same symplectic scheme for flows). Methods differ only in how they turn that stream into exponents.

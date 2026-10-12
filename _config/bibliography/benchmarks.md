@@ -1,0 +1,24 @@
+# Bibliography: Benchmark values (only values read in a cited source)
+
+Layer 3, canonical. Only values read in a cited source, with location. Canonical home for benchmark values.
+
+| Quantity | Value | System / parameters | Source key(s) | How confirmed |
+|---|---|---|---|---|
+| Golden-mean KAM torus breakup, standard map (Greene K_c) | K_c = 0.971635406 (about 0.9716); only K_c < 4/3 rigorous (Mather) also stated in source | p' = p + K sin x, x' = x + p'; rotation number (sqrt5 - 1)/2 | FrahmShepelyansky2010; CarlettiLaskar2000 (0.971635...); original: Greene1979, MacKay1983 (not read directly) | Read in arXiv full texts |
+| Standard map largest Lyapunov exponent, large K | lambda ~ ln(K/2) (Chirikov law; asymptotic, assumes small regular fraction). Numerics deviate at moderate K; downward spikes from stickiness | K >> 1 | Shevchenko2004 (describes the law); original Chirikov1979 (not read) | Read in arXiv:1605.08623 |
+| Henon-Heiles escape energy | E_esc = h_esc = 1/6 (three saddle points (0,1), (+-sqrt(3)/2, 1/2) lie on V = 1/6; contours closed below, three exits above) | V = (x^2+y^2)/2 + x^2 y - y^3/3 (polynomial form consistent with the stated saddles; original HenonHeiles1964 not read) | Zotos2017 | Read in arXiv:1709.04360 |
+| Henon-Heiles regularity vs energy | Motion regular for E < 1/12; chaotic fraction grows to E = 1/6 (their statement of numerical studies) | same | ZhaoDu2007 (preprint, secondary) | Read in arXiv:nlin/0701028; low authority |
+| MEGNO, quasi-periodic orbit | <Y>(t) oscillates about 2 as t -> infinity | MEGNO Y(t) and time-average <Y>(t) (standard Cincotta-Simo definition, not read in source) | Hinse2010 (review quoting CincottaSimo2000, Cincotta2003); Maffione2011a | Read in arXiv:0907.4886; test integrations gave <Y> = 1.999757 and 2.000367 at tight tolerances |
+| MEGNO, chaotic orbit | <Y>(t) = gamma t / 2, gamma = Lyapunov characteristic number (linear growth); linear fit recovers the LCN | same | Hinse2010 | Read in arXiv:0907.4886 (formula as printed there) |
+| SALI, chaotic orbit | SALI ~ exp(-(sigma_1 - sigma_2) t): exponential decay at the difference of the two largest Lyapunov exponents | Hamiltonian flows 2D/3D DOF | Skokos2004 | Abstract read (arXiv nlin/0404058) |
+| SALI, regular orbit | Fluctuates around a non-zero value (no decay); in Maffione2011a SALI in (0,2) for regular orbits | Hamiltonian flows and maps | Skokos2004; Maffione2011a | Read |
+| GALI_k, chaotic orbit | GALI_k ~ exp(-[(s1-s2)+(s1-s3)+...+(s1-sk)] t); GALI_2 ~ SALI | N-DOF Hamiltonian, 2 <= k <= 2N | Skokos2007 | Read in arXiv:0704.3155 Eq. (2) |
+| GALI_k, regular orbit on N-dim torus | GALI_k ~ constant for 2 <= k <= N; for N < k <= 2N: ~ t^{-(k-N)} if m >= k-N, ~ t^{-2(k-N)+m} if 0 <= m < k-N (m = initial deviation vectors tangent to the torus) | N-DOF Hamiltonian | Skokos2007 | Read in abstract and arXiv text |
+| FLI growth (norm-based convention) | Chaotic: exponential growth; regular: power-law growth (stated for the unlogged norm of the deviation vector) | symplectic maps | Maffione2011a | Read. The original logarithmic FLI definition and its log/linear laws (Froeschle1997) NOT confirmed |
+| Finite-time mLCE of a regular orbit | Deviation-vector norm grows ~ t, so the finite-time estimate X_1(t) = O(ln t / t), decaying roughly like 1/t (up to a log) | integrable/regular motion | Skokos2010 | Read in arXiv:0811.0882 (Eq. 62 and following text); key for finite-time LCE vs indicator disagreement |
+| Inner Solar System Lyapunov time | about 5 Myr | Solar System inner planets (secular model and full integrations) | MogaveroHoangLaskar2023 | Abstract read (arXiv:2305.01683) |
+| Whole Solar System exponential divergence time | about 4 Myr | 100 Myr Digital Orrery integration | SussmanWisdom1992 | Abstract read via MIT AIM-1359 record (same title/authors); Science version not fetched |
+| Jovian planets Lyapunov time | about 10 Myr (Uranus dynamical lifetime ~10^18 yr) | analytic Jupiter-Saturn-Uranus resonance overlap | MurrayHolman1999 | Abstract read (arXiv:astro-ph/9903277) |
+| Pluto Lyapunov (e-folding) time | about 20 Myr (845 Myr outer-planet integration) | Pluto + outer planets | SussmanWisdom1988 | Only via a secondary description of the abstract (paywalled); treat as unconfirmed-primary |
+| Mercury destabilisation probability | about 1% (large Mercury eccentricity growth) over 5 Gyr; 2501 solutions | Solar System with GR + Moon | LaskarGastineau2009; Zeebe2015 | Zeebe2015 abstract read: 'estimated probability of ~1%', his own 1600 x 5 Gyr runs give lower odds; Laskar-Gastineau details via secondary relay of its abstract |
+| Mercury dynamical half-life | about 40 Gyr (recent estimate) | inner Solar System secular models | Hoang2022 | Abstract read (arXiv:2205.04170); '5 Gyr is about 1000 x the Lyapunov time' |

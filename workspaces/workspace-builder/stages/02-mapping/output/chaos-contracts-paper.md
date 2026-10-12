@@ -113,7 +113,8 @@ DRAFT (Stage 02). One run per paper. `[paper]` is a slug such as `p1-le-algorith
 | Source | File/Location | Section/Scope | Why |
 |--------|--------------|---------------|-----|
 | Previous stage | `../03-review/output/[paper]-revised.md` | Full file | final text |
-| Config | `/_config/publication.md` | journal template, citation style | format |
+| Config | `/_config/publication.md` | "Journals", "Citation style" | format |
+| Guide | `/_config/setup-guides/latex.md` | Full file, first run only | building the PDF |
 | Config | `/_config/bibliography/references.bib` | Full file | bibliography |
 
 ### Process

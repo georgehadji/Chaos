@@ -79,6 +79,10 @@ No workspace reads a module-build `output/` folder except module-build itself.
 | HDF5 run layout | `/schema/run-store.md` | Julia `Experiments`, `/python/nbody/` |
 | Value types | `/_config/value-types.md` | study/01, paper/01 |
 | Journals, citation style, author data | `/_config/publication.md` | paper/01, 04 |
+| Compute target, cores, data root | `/_config/environment.md` | study/01, 03 |
+| Tool installation | `/_config/setup-guides/` | module-build/02, study/03, paper/04 |
+| Spec sections | `module-build/stages/01-spec/references/spec-format.md` | module-build/01, 02, 04 |
+| Preregistration sections | `study/stages/01-design/references/preregistration-format.md` | study/01 to 04 |
 | Subagent model policy | `/CLAUDE.md` | every stage names the model per step |
 | ICM rules | `/_core/CONVENTIONS.md` | builder, validation |
 

@@ -1,5 +1,7 @@
 # Catalog: Systems
 
+> Promoted to `/_config/catalogs/systems.md` on 2026-10-12; that copy is canonical. This file is a Stage 01 record.
+
 Layer 3 draft. Every system ships: the map or Hamiltonian, its analytic tangent map / Hessian, its invariants, and a known-answer test case. Keys with `?` are pending verification.
 
 ## A. Area-preserving and symplectic maps (exact tangent maps, no integrator error)

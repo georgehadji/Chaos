@@ -41,7 +41,7 @@ Implementation rule (see architecture): every explicit splitting/composition met
 | N4 | SABA family in REBOUND | symplectic | LaskarRobutel2001, Rein2019 | M7 | planned |
 | N5 | MERCURIUS, TRACE (hybrid, close encounters) | hybrid | REBOUND docs | M7 (catalog only unless needed) | planned |
 | N6 | IAS15 (adaptive Gauss-Radau, 15th order) | non-symplectic, round-off limited | ReinSpiegel2015 | M7 | planned |
-| N7 | Janus (bit-wise reversible) | reversible | ReinTamayo2018? | catalog only | planned |
+| N7 | Janus (bit-wise reversible) | reversible | ReinTamayo2018 | catalog only | planned |
 | N8 | REBOUNDx effects inside WHFast / IAS15 (operator-split additional forces) | keeps symplectic splitting for conservative effects; dissipative ones break it | TamayoRein2020 | M7 | planned |
 | N9 | ASSIST: IAS15 with DE440/441 perturbers, harmonics, GR, Marsden non-gravitational model, first-order variational equations | ephemeris-quality reference | Holman2023, Marsden1973 | M7 (optional) | planned |
 | N10 | celmech: integration of reduced resonant / secular Hamiltonians (canonical variables, Lie-series transformations) | semi-analytic models | HaddenTamayo2022 | M7 | planned |

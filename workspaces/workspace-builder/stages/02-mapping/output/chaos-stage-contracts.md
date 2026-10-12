@@ -1,6 +1,6 @@
 # Chaos: Stage Contracts (ICM Stage 02 Mapping)
 
-Output of `workspace-builder/stages/02-mapping`; input to Stage 03 (scaffolding). Name mapping for builder Stage 03: its `stage-contracts.md` is this file plus the four contract files; its `workflow-map.md` is `../../01-discovery/output/chaos-workflow-map.md`; its "Selected Skills" section is that file's Section 9. Status: DRAFT, waiting at the Stage 02 checkpoint. Paths starting with `/` are from the repo root.
+Output of `workspace-builder/stages/02-mapping`; input to Stage 03 (scaffolding). Name mapping for builder Stage 03: its `stage-contracts.md` is this file plus the four contract files; its `workflow-map.md` is `../../01-discovery/output/chaos-workflow-map.md`; its "Selected Skills" section is that file's Section 9. Status: APPROVED at the Stage 02 checkpoint (2026-10-12). Paths starting with `/` are from the repo root.
 
 ## Files
 

@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from bibcheck import parse_bib  # noqa: E402
+from bibcheck import norm, parse_bib  # noqa: E402
 
 LR = "workspaces/literature-review/stages"
 BIB = "_config/bibliography"
@@ -35,9 +35,12 @@ def plan(root, topic):
     new = parse_bib(bib_new_text)
     problems = [f"duplicate key {e['key']}" for e in new if e["key"] in keys]
     problems += [f"duplicate DOI {e['doi']} ({e['key']})" for e in new if e.get("doi", "").lower() in dois]
+    titles = {norm(e.get("title", "")): e["key"] for e in existing if e.get("title")}
+    problems += [f"duplicate title {e['key']} = {titles[norm(e['title'])]}" for e in new
+                 if e.get("title") and norm(e["title"]) in titles]
     unverified = [l for l in section_lines(report, "UNVERIFIED") if l.startswith("- ")]
     bench = [l for l in section_lines(notes, "Benchmark") if l.startswith("|") and not re.match(r"^\|[-| ]+\|$", l)][1:]
-    resolvable = keys | {e["key"] for e in new}
+    resolvable = {e["key"] for e in new}  # only keys this topic adds; `?` on an existing key is a pending human decision
     flips = {}
     for cat in sorted((root / "_config/catalogs").glob("*.md")):
         hits = sorted(set(k for k in re.findall(r"\b([A-Z][A-Za-z]+(?:19|20)\d\d[a-z]?)\?", cat.read_text(encoding="utf-8")) if k in resolvable))

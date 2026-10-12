@@ -30,10 +30,20 @@ class BibcheckTests(unittest.TestCase):
         self.assertTrue(any(i.startswith("pages") for i in issues))
 
     def test_key_rule(self):
-        taken = set()
-        self.assertEqual(bibcheck.make_key(["Hénon", "Heiles"], 1964, taken), "HenonHeiles1964")
-        self.assertEqual(bibcheck.make_key(["A", "B", "C", "D"], 2000, taken), "A2000")
-        self.assertEqual(bibcheck.make_key(["A", "B", "C", "D"], 2000, taken), "A2000a")
+        self.assertEqual(bibcheck.key_base(["Hénon", "Heiles"], 1964), "HenonHeiles1964")
+        self.assertEqual(bibcheck.key_base(["A", "B", "C", "D"], 2000), "A2000")
+        self.assertEqual(bibcheck.key_base(["FARANDA", "Udwadia", None, "None"], 2012), "FarandaUdwadia2012")
+        self.assertEqual(bibcheck.assign_keys(["W1993", "X2000", "W1993"]), ["W1993a", "X2000", "W1993b"])
+
+    def test_year_falls_back_when_issued_is_empty(self):
+        rec = {"issued": {"date-parts": [[None]]}, "created": {"date-parts": [[2002, 11, 23]]},
+               "event": {"name": "1997 1st International Conference, Control of Oscillations and Chaos"}}
+        self.assertEqual(bibcheck.rec_year(rec), 1997)
+        self.assertEqual(bibcheck.rec_year({"issued": {"date-parts": [[None]]}, "created": {"date-parts": [[2002]]}}), 2002)
+
+    def test_arxiv_ids_new_and_old_style(self):
+        text = "- arXiv:2304.08340\n- arXiv:acc-phys/9411001\n- arXiv:chao-dyn/9406010\n"
+        self.assertEqual(bibcheck.ARXIV_RE.findall(text), ["2304.08340", "acc-phys/9411001", "chao-dyn/9406010"])
 
     def test_bibtex_round_trip(self):
         entry = bibcheck.parse_bib(bibcheck.to_bibtex("Chirikov1979", RECORD))[0]
@@ -62,7 +72,7 @@ class PromoteTests(unittest.TestCase):
         (r / promote.BIB / "references.bib").write_text("@article{Old2000,\n  doi = {10.1/old}\n}\n")
         (r / promote.LR / "03-verify/output/t-verified.bib").write_text(f"@article{{{new_key},\n  doi = {{10.1/new}}\n}}\n")
         (r / promote.LR / "03-verify/output/t-verify-report.md").write_text("## UNVERIFIED\n\n- Lost1999: no record\n")
-        (r / "_config/catalogs/x.md").write_text("| L1 | m | New2001? | M2 | planned |\n")
+        (r / "_config/catalogs/x.md").write_text("| L1 | m | New2001? | M2 | planned |\n| L2 | m | Old2000? | M5 | planned |\n")
         return r
 
     def test_plan_resolves_keys_and_collects_unverified(self):
@@ -71,6 +81,14 @@ class PromoteTests(unittest.TestCase):
             self.assertEqual(p["problems"], [])
             self.assertEqual(p["flips"], {"_config/catalogs/x.md": ["New2001"]})
             self.assertEqual(len(p["unverified"]), 1)
+
+    def test_duplicate_title_blocks(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = self.make_repo(d, "New2001")
+            (r / promote.BIB / "references.bib").write_text("@article{Old2000,\n  title = {Same Paper},\n  doi = {10.1/old}\n}\n")
+            (r / promote.LR / "03-verify/output/t-verified.bib").write_text(
+                "@article{New2001,\n  title = {Same paper.},\n  doi = {10.1/other-form}\n}\n")
+            self.assertIn("duplicate title New2001 = Old2000", promote.plan(r, "t")["problems"])
 
     def test_duplicate_key_blocks(self):
         with tempfile.TemporaryDirectory() as d:

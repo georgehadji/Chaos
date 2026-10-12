@@ -6,7 +6,7 @@ REBOUND is a C library with Python bindings for N-body integration. Only study/0
 
 1. `python -m venv .venv-nbody` in `python/nbody/`, then activate it.
 2. `pip install rebound` (binary wheels). REBOUNDx ships as source only: on Windows it needs the MSVC Build Tools.
-3. celmech is a C extension; its Windows build and REBOUND 5 compatibility are unverified. If it fails, use WSL2.
+3. `pip install celmech` (C extension). It must work on native Windows; see the Windows notes below once tested.
 
 ## Install (venv B: ASSIST)
 

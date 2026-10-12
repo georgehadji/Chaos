@@ -30,6 +30,7 @@ Chaos/
 - Commits are fine at the stage that says so; every push, PR or submission needs explicit human approval.
 - No em dashes. File and folder names lowercase-with-hyphens (Julia module folders in `src/` excepted).
 - Each fact has one home (see `_config/CONTEXT.md`). Point to it; do not copy it.
+- Structural decisions go into `_config/decision-log.md`; review `_config/risks.md` at every milestone exit.
 
 ## Triggers
 

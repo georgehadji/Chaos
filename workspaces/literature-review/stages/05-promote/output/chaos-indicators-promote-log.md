@@ -4,4 +4,4 @@ Merged keys: Daquin2022, Chatar2022, BountisKaloudisChristodoulidi2023, Zolkin20
 UNVERIFIED items: 0
 Benchmark rows: 0
 Catalog keys resolved: 0
-Commit: record the SHA after committing.
+Commit: d0be26a (promotion, with the section-file annotations).

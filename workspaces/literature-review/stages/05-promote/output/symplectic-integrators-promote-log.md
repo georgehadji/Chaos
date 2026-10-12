@@ -4,4 +4,4 @@ Merged keys: SanzSernaCalvo1993, GozdziewskiBreiterBorczyk2007, LibertHubauxCarl
 UNVERIFIED items: 0
 Benchmark rows: 0
 Catalog keys resolved: 0
-Commit: record the SHA after committing.
+Commit: d0be26a (promotion, with the section-file annotations).

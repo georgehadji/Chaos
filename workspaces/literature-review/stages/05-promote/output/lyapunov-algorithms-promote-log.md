@@ -4,4 +4,4 @@ Merged keys: SalaArtuso2015, Shevchenko2014, HarsoulaKaramanosContopoulos2019, P
 UNVERIFIED items: 0
 Benchmark rows: 16
 Catalog keys resolved: 0
-Commit: record the SHA after committing.
+Commit: 12b4a34 (promotion). Annotations appended to the section file and the Efthymiopoulos correction were part of the same commit.

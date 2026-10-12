@@ -4,4 +4,4 @@ Merged keys: Balescu1997, ChirikovShepelyansky1999, Zaslavsky2004, ZaslavskyEdel
 UNVERIFIED items: 0
 Benchmark rows: 24
 Catalog keys resolved: 0
-Commit: record the SHA after committing.
+Commit: 12b4a34 (promotion). Annotations appended to the section file and the Efthymiopoulos correction were part of the same commit.

@@ -50,6 +50,15 @@ class BibcheckTests(unittest.TestCase):
         self.assertEqual(entry["key"], "Chirikov1979")
         self.assertEqual(bibcheck.compare(entry, RECORD), [])
 
+    def test_datacite_record_converts(self):
+        attrs = {"titles": [{"title": "Chaos Indicators for Dynamic Aperture"}], "doi": "10.18429/x",
+                 "creators": [{"familyName": "Hwang", "givenName": "Kilean"}, {"name": "Org"}],
+                 "publicationYear": 2019, "container": {"title": "Proc. IPAC2019"}}
+        rec = bibcheck.datacite_to_record(attrs)
+        self.assertEqual(bibcheck.rec_year(rec), 2019)
+        self.assertEqual(bibcheck.key_base([a["family"] for a in rec["author"]], 2019), "HwangOrg2019")
+        self.assertIn("journal = {Proc. IPAC2019}", bibcheck.to_bibtex("Hwang2019", rec))
+
     def test_em_dash_written_as_bibtex_markup(self):
         rec = dict(RECORD, title=["Chaos" + chr(0x2014) + "order"])
         text = bibcheck.to_bibtex("X2000", rec)

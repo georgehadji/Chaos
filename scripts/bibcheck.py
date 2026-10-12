@@ -110,6 +110,26 @@ def fetch_crossref(doi):
     return json.loads(http_get("https://api.crossref.org/works/" + doi))["message"]
 
 
+def datacite_to_record(a):
+    """A DataCite `attributes` object in the Crossref record shape used here (title, author, year, venue, DOI)."""
+    return {"title": [a["titles"][0]["title"]],
+            "author": [{"family": c.get("familyName") or c.get("name", ""), "given": c.get("givenName", "")}
+                       for c in a.get("creators", [])],
+            "issued": {"date-parts": [[a.get("publicationYear")]]},
+            "container-title": [(a.get("container") or {}).get("title", "")],
+            "DOI": a.get("doi", "")}
+
+
+def fetch_doi(doi):
+    """Crossref first; DataCite for DOIs Crossref does not hold (e.g. JACoW proceedings)."""
+    try:
+        return fetch_crossref(doi)
+    except urllib.error.HTTPError as ex:
+        if ex.code != 404:
+            raise
+        return datacite_to_record(json.loads(http_get("https://api.datacite.org/dois/" + doi))["data"]["attributes"])
+
+
 def fetch_arxiv(aid):
     entry = ET.fromstring(http_get("https://export.arxiv.org/api/query?id_list=" + aid)).find(ATOM + "entry")
     names = [a.findtext(ATOM + "name", "") for a in entry.findall(ATOM + "author")]
@@ -152,7 +172,7 @@ def check_bib(path):
     entries = [e for e in parse_bib(open(path, encoding="utf-8").read()) if e.get("doi")]
     bad = 0
     with cf.ThreadPoolExecutor(3) as ex:
-        for e, rec in zip(entries, ex.map(lambda e: _safe(fetch_crossref, e["doi"]), entries)):
+        for e, rec in zip(entries, ex.map(lambda e: _safe(fetch_doi, e["doi"]), entries)):
             issues = [f"fetch failed: {rec}"] if isinstance(rec, str) else compare(e, rec)
             if issues:
                 bad += 1
@@ -167,7 +187,7 @@ def fetch_candidates(path, out):
     ids += [("arxiv", a) for a in dict.fromkeys(ARXIV_RE.findall(text))]
     recs, titles, failed = [], {}, 0
     for kind, ident in ids:
-        rec = _safe(fetch_crossref if kind == "doi" else fetch_arxiv, ident)
+        rec = _safe(fetch_doi if kind == "doi" else fetch_arxiv, ident)
         if isinstance(rec, str):
             failed += 1
             print(f"{kind}:{ident}: fetch failed: {rec}")

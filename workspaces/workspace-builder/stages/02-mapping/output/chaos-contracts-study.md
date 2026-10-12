@@ -56,7 +56,7 @@ DRAFT (Stage 02). One run per study. `[study]` is a slug such as `p1-le-benchmar
 
 1. Run `julia --project bin/chaoslab.jl panel` with the preregistration (no AI): picks initial conditions per class, writes the panel file and phase portraits.
 2. **[Checkpoint]** Present the portraits.
-3. If a class is wrong, log an amendment in 01 and rerun.
+3. If a class is wrong, the human amends `[study]-preregistration.md` in 01's output (logged amendment, allowed only before 03-run), then this stage reruns.
 
 ### Checkpoints
 
@@ -84,7 +84,7 @@ DRAFT (Stage 02). One run per study. `[study]` is a slug such as `p1-le-benchmar
 
 ### Process
 
-1. Run `julia --project bin/chaoslab.jl run` (no AI): chunked, resumable, health checks on every chunk. N-body studies first run the Python adapters in `/python/nbody/`, which write HDF5 per the schema.
+1. Record the preregistration SHA-256 in the manifest, then run `julia --project bin/chaoslab.jl run` (no AI): chunked, resumable, health checks on every chunk. N-body studies first run the Python adapters in `/python/nbody/`, which write HDF5 per the schema.
 2. Rerun failed chunks once; log any that fail again.
 3. **[Checkpoint]** Present the health summary.
 
@@ -99,7 +99,7 @@ DRAFT (Stage 02). One run per study. `[study]` is a slug such as `p1-le-benchmar
 | Check | Pass Condition |
 |-------|---------------|
 | Complete | Every chunk is done or logged as failed with a reason |
-| Provenance | Manifest git SHA matches a commit with a clean tree; preregistration SHA-256 unchanged |
+| Provenance | Manifest git SHA matches a commit with a clean tree; the preregistration SHA-256 recorded at run start still matches at run end |
 
 ### Outputs
 

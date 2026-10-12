@@ -59,7 +59,7 @@ DRAFT (Stage 02). One run per library module. `[module]` is a slug from `/_confi
 
 1. Write test files in `/test/<module>/` (Sonnet subagent): invariants at seeded random points, order or convergence slopes, oracle comparisons, regression values from the bibliography benchmark section only.
 2. Write the test plan: a table mapping each acceptance criterion to its tests.
-3. Run the suite (`julia --project -e "using Pkg; Pkg.test()"`); the new tests must fail for missing functionality, not for syntax errors (RED).
+3. Run the suite (`julia --project -e "using Pkg; Pkg.test()"`); the new tests must fail or error because the module does not exist yet, never because of a broken test (RED).
 4. **[Checkpoint]** Present the plan and the RED run.
 5. Run the audit, write the outputs.
 
@@ -74,7 +74,7 @@ DRAFT (Stage 02). One run per library module. `[module]` is a slug from `/_confi
 | Check | Pass Condition |
 |-------|---------------|
 | Coverage of spec | Every acceptance criterion maps to at least one test |
-| RED | Every new test fails, none errors on load |
+| RED | Every new test reports Fail or Error caused by missing module functionality (e.g. `UndefVarError`, `MethodError`); no parse errors, no errors inside test helpers |
 | Reproducible | Every random draw uses a recorded StableRNGs seed |
 | No memory values | Every regression value cites a bibliography benchmark row |
 

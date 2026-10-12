@@ -1,6 +1,6 @@
 # Contracts: literature-review workspace
 
-DRAFT (Stage 02). One run per topic. `[topic]` is a lowercase-hyphen slug (e.g. `lyapunov-algorithms`). Paths starting with `/` are from the repo root. Full texts of papers live in `data/literature/[topic]/` (git-ignored, never committed).
+DRAFT (Stage 02). One run per topic. `[topic]` is a lowercase-hyphen slug (e.g. `lyapunov-algorithms`). Paths starting with `/` are from the repo root. Full texts of papers live in `data/literature/[topic]/` (git-ignored, never committed): 04-synthesize step 1 fetches open-access versions (arXiv, publisher OA); the human adds paywalled PDFs.
 
 ## 01-scope
 
@@ -123,6 +123,7 @@ DRAFT (Stage 02). One run per topic. `[topic]` is a lowercase-hyphen slug (e.g. 
 
 | Source | File/Location | Section/Scope | Why |
 |--------|--------------|---------------|-----|
+| Stage 01 | `../01-scope/output/[topic]-search-plan.md` | sub-questions, catalog rows named | what to extract |
 | Previous stage | `../03-verify/output/[topic]-verified.bib` | Full file | which papers to read |
 | Sources | `data/literature/[topic]/` | one paper per subagent | full texts |
 | Config | `/_config/research-question.md` | "Three claims to test" | what to extract |
@@ -130,7 +131,7 @@ DRAFT (Stage 02). One run per topic. `[topic]` is a lowercase-hyphen slug (e.g. 
 
 ### Process
 
-1. Read each paper (one Sonnet subagent per paper): claims, method, benchmark values with page, equation or table number, relevance to catalog rows.
+1. Fetch open-access full texts into `data/literature/[topic]/`; list paywalled papers for the human to add. Then read each paper (one Sonnet subagent per paper): claims, method, benchmark values with page, equation or table number, relevance to catalog rows.
 2. Merge into one notes file; list open questions and conflicts between papers.
 3. **[Checkpoint]** Present the notes.
 4. Run the audit, write the output.

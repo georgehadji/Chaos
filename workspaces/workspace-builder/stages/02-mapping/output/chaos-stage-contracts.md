@@ -1,6 +1,6 @@
 # Chaos: Stage Contracts (ICM Stage 02 Mapping)
 
-Output of `workspace-builder/stages/02-mapping`; input to Stage 03 (scaffolding). Status: DRAFT, waiting at the Stage 02 checkpoint. Paths starting with `/` are from the repo root.
+Output of `workspace-builder/stages/02-mapping`; input to Stage 03 (scaffolding). Name mapping for builder Stage 03: its `stage-contracts.md` is this file plus the four contract files; its `workflow-map.md` is `../../01-discovery/output/chaos-workflow-map.md`; its "Selected Skills" section is that file's Section 9. Status: DRAFT, waiting at the Stage 02 checkpoint. Paths starting with `/` are from the repo root.
 
 ## Files
 
@@ -14,7 +14,7 @@ Output of `workspace-builder/stages/02-mapping`; input to Stage 03 (scaffolding)
 
 ## 1. Dependency graph
 
-Arrows point from reader to what it reads (one-way). `==>` marks a gated promotion write: the final stage of a run writes into `/_config/` only after the human approves the diff.
+Legend: inside a pipeline, `->` is flow from producer to consumer (01 -> 02 means 02 reads 01's output). `^ reads` and `v` mark reads from or writes to shared folders. `==>` is a gated promotion write: the final stage of a run writes into `/_config/` only after the human approves the diff. No arrow ever points from `/_config/` to a workspace.
 
 ```
                  +-----------------------------------------------+
@@ -88,7 +88,9 @@ The ICM default (non-empty `output/` = COMPLETE) breaks after the first run. Eac
 
 - `status`: list every slug found in that workspace's `output/` file names; for each slug, a stage is COMPLETE when its output artifact for that slug exists.
 - `status <slug>`: the pipeline diagram for one slug.
-- Root `status`: one line per workspace with slug counts, plus catalog `Status` counts (planned, spec, tests, verified).
+- Root `status`: one line per workspace with slug counts, plus catalog `Status` counts.
+
+Catalog `Status` is binary: `planned` or `verified`. Only module-build/05 writes it (gated). Progress inside a module run comes from `status <slug>`, not from the catalog.
 
 ## 5. Agent model per step
 
@@ -108,6 +110,6 @@ To do at Stage 03 (scaffolding), not now: split the bibliography into section fi
 | Check | Result |
 |-------|--------|
 | No circular references | PASS. Reads flow from workspaces to `/_config/`, `/src/`, `/schema/` and upstream study outputs only; `/_config/` references nothing. The two write-backs into `/_config/` are declared, gated promotions, not references. |
-| Output consumption | PASS. Every output names a reader. Human-gate artifacts: `[topic]-verify-report.md` (also read by lit-review/05), `[study]-portraits.png`, `[paper]-review-response.md`. Final deliverables: promoted bibliography, catalog status flips, `[study]-results.md`, `[paper]/` manuscript. Logs (`[topic]-promote-log.md`, `[module]-integration-log.md`) are read by `status`. |
+| Output consumption | PASS. Every output names a reader. Human-gate artifacts: `[topic]-verify-report.md` (also read by lit-review/05), `[module]-*.png` (module-build/04), `[study]-portraits.png`, `[paper]-review-response.md`. Final deliverables: promoted bibliography, catalog status flips, `[study]-results.md`, `[paper]/` manuscript. Logs (`[topic]-promote-log.md`, `[module]-integration-log.md`) are read by `status`. |
 | Contract completeness | PASS. All 19 stages have non-empty Inputs, Process, Outputs. |
 | Canonical sources | PASS after reconciliations 1-4. |

@@ -12,7 +12,7 @@ Stage 03, 2026-10-12. Input: included rows of `../02-search/output/standard-map-
 ## Fixes and notes
 
 - HomanMeiss2026: published title differs from the arXiv title in the candidate row ('Recurrence and Stickiness in the Noisy Harper Map'); the entry uses the record fetched by DOI.
-- EfthymioulosContopoulosVoglis1999: the Crossref record spells the first author 'Efthymioulos'; the same author's 1997 record in this list (Efthymiopoulos1997) spells 'Efthymiopoulos'. Kept as the record gives it; fix by hand at the checkpoint if you agree it is a record typo.
+- EfthymiopoulosContopoulosVoglis1999: the Crossref record (doi:10.1017/s0252921100072572) spells the first author 'Efthymioulos'; the same author's 1997 record (Efthymiopoulos1997) spells 'Efthymiopoulos'. Corrected to Efthymiopoulos at the owner's checkpoint decision, 2026-10-12; goes into `corrections.md` at stage 05.
 
 ## Dropped at verification
 

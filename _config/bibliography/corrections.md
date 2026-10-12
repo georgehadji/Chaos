@@ -14,3 +14,4 @@ Layer 3, canonical. Annotated entries; records in `references.bib`.
 - Batygin & Laughlin 2008 abstract has no '~1%' figure (that figure is Laskar & Gastineau 2009, quoted by Zeebe 2015).
 - Greene & Kim 1989 (Physica D 36, 83) is a metric-tensor paper, not obviously SVD.
 - Kovacs arXiv:2607.13629 = Universe 12(7), 203; Hernandez arXiv:2603.24456 = ApJ 1005, 25; Bazzani et al. arXiv:2304.08340 = PRE 107, 064209.
+- Crossref record doi:10.1017/s0252921100072572 spells the first author 'Efthymioulos'; corrected to Efthymiopoulos (EfthymiopoulosContopoulosVoglis1999), matching the same author's 1997 record (literature-review run standard-map-stickiness, 2026-10-12).

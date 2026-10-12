@@ -22,6 +22,6 @@ Every milestone exit: review `risks.md`; record structural decisions in `decisio
 
 - Version tags `vMAJOR.MINOR.PATCH` (Semantic Versioning) on the Julia package `Chaoslab`; `0.x` until the P1-P3 API settles.
 - First tag `v0.1.0` at M3 exit (P1 modules verified, P1 study accepted); a minor version per later milestone.
-- GitHub-Zenodo integration (set up in M0) gives every tag a citable DOI; each paper cites the tag and the study manifests it used.
+- GitHub-Zenodo integration (the owner enables it on zenodo.org before the first tag, M3) gives every tag a citable DOI; each paper cites the tag and the study manifests it used.
 - User documentation with Documenter.jl from M2; a JOSS paper on the library after M5.
 - Each release: tests and CI green, `CHANGELOG.md` entry, catalog `Status` matches the code.

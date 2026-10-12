@@ -16,7 +16,7 @@ Fallback if the human overrides to Python: P1/P2 survive (float64 + mpmath oracl
 
 | Module | Lang | Pattern | Notes |
 |--------|------|---------|-------|
-| `Core` | Julia | value objects (immutable structs), type parameter `T<:Real` for precision | `State{T}`, errors, provenance |
+| `Foundation` | Julia | value objects (immutable structs), type parameter `T<:Real` for precision | `State{T}`, errors, provenance |
 | `Systems` | Julia | multiple dispatch on `AbstractMap`, `AbstractFlow`, `AbstractSeparableFlow`; StaticArrays for dim <= 8 | each system: `step`, `tangent` (analytic Jacobian), `invariants`; maps keep lifted coordinates, wrap only for output |
 | `Integrators` | Julia | table-driven strategy: coefficients as data + ONE generic `splitstep`; composition builder (triple jump, Suzuki) | coefficients copied from the cited paper, cross-checked against OrdinaryDiffEqSymplecticRK where it ships the method; hand-rolled: Forest-Ruth, PEFRL, Blanes-Moan, SABA/SBAB, ABA864, Tao, Gauss-Legendre |
 | `Tangent` | Julia | pipe-and-filter: `propagate` is the single hot loop, emits snapshots to reducers | carries deviation vectors through the SAME splitting (needed anyway: ChaosTools tangent systems cannot use partitioned symplectic solvers) |
@@ -33,7 +33,7 @@ Fallback if the human overrides to Python: P1/P2 survive (float64 + mpmath oracl
 
 ## Layering
 
-`Core <- Systems <- Integrators <- Tangent <- {Lyapunov, Indicators, Diagnostics} <- {Shadow, TimeSeries} <- Experiments <- Figures`. A test parses each file's `using`/`import` lines and fails on an upward edge. Python never imports Julia and vice versa.
+`Foundation <- Systems <- Integrators <- Tangent <- {Lyapunov, Indicators, Diagnostics} <- {Shadow, TimeSeries} <- Experiments <- Figures`. A test parses each file's `using`/`import` lines and fails on an upward edge. Python never imports Julia and vice versa.
 
 ## Repo shape
 

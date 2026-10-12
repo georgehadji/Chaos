@@ -10,6 +10,8 @@ No `@fastmath`. Accumulated logarithms use compensated (Kahan) summation. Precis
 
 ## Tests
 
+- Registration: a module's suite is `test/<module>/runtests.jl`; `test/runtests.jl` runs every such file automatically, after the quality (Aqua, JET) and layering checks.
+
 - Invariant tests at random seeded points: det DT = 1, J^T Omega J = Omega for maps and one-step integrator maps; Jacobian vs complex-step / ForwardDiff.
 - Integrator order from log-log slope; time reversibility; bounded energy error; modified energy conserved to higher order.
 - Asymptotic-equivalence test (claim C1 as a test): all QR variants agree on lambda_1 for strongly chaotic orbits.

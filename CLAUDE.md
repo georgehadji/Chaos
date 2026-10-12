@@ -28,7 +28,7 @@ Chaos/
 - Subagents run on Sonnet; mechanical subagent tasks (listing, formatting, status) on Haiku. Never Opus for subagents.
 - Never cite from memory. Only keys in `_config/bibliography/references.bib`; never anything in `unverified.md`.
 - Commits are fine at the stage that says so; every push, PR or submission needs explicit human approval.
-- No em dashes. File and folder names lowercase-with-hyphens (Julia module folders in `src/` excepted).
+- No em dashes. Names in `workspaces/`, `_config/`, `setup/`, `schema/` are lowercase-with-hyphens; code and tooling files follow their ecosystem (`Project.toml`, `src/Chaoslab.jl`, `scripts/icm_validate.py`).
 - Each fact has one home (see `_config/CONTEXT.md`). Point to it; do not copy it.
 - Structural decisions go into `_config/decision-log.md`; review `_config/risks.md` at every milestone exit.
 

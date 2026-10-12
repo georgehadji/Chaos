@@ -6,3 +6,5 @@ __pycache__/
 *.jl.*.cov
 *.jl.mem
 .ruff_cache/
+# Manifests are committed from M2 on, one per Julia version (decision D13)
+Manifest*.toml

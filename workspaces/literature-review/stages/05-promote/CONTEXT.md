@@ -12,9 +12,9 @@ Merge the verified results into the shared bibliography after human approval.
 
 ## Process
 
-1. Run `python scripts/promote.py [topic]` (no AI): it proposes appends to `references.bib`, the section files, the benchmark file and the UNVERIFIED file, plus catalog `?` keys that now resolve.
+1. Run `python scripts/promote.py [topic]` (no AI): it proposes appends to `references.bib`, `benchmarks.md` and `unverified.md`, plus catalog `?` keys that now resolve, and blocks on duplicate keys or DOIs. Draft the matching annotation additions to the bibliography section files from the notes (Sonnet subagent).
 2. **[Checkpoint]** Present the diff.
-3. Apply the approved diff (promotion write into `/_config/`), run the audit, commit. Push only with explicit approval.
+3. Apply the approved diff (`promote.py [topic] --apply` plus the approved annotations; a promotion write into `/_config/`), run the audit, commit. Push only with explicit approval.
 
 ## Checkpoints
 

@@ -142,7 +142,8 @@ def to_bibtex(key, rec):
               "journal": (rec.get("container-title") or [""])[0], "volume": rec.get("volume", ""),
               "number": rec.get("issue", ""), "pages": (rec.get("page") or "").replace("–", "--"),
               "doi": rec.get("DOI", ""), "eprint": rec.get("eprint", "")}
-    body = ",\n".join(f"  {k} = {{{v}}}" for k, v in fields.items() if v)
+    em = chr(0x2014)  # repo rule: no em dash characters; BibTeX writes it as ---
+    body = ",\n".join(f"  {k} = {{{str(v).replace(em, '---')}}}" for k, v in fields.items() if v)
     kind = "article" if fields["journal"] else "misc"
     return f"@{kind}{{{key},\n{body}\n}}\n"
 

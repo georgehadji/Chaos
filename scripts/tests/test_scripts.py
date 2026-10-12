@@ -50,6 +50,12 @@ class BibcheckTests(unittest.TestCase):
         self.assertEqual(entry["key"], "Chirikov1979")
         self.assertEqual(bibcheck.compare(entry, RECORD), [])
 
+    def test_em_dash_written_as_bibtex_markup(self):
+        rec = dict(RECORD, title=["Chaos" + chr(0x2014) + "order"])
+        text = bibcheck.to_bibtex("X2000", rec)
+        self.assertNotIn(chr(0x2014), text)
+        self.assertIn("Chaos---order", text)
+
 
 class StatusTests(unittest.TestCase):
     def test_slug_detection_handles_hyphenated_slugs(self):

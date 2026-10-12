@@ -10,7 +10,9 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import bibcheck  # noqa: E402
 import icm_status  # noqa: E402
 import icm_validate  # noqa: E402
+import litmerge  # noqa: E402
 import promote  # noqa: E402
+import verify_report  # noqa: E402
 
 RECORD = {"title": ["A universal instability of many-dimensional oscillator systems"],
           "author": [{"family": "Chirikov", "given": "B. V."}, {"name": "Some Institute"}],
@@ -109,6 +111,34 @@ class PromoteTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p = promote.plan(self.make_repo(d, "Old2000"), "t")
             self.assertIn("duplicate key Old2000", p["problems"])
+
+
+class LitMergeTests(unittest.TestCase):
+    def test_sources_merge_by_identifier_and_known_papers_drop(self):
+        head = "| identifier | a | y | t | SQ | include/exclude | reason |\n|---|---|---|---|---|---|---|\n"
+        crossref = head + "| doi:10.1/a | A | 2000 | Paper A | S1 | exclude | weak |\n| doi:10.1/old | O | 1990 | Old | S1 | include | r |\n"
+        openalex = head + "| doi:10.1/A / doi:10.48550/arxiv.2001.00001 | A | 2000 | Paper A | S1 | include | r |\n"
+        rows, known = litmerge.merge({"crossref": crossref, "openalex": openalex}, "doi = {10.1/old}")
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["cells"][5], "include")
+        self.assertEqual(rows[0]["arxiv"], {"2001.00001"})
+        self.assertEqual(rows[0]["sources"], {"crossref", "openalex"})
+        self.assertEqual(len(known), 1)
+
+
+class VerifyReportTests(unittest.TestCase):
+    def test_drop_rules(self):
+        refs = bibcheck.parse_bib("@book{Book2004,\n  title = {A Book},\n  doi = {10.1/book}\n}\n"
+                                  "@article{Old2000,\n  title = {Same Paper},\n  doi = {10.1/old}\n}\n")
+        entry = lambda k, t, d: f"@article{{{k},\n  title = {{{t}}},\n  doi = {{{d}}}\n}}"
+        chunks = [entry("Ch2005", "A chapter", "10.1/book.006"), entry("New2001", "Same paper.", "10.1/x"),
+                  entry("Pre2002", "Seen before", "10.1/y"), entry("Rs2026", "Preprint", "10.2/rs"),
+                  entry("Keep2003", "Fresh", "10.1/z")]
+        keep, dropped = verify_report.classify(chunks, refs, {"drop_doi": {"10.2/RS": "not peer-reviewed"}},
+                                               {bibcheck.norm("Seen before"): "other-topic"})
+        self.assertEqual([bibcheck.parse_bib(c + "\n")[0]["key"] for c in keep], ["Keep2003"])
+        self.assertEqual(len(dropped), 4)
+        self.assertTrue(any("chapter of Book2004" in d for d in dropped))
 
 
 class ValidateTests(unittest.TestCase):

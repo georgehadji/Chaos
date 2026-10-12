@@ -49,11 +49,12 @@ DRAFT (Stage 02). One run per topic. `[topic]` is a lowercase-hyphen slug (e.g. 
 |--------|--------------|---------------|-----|
 | Previous stage | `../01-scope/output/[topic]-search-plan.md` | Full file | what to search |
 | Config | `/_config/bibliography/references.bib` | citation keys and DOIs only | de-duplication |
+| Tool | `/scripts/litmerge.py` | run, do not read | merges the per-source tables, drops papers already in the bibliography |
 
 ### Process
 
 1. Run each query (Sonnet subagents, one per source, in parallel). Every candidate must carry a DOI, arXiv ID or ADS bibcode found in this run. Nothing from memory.
-2. De-duplicate against existing keys and DOIs.
+2. De-duplicate across sources and against existing keys and DOIs: `python scripts/litmerge.py [topic]` (no AI).
 3. Screen titles and abstracts with the inclusion rules; record the reason for each exclusion.
 4. **[Checkpoint]** Present the screened list.
 5. Run the audit, write the output.
@@ -86,13 +87,14 @@ DRAFT (Stage 02). One run per topic. `[topic]` is a lowercase-hyphen slug (e.g. 
 |--------|--------------|---------------|-----|
 | Previous stage | `../02-search/output/[topic]-candidates.md` | included rows only | what to verify |
 | Config | `/_config/bibliography/conventions.md` | Full file | key format, verification classes |
-| Tool | `/scripts/bibcheck.py` | run, do not read | resolves identifiers on Crossref and arXiv |
+| Tool | `/scripts/bibcheck.py` | run, do not read | resolves identifiers on Crossref, DataCite and arXiv |
+| Tool | `/scripts/litmerge.py`, `/scripts/verify_report.py` | run, do not read | identifier list in; verified .bib and report out |
 
 ### Process
 
-1. Run `python scripts/bibcheck.py` on the candidate list (no AI). It fetches each record and reports mismatches in title, authors, venue, volume, pages.
+1. Run `python scripts/litmerge.py [topic] --to-verify`, then `python scripts/bibcheck.py` on that list with `--out` a draft .bib (no AI). It fetches each record and reports failures and duplicate records.
 2. Fix mismatches against the fetched record only (Sonnet subagent).
-3. Classify each entry: verified, verified-secondary, or UNVERIFIED (per `conventions.md`).
+3. Classify each entry: verified, verified-secondary, or UNVERIFIED (per `conventions.md`); `python scripts/verify_report.py [topic]` writes the outputs and drops known duplicates (checkpoint decisions go in `verify-overrides.json` beside the draft).
 4. **[Checkpoint]** Present failures and UNVERIFIED items.
 5. Run the audit, write the outputs.
 

@@ -17,6 +17,7 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 - Four literature runs (lyapunov-algorithms, standard-map-stickiness, chaos-indicators, symplectic-integrators): bibliography 180 to 353 verified entries, 40 located benchmark values, sticky-orbit candidates for the P1 panel (decision D19).
 - `bibcheck.py`: DataCite fallback, old-style arXiv IDs, duplicate records under a second DOI form, key suffixes per `conventions.md`, proceedings years, em dashes as `---`. `promote.py`: blocks duplicate titles; flips only keys the topic adds.
+- `litmerge.py` (merge per-source search tables, identifier list) and `verify_report.py` (stage 03 outputs, duplicate and chapter drops, checkpoint overrides), named in the literature-review stage 02 and 03 contracts, with tests.
 
 ### Deferred, with reason
 

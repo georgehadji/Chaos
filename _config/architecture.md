@@ -41,7 +41,7 @@ GPU first, CPU fallback (decision D17). Each run resolves `backend` from `numeri
 
 - One kernel, two backends: hot loops are KernelAbstractions kernels over isbits element types; the CPU backend runs the same kernel with `Threads.nthreads()` workers. The CPU run is the verified reference; a module ships GPU as default only after its cross-backend test passes.
 - What runs where: ensembles of independent orbits in Float32 or Float64 (grids, indicator maps, sweeps) are GPU candidates; BigFloat, single long orbits and LAPACK-heavy spectra run on CPU threads unless the module spec measures a GPU win.
-- Fallback to CPU, recorded in provenance with the reason: CUDA.jl not loadable, no functional device, kernel does not compile for the element type, device out of memory, or a `NumericalHealthError` raised only on the GPU.
+- Fallback to CPU, recorded in provenance with the reason: CUDA.jl not loadable, no functional device, kernel does not compile for the element type, device out of memory, a `NumericalHealthError` raised only on the GPU, a reducer in the chain that is CPU-only (e.g. a LAPACK factorization), or GPU not faster for the element type (`auto` picks the GPU for an element type only after the tangent-core benchmark shows a GPU win on this machine, risk K15; decision D25).
 - CUDA.jl is a weak dependency (package extension) loaded by `bin/chaoslab.jl`; the library never requires a GPU and CI has none.
 - Memory: chunk size derives from free device or host memory at run start, never a fixed number; ensembles are structure-of-arrays; workspaces are preallocated per chunk; the hot loop allocates nothing.
 - CPU: threads over orbits with dynamic scheduling; BLAS threads set to 1 when Julia threads > 1, so the two pools do not oversubscribe cores.

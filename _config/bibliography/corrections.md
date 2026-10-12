@@ -15,3 +15,5 @@ Layer 3, canonical. Annotated entries; records in `references.bib`.
 - Greene & Kim 1989 (Physica D 36, 83) is a metric-tensor paper, not obviously SVD.
 - Kovacs arXiv:2607.13629 = Universe 12(7), 203; Hernandez arXiv:2603.24456 = ApJ 1005, 25; Bazzani et al. arXiv:2304.08340 = PRE 107, 064209.
 - Crossref record doi:10.1017/s0252921100072572 spells the first author 'Efthymioulos'; corrected to Efthymiopoulos (EfthymiopoulosContopoulosVoglis1999), matching the same author's 1997 record (literature-review run standard-map-stickiness, 2026-10-12).
+- DatserisDiakonosSchmelcher2015 Eqs. (7), (8) p.15: the printed eigenvector components of the fixed point (0, 0) are in (p, theta) order, not (theta, p); the printed stable formula agrees with the derived one only at k = 1. Benchmarks row "Eigenvectors of the fixed point (0,0)" corrected (module-build standard-map spec, 2026-10-13).
+- ContopoulosHarsoula2008 pp.4-5: island centre O1 at K = 5 is a period-2 point and the 4/9 orbit point P1 has period 18; benchmarks row "Island centre and unstable 4/9 orbit point" now says so (checked numerically, standard-map spec, 2026-10-13).

@@ -12,6 +12,8 @@ Companion artifacts in this folder:
 | `chaos-catalog-indicators.md` | Every chaos indicator, status and phase | `_config/catalogs/indicators.md` |
 | `chaos-catalog-integrators.md` | Every symplectic / reference integrator | `_config/catalogs/integrators.md` |
 | `chaos-catalog-systems.md` | Maps, flows, N-body systems | `_config/catalogs/systems.md` |
+| `chaos-research-ideas.md` | Ranked idea backlog, prior art to check | `_config/research-ideas.md` |
+| `chaos-workflow-map.md` Section 11 | Build order (milestones M0-M8) | `_config/build-order.md` |
 | `chaos-bibliography.md`, `references.bib` | Verified references and benchmark values | `_config/bibliography/` (the .md, 255 lines, is split by its five sections at stage 03; the .bib is a data file, exempt from the 200-line rule) |
 
 ## 1. End to end
@@ -20,7 +22,7 @@ Start: a research question (in `chaos-research-question.md`). End: reproducible 
 
 ## 2. Why ICM fits, and where it does not
 
-The work is sequential and review-heavy: the math of every method must be checked by a human before code exists, and every study must be pre-registered before data exists. That is ICM's home ground. What ICM does not do (Section 5.2 of the paper) is handled by code, not by agents: parallel sweeps over 10^6 orbits, chunked storage and resumable runs live in `chaoslab.experiments` and in `scripts/`, which stages call.
+The work is sequential and review-heavy: the math of every method must be checked by a human before code exists, and every study must be pre-registered before data exists. That is ICM's home ground. What ICM does not do (Section 5.2 of the paper) is handled by code, not by agents: parallel sweeps over 10^6 orbits, chunked storage and resumable runs live in the Julia `Experiments` module, run through the single entry point `bin/chaoslab.jl`, which stages call.
 
 ## 3. Repo shape (one repo, four workspaces, one library)
 
@@ -39,7 +41,8 @@ Chaos/
   Project.toml, src/             Julia package Chaoslab (canonical code home)
   test/, bench/                  Test.jl suites, BenchmarkTools budgets
   python/nbody/                  optional N-body adapters (REBOUND ecosystem)
-  scripts/                       mechanical work, no AI (Python stdlib)
+  bin/chaoslab.jl                Julia entry point: panel, run, analyze, figures
+  scripts/                       ICM mechanics, no AI (Python stdlib)
   schema/                        HDF5 run-store layout shared by Julia and Python
   data/                          run outputs (git-ignored), manifests tracked
 ```
@@ -73,9 +76,9 @@ Workspaces are not numbered: they are independent pipelines. Dependency is one-w
 | Stage | In | Out | Human gate |
 |-------|----|-----|-----------|
 | 01-design | research question, catalogs | `[study]-preregistration.md`: hypotheses, panel, metrics, thresholds, budgets, analysis plan, frozen before data | approve and freeze |
-| 02-panel | preregistration | `[study]-panel.toml` + phase portraits (`scripts/build_panel.py`) | inspect orbits |
-| 03-run | panel, run config | `data/[study]/` (chunked store) + `[study]-manifest.json` (`scripts/run_study.py`, no AI); health checks | rerun failures |
-| 04-analyze | manifest, data | figures, tables (`scripts/analyze.py`), `[study]-findings.md` | interpret |
+| 02-panel | preregistration | `[study]-panel.toml` + phase portraits (`julia --project bin/chaoslab.jl panel`) | inspect orbits |
+| 03-run | panel, run config | `data/[study]/` (chunked store) + `[study]-manifest.json` (`bin/chaoslab.jl run`, no AI); health checks | rerun failures |
+| 04-analyze | manifest, data | figures, tables (`bin/chaoslab.jl analyze`), `[study]-findings.md` | interpret |
 | 05-report | findings, bibliography | `[study]-results.md`: every number traced to a manifest, every claim cited | accept |
 
 ### 4.4 paper (per paper)

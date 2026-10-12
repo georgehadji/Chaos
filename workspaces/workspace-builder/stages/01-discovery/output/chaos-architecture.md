@@ -44,6 +44,7 @@ src/Chaoslab.jl + src/<module>/  library
 test/                            Test.jl suites mirroring src/
 bench/                           BenchmarkTools suites (perf budgets)
 python/nbody/                    optional N-body adapters (own pyproject, GPL deps)
+bin/chaoslab.jl                  Julia entry point (panel, run, analyze, figures) into Experiments/Figures
 scripts/                         ICM mechanical scripts (Python stdlib)
 schema/run-store.md              HDF5 layout shared by Julia and Python
 ```
@@ -71,6 +72,8 @@ schema/run-store.md              HDF5 layout shared by Julia and Python
 - Quality gates: Aqua.jl, JET.jl, coverage >= 80%, CI on Windows + Ubuntu (Julia LTS + current). Property tests use plain Test.jl loops over seeded random points (Supposition.jl not adopted: last release 2025-11).
 
 ## 7. Numerics policy (canonical home for these rules)
+
+Rules only. Default values (tau, tolerances, health-check thresholds, seed policy) live in `_config/numerics-defaults.toml`, which `Experiments` reads at run time; this section never restates a number.
 
 Lifted coordinates internally, wrapping only for display and FMA windows; renormalization interval `tau` is a recorded run parameter; deviation-vector initialization random-orthonormal with recorded seed; thresholds pre-registered per study, never hard-coded; precision recorded per run; two-trajectory perturbation size swept, not fixed.
 

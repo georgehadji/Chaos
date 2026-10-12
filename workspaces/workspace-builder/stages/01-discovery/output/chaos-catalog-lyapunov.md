@@ -1,6 +1,6 @@
 # Catalog: Lyapunov-Exponent Algorithms
 
-Layer 3 draft. One row per algorithm. `Phase` = milestone that builds it (see workflow map Section 11). `Source` keys resolve in `references.bib`; a key marked `?` is pending verification and must not be cited until verified.
+Layer 3 draft. One row per algorithm. `Phase` = milestone that builds it (see `_config/build-order.md`). `Source` keys resolve in `references.bib`; a key marked `?` is pending verification and must not be cited until verified.
 
 Every variational method below consumes the same tangent stream from `chaoslab.tangent.propagate` (analytic tangent map for maps, variational equations integrated with the same symplectic scheme for flows). Methods differ only in how they turn that stream into exponents.
 

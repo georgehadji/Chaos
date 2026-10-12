@@ -1,0 +1,267 @@
+Native Windows (MSVC) build of REBOUNDx 5.1.0 against the REBOUND PyPI wheel.
+The C fixes (VLAs, rand_r) are the same fix as the unmerged upstream PR
+https://github.com/dtamayo/reboundx/pull/170 (consulted as a reference). The setup.py mechanism differs:
+pure-Python PE/COFF parsing instead of dumpbin, get_export_symbols override instead of a PyInit stub.
+The src/steppers.c shim is new; PR 170 does not touch that file.
+Changes: setup.py (import library for librebound generated from its export table, .def export
+file generated from the compiled objects, no rpath on Windows, no PyInit export),
+reboundx/__init__.py (import rebound before loading libreboundx), src/gr_full.c and
+src/interpolation.c (C99 VLAs -> malloc/free), src/stochastic_forces.c (rand_r shim),
+src/steppers.c (reb_integrator_ias15/whfast are not exported from REBOUND's Windows DLL).
+
+diff --git a/reboundx/__init__.py b/reboundx/__init__.py
+index ba572f3..1721ae0 100644
+--- a/reboundx/__init__.py
++++ b/reboundx/__init__.py
+@@ -13,6 +13,7 @@ pymodulespath = os.path.dirname(os.path.abspath(__file__))
+ pymodulespath = os.path.abspath(os.path.join(pymodulespath, os.pardir))
+ __libpath__ = os.path.join(pymodulespath, "libreboundx"+suffix)
+ from ctypes import *
++import rebound # on Windows libreboundx imports librebound by name, so librebound must already be loaded
+ clibreboundx = cdll.LoadLibrary(__libpath__)
+ 
+ # Version
+diff --git a/setup.py b/setup.py
+index cd4694c..ec0e737 100644
+--- a/setup.py
++++ b/setup.py
+@@ -32,6 +32,56 @@ suffix = sysconfig.get_config_var('EXT_SUFFIX')
+ if suffix is None:
+     suffix = ".so"
+ 
++# ---- Windows (MSVC) support -------------------------------------------------------------------
++# REBOUND's Windows wheel ships librebound<suffix> (a DLL with a .pyd extension) but no import
++# library, and MSVC does not export symbols from a DLL unless told to. libreboundx is loaded
++# through ctypes (not imported as a Python module), so we (1) generate an import library for
++# librebound from its export table and (2) export every external symbol defined in our own
++# object files through a generated .def file. Both are done in pure Python (no dumpbin needed).
++import struct, subprocess
++
++def _pe_export_names(path):
++    """Names in the export table of a PE file."""
++    d = open(path, 'rb').read()
++    pe = struct.unpack_from('<I', d, 0x3c)[0]
++    nsec, opt = struct.unpack_from('<H', d, pe + 6)[0], struct.unpack_from('<H', d, pe + 20)[0]
++    opt_off = pe + 24
++    magic = struct.unpack_from('<H', d, opt_off)[0]
++    dd_off = opt_off + (112 if magic == 0x20b else 96)  # data directories (PE32+ / PE32)
++    exp_rva = struct.unpack_from('<I', d, dd_off)[0]
++    secs = [struct.unpack_from('<8sIIII', d, opt_off + opt + 40 * i)[1:] for i in range(nsec)]
++    def off(rva):
++        for vsize, va, rsize, rptr in secs:
++            if va <= rva < va + max(vsize, rsize):
++                return rva - va + rptr
++        raise ValueError("bad RVA")
++    e = off(exp_rva)
++    nnames, names_rva = struct.unpack_from('<I', d, e + 24)[0], struct.unpack_from('<I', d, e + 32)[0]
++    out = []
++    for i in range(nnames):
++        s = off(struct.unpack_from('<I', d, off(names_rva) + 4 * i)[0])
++        out.append(d[s:d.index(b'\0', s)].decode('ascii'))
++    return out
++
++def _coff_defined_externals(path):
++    """Names of external symbols defined (not merely referenced) in a COFF object file."""
++    d = open(path, 'rb').read()
++    symptr, nsyms = struct.unpack_from('<II', d, 8)
++    strtab = symptr + 18 * nsyms
++    out, i = [], 0
++    while i < nsyms:
++        o = symptr + 18 * i
++        raw, _value, section, _type, storage, naux = struct.unpack_from('<8sIhHBB', d, o)
++        if raw[:4] == b'\0\0\0\0':
++            s = strtab + struct.unpack_from('<I', raw, 4)[0]
++            name = d[s:d.index(b'\0', s)].decode('ascii', 'replace')
++        else:
++            name = raw.rstrip(b'\0').decode('ascii', 'replace')
++        if storage == 2 and section > 0:  # IMAGE_SYM_CLASS_EXTERNAL, defined in a section
++            out.append(name)
++        i += 1 + naux
++    return out
++
+ # Try to get git hash
+ try:
+     import subprocess
+@@ -58,16 +108,54 @@ class build_ext(_build_ext):
+         
+         self.library_dirs.append(rebdir+'/../')
+         self.library_dirs.append(sitepackagesdir)
+-        for ext in self.extensions:
+-            ext.runtime_library_dirs.append(rebdir+'/../')
+-            ext.extra_link_args.append('-Wl,-rpath,'+rebdir+'/../')
+-            ext.runtime_library_dirs.append(sitepackagesdir)
+-            ext.extra_link_args.append('-Wl,-rpath,'+sitepackagesdir)
++        if sys.platform != 'win32': # rpath does not exist on Windows (see build_extension)
++            for ext in self.extensions:
++                ext.runtime_library_dirs.append(rebdir+'/../')
++                ext.extra_link_args.append('-Wl,-rpath,'+rebdir+'/../')
++                ext.runtime_library_dirs.append(sitepackagesdir)
++                ext.extra_link_args.append('-Wl,-rpath,'+sitepackagesdir)
+         if editable_rebdir:
+             self.library_dirs.append(editable_rebdir)
+-            for ext in self.extensions:
+-                ext.runtime_library_dirs.append(editable_rebdir)
+-                ext.extra_link_args.append('-Wl,-rpath,'+editable_rebdir)
++            if sys.platform != 'win32':
++                for ext in self.extensions:
++                    ext.runtime_library_dirs.append(editable_rebdir)
++                    ext.extra_link_args.append('-Wl,-rpath,'+editable_rebdir)
++
++    def get_export_symbols(self, ext):
++        # libreboundx is loaded with ctypes and has no PyInit_libreboundx. setuptools would otherwise
++        # pass /EXPORT:PyInit_libreboundx to the MSVC linker, which fails.
++        return []
++
++    def build_extension(self, ext):
++        if sys.platform != 'win32':
++            return _build_ext.build_extension(self, ext)
++        import rebound
++        rebdir = os.path.dirname(inspect.getfile(rebound))
++        rebound_dll = os.path.join(os.path.dirname(rebdir), 'librebound'+suffix)
++        cc = self.compiler
++        cc.initialize()
++        os.makedirs(self.build_temp, exist_ok=True)
++        # 1. import library for librebound, made from the DLL's export table
++        implib = os.path.join(self.build_temp, 'librebound'+suffix[:suffix.rfind('.')]+'.lib')
++        deffile = os.path.splitext(implib)[0] + '.def'
++        with open(deffile, 'w') as f:
++            f.write('LIBRARY '+os.path.basename(rebound_dll)+'\nEXPORTS\n')
++            f.write(''.join('    '+n+'\n' for n in _pe_export_names(rebound_dll)))
++        subprocess.check_call([cc.lib, '/nologo', '/MACHINE:X64', '/DEF:'+deffile, '/OUT:'+implib])
++        # 2. compile (without /GL so the objects keep a readable COFF symbol table)
++        objects = cc.compile(ext.sources, output_dir=self.build_temp, macros=ext.define_macros,
++                             include_dirs=ext.include_dirs, debug=self.debug,
++                             extra_postargs=list(ext.extra_compile_args) + ['/GL-'])
++        # 3. export every external symbol we define, then link
++        names = sorted({n for o in objects for n in _coff_defined_externals(o)
++                        if not n.startswith('_') and not n.startswith('PyInit_')})
++        extdef = os.path.join(self.build_temp, ext.name+'.def')
++        with open(extdef, 'w') as f:
++            f.write('EXPORTS\n'+''.join('    '+n+'\n' for n in names))
++        cc.link_shared_object(objects + [implib], self.get_ext_fullpath(ext.name),
++                              library_dirs=ext.library_dirs, build_temp=self.build_temp,
++                              extra_postargs=['/DEF:'+extdef] + list(ext.extra_link_args),
++                              target_lang='c')
+ 
+ 
+ extra_link_args=[]
+@@ -90,7 +178,7 @@ libreboundxmodule = Extension(
+     'libreboundx',
+     sources = sorted(glob("src/*.c")),
+     include_dirs = ['src'],
+-    libraries=['rebound'+suffix[:suffix.rfind('.')]],
++    libraries=[] if sys.platform == 'win32' else ['rebound'+suffix[:suffix.rfind('.')]],
+     extra_compile_args=extra_compile_args,
+     extra_link_args=extra_link_args,
+     )
+diff --git a/src/gr_full.c b/src/gr_full.c
+index cdd5684..7b8a46b 100644
+--- a/src/gr_full.c
++++ b/src/gr_full.c
+@@ -60,7 +60,9 @@
+ 
+ static void rebx_calculate_gr_full(struct reb_simulation* const sim, struct reb_particle* const particles, const int N, const double C2, const double G, const int max_iterations, const int gravity_ignore_10){
+     
+-    double a_const[N][3]; // array that stores the value of the constant term
++    // Heap-allocated instead of C99 VLAs (not supported by MSVC).
++    double (*a_const)[3] = malloc(N*sizeof(*a_const)); // array that stores the value of the constant term
++    double (*a_old)[3] = malloc(N*sizeof(*a_old)); // array that stores the previously calculated acceleration
+     struct reb_particle* const ps_b = malloc(N*sizeof(*ps_b));
+     memcpy(ps_b, particles, N*sizeof(*ps_b));
+ 
+@@ -182,7 +184,6 @@ static void rebx_calculate_gr_full(struct reb_simulation* const sim, struct reb_
+ 
+     // Now running the substitution again and again through the loop below
+     for (int k=0; k<10; k++){ // you can set k as how many substitution you want to make
+-        double a_old[N][3]; // initialize an arry that stores the information of previousu calculated accleration
+         for (int i =0; i <N; i++){
+             a_old[i][0] = ps_b[i].ax;
+             a_old[i][1] = ps_b[i].ay;
+@@ -241,6 +242,8 @@ static void rebx_calculate_gr_full(struct reb_simulation* const sim, struct reb_
+     }
+     
+     free(ps_b);
++    free(a_const);
++    free(a_old);
+ 
+ }
+ 
+diff --git a/src/interpolation.c b/src/interpolation.c
+index b8ad365..dfc5510 100644
+--- a/src/interpolation.c
++++ b/src/interpolation.c
+@@ -64,7 +64,8 @@
+  * Adapted from "Numerical Recipes for C," 2nd Ed., §3.3, p. 115.
+  */
+ static void rebx_spline(const double* x, const double* y, const int n, double* y2) {
+-    double p, qn, sig, un, u[n];
++    double p, qn, sig, un;
++    double* u = malloc(n*sizeof(*u)); // heap-allocated instead of a C99 VLA (not supported by MSVC)
+ 
+     y2[0] = 0.;
+     u[0] = 0.0; // lower boundary condition is set to "natural"
+@@ -82,6 +83,7 @@ static void rebx_spline(const double* x, const double* y, const int n, double* y
+     y2[n-1] = (un - qn*u[n-2]) / (qn * y2[n-2] + 1.);
+     for (int k=n-2; k>=0; k--) // backsubstitution loop of tridiagonal alg.
+         y2[k] = y2[k] * y2[k+1] + u[k];
++    free(u);
+ }
+ 
+ /**
+diff --git a/src/steppers.c b/src/steppers.c
+index 3efc93c..fa09b82 100644
+--- a/src/steppers.c
++++ b/src/steppers.c
+@@ -53,6 +53,32 @@
+ #include "integrator_ias15.h"
+ #include "reboundx.h"
+ 
++#ifdef _WIN32
++// REBOUND declares `extern const struct reb_integrator reb_integrator_ias15` (and _whfast) without REB_API, so
++// they are not exported from REBOUND's Windows DLL and cannot be linked against. Obtain the same callbacks at
++// run time from a scratch simulation instead; behaviour is identical to using the exported structs elsewhere.
++static const struct reb_integrator* rebx_win_integrator(const char* name, struct reb_integrator* cache, int* have){
++    if (!*have){
++        struct reb_simulation* scratch = reb_simulation_create();
++        reb_simulation_set_integrator(scratch, name);
++        *cache = scratch->integrator.callbacks;
++        reb_simulation_free(scratch);
++        *have = 1;
++    }
++    return cache;
++}
++static const struct reb_integrator* rebx_win_ias15(void){
++    static struct reb_integrator cache; static int have = 0;
++    return rebx_win_integrator("ias15", &cache, &have);
++}
++static const struct reb_integrator* rebx_win_whfast(void){
++    static struct reb_integrator cache; static int have = 0;
++    return rebx_win_integrator("whfast", &cache, &have);
++}
++#define reb_integrator_ias15 (*rebx_win_ias15())
++#define reb_integrator_whfast (*rebx_win_whfast())
++#endif
++
+ // will do IAS with gravity + any additional_forces
+ 
+ void rebx_ias15_step(struct reb_simulation* const sim, struct rebx_operator* const operator, const double dt){
+diff --git a/src/stochastic_forces.c b/src/stochastic_forces.c
+index 2821c5d..5414880 100644
+--- a/src/stochastic_forces.c
++++ b/src/stochastic_forces.c
+@@ -61,6 +61,15 @@
+ #include <stdlib.h>
+ #include "reboundx.h"
+ 
++#ifdef _WIN32
++// The MSVC C runtime has no POSIX rand_r(). This is the reentrant LCG from the POSIX.1 specification
++// (RAND_MAX is 32767 on MSVC, matching its 15-bit output).
++static int rand_r(unsigned int* seed){
++    *seed = *seed * 1103515245u + 12345u;
++    return (int)((*seed / 65536u) % ((unsigned int)RAND_MAX + 1u));
++}
++#endif
++
+ 
+ static void rebx_random_normal2(struct reb_simulation* r, double* n0, double* n1){
+ 	double v1,v2,rsq=1.;

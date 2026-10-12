@@ -1,0 +1,65 @@
+Native Windows build of celmech 1.5.8: libcelmech is compiled with `python -m ziglang cc`
+because MSVC's C compiler has no C99 `double complex` arithmetic. Only setup.py changes.
+
+diff --git a/setup.py b/setup.py
+index e011640..910da1f 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1,7 +1,9 @@
+ try:
+     from setuptools import setup, Extension
++    from setuptools.command.build_ext import build_ext as _build_ext
+ except ImportError:
+     from distutils.core import setup, Extension
++    from distutils.command.build_ext import build_ext as _build_ext
+ from codecs import open
+ import os
+ import sys
+@@ -26,6 +28,32 @@ if sys.platform == 'darwin':
+     vars['LDSHARED'] = vars['LDSHARED'].replace('-bundle', '-shared')
+     extra_link_args=['-Wl,-install_name,@rpath/libcelmech'+suffix]
+     
++if sys.platform == 'win32':
++    # MSVC's C compiler has no C99 `double complex` arithmetic (used throughout poisson_series.[ch]) and
++    # understands none of the gcc flags below. The library is loaded with ctypes, not imported as a Python
++    # module, so it only needs to be a DLL named libcelmech<EXT_SUFFIX> that exports its C functions.
++    # We therefore compile it with clang through the `ziglang` PyPI package (`python -m ziglang cc`), targeting
++    # x86_64-windows-gnu; the lld MinGW driver exports all global symbols when none are marked dllexport.
++    extra_compile_args = ['-fstrict-aliasing', '-O3', '-std=c99', '-Wno-unknown-pragmas', '-Wno-date-time',
++                          ghash_arg, '-DLIBCELMECH', '-D_GNU_SOURCE']
++
++    class build_ext(_build_ext):
++        def get_export_symbols(self, ext):
++            return []  # no PyInit_libcelmech, see above
++
++        def build_extension(self, ext):
++            import subprocess
++            out = self.get_ext_fullpath(ext.name)
++            os.makedirs(os.path.dirname(out), exist_ok=True)
++            cmd = [sys.executable, '-m', 'ziglang', 'cc', '-target', 'x86_64-windows-gnu', '-mcpu=x86_64',
++                   '-shared'] + ext.extra_compile_args + ['-I' + d for d in ext.include_dirs] + \
++                  list(ext.sources) + ['-o', out]
++            print(' '.join(cmd))
++            subprocess.check_call(cmd)
++else:
++    extra_compile_args = ['-fstrict-aliasing', '-O3','-std=c99','-Wno-unknown-pragmas', ghash_arg, '-DLIBCELMECH', '-D_GNU_SOURCE', '-fPIC']
++    build_ext = _build_ext
++
+ libcelmechmodule = Extension('libcelmech',
+                     sources = [ 
+                         'src/disturbing_function.c',
+@@ -37,7 +65,7 @@ libcelmechmodule = Extension('libcelmech',
+                     include_dirs = ['src'],
+                     define_macros=[ ('LIBCELMECH', None) ],
+                     # Removed '-march=native' for now.
+-                    extra_compile_args=['-fstrict-aliasing', '-O3','-std=c99','-Wno-unknown-pragmas', ghash_arg, '-DLIBCELMECH', '-D_GNU_SOURCE', '-fPIC'],
++                    extra_compile_args=extra_compile_args,
+                     extra_link_args=extra_link_args,
+                     )
+ 
+@@ -81,4 +109,5 @@ setup(name='celmech',
+     install_requires=['exoplanet-core>=0.3.0rc2','pytensor>=2.18', 'mpmath>=1.0.0', 'sympy>=1.1.1', 'rebound>=4.0.1', 'reboundx>=4.0.0', 'numpy', 'scipy>=1.2.0'],
+     test_suite="celmech.test",
+     ext_modules = [libcelmechmodule],
++    cmdclass = {'build_ext': build_ext},
+     zip_safe=False)

@@ -11,6 +11,7 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 - ICM scripts (Python standard library): `icm_validate.py`, `icm_status.py`, `bibcheck.py`, `promote.py`, with offline unit tests.
 - CI on Windows and Ubuntu, Julia LTS and current release, two threads; a separate job runs the ICM checks and script tests.
 - Compute policy: GPU first with automatic CPU fallback, one kernel for both, allocation-free hot loops, thread-count invariance, backend recorded per run (decision D17).
+- Native Windows build of REBOUNDx 5.1.0 and celmech 1.5.8 (`python/nbody/windows-build/`): patches, build script, smoke tests; closes risk K2 (decision D18).
 
 ### Deferred, with reason
 

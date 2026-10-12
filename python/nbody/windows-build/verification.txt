@@ -1,0 +1,109 @@
+# Verification run 2026-10-12T13:42:06+03:00 on MINGW64_NT-10.0-26300 / Windows 11 x64
+
+## Environment
+$ python --version
+Python 3.12.12
+$ uv pip list (selected)
+celmech                 1.5.8
+exoplanet-core          0.4.0
+ipython                 9.17.1
+ipython-pygments-lexers 1.1.1
+numpy                   2.5.4
+pytensor                3.3.3
+rebound                 5.2.2
+reboundx                5.1.0
+scipy                   1.18.1
+setuptools              84.0.0
+sympy                   1.14.0
+ziglang                 0.16.0
+
+## 1. Import and versions
+$ python -I -W ignore -c "import rebound, reboundx, celmech; print(rebound.__version__, reboundx.__version__, celmech.__version__)"
+5.2.2 5.1.0 1.5.8
+Oct 12 2026 13:37:30 6253cea575af12b85392baaacd3688045702a5b2
+Oct 12 2026 13:19:16 3415d36584a35c9759ba824b64459b49da442c39
+
+## 2. Native DLL dependencies (no MinGW/zig runtime DLLs expected)
+libreboundx.cp312-win_amd64.pyd 157696 bytes; referenced DLL names: ['KERNEL32.dll', 'VCRUNTIME140.dll', 'api-ms-win-crt-heap-l1-1-0.dll', 'api-ms-win-crt-math-l1-1-0.dll', 'api-ms-win-crt-runtime-l1-1-0.dll', 'api-ms-win-crt-stdio-l1-1-0.dll', 'api-ms-win-crt-string-l1-1-0.dll', 'librebound.cp312-win_amd64.pyd', 'libreboundx.cp312-win_amd64.pyd']
+libcelmech.cp312-win_amd64.pyd 259584 bytes; referenced DLL names: ['KERNEL32.dll', 'api-ms-win-crt-convert-l1-1-0.dll', 'api-ms-win-crt-filesystem-l1-1-0.dll', 'api-ms-win-crt-heap-l1-1-0.dll', 'api-ms-win-crt-locale-l1-1-0.dll', 'api-ms-win-crt-math-l1-1-0.dll', 'api-ms-win-crt-runtime-l1-1-0.dll', 'api-ms-win-crt-stdio-l1-1-0.dll', 'api-ms-win-crt-string-l1-1-0.dll', 'libcelmech.cp312-win_amd64.pyd']
+
+## 3. Smoke tests (REBOUNDx effects/operators/interpolation, celmech C library)
+$ python -I -W ignore smoke_tests.py
+rebound 5.2.2 | reboundx 5.1.0 | celmech 1.5.8
+reboundx lib: <venv>\Lib\site-packages\libreboundx.cp312-win_amd64.pyd
+celmech lib : <venv>\Lib\site-packages\libcelmech.cp312-win_amd64.pyd
+PASS reboundx gr_potential (whfast) precession -- measured 0.03923 rad, expected 0.03808 rad, ratio 1.0303
+PASS reboundx gr (ias15) precession -- measured 0.03867 rad, expected 0.03808 rad, ratio 1.0155
+PASS reboundx gr_full (ias15) precession -- measured 0.03864 rad, expected 0.03808 rad, ratio 1.0147
+PASS reboundx 'kepler' operator vs plain IAS15 -- max |dx| = 8.88e-16
+PASS reboundx 'ias15' operator vs plain IAS15 -- max |dx| = 5.48e-15
+PASS reboundx spline interpolation -- max error 1.23e-05
+PASS reboundx stochastic_forces reproducible
+PASS reboundx stochastic_forces has an effect
+PASS celmech FMFT recovers 3 sinusoids -- f=0.70000000 amp=1.000000; f=-1.90000000 amp=0.300000; f=3.10000000 amp=0.050000
+PASS celmech Poisson series evaluate (C vs Python) -- C=-0.000400358900677804 python=-0.000400358900677804
+PASS celmech Poincare round trip
+PASS celmech PoincareHamiltonian integrates -- e1(t=5) = 0.020370
+
+ALL PASSED
+exit code: 0
+
+## 4. celmech upstream test-suite (shadden/celmech tag 1.5.8, celmech/test; it is not shipped in the PyPI sdist)
+### 4a. celmech built with BOTH patches (windows + modern-deps-compat), the default of build_windows.py
+$ python -I -m pytest -p no:cacheprovider -W ignore celmech_upstream_tests -v
+test_disturbing_function.py::TestDisturbingFunction::test_df_coefficient_C PASSED [  4%]
+test_disturbing_function.py::TestDisturbingFunction::test_get_fg_coffs PASSED [  8%]
+test_nbody_simulation_utilities.py::TestHeliocentricElements::test_add_helio_particles PASSED [ 12%]
+test_poincare.py::TestPoincare::test_copy PASSED  [ 16%]
+test_poincare.py::TestPoincare::test_masses PASSED [ 20%]
+test_poincare.py::TestPoincare::test_orbelements PASSED [ 25%]
+test_poincare.py::TestPoincare::test_particles PASSED [ 29%]
+test_poincare.py::TestPoincare::test_rebound_transformations PASSED [ 33%]
+test_poincare.py::TestPoincare::test_tp_orbelements PASSED [ 37%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_cos_vs_MMR PASSED [ 41%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_cos_vs_MMR_high_order PASSED [ 45%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_cos_vs_MMR_high_order_ecc PASSED [ 50%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_cos_vs_MMR_high_order_inc PASSED [ 54%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_double_tuple_list PASSED [ 58%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_higher_order_than_max_order PASSED [ 62%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_invalid_dalembert_kvec PASSED [ 66%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_invalid_inc_kvec PASSED [ 70%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_negative_kvec PASSED [ 75%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_repeat_terms PASSED [ 79%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_res PASSED [ 83%]
+test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_secular PASSED [ 87%]
+test_transformations.py::TestTransformations::test_actionangle PASSED [ 91%]
+test_transformations.py::TestTransformations::test_jacobi_masses PASSED [ 95%]
+test_transformations.py::TestTransformations::test_jacobi_masses_and_back PASSED [100%]
+======================== 24 passed in 62.39s (0:01:02) ========================
+
+### 4b. Same C library, celmech Python sources UNPATCHED by the compat diff (build_windows.py --no-compat)
+(run in the development venv on the first build of the wheels, i.e. same C library and Windows patches, before the compat diff existed; every failure was AttributeError: 'Simulation' object has no attribute 'N_real', i.e. REBOUND 5 API drift)
+FAILED test_nbody_simulation_utilities.py::TestHeliocentricElements::test_add_helio_particles
+FAILED test_poincare.py::TestPoincare::test_copy - Att...
+FAILED test_poincare.py::TestPoincare::test_rebound_transformations
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_cos_vs_MMR
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_cos_vs_MMR_high_order
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_cos_vs_MMR_high_order_ecc
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_cos_vs_MMR_high_order_inc
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_double_tuple_list
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_add_higher_order_than_max_order
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_invalid_dalembert_kvec
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_invalid_inc_kvec
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_negative_kvec
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_repeat_terms
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_res
+FAILED test_poincare_hamiltonian.py::TestPoincareHamiltonian::test_secular
+15 failed, 9 passed in 81.30s (0:01:21)
+
+### 4c. Intermediate: only the N_real fix applied -> 20 passed, 4 failed. Remaining 4 were pure-Python issues:
+    NameError: name 'xrange' is not defined (celmech/disturbing_function.py) and
+    ValueError: DVODE function must return array of length NEQ (SciPy 1.18 vode vs celmech's (n,1) flow matrix).
+    Both fixed by the compat diff (-> 4a).
+
+## Notes
+- Sections 1-2 come from the venv produced by build_windows.py (venv_final); the end-to-end script run itself
+  (fresh sdist extraction, patching, both wheel builds, install) was executed twice and exited 0. The last run
+  predates adding 'pytest' to BUILD_REQS in build_windows.py (a one-line change; pytest was installed into
+  venv_final by hand for section 4).
+- Section 4a was run against the wheels in out/wheels (built by that script, compat diff applied).

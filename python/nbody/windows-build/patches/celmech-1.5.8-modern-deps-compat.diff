@@ -1,0 +1,229 @@
+Not Windows specific. Lets celmech 1.5.8 run against current REBOUND 5 / SciPy / Python 3:
+Simulation.N_real no longer exists in REBOUND 5 (N counts real particles), `xrange` is Python 2,
+and recent SciPy's vode rejects the (n,1) right-hand side returned by the lambdified flow.
+
+diff --git a/celmech/disturbing_function.py b/celmech/disturbing_function.py
+index 1390e4a..bba057a 100644
+--- a/celmech/disturbing_function.py
++++ b/celmech/disturbing_function.py
+@@ -606,7 +606,7 @@ def calX_term(a,b,c,d):
+     float
+     """
+     tot = 0
+-    for n in xrange(d+1):
++    for n in range(d+1):
+         tot += binom(-0.5,n) * (-1)**n * HansenCoefficient_term(a,b,c,d - n)
+     return tot
+ 
+diff --git a/celmech/hamiltonian.py b/celmech/hamiltonian.py
+index c108c36..c96b538 100644
+--- a/celmech/hamiltonian.py
++++ b/celmech/hamiltonian.py
+@@ -472,7 +472,7 @@ class Hamiltonian(object):
+         self._jacobian_func = lambdify(qp_vars,self._N_jacobian,**self._lambdify_kwargs)
+ 
+         self._integrator = ode(
+-                lambda t,y: self._flow_func(*y),
++                lambda t,y: np.ravel(self._flow_func(*y)),
+                 jac = lambda t,y: self._jacobian_func(*y))
+         self._integrator.set_integrator('vode',method='adams',rtol=1e-14)
+ 
+diff --git a/celmech/miscellaneous.py b/celmech/miscellaneous.py
+index 43c400f..aa3c282 100644
+--- a/celmech/miscellaneous.py
++++ b/celmech/miscellaneous.py
+@@ -75,7 +75,7 @@ def sk(k,y,tol=1.49e-08,rtol=1.49e-08,maxiter=50,miniter=1):
+     maxiter=max(miniter+1,maxiter)
+     val = np.inf
+     err = np.inf
+-    for n in xrange(miniter,maxiter+1):
++    for n in range(miniter,maxiter+1):
+         newval = _sk_integral_fixed_quad(k,y,n)
+         err = abs(newval-val)
+         val = newval
+@@ -135,7 +135,7 @@ def Dsk(k,y,tol=1.49e-08,rtol=1.49e-08,maxiter=50,miniter=1):
+     maxiter=max(miniter+1,maxiter)
+     val = np.inf
+     err = np.inf
+-    for n in xrange(miniter,maxiter+1):
++    for n in range(miniter,maxiter+1):
+         newval = _Dsk_integral_fixed_quad(k,y,n)
+         err = abs(newval-val)
+         val = newval
+diff --git a/celmech/nbody_simulation_utilities.py b/celmech/nbody_simulation_utilities.py
+index f0cfd5d..b325c20 100644
+--- a/celmech/nbody_simulation_utilities.py
++++ b/celmech/nbody_simulation_utilities.py
+@@ -14,12 +14,12 @@ def set_time_step(sim,dtfactor):
+     :math:`\lesssim\tau_p/20` in order to obtain reliable
+     results (see `Wisdom 2015 <https://ui.adsabs.harvard.edu/abs/2015AJ....150..127W/abstract>`_)
+     """
+-    ps=sim.particles[1:sim.N_real]
++    ps=sim.particles[1:sim.N]
+     tperi=np.min([p.P * (1-p.e)**1.5 / np.sqrt(1+p.e) for p in ps])
+     dt = tperi * dtfactor
+     sim.dt = dt
+ def set_min_distance(sim,rhillfactor):
+-    ps=sim.particles[1:sim.N_real]
++    ps=sim.particles[1:sim.N]
+     mstar = sim.particles[0].m
+     rhill = np.min([ p.rhill for p in ps if p.m > 0])
+     mindist = rhillfactor * rhill
+@@ -70,7 +70,7 @@ def _get_rebound_simarchive_integration_results(sa,coordinates):
+         raise ValueError("'Coordinates must be one of 'jacobi','heliocentric', or 'barycentric'")
+     N = len(sa)
+     sim0 = sa[0]
+-    Npl= sim0.N_real - 1
++    Npl= sim0.N - 1
+     shape = (Npl,N)
+     sim_results = {
+         'time':np.zeros(N),
+@@ -110,7 +110,7 @@ def _get_reboundx_simarchive_integration_results(sa,coordinates):
+        raise ValueError("'Coordinates must be one of 'jacobi','heliocentric', or 'barycentric'")
+     N = len(sa)
+     sim0,_ = sa[0]
+-    Npl= sim0.N_real - 1
++    Npl= sim0.N - 1
+     shape = (Npl,N)
+     sim_results = {
+         'time':np.zeros(N),
+@@ -187,7 +187,7 @@ def reb_orbits(sim, coordinates="canonical heliocentric"):
+     # the central body in this splitting should have star.m + mu, but 
+     # this is already accounted for in REBOUND's orbit calculation 
+     fictitious_star = rb.Particle(m=star.m)
+-    for planet in sim.particles[1:sim.N_real]:
++    for planet in sim.particles[1:sim.N]:
+         # Heliocentric position
+         r = np.array(planet.xyz) - np.array(star.xyz)
+         # For canonical heliocentric coordinates the momentum
+@@ -320,8 +320,8 @@ def reb_add_from_elements(m,elements,sim,coordinates='canonical heliocentric'):
+     sim.add(p)
+     # We now move all particles by the same offset to keep the COM at 0
+     # This ensures that the xi-x0 remain the same
+-    Mtot = np.array([p.m for p in sim.particles[:sim.N_real]]).sum()
+-    for p in sim.particles[:sim.N_real]:
++    Mtot = np.array([p.m for p in sim.particles[:sim.N]]).sum()
++    for p in sim.particles[:sim.N]:
+         p.x -= m/Mtot*x
+         p.y -= m/Mtot*y
+         p.z -= m/Mtot*z
+@@ -368,7 +368,7 @@ def align_simulation(sim):
+     sim : rebound.Simulation
+     """
+     theta1,theta2 = _compute_transformation_angles(sim)
+-    for p in sim.particles[:sim.N_real]:
++    for p in sim.particles[:sim.N]:
+         p.x,p.y,p.z = npEulerAnglesTransform(p.xyz,0,theta2,theta1)
+         p.vx,p.vy,p.vz = npEulerAnglesTransform(p.vxyz,0,theta2,theta1) 
+ def _get_lhat(p):
+@@ -398,18 +398,18 @@ def calculate_mutual_inclinations(s):
+     """
+     if type(s)==rb.Simulation:
+         return _calculate_mutual_inc(s)
+-    combs = combinations(range(1,sa[0].N_real),2)
++    combs = combinations(range(1,sa[0].N),2)
+     imut = {comb:np.zeros(len(sa)) for comb in combs}
+     for i,sim in enumerate(sa):
+         lhats = [_get_lhat(p) for p in sim.particles[1:]]
+-        for comb in combinations(range(1,sa[0].N_real),2):
++        for comb in combinations(range(1,sa[0].N),2):
+             j,k = comb
+             cosimut = lhats[j-1] @ lhats[k-1]
+             imut[comb][i] = np.arccos(cosimut)
+ 
+     return imut
+ def _calculate_mutual_inc(sim):
+-    combs = combinations(range(1,sim.N_real),2)
++    combs = combinations(range(1,sim.N),2)
+     lhats = [_get_lhat(p) for p in sim.particles[1:]]
+     return {(j,k):np.arccos(lhats[j-1]@lhats[k-1]) for j,k in combs}
+     
+diff --git a/celmech/poincare.py b/celmech/poincare.py
+index 21e46a7..2b143c1 100644
+--- a/celmech/poincare.py
++++ b/celmech/poincare.py
+@@ -483,7 +483,7 @@ class Poincare(PhaseSpaceState):
+         particles = []
+         #pvars = Poincare(G=sim.G, coordinates=coordinates,t=sim.t)
+         o = reb_orbits(sim, coordinates=coordinates)
+-        for i in range(1,sim.N_real):
++        for i in range(1,sim.N):
+             orb = o[i-1]
+             if orb.a <= 0. or orb.e >= 1.:
+                 raise AttributeError("Celmech error: Poincare.from_Simulation only support elliptical orbits. Particle {0}'s (heliocentric) a={1}, e={2}".format(i, orb.a, orb.e))
+diff --git a/celmech/rk_integrator.py b/celmech/rk_integrator.py
+index 7668799..caf1515 100644
+--- a/celmech/rk_integrator.py
++++ b/celmech/rk_integrator.py
+@@ -257,7 +257,7 @@ class RKIntegrator():
+                 k[i,:] = ktemp 
+             else:
+                 _,k[i,:] = self._rk4_step(y,ktemp,ci*h)
+-        for itr in xrange(max_iter):
++        for itr in range(max_iter):
+             k_old = k.copy()
+             ytemps = y + h * a @ k 
+             k = np.array([f(ytemp) for ytemp in ytemps])
+diff --git a/celmech/secular.py b/celmech/secular.py
+index 9e38d6e..5b336c7 100644
+--- a/celmech/secular.py
++++ b/celmech/secular.py
+@@ -78,8 +78,8 @@ class LaplaceLagrangeSystem(Poincare):
+                 continue # skip the star
+             m,mu,M,Lambda = symbols('m{0},mu{0},M{0},Lambda{0}'.format(i)) 
+             self.params.update({m:particle.m,mu:particle.mu,M:particle.M,Lambda:particle.Lambda})
+-        self.ecc_entries  = {(j,i):S(0) for i in xrange(1,self.N) for j in xrange(1,i+1)}
+-        self.inc_entries  = {(j,i):S(0) for i in xrange(1,self.N) for j in xrange(1,i+1)}
++        self.ecc_entries  = {(j,i):S(0) for i in range(1,self.N) for j in range(1,i+1)}
++        self.inc_entries  = {(j,i):S(0) for i in range(1,self.N) for j in range(1,i+1)}
+         self.tol = np.min([p.m for p in self.particles[1:]]) * np.finfo(np.float64).eps
+         ps = self.particles[1:]
+         self.eta0_vec = np.array([p.eta for p in ps])
+@@ -127,15 +127,15 @@ class LaplaceLagrangeSystem(Poincare):
+     @property
+     def eccentricity_matrix(self):
+         return Matrix([
+-            [self.ecc_entries[max(i,j),min(i,j)] for i in xrange(1,self.N)]
+-            for j in xrange(1,self.N) 
++            [self.ecc_entries[max(i,j),min(i,j)] for i in range(1,self.N)]
++            for j in range(1,self.N) 
+             ])
+ 
+     @property
+     def inclination_matrix(self):
+         return Matrix([
+-            [self.inc_entries[max(i,j),min(i,j)] for i in xrange(1,self.N)]
+-            for j in xrange(1,self.N) 
++            [self.inc_entries[max(i,j),min(i,j)] for i in range(1,self.N)]
++            for j in range(1,self.N) 
+             ])
+     @property 
+     def Neccentricity_matrix(self):
+@@ -310,8 +310,8 @@ class LaplaceLagrangeSystem(Poincare):
+         ecc_off_coeff = df_coefficient_C(*js_dpomega,0,0,0,0)
+         inc_off_coeff = df_coefficient_C(*js_dOmega,0,0,0,0)
+         l1,l2=0,0
+-        for i in xrange(1,self.N):
+-            for j in xrange(1,self.N):
++        for i in range(1,self.N):
++            for j in range(1,self.N):
+                 if j==i:
+                     continue
+                 indexIn = min(i,j)
+@@ -1080,14 +1080,14 @@ class SecularSystemSimulation():
+         qp = self.state_to_qp_vec()
+ 
+         qp = self._integrator.init_step(qp)
+-        for _ in xrange(Nstep):
++        for _ in range(Nstep):
+             qp = self._integrator.step(qp)
+         qp = self._integrator.final_step(qp)
+ 
+         if exact_finish_time:
+             warnings.warn("Exact finish time is not currently implemented.")
+ 
+-        for i in xrange(Npl):
++        for i in range(Npl):
+             eta,kappa,rho,sigma = symbols("eta{0},kappa{0},rho{0},sigma{0}".format(i+1))
+             # eta
+             self.state.qp[eta] =  qp[i]

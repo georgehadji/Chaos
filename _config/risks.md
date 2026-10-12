@@ -5,7 +5,7 @@ Layer 3, canonical. Reviewed at every milestone exit (see `build-order.md`). Lik
 | ID | Risk | Likelihood | Impact | Mitigation | Watch at |
 |----|------|------------|--------|------------|----------|
 | K1 | Julia not installed on the main machine | H | H (blocks all code) | first step of M0: install via juliaup (`setup-guides/julia.md`) | closed 2026-10-12: Julia 1.13.1 installed via juliaup, channel `release` |
-| K2 | celmech does not build on Windows or with REBOUND 5 | M | M (P6 models) | owner requires native Windows: if the build fails, fix it (compiler flags, patch, or local wheel); WSL2 only as last resort | M8 |
+| K2 | celmech does not build on Windows or with REBOUND 5 | M | M (P6 models) | owner requires native Windows: if the build fails, fix it (compiler flags, patch, or local wheel); WSL2 only as last resort | closed 2026-10-12: both build and pass tests natively with `python/nbody/windows-build/` (`setup-guides/rebound.md`, section "Native Windows build"); rebuild REBOUNDx after each REBOUND upgrade |
 | K3 | ASSIST pins `rebound<5`, conflicting with venv A | H | L | separate venv B or WSL2 | M8 |
 | K4 | WHFast512 sources conflict on native Windows AVX512 support | M | L | verify on this CPU; else run under WSL2 or Linux | M8 |
 | K5 | Geist1990 CPU-time ratios unverified (full text inaccessible) | H | L | reproduction target only after reading the paper; never a test oracle | M1 |

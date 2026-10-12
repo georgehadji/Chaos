@@ -12,6 +12,8 @@ jobs:
   julia:
     name: Julia ${{ matrix.version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    env:
+      JULIA_NUM_THREADS: 2
     strategy:
       fail-fast: false
       matrix:

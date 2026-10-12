@@ -16,10 +16,10 @@ Fallback if the human overrides to Python: P1/P2 survive (float64 + mpmath oracl
 
 | Module | Lang | Pattern | Notes |
 |--------|------|---------|-------|
-| `Foundation` | Julia | value objects (immutable structs), type parameter `T<:Real` for precision | `State{T}`, errors, provenance |
+| `Foundation` | Julia | value objects (immutable structs), type parameter `T<:Real` for precision | `State{T}`, errors, provenance, compute backend detection and fallback (section "Compute") |
 | `Systems` | Julia | multiple dispatch on `AbstractMap`, `AbstractFlow`, `AbstractSeparableFlow`; StaticArrays for dim <= 8 | each system: `step`, `tangent` (analytic Jacobian), `invariants`; maps keep lifted coordinates, wrap only for output |
 | `Integrators` | Julia | table-driven strategy: coefficients as data + ONE generic `splitstep`; composition builder (triple jump, Suzuki) | coefficients copied from the cited paper, cross-checked against OrdinaryDiffEqSymplecticRK where it ships the method; hand-rolled: Forest-Ruth, PEFRL, Blanes-Moan, SABA/SBAB, ABA864, Tao, Gauss-Legendre |
-| `Tangent` | Julia | pipe-and-filter: `propagate` is the single hot loop, emits snapshots to reducers | carries deviation vectors through the SAME splitting (needed anyway: ChaosTools tangent systems cannot use partitioned symplectic solvers) |
+| `Tangent` | Julia | pipe-and-filter: `propagate` is the single hot loop, emits snapshots to reducers; one KernelAbstractions kernel per system serves CPU and GPU | carries deviation vectors through the SAME splitting (needed anyway: ChaosTools tangent systems cannot use partitioned symplectic solvers) |
 | `Lyapunov` | Julia | strategy via dispatch: `orthonormalize!(alg, W)` for CGS, MGS, RGS, Householder (LAPACK), H2, Givens, block/sparse; estimators are reducers | LAPACK through LinearAlgebra; hand-written small-dim kernels; Ginelli CLVs with stored R factors and checkpoints |
 | `Indicators` | Julia | reducers `(init, update!, finalize)` | SALI, GALI_k, MEGNO, FLI/OFLI, RLI, stretching numbers, NAFF/FMA, WBA, REM, 0-1; all computed in ONE pass over the same orbit for fair cost comparison |
 | `Diagnostics` | Julia | reducers | pairing residual, det residual, orthogonality loss, energy / modified-energy error |
@@ -27,13 +27,25 @@ Fallback if the human overrides to Python: P1/P2 survive (float64 + mpmath oracl
 | `Shadow` | Julia | symbolic -> generated code: Symbolics.jl BCH Poisson brackets, `build_function` | modified Hamiltonian H_h for R2 |
 | `Experiments` | Julia | command (`RunSpec` -> `run`), repository (`Store`), content-addressed cache | TOML.jl configs, HDF5.jl store, manifests, chunked resumable sweeps |
 | `Figures` | Julia | scripts | CairoMakie (single language end to end) |
-| `nbody` (P6) | Python | adapters | REBOUND/REBOUNDx/celmech in venv A; ASSIST pins `rebound<5`: venv B or WSL2 |
+| `nbody` (P6) | Python | adapters | REBOUND/REBOUNDx/celmech in venv A; ASSIST pins `rebound<5`: venv B or WSL2; CPU only, parallel as one process per independent simulation |
 | `scripts/` (ICM) | Python stdlib | one script, one job | `icm_status.py`, `icm_validate.py`, `bibcheck.py` (Crossref), `promote.py`, `fetch_horizons.py` |
 
 
 ## Layering
 
 `Foundation <- Systems <- Integrators <- Tangent <- {Lyapunov, Indicators, Diagnostics} <- {Shadow, TimeSeries} <- Experiments <- Figures`. A test parses each file's `using`/`import` lines and fails on an upward edge. Python never imports Julia and vice versa.
+
+## Compute
+
+GPU first, CPU fallback (decision D17). Each run resolves `backend` from `numerics-defaults.toml` (`auto`, `gpu`, `cpu`); `auto` means GPU when CUDA.jl loads and reports a functional device, else CPU.
+
+- One kernel, two backends: hot loops are KernelAbstractions kernels over isbits element types; the CPU backend runs the same kernel with `Threads.nthreads()` workers. The CPU run is the verified reference; a module ships GPU as default only after its cross-backend test passes.
+- What runs where: ensembles of independent orbits in Float32 or Float64 (grids, indicator maps, sweeps) are GPU candidates; BigFloat, single long orbits and LAPACK-heavy spectra run on CPU threads unless the module spec measures a GPU win.
+- Fallback to CPU, recorded in provenance with the reason: CUDA.jl not loadable, no functional device, kernel does not compile for the element type, device out of memory, or a `NumericalHealthError` raised only on the GPU.
+- CUDA.jl is a weak dependency (package extension) loaded by `bin/chaoslab.jl`; the library never requires a GPU and CI has none.
+- Memory: chunk size derives from free device or host memory at run start, never a fixed number; ensembles are structure-of-arrays; workspaces are preallocated per chunk; the hot loop allocates nothing.
+- CPU: threads over orbits with dynamic scheduling; BLAS threads set to 1 when Julia threads > 1, so the two pools do not oversubscribe cores.
+- Reproducibility: random streams are keyed by orbit id, never by thread or device, so results do not depend on thread count; backends are compared at the preregistered estimator tolerance, never bitwise (chaotic orbits amplify FMA and reduction-order differences).
 
 ## Repo shape
 
@@ -56,7 +68,7 @@ schema/run-store.md              HDF5 layout shared by Julia and Python
 | Phase-space dimension | 2 to 200 (coupled maps, lattices) | k-vector tangent blocks, LAPACK QR; banded/sparse QR (R3) |
 | Time | 10^9 map steps; Gyr N-body | checkpoint/resume; REBOUND SimulationArchive on the Python side |
 | Precision | Float64 to BigFloat | type parameter, same kernel |
-| Hardware | laptop -> workstation -> cluster -> GPU | job arrays read one TOML + chunk index; GPU later via KernelAbstractions behind the same `propagate` signature, only after CPU reference is verified |
+| Hardware | GPU or CPU on one machine -> cluster | section "Compute"; job arrays read one TOML + chunk index |
 | Storage | 2000x2000 float64 grid = 32 MB | HDF5 per run, attributes for metadata; zarr only if cloud/parallel writes are needed |
 
 ## Robustness

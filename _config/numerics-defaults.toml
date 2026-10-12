@@ -3,6 +3,7 @@
 # A key is filled by the module-build/01 spec that first needs it; cite that spec in the comment.
 precision = "Float64"
 seed = 20261012
+backend = "auto"            # auto (GPU if functional, else CPU), gpu, cpu; architecture.md, section "Compute"
 # renorm_interval_tau =      # set by the tangent-core spec
 # orthogonality_tol =        # set by the lyap-gram-schmidt spec
 # pairing_residual_tol =     # set by the diagnostics spec

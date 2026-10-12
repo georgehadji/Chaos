@@ -16,6 +16,8 @@ Layer 3, canonical. Milestones and the module, topic and study slugs each run us
 | M7 P5 (R2) | modules: forced-pendulum, shadow-hamiltonian (BCH), transport metrics; study p5 | falsification criteria evaluated |
 | M8 P6 (conditional on P5) | modules: rebound-adapter, reboundx-effects, celmech-models, assist-adapter, horizons-fetch; study p6 | results accepted |
 
+Compute backends (`architecture.md`, section "Compute") are built inside the M2 runs `tangent-core` (one kernel, CPU and GPU, fallback) and `precision` (element types per backend); no separate slug.
+
 Every milestone exit: review `risks.md`; record structural decisions in `decision-log.md`.
 
 ## Releases

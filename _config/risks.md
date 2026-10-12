@@ -18,3 +18,5 @@ Layer 3, canonical. Reviewed at every milestone exit (see `build-order.md`). Lik
 | K12 | Dependency drift changes numbers between runs | M | M | committed `Manifest.toml`, versions in every run file, CI on Windows and Ubuntu | M0 onward |
 | K13 | Run data lost (`data/` is not in git) | L | M | manifests tracked; every result regenerable from manifest and commit; back up the data root | M3 onward |
 | K14 | Single researcher: decisions and context live in one head | M | M | decision log, ICM stage outputs, per-run notes | every milestone |
+| K15 | The main machine's GPU (GeForce GTX 1050, 3 GB, compute capability 6.1, from `nvidia-smi`) may be unsupported by current CUDA.jl or slower than the CPU in Float64 | M | M (GPU-first gives no speedup here) | `tangent-core` 01-spec verifies CUDA.jl support for this device and its Julia 1.10 compat; benchmark CPU vs GPU and record it; `auto` falls back to CPU | M2 |
+| K16 | GPU and CPU runs of a chaotic orbit diverge (FMA contraction, reduction order) | H | M (results differ by backend) | compare estimators at the preregistered tolerance, never trajectories; backend recorded per run; CPU is the reference | M2 onward |

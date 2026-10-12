@@ -20,6 +20,9 @@ Layer 3, canonical. Shared contract between Julia (`Experiments`) and Python (`p
 | `julia_version` / `python_version` | string | writer runtime |
 | `packages` | string | manifest hash or `pip freeze` hash |
 | `cpu`, `threads` | string, int | host info |
+| `backend` | string | `gpu` or `cpu` (resolved, never `auto`) |
+| `device` | string | GPU name or `cpu` |
+| `backend_fallback_reason` | string | empty, or why `auto`/`gpu` ran on CPU |
 | `precision` | string | `Float64`, `Double64`, `BigFloat(256)` |
 | `created_utc` | string | ISO 8601, e.g. `2026-10-12T14:03:00Z` |
 | `complete` | bool | `true` |

@@ -9,7 +9,8 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 - ICM workspace: four workspaces, 19 stage contracts, `_config/` references, run-store schema v1, setup questionnaire.
 - Julia package skeleton `Chaoslab` (empty module), test entry with Aqua, JET and a layering test that also tests itself.
 - ICM scripts (Python standard library): `icm_validate.py`, `icm_status.py`, `bibcheck.py`, `promote.py`, with offline unit tests.
-- CI on Windows and Ubuntu, Julia LTS and current release; a separate job runs the ICM checks and script tests.
+- CI on Windows and Ubuntu, Julia LTS and current release, two threads; a separate job runs the ICM checks and script tests.
+- Compute policy: GPU first with automatic CPU fallback, one kernel for both, allocation-free hot loops, thread-count invariance, backend recorded per run (decision D17).
 
 ### Deferred, with reason
 

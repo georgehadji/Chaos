@@ -46,7 +46,14 @@ AC11 ensemble: 4000 orbits x 500 steps (2e6 steps), min of 3 timings; Float64 to
 
 ## Review findings
 
-(left for the orchestrator)
+Code review (two independent reviewers, stage 04): no CRITICAL or HIGH findings; the MEDIUM findings were fixed in commit 1361767. Stage 02 rework (AC12 allocation helper specialised on the function argument for Julia 1.10) is recorded in the test plan.
+
+Findings on the evidence:
+- AC6: one orbit of 200 exceeds the first-order bound (ratio 2.6); the amendment allows 5 percent. The orbit is accelerator-like; the bound has no local-stretch term. No change.
+- AC4: n_H is capped at the reference length 100 for 7 (Float64) and 9 (Double64) regular orbits, so their ratio is checked only to n = 100. Accepted: these orbits are regular and the cap is conservative for the horizon count.
+- AC13: one initial condition of 100 never separated by 1e-8 within 200 steps; the 0.99 fraction passes.
+- AC11: cost ratios (Double64 about 50x, BigFloat(256) about 550x Float64) were taken on a loaded machine and vary by run; treat them as orders of magnitude.
+- Effective Double64 eps measured 2^-104.4 to 2^-104.9, inside the amended 2^-100 with a 2^4 margin.
 
 ## Notes
 

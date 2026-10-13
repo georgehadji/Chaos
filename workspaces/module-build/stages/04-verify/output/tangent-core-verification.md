@@ -88,7 +88,17 @@ The GPU side (CUDA runtime version, device name, Float64 only because Float32 wa
 
 ## Review findings
 
-(To be filled in by the orchestrator.)
+Code review (two independent reviewers, stage 04): no CRITICAL or HIGH findings; the MEDIUM findings were fixed in commit 1361767 and the suite re-run GREEN on Julia 1.13 and 1.10.
+
+Accepted deviations from the spec, owner to confirm at the checkpoint:
+- Reducers do not receive the orbit id. The per-orbit body returns a status code and the host attaches the orbit id when it raises the error (`reducer_error`, `_health_error`), so the error record is complete without passing the id into the kernel.
+- The CPU-only reducer trait (fallback reason 6) is deferred to lyap-householder-qr, the first module with a LAPACK reducer. Until then reason 6 fires for a reducer whose state is not isbits (D29 amendment).
+- Probe per element type: resolved by the D29 amendment (see the GPU section).
+
+Findings on the evidence:
+- AC10 covers reasons 4 (device out of memory) and 5 (health error only on the GPU) only through the GPU path; see the GPU section for how each was exercised.
+- Runtime 14.6 min against the 10 min target, on a loaded machine; the single-thread child run and the 10^8-step sums dominate. Accepted for a stage 04 script, not for CI.
+- AC4: the Frobenius-product bound is loose at large n (ratio 1e-22 at n = 100); the check that bites is at small n (0.04). Recorded, no change.
 
 ## Notes
 

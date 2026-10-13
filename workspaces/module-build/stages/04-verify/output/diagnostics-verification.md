@@ -48,7 +48,12 @@ Informational: `reducer_update` time per call 304 ns (Float64) and 5.19 us (Doub
 
 ## Review findings
 
-(left for the orchestrator)
+Code review (two independent reviewers, stage 04): no CRITICAL or HIGH findings; the MEDIUM findings (pending failure wins in `monitor_exponents`, one shared `_failure`) were fixed in commit 1361767. The Tangent patch adding `reducer_step`, `reducer_failed` and `reducer_error` lets the monitor report its failure with the orbit id.
+
+Findings on the evidence:
+- Criterion 7: max 0.196 against the pass bound 4, so `pairing_residual_tol = 16` sits about 80 times above the measurement. The spec allows tightening; no change until lyap-* runs give more orbits.
+- Criterion 11, kernel path: the monitor's `reducer_final` does not export M_max, so the script checks det_max / eps <= threshold instead of eps_det / (eps M). With M >= 1 this is the stricter check. Accepted.
+- Criterion 7 uses one orbit per K, not an ensemble; recorded as a sample-size limit of this stage, revisited in lyap-gram-schmidt stage 04.
 
 ## Notes
 

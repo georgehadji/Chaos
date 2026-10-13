@@ -72,10 +72,10 @@ Canonical form of this module (spec Equations item 1): p' = p + K sin x, x' = x 
 | W5 | same, Double64 | 0.003006; 7.973e-06 | 1 | PASS | T, V |
 | W6 | round trip, counts exactly equal, Float64, Double64 | 0.07371, 0.001891 | 1 | PASS | T, V |
 | W7 | allocations after warm-up, Float64 | (0,0,0,0,0) | 0 | PASS | T, V |
-| W7 | allocations after warm-up, Double64: full run | (160,160,0,0,16000) | 0 | FAIL in the full run, PASS in isolation (see Notes) | T, V |
+| W7 | allocations after warm-up, Double64 | (0,0,0,0,0) | 0 | PASS (final run; see Review findings) | T, V |
 | W8 | overflow guard NaN, health error "state", two below limit exact | true | true | PASS | T, V |
 
-Count: 19 spec criteria plus W1 to W8 (27 criteria). PASS on every measured line except W7 Double64 in the full run (FAIL; see Notes); criterion 18 GPU parts are STAGE04-GPU; Lyapunov-estimator comparisons are not in this slug (DEFERRED lyap-benettin 04 for exponent comparisons with ChaosTools).
+Count: 19 spec criteria plus W1 to W8 (27 criteria). PASS on every measured line (90 PASS lines in the final run); criterion 18 GPU parts are STAGE04-GPU; Lyapunov-estimator comparisons are not in this slug (DEFERRED lyap-benettin 04 for exponent comparisons with ChaosTools).
 
 ## Figures
 
@@ -83,9 +83,17 @@ Count: 19 spec criteria plus W1 to W8 (27 criteria). PASS on every measured line
 
 ## Review findings
 
+Code review (two independent reviewers, stage 04): no CRITICAL or HIGH findings; the MEDIUM findings were fixed in commit 1361767. The D28 amendment (wrapped state with winding counts) was reviewed and committed in 55e5987 before the final run.
+
+Findings on the evidence:
+- W7 Double64 (resolved). The first full run measured (160, 160, 0, 0, 16000) bytes. A rerun of the identical script order up to W7 against the committed source gave (0, 0, 0, 0, 0), `code_warntype` of `forward` on the wrapped Double64 map is fully inferred, and the final full run (857 s) gives (0, 0, 0, 0, 0) and 90 PASS lines. The likely cause is that the first run loaded the D28 source before the `_pi` constant replaced `oftype(x, pi)`, which allocated for Double64 (noted by the D28 implementer). The log in this folder is the final run.
+- Criterion 16, A_S at 0.976: with n >= 10 the term ln(kappa(S))/n is about 10^14 times 16 eps, so the ratio measures how close the worst draw comes to the analytic inequality smax(S^-1 B S) <= kappa(S) smax(B), not rounding. A value near 1 is expected for a draw whose dominant direction aligns with the extreme directions of S; it cannot exceed 1 except by rounding. Not marginal.
+- Criterion 18 compares serial with 4 threads (bitwise) rather than 1 with 8 threads; orbits are independent work items, and tangent-core AC6 covers a 1-thread child process against 4 threads. Accepted.
+- Winding counts (D28): m grows like n^2/2 on an accelerator-mode orbit and reaches 2^53 after about 10^8 steps; the guard turns this into a health error. Owner decision pending at the Batch A checkpoint.
+
 ## Notes
 
-- **W7 Double64 allocation (open, flaky).** In the full 17-minute run `smw_allocs` returned (160, 160, 0, 0, 16000) bytes for forward, inverse, tangent, inverse_tangent and `propagate_orbit` (100 steps) with the wrapped map in Double64, i.e. 160 bytes per forward and per inverse step. The same function in a fresh process returns (0, 0, 0, 0, 0): alone (`SM_ONLY=W`), with the AC1 to AC13 sections before it, with O6, AC18 and AC19 before it, with AC14 before it, with AC15 to AC17 before it (the full sequence was not rerun a second time), and in a separate script with ChaosTools, CairoMakie and BenchmarkTools loaded; all give 0 bytes. Float64 was 0 in every run. The original FAIL line is kept in the log unedited. The package test W7 passes in its own process. Treat as: the module allocates nothing in isolation, but the measurement is context dependent, and the cause has not been found. Owner decision: accept the isolated result, or send back to 03.
+- **W7 Double64 allocation (resolved, see Review findings).** In the first full 17-minute run `smw_allocs` returned (160, 160, 0, 0, 16000) bytes for forward, inverse, tangent, inverse_tangent and `propagate_orbit` (100 steps) with the wrapped map in Double64, i.e. 160 bytes per forward and per inverse step. The same function in a fresh process returns (0, 0, 0, 0, 0): alone (`SM_ONLY=W`), with the AC1 to AC13 sections before it, with O6, AC18 and AC19 before it, with AC14 before it, with AC15 to AC17 before it (the full sequence was not rerun a second time), and in a separate script with ChaosTools, CairoMakie and BenchmarkTools loaded; all give 0 bytes. Float64 was 0 in every run. The original FAIL line is kept in the log unedited. The package test W7 passes in its own process. Treat as: the module allocates nothing in isolation, but the measurement is context dependent, and the cause has not been found. Owner decision: accept the isolated result, or send back to 03.
 - **Criterion 2 marginal (Float64): worst ratio 0.7875** of the bound 8 eps (1 + |K|). Double64 against the nominal 2^-104 gives 0.795, so the Double64 symplecticity residual would also meet the nominal eps on this sample (the test plan, "Spec ambiguities" 1, reported 1.4 times the bound at K = 20 on its sample; not reproduced here at 100 per K, sample dependent).
 - **Criterion 16, A_S: ratio 0.9764** against 16 eps + ln(kappa(S))/n. Close to 1; the bound for the non-normal variant is derived and loose in the other direction for most draws, but the worst draw uses 98 percent of it. Not a failure.
 - **Criterion 14, effective Double64 eps.** The measured maximum relative error of sin and cos in Double64 against BigFloat-256 is 1.937e-31 (2^-102.0, sin at x = -141.3), on 259346 evaluations (119346 orbit arguments, 100000 uniform in [-4 pi, 4 pi], 40000 uniform in [-1e3, 1e3]); 99.9 percent quantiles 2.0e-32 to 7.6e-33. The pass limit is 2^-100 = 7.889e-31. The test plan measured 7.2e-31 on a 2000-point sample; this larger sample does not reproduce that, so the 2^-100 used for all Double64 tolerances in the tests is a factor 4 looser than what DoubleFloats `sin` and `cos` delivered here. The nominal 2^-104 is still not reached (1.9e-31 is 2^-102). Owner confirmation of the eps 2^-100 convention (test plan item 1) stands.

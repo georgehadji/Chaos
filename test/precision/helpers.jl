@@ -128,6 +128,8 @@ pr_probe_slow() = (loadable = true, functional = true, device = "pr-test-gpu", c
 pr_probe_boom() = error("probe must not be called for BigFloat on auto or gpu")
 
 # Hot-loop kernels for allocation checks (returns the result so nothing is dead-code eliminated).
+# Allocation measured behind a function barrier (testset scope boxes return values on Julia 1.10).
+pr_allocs(f::F, args::Vararg{Any,N}) where {F,N} = (f(args...); @allocated f(args...))   # forces specialization on f
 pr_loop_forward(sys, z, n) = (for _ in 1:n; z = forward(sys, z); end; z)
 pr_loop_tangent(sys, z, n) = (m = tangent(sys, z); for _ in 1:n; m = tangent(sys, z); end; m)
 pr_loop_add(acc, x, n) = (for _ in 1:n; acc = add(acc, x); end; acc)

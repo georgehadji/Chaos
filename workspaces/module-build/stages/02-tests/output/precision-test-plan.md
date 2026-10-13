@@ -49,3 +49,7 @@ Command (from repo root, wrapped in a testset so all testsets run): `julia --pro
 | AC13 conversion consequence | 1 | 0 | UndefVarError `exact` |
 
 Total 15 errors, 0 failures, 10 testsets. Helper check: with temporary stubs of the API (kept outside the repo, in the session scratchpad) all 127 assertions pass in about 30 s.
+
+## Rework (stage 03 audit, 2026-10-13)
+
+AC12 allocation checks moved behind a function barrier (`pr_allocs`): on Julia 1.10 `@allocated` at testset scope counted the boxing of the returned SVector (16 or 32 bytes), not library allocation. Criterion and tolerance unchanged.

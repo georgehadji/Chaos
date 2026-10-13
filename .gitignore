@@ -12,3 +12,6 @@ __pycache__/
 python/nbody/windows-build/venv/
 python/nbody/windows-build/_work/
 python/nbody/windows-build/wheels/
+
+# Julia coverage output
+*.cov

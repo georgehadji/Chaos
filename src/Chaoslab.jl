@@ -7,4 +7,15 @@ Architecture, module map and layering: `_config/architecture.md`. Each submodule
 """
 module Chaoslab
 
+include("Foundation/Foundation.jl")
+include("Systems/Systems.jl")
+include("Tangent/Tangent.jl")
+include("Diagnostics/Diagnostics.jl")
+
+using .Foundation, .Systems, .Tangent, .Diagnostics
+
+# Re-export every name a submodule exports, so users and tests need only `using Chaoslab`.
+for m in (Foundation, Systems, Tangent, Diagnostics), n in names(m)
+    n === nameof(m) || @eval export $n
+end
 end

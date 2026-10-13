@@ -222,9 +222,9 @@ end
         acc = CompensatedSum{T}()
         x = exact(T, 0.3)
         pr_loop_forward(sys, z, 2); pr_loop_tangent(sys, z, 2); pr_loop_add(acc, x, 2)    # warm-up
-        @test (@allocated pr_loop_forward(sys, z, 100)) == 0
-        @test (@allocated pr_loop_tangent(sys, z, 100)) == 0
-        @test (@allocated pr_loop_add(acc, x, 100)) == 0
+        @test pr_allocs(pr_loop_forward, sys, z, 100) == 0
+        @test pr_allocs(pr_loop_tangent, sys, z, 100) == 0
+        @test pr_allocs(pr_loop_add, acc, x, 100) == 0
     end
 end
 

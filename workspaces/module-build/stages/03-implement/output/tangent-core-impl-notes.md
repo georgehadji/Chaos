@@ -59,3 +59,9 @@ Code: `src/Tangent/` (`Tangent.jl` protocol functions and exports, `initial.jl`,
 - Host-side `W0` generation (QR per orbit) is serial; for very short runs it dominates. A threaded fill is possible without changing results (the stream is keyed by orbit only).
 - `reducer_init` state types must equal the types `reducer_update` returns; the per-chunk state buffer is typed from `reducer_init`.
 - The run takes about 2.5 minutes mostly from AC3 (10^6 steps) and AC9 (10^8 compensated adds).
+
+## Review fixes (stage 04)
+
+- `add(::CompensatedSum{T}, x)` no longer narrows: accepts `x::T`, any `Integer`, and floats with `promote_type(T, typeof(x)) === T`; otherwise `ArgumentError`. The check folds at compile time.
+- `propagate`: a `W0` entry with element type wider than T throws `ArgumentError` (checked per orbit as chunks are filled, before any result is returned).
+- Provenance gains `headroom` (the `chunk_size` fraction, constant `CHUNK_HEADROOM = 0.5`); existing fields unchanged.

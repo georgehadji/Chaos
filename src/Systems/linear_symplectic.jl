@@ -80,6 +80,7 @@ Non-normal variant `S^-1 A S` with `S = [I B; 0 I]` and `B` symmetric `N x N`; s
 """
 function conjugated(A::SMatrix{D, D}, B::SMatrix{N, N}) where {D, N}
     D == 2N || throw(DimensionMismatch("A is $(D) x $(D) but B is $(N) x $(N)"))
+    B == B' || throw(ArgumentError("B must be symmetric"))
     T = promote_type(eltype(A), eltype(B))
     S(sgn) = SMatrix{D, D, T}(ntuple(Val(D * D)) do l
         i = (l - 1) % D + 1

@@ -61,7 +61,9 @@ end
 
 Tangent.reducer_failed(::ResidualMonitor, st::MonitorState) = st.code != 0
 
-function Tangent.reducer_error(::ResidualMonitor, st::MonitorState, orbit, backend)
+Tangent.reducer_error(::ResidualMonitor, st::MonitorState, orbit, backend) = _failure(st, orbit, backend)
+
+function _failure(st::MonitorState, orbit, backend)
     finite = isfinite(st.value)
     return NumericalHealthError(FAILURE_NAMES[st.code], Float64(st.value), finite ? Float64(st.threshold) : Inf,
                                 st.step, orbit, backend)
@@ -75,6 +77,7 @@ Feed the exponents `lambda` (all 2N, estimator order) and the window growth `G` 
 finite-time allowance of the spec (O2) and is left to the caller through [`check_residual`](@ref).
 """
 function monitor_exponents(st::MonitorState{T}, lambda::StaticVector, G, n; pairing_tol, tau, M_max, step, orbit) where {T}
+    st.code == 0 || throw(_failure(st, orbit, :cpu))   # a recorded det, symplecticity or orthogonality failure comes first
     G_max = max(st.G_max, T(G))
     M_hi = max(st.M_max, T(M_max))
     s = eps_sum(lambda)

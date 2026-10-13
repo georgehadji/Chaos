@@ -21,3 +21,7 @@ Code: `src/Foundation/Foundation.jl` (precision items: `precision_label`, `parse
 
 - `exact(Double64, x::BigFloat)` / `exact(Double64, x::BigInt)` rely on the DoubleFloats constructor; not tested.
 - `precision_label(BigFloat)` reads `precision(BigFloat)` at call time; callers must set the precision before building labels.
+
+## Review fixes (stage 04)
+
+- `parse_precision` accepts `AbstractString`, anchors with `\z` (no trailing newline accepted), parses bits with `tryparse` and throws `ArgumentError` for unparsable bits or bits < 64.

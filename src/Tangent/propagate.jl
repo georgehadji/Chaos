@@ -5,12 +5,14 @@ Resident bytes per orbit: `sizeof(T) (d + d k + 2 k) + 16` (spec Compute).
 """
 bytes_per_orbit(::Val{d}, ::Val{k}, ::Type{T}) where {d, k, T} = sizeof(T) * (d + d * k + 2k) + 16
 
+const CHUNK_HEADROOM = 0.5   # fraction of free memory a chunk may use
+
 """
     chunk_size(free_bytes, Val(d), Val(k), T; f=0.5, reducer_bytes=0) -> Int
 
 Orbits per chunk: `floor(f free_bytes / (bytes_per_orbit + reducer_bytes))`, at least 1.
 """
-function chunk_size(free_bytes::Integer, v::Val{d}, kv::Val{k}, ::Type{T}; f = 0.5, reducer_bytes::Integer = 0) where {d, k, T}
+function chunk_size(free_bytes::Integer, v::Val{d}, kv::Val{k}, ::Type{T}; f = CHUNK_HEADROOM, reducer_bytes::Integer = 0) where {d, k, T}
     return max(1, floor(Int, f * free_bytes / (bytes_per_orbit(v, kv, T) + reducer_bytes)))
 end
 
@@ -38,6 +40,8 @@ const WORKGROUP = 16   # orbits per CPU work item; the sequential work per orbit
 # Initial deviation matrices of one chunk, on the host for every backend (spec, initial vectors).
 function _fill_W!(Win, r, seed, W0, ::Val{d}, ::Val{k}, ::Type{T}) where {d, k, T}
     for (i, j) in enumerate(r)
+        W0 === nothing || promote_type(T, eltype(W0[j])) === T ||
+            throw(ArgumentError("W0[$j] has element type $(eltype(W0[j])), wider than $T"))
         Win[i] = W0 === nothing ? initial_deviations(seed, j, Val(d), Val(k), T) : SMatrix{d, k, T}(W0[j])
     end
 end
@@ -66,7 +70,7 @@ function _propagate(sys, x0::AbstractVector{SVector{d, T}}, N, tau, ::Val{k}, se
     choice.backend === :cpu || error("GPU propagation needs the CUDA package extension")
     s0 = _init_states(reducers, T, Val(d), Val(k))
     csize = chunk !== nothing ? chunk :
-            chunk_size(Sys.free_memory(), Val(d), Val(k), T; reducer_bytes = isbitstype(typeof(s0)) ? sizeof(s0) : 0)
+            chunk_size(Sys.free_memory(), Val(d), Val(k), T; f = CHUNK_HEADROOM, reducer_bytes = isbitstype(typeof(s0)) ? sizeof(s0) : 0)
     m = min(csize, n)
     bufs = (Vector{SVector{d, T}}(undef, m), Vector{SMatrix{d, k, T, d * k}}(undef, m),
             Vector{SVector{d, T}}(undef, m), Vector{SMatrix{d, k, T, d * k}}(undef, m),
@@ -80,7 +84,7 @@ function _propagate(sys, x0::AbstractVector{SVector{d, T}}, N, tau, ::Val{k}, se
     end
     prov = (backend = choice.backend, device = choice.device, backend_fallback_reason = choice.reason,
             precision = precision_label(T), threads = Threads.nthreads(), cpu = Sys.CPU_NAME,
-            seed = seed, tau = tau, k = k, chunk_size = csize)
+            seed = seed, tau = tau, k = k, chunk_size = csize, headroom = CHUNK_HEADROOM)
     return PropagationResult(out.x, out.W, out.finals, prov)
 end
 

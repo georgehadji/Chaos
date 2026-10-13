@@ -25,3 +25,10 @@ The orbit is chaotic and unbounded in the lifted coordinates, so `sin`/`cos` run
 - `symplectic_residual` and `det_residual` take static matrices (`symplectic_residual` needs `StaticMatrix`; `det_residual` any `AbstractMatrix`).
 - `symplectic_form(T, d)` is type-stable only when `d` is a compile-time constant.
 - Double64 `sin`/`cos` accuracy is the library's (about 2^-100), which is why the tests use eps 2^-100 (test plan, ambiguity 1).
+
+## Review fixes (stage 04)
+
+- `wrap`/`_wrap1` never return a negative value (`y < 0 && (y += tp)` before the `>= tp` guard); docstring states wrap is for display (absolute error about |x| eps_T, meaningless above |x| ~ 1/eps_T); BigFloat uses the global precision, so callers wrap in `setprecision`.
+- `StandardMap` docstring: K must be built in the state's element type (use `exact`).
+- `conjugated(A, B)` throws `ArgumentError` unless `B == B'`.
+- `det_residual` (src/Systems/residuals.jl) uses `det(M)` on the SMatrix for every size; the dense `Matrix(M)` path and `_det` are removed.

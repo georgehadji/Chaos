@@ -33,3 +33,8 @@ This also matches the spec ("a kernel records the first-exceedance record per or
 
 - For 2N >= 4 `eps_det` and `eps_symp` come from Systems (`det_residual` builds a dense matrix for D > 3), so the 0-allocation claim is verified for 2 x 2 only.
 - Coverage, Aqua and JET not run in this stage run (orchestrator runs them).
+
+## Review fixes (stage 04)
+
+- `monitor_exponents` raises a failure already recorded in the state (det, symplecticity, orthogonality) before the sum and pairing checks; error construction shared with `reducer_error` through `_failure`.
+- `det_residual` for D > 3 no longer allocates a dense matrix (see standard-map notes); the D > 3 allocation caveat above no longer applies.

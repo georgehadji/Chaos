@@ -15,16 +15,12 @@ function _omega(::Type{T}, ::Val{D}) where {T, D}
     end)
 end
 
-# closed-form determinant up to 3 x 3; larger blocks go through LU on a dense copy
-_det(M::StaticMatrix{D, D}) where {D} = D <= 3 ? det(M) : det(Matrix(M))
-_det(M::AbstractMatrix) = det(M)
-
 """
     det_residual(M)
 
-`abs(det(M) - 1)`.
+`abs(det(M) - 1)`; `det` of an `SMatrix` is static and does not allocate.
 """
-det_residual(M::AbstractMatrix) = abs(_det(M) - one(eltype(M)))
+det_residual(M::AbstractMatrix) = abs(det(M) - one(eltype(M)))
 
 """
     symplectic_residual(M)

@@ -34,8 +34,13 @@ struct CompensatedSum{T}
 end
 CompensatedSum{T}() where {T} = CompensatedSum{T}(zero(T), zero(T))
 
-"Add `x` to a [`CompensatedSum`](@ref) and return the new accumulator (Neumaier update)."
+"""
+Add `x` to a [`CompensatedSum`](@ref) and return the new accumulator (Neumaier update); `x` must be an
+`Integer` or a float that widens exactly into `T`, anything else throws `ArgumentError`.
+"""
 function add(acc::CompensatedSum{T}, x) where {T}
+    x isa T || x isa Integer || (x isa AbstractFloat && promote_type(T, typeof(x)) === T) ||
+        throw(ArgumentError("add: x of type $(typeof(x)) would be narrowed to $T"))
     y = T(x)
     t = acc.s + y
     c = abs(acc.s) >= abs(y) ? (acc.s - t) + y : (y - t) + acc.s
@@ -91,12 +96,14 @@ precision_label(::Type{Double64}) = "Double64"
 precision_label(::Type{BigFloat}) = "BigFloat($(precision(BigFloat)))"
 
 "Inverse of [`precision_label`](@ref): returns `(T, bits)` with `bits === nothing` unless `T` is `BigFloat`."
-function parse_precision(s::String)
+function parse_precision(s::AbstractString)
     s == "Float64" && return (Float64, nothing)
     s == "Double64" && return (Double64, nothing)
-    m = match(r"^BigFloat\((\d+)\)$", s)
+    m = match(r"^BigFloat\((\d+)\)\z", s)
     m === nothing && throw(ArgumentError("unknown precision string \"$s\""))
-    return (BigFloat, parse(Int, something(m[1])))
+    bits = tryparse(Int, m[1])
+    (bits === nothing || bits < 64) && throw(ArgumentError("BigFloat bits must be an integer >= 64 in \"$s\""))
+    return (BigFloat, bits)
 end
 
 # Build a value in T from its definition, never through a Float64 detour (spec precision E2).

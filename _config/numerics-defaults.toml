@@ -6,7 +6,7 @@ seed = 20261012
 bigfloat_bits = 256         # working precision of BigFloat oracle runs (precision spec, Algorithm 7)
 backend = "auto"            # auto (GPU if functional, else CPU), gpu, cpu; architecture.md, section "Compute"
 renorm_interval_tau = 1     # map steps between handoffs; override only within tau_max(T) (tangent-core spec, Algorithm)
-# orthogonality_tol =        # set by the lyap-gram-schmidt spec
+orthogonality_tol = 8       # multiplier of eps(T) x k x g(method), g = 1 for RGS and Householder, g = G_w for CGS and MGS (lyap-gram-schmidt spec, D30)
 pairing_residual_tol = 16   # multiplier of eps(T) x (G_max/tau + M_max), not an absolute value (diagnostics spec, Tolerances)
 det_residual_tol = 4        # multiplier of eps(T) x (1 + M), not an absolute value (diagnostics spec, Tolerances)
 # energy_error_tol =         # set by the first integrator spec

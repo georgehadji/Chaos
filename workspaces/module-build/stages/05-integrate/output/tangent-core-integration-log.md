@@ -48,4 +48,4 @@ Short hashes are the commits on `main..m2-p1-modules` that touched the file (`gi
 
 - Folder `CONTEXT.md` files for Foundation, Systems, Tangent, Diagnostics and `ext/`; `CHANGELOG.md` section "Added (M2 Batch A)", "Changed", "Deferred"; this log.
 
-Commit SHA: (filled by orchestrator)
+Commit SHA: abef540

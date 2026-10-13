@@ -84,3 +84,34 @@ No measurable change for s = d (same method bodies after specialization). For s 
 ### Known limits
 - The memory formula adds `sizeof(T) (s - d)` per orbit (32 bytes in Float64 for the wrapped system); reducer state is separate.
 - A reducer sees the full s-component state; reducers written for d components that index `x` by position keep working, since the first d components are the phase-space point by convention.
+
+## Amendment D29 (2026-10-13)
+
+Code: `src/Foundation/Foundation.jl` (`AbstractDevice`, `NoDevice`, `DEVICE`, `probe(::NoDevice, T)` replacing `default_probe`, `free_memory`, `is_oom`, `is_compile_error`, none exported; `resolve_backend(...; probe = nothing)` calls `probe(DEVICE[], T)` when no zero-argument probe is passed), `src/Tangent/propagate.jl` (`device_backend`, `workgroup`, `_alloc_bufs`, `_run_chunk!` on any backend, `_device_chunk!` with the single `try`; the `error("GPU propagation needs ...")` line is gone), `src/Tangent/Tangent.jl` (imports the hooks), `ext/ChaoslabCUDAExt.jl` (about 60 lines), `Project.toml` (`[weakdeps] CUDA`, `[extensions]`, compat `CUDA = "6"`, `TOML` in `[deps]`), both root manifests re-resolved. `test/layering.jl` walks `src/` only, so `ext/` needs no change there.
+
+### Result
+Full suite with the new `tc_device.jl` (42 assertions): 1617 pass, 0 fail on Julia 1.13.1 (19 min 54 s) and on Julia 1.10.12 (122 min 12 s), Aqua and JET included. `verify/gpu.jl` prints 19 lines (11 PASS, 1 FAIL, 6 FALLBACK, 1 INFO), see `gpu-verify-log.txt`.
+
+### Deviations from the brief
+- Compat is `CUDA = "6"`, not `"5"`: the depot has 6.4.2 (CUDA.jl 6 splits into CUDACore and CUDATools; `CUDA.KernelError` and `CUDA.InvalidIRError` are public there). Version 5 was not tried.
+- `CUDA.free_memory()` is the free-memory call; `CUDA.available_memory` does not exist in 6.4.2.
+- The default chunk is sized from free device memory (about 13 million orbits at 96 bytes), but a launch lasts as long as the number of steps per orbit says, whatever the orbit count: 1024 orbits x 1e5 steps is one launch of 1.5 to 2.9 s. The brief's remedy (fewer orbits per chunk) does not shorten such a launch. This machine has TdrDelay 8 s; with the default 2 s a run of that length would need a smaller n or a longer delay. The kernel was not changed.
+- `gpu_faster` for Float64 is true (21.4 vs 91.8 ns/orbit-step on 4 threads), not false as the brief expected, so with CUDA loaded `:auto` picks the GPU for Float64 on this machine.
+- Reason 5 is forced in `tc_device.jl` by a fake device and a fault that fires once; on real hardware it cannot be forced.
+- `verify/Manifest.toml` was regenerated with CUDA 6.4.2 pinned: Atomix 1.6.0 to 1.5.0, ColorTypes 0.12.3 to 0.12.4 and OrderedCollections 2.0.2 to 2.0.3 changed as a side effect, 38 packages were added. Earlier verify logs were produced with the old manifest.
+- AC12a "regular class" is defined by agreement of the CPU Float64 S/n with a Double64 CPU run within 1e-6 (1004 of 1024 orbits); on it the CPU-GPU maximum is 1.162e-06, a FAIL against the proposed 1e-6 by 16 percent.
+
+### Known limits
+- Double64 does not compile for the GPU (Quadmath `__subtf3` lazy initialisation, `Vector{Base.Padding}` allocation); the probe caches `compiles = false` per element type and the run falls back with reason 3.
+- The `compiles` probe launches one orbit of `StandardMap` with no reducer; a reducer that does not compile is caught per chunk (reason 3 after the fact).
+- The record file is read at every probe (a small TOML parse), not cached, so a new measurement takes effect without a restart.
+
+## Amendment D33 (2026-10-13)
+
+Code: `src/Foundation/Foundation.jl` (eighth `FALLBACK_REASONS` string, hooks `is_device_lost` and `gpu_step_ns`, neither exported), `src/Tangent/propagate.jl` (`LAUNCH_BUDGET_S`, `LAUNCH_WAVE`, `DEFAULT_GPU_NS`, `_budget_orbits`, `_fallback_reason`; `_propagate` sets up the device inside the same classification as a chunk, runs a `while` loop so the chunk size can change at a fallback, and records `gpu_chunks` and `gpu_chunk_size`; the docstring states that bitwise equality holds for CPU backends only), `ext/ChaoslabCUDAExt.jl` (`is_device_lost` for the CuError codes 4, 100, 201, 214, 700, 702, 709, 710, 714, 715, 716, 719, 999; `record_entry` reads the record inside `try`; `gpu_step_ns`; the `COMPILES` cache under a `ReentrantLock`), `verify/gpu.jl` (record written through a temporary file and `mv`; AC13 and the record first; AC12a symmetric), `verify/tangent-core.jl` (the reasons-list check has eight strings).
+
+### Deviations and notes
+- Reason for a lost device: no new string; "launch exceeds the display watchdog" is used for code 702 and, for lack of a separate string, for the other context losses. Proposed separate string if the owner wants one: "device lost".
+- `DEFAULT_GPU_NS = 100` is a judgement (about 5 times the measured 21.4 ns); with it an explicit `:gpu` run without a record refuses N above 9765 with one wave. `verify/gpu.jl` measures AC13 first so a fresh machine records its own value before the long-N lines.
+- The device chunk is capped by the budget even when the caller passes a larger `chunk`.
+- A real 702 cannot be provoked on purpose; the lost-device path is tested with a fake exception, and `is_device_lost(CuError(ERROR_LAUNCH_TIMEOUT))` was checked in a scratch script.

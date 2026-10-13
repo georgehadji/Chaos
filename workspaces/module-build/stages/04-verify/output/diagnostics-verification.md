@@ -64,3 +64,16 @@ Findings on the evidence:
 - Criterion 10 compares 4 threads with 1 thread through a child Julia process started by the script (`--child`); the digest covers x, W and the five residual maxima of all 64 orbits.
 - Criterion 11: the GPU part (`STAGE04-GPU`) is not run here. The monitor's `reducer_final` does not export M_max, so the kernel-path panel check reports det_max / eps (max 4.0 over the panel, K up to 10 so M up to 11) and a bitwise match against a direct loop instead of eps_det / (eps M).
 - D28 wrapped-state names are not used by this module; no criterion is PENDING D28.
+
+## GPU
+
+Measured by `verify/gpu.jl` (decisions D29 and D33), raw output `gpu-verify-log.txt`. Machine: GeForce GTX 1050 (sm_61, 3 GB, display GPU, WDDM driver 581.83), CUDA.jl 6.4.2 with runtime 12.9.0, Julia 1.13.1, 4 CPU threads. Windows TDR registry: TdrDelay 8 s, TdrLevel 3 (the default delay is 2 s). Every GPU line below was checked for `provenance.backend == gpu`; an element type or run that ended on the CPU is printed as FALLBACK(reason), which is a result of the fallback path and not a kernel pass. Since D33 a launch is kept under a 1 s estimated budget (gpu_ns_per_step x N x orbits, at least one wave of 1024 orbits); a run beyond it goes to the CPU with the reason "launch exceeds the display watchdog".
+
+| Criterion | Quantity | Value | Bound | Verdict |
+|---|---|---|---|---|
+| AC11 item 1 | integer maps x 1000 steps, Float64: max residual, GPU / CPU | 0 / 0 | 0 (exact) | PASS |
+| AC11 item 1 | same, Double64 | - | 0 (exact) | FALLBACK(kernel does not compile for the element type) |
+| AC11 item 5 | det fault, theta = 2.665e-15: raise on both backends / quiet on the GPU with det_max within theta of the CPU | 1/1, 1/1 | all | PASS |
+| AC11 item 6 | standard-map panel K in {0.5, 0.9716354, 2, 5, 10}, 50 starts x 1e4 steps: health errors; max \|det_max GPU - CPU\| / det threshold in force | 0; 0 | 0; 1 | PASS |
+
+Item 5, raise side: a determinant fault on the GPU is recorded by the monitor in its state, the host sees a non-OK status at the end of the chunk, the chunk reruns on the CPU (reason 5) and the CPU raises the error that reaches the caller, so that error carries `backend = cpu` and the run returns no provenance; the verdict (raise on both sides of the threshold) matches the CPU. The quiet side is checked from the GPU provenance (no fallback) and the det maxima. Item 6: the det maxima on the GPU equal those on the CPU for every start (ratio 0 to the threshold). The monitor state compiles for the GPU for Float64; Double64 does not (cause in the tangent-core GPU section).

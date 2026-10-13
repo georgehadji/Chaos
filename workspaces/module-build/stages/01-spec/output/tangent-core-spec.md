@@ -95,7 +95,7 @@ All run on the CPU backend (kernel on CPU) unless marked [local]. Seeds: run see
 9. Compensated summation. (a) Sum of 10^8 copies of fl(0.1) in Float64: |computed - exact| / exact <= eps(T), exact = 10^8 fl(0.1) in rational arithmetic (the correctly rounded result passes; measured here 0.25 eps). (b) Negative control: the plain running sum on the same input has error 1.9e-9 relative (8.5e6 eps, measured) and must fail (a), showing the test discriminates. (c) Double64, 10^7 copies of fl(0.1): relative error <= eps(Double64) against rational exact.
 10. Backend resolution and provenance. (a) CI, no CUDA: `auto` gives `backend` = cpu, `device` = cpu, reason "CUDA.jl not loadable" or "no functional device". (b) `cpu` request: reason empty. (c) `gpu` request without a device: falls back, reason recorded. (d) BigFloat with `gpu`: cpu, reason "kernel does not compile for the element type". (e) Each of the five reasons can be forced by a test hook and is recorded as the exact string. (f) The provenance record contains backend, device, reason, precision, threads, cpu, seed, tau, k, chunk size; `backend` is never `auto`. Tolerance: exact string equality.
 11. Chunk size. For free_bytes = 2^30, f = 0.5: d = 2, k = 2, Float64 gives 5592405; d = 4, k = 4, Float64 gives 2236962 (floor(536870912/240)). With free_bytes halved, chunk halves (floor). Tolerance 0.
-12. [local] CPU vs GPU, Float64, report in 04-verify. Compare S/n (accumulated log divided by n), never per-step values or trajectories. (a) Regular class: K = 0.5, 1024 seeded orbits, n = 10^5: max |S_cpu/n - S_gpu/n| <= 1e-6. (b) Same-orbit short horizon (orbits not yet diverged): K = 2 pi and K = 10, n = 10: |x_cpu - x_gpu| <= 4 n eps G^n with G = sqrt((1 + K)^2 + K^2 + 2) (derived: Frobenius norm of E8, an upper bound of the Jacobian's 2-norm, so initial perturbations grow at most by G per step). (c) Chaotic ensemble: K = 10, 1024 seeded orbits, n = 10^4: sigma_FT = standard deviation of S/n on the CPU ensemble; per orbit |S_cpu/n - S_gpu/n| <= 6 sigma_FT; difference of ensemble means <= 4 combined standard errors. Tolerances (a) and (c) are conservative proposals to be preregistered for the study; the observed maxima go in the report.
+12. [local] CPU vs GPU, Float64, report in 04-verify. Compare S/n (accumulated log divided by n), never per-step values or trajectories. (a) K = 0.5, 1024 seeded orbits, n = 10^5, symmetric form of Amendment D33: each backend against a Double64 reference; the counts of orbits above 1e-6 differ by at most 3; where both agree with the reference the CPU-GPU gap is at most 2e-6. (b) Same-orbit short horizon (orbits not yet diverged): K = 2 pi and K = 10, n = 10: |x_cpu - x_gpu| <= 4 n eps G^n with G = sqrt((1 + K)^2 + K^2 + 2) (derived: Frobenius norm of E8, an upper bound of the Jacobian's 2-norm, so initial perturbations grow at most by G per step). (c) Chaotic ensemble: K = 10, 1024 seeded orbits, n = 10^4: sigma_FT = standard deviation of S/n on the CPU ensemble; per orbit |S_cpu/n - S_gpu/n| <= 6 sigma_FT; difference of ensemble means <= 4 combined standard errors. Tolerances (a) and (c) are conservative proposals to be preregistered for the study; the observed maxima go in the report.
 13. [local] Performance record for K15: CPU (1 thread and all threads) vs GPU wall time for 10^6 orbits, d = 2, k = 2, N = 10^4, Float64 and Float32, with the CUDA runtime version and device name. Pass: the table is in the 04-verify report; GPU is the default for T only if GPU time <= CPU time (then `auto` may resolve GPU for T).
 14. Single kernel. Stage 04 inspection: exactly one per-step update implementation exists; AC1 to AC9 exercise it through the CPU backend. Pass/fail by inspection, recorded in the 04-verify report.
 
@@ -127,3 +127,61 @@ The single stepping body stays the only kernel. Buffers of states hold s compone
 ### Acceptance criteria (amendment)
 
 - W9 State longer than the tangent dimension: with a test map of state length 4 and dimension 2 (the last two components are a step counter and a running sum of x; the tangent is the standard-map matrix at x), k in {1, 2}, tau in {1, 3}: (a) the per-orbit propagation returns a state of 4 components equal bitwise to the manual iteration of the map and a 2 x k deviation matrix equal bitwise to the manual tangent product; (b) the chunked propagation over 257 seeded orbits equals the serial map of the per-orbit propagation bitwise (chunk sizes 16 and default); (c) a non-finite value in component 3 or in component 4 raises the numerical health error of kind "state" at the correct handoff; (d) the per-orbit propagation allocates 0 bytes after warm-up; (e) a reducer sees the 4-component state; (f) the memory formula gives 112 bytes for s = 4, d = 2, k = 2 in Float64 and 96 for the default call, and the chunk size follows; (g) k = 3 with d = 2 is rejected before any work; (h) the existing suites (s = d) are unchanged.
+
+## Amendment D29 (2026-10-13)
+
+Decision D29 builds the GPU path in M2: CUDA.jl as a weak dependency, the probe answering per element type, `gpu_faster` taken from a recorded measurement. This amendment fixes the device hook, the per-chunk fallback handling and the record. The kernel, the reducer contract and the CPU results are unchanged.
+
+### Device hook (contract)
+
+- `Foundation` owns `AbstractDevice`, `NoDevice` and the run-wide `DEVICE` (a `Ref`, `NoDevice()` by default). Nothing in `src/` loads CUDA. The hooks are not exported: `probe(device, T)` (the NamedTuple `loadable, functional, device, compiles, gpu_faster`, answered per element type), `free_memory(device)`, `is_oom(exception)`, `is_compile_error(exception)`; the last two default to `false`.
+- `resolve_backend(request, T; cpu_only_reducer, probe)`: `probe` is an optional zero-argument function (the test hook of AC10, unchanged); without it the record of `DEVICE[]` for `T` is used. Order of checks unchanged (E10).
+- `Tangent` owns `device_backend(device)` (the KernelAbstractions backend of a device; `CPU()` for `NoDevice`) and `workgroup(backend)` (orbits per work group; 16 on the CPU, 256 on CUDA). The CUDA extension `ext/ChaoslabCUDAExt.jl` sets `DEVICE[]` when `CUDA.functional()`, adds the methods and implements `probe`.
+
+### Fallback handling in `propagate`
+
+1. The reducer chain is built before backend resolution; a state that is not `isbits` resolves to the CPU with reason 6 ("reducer is CPU-only").
+2. A GPU run allocates the seven chunk buffers on the device backend, fills the initial deviations on the host and copies them (and the slice of `x0`) to the device, and brings status, state, deviation, reducer-state and failing-step buffers back to the host after `synchronize`. Everything after that is the CPU code. The chunk size comes from `free_memory(DEVICE[])`.
+3. A device chunk is wrapped in one `try`: `is_oom` reruns the chunk on the CPU and keeps the rest of the run there, reason 4; `is_compile_error` the same with reason 3; a health error (non-OK status) reruns the chunk on the CPU, and if the CPU passes the run continues there with reason 5, otherwise the CPU error is thrown (its `backend` field is `:cpu`). Any other exception is rethrown. Provenance records the final backend and its reason; `device` is `cpu` after a fallback.
+
+### Record
+
+`data/gpu-benchmark.toml` under the package directory (git-ignored, per machine): tables `[<device name>."<precision label>"]` with `gpu_faster`, `cpu_ns_per_step`, `gpu_ns_per_step`, `threads`, `date`, and `reason` when the element type did not run on the device. `gpu_faster` is true when the GPU time per orbit-step is at most the CPU time with all threads on the AC13 ensemble; an absent entry reads as false. `verify/gpu.jl` writes it; the extension only reads it. The record file is the only home of this fact (`_config/architecture.md`, "Compute").
+
+### Acceptance criteria (amendment)
+
+- D29a Device path equals the CPU path: with a test device whose backend is the CPU backend, `propagate` with `backend = :gpu` gives bitwise equal results and provenance `gpu` with the device name.
+- D29b Reasons 3, 4, 6 and the health path: a device chunk that throws an out-of-memory or compile error reruns on the CPU (first, middle and last chunk) with the exact reason string; a reducer with a non-isbits state records reason 6; a health error that only the first run of a chunk raises records reason 5; a health error the CPU raises too is thrown with `backend = :cpu`; other exceptions propagate.
+- D29c [local] The STAGE04-GPU lines of the four Batch A verify logs, printed by `verify/gpu.jl` (spec items AC12, AC13 above and the matching items of the precision, standard-map and diagnostics specs).
+
+## Amendment D33 (2026-10-13)
+
+Decision D33 (owner, after the D29 GPU run and an independent review) adds the launch budget, the lost-device path and the symmetric AC12a. It changes the Amendment D29 text above as follows.
+
+### Launch budget (contract)
+
+- One launch runs all N steps of every orbit in its chunk, and the Windows display watchdog (TDR) kills a launch that takes too long (8 s on the measured machine, 2 s by default). A launch is estimated as `gpu_ns_per_step x N x orbits`, with `gpu_ns_per_step` from the record (`Foundation.gpu_step_ns`), and never less than for one wave of 1024 orbits (`LAUNCH_WAVE`; the launch time is flat below it: 256 and 1024 orbits x 1e4 steps took 0.38 s and 0.30 s). The budget is 1 s (`LAUNCH_BUDGET_S`).
+- The device chunk is the smaller of the memory-based or requested chunk and the largest chunk within the budget. If that chunk is below one wave, N alone exceeds the budget: the run uses the CPU and records the new eighth fallback reason "launch exceeds the display watchdog" (appended last to `FALLBACK_REASONS`; architecture "Compute" lists it). The seven reasons of the D29 text above plus this one make eight.
+- No record (no `gpu_ns_per_step` for the device and element type, or an unreadable record): the conservative default 100 ns per orbit-step (`DEFAULT_GPU_NS`, about 5 times the value measured on a GTX 1050) is used. With it, one wave of 1024 orbits runs up to N = 9765 steps.
+- Step-chunked relaunch (carrying the state between launches) is a named run before M2 exit; until then a long N runs on the CPU.
+
+### Lost device and setup failures
+
+- `Foundation.is_device_lost(exception)` (default false; the CUDA extension answers true for the CuError codes after which the context is unusable, among them the launch timeout 702). A lost device sends the rest of the run to the CPU with the reason "launch exceeds the display watchdog" (the nearest existing string: a launch timeout is exactly that, and other context losses share it until the owner names a separate string, proposed: "device lost") and resets `DEVICE[]` to `NoDevice()`, so later calls do not touch the dead context.
+- The first `free_memory` call and the buffer allocation on the device sit inside the same classification as a chunk: an out-of-memory error there is reason 4, a compile error reason 3, a lost device as above.
+
+### Provenance and record
+
+- After a mid-run fallback the CPU chunk size is recomputed from host memory (an explicit `chunk` is kept). Provenance `chunk_size` is the chunk size of the backend that finished the run; `gpu_chunks` counts the chunks that ran on the device first and `gpu_chunk_size` is the device chunk size (0 if the device was never used).
+- The record is read inside `try`; any read, parse or shape error gives `gpu_faster = false` and no ns value. `verify/gpu.jl` writes it through a temporary file and a move.
+
+### AC12a, symmetric form
+
+Each backend is compared with a Double64 CPU reference on all 1024 seeded orbits (K = 0.5, tau = 10): the numbers of orbits whose S/n differs from the reference by more than 1e-6 differ between CPU and GPU by at most 3, and on the orbits where both backends agree with the reference within 1e-6 the CPU-GPU gap is at most 2e-6. This replaces the CPU-selected class of the D29 run (which failed at 1.162e-6 on one orbit although 20 orbits were above 1e-6 for each backend). At n = 10^5 one launch of 1024 orbits is estimated at 2.2 s, above the budget, so the run goes to the CPU with the new reason; `verify/gpu.jl` prints that FALLBACK line and evaluates the same criterion at n = 4 x 10^4, the largest n whose one-wave launch fits the budget.
+
+### Acceptance criteria (amendment)
+
+- D33a Budget: with a recorded gpu_ns_per_step the device chunk is capped (exact chunk size); with N beyond one wave the provenance reason is the eighth string, the results equal the CPU run, `gpu_chunks` is 0; without a record the default applies.
+- D33b Lost device: a device chunk that throws a lost-device error reruns on the CPU with the eighth reason, `DEVICE[]` is `NoDevice()` afterwards.
+- D33c Setup: an out-of-memory error from `free_memory` or from the buffer allocation gives reason 4 and a complete CPU run.
+- D33d Provenance: `gpu_chunks`, `gpu_chunk_size`, and `chunk_size` recomputed from host memory after the switch.

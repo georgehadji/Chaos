@@ -112,3 +112,25 @@ Findings on the evidence:
 - The script took 14.6 minutes (wall) on the loaded machine, above the 10 minute target. The single-thread child run (AC6 digests, AC13 timings) and the AC13 measurements take roughly 5 of those minutes; the 10^8-step compensated sums and the BigFloat curves take most of the rest.
 - In the K = 2 pi panel of the first figure the legend covers part of the Float64 curves. The data are all in the log and script; moving the legend below the axes is a one-line change if the figure is used in a paper.
 - Timings were taken on a loaded machine (see above); the thread speedup of 4.6 for Float64 on 4 threads is above the thread count and is an artifact of load during the 1-thread run.
+
+## GPU
+
+Measured by `verify/gpu.jl` (decisions D29 and D33), raw output `gpu-verify-log.txt`. Machine: GeForce GTX 1050 (sm_61, 3 GB, display GPU, WDDM driver 581.83), CUDA.jl 6.4.2 with runtime 12.9.0, Julia 1.13.1, 4 CPU threads. Windows TDR registry: TdrDelay 8 s, TdrLevel 3 (the default delay is 2 s). Every GPU line below was checked for `provenance.backend == gpu`; an element type or run that ended on the CPU is printed as FALLBACK(reason), which is a result of the fallback path and not a kernel pass. Since D33 a launch is kept under a 1 s estimated budget (gpu_ns_per_step x N x orbits, at least one wave of 1024 orbits); a run beyond it goes to the CPU with the reason "launch exceeds the display watchdog".
+
+| Criterion | Quantity | Value | Bound | Verdict |
+|---|---|---|---|---|
+| AC12b | K = 2 pi, n = 10, same orbit, max over 1024 orbits, \|x_cpu - x_gpu\| | 1.231e-08 | 6.702e-05 | PASS |
+| AC12b | K = 10, n = 10, same orbit, max over 1024 orbits | 7.248e-07 | 0.004898 | PASS |
+| AC12c | K = 10, 1024 orbits, n = 1e4, tau = 10: max per-orbit \|S_cpu/n - S_gpu/n\| / sigma_FT (sigma_FT = 0.009283); \|difference of means\| / SE | 4.599; 1.936 | 6; 4 | PASS |
+| AC12a | K = 0.5, 1024 orbits, n = 1e5, tau = 10 (symmetric form, D33) | - | count diff <= 3; gap <= 2e-6 | FALLBACK(launch exceeds the display watchdog) |
+| AC12a | same at n = 4e4 (largest n whose one-wave launch fits the budget; launch 1.4 s): orbits above 1e-6 against the Double64 reference, CPU / GPU; max CPU-GPU gap over the 1006 orbits where both agree with the reference | 18 / 18 (diff 0); 3.016e-07 | count diff <= 3; gap <= 2e-6 | PASS |
+| AC12a | same, maxima over all 1024 orbits (chaotic layer included): \|S_cpu - S_ref\| 0.05609, \|S_gpu - S_ref\| 0.06607, \|S_cpu - S_gpu\| 0.04523 | 0.04523 | - | INFO |
+| AC13 | Float64, 1e5 orbits x 1e3 steps, GPU 20.2 ns/orbit-step (chunk 8000) vs CPU 4 threads 102.6 ns/orbit-step; speedup 5.08; extrapolated to 1e6 x 1e4: 202 s GPU, 1026 s CPU | 2.02 s vs 10.26 s | GPU <= CPU | PASS |
+| AC13 | Float64, vs CPU 1 thread 368.3 ns/orbit-step (child run, 2e4 orbits x 1e3 steps); speedup 18.2 | 2.02 s vs 36.83 s | GPU <= CPU | PASS |
+| AC13 | Double64, 2000 orbits x 1e3 steps; CPU 4 threads 3006 ns/orbit-step, 1 thread 2.26e+04 ns/orbit-step | - | GPU <= CPU | FALLBACK(kernel does not compile for the element type) |
+
+Findings.
+- AC12a. The D29 form compared CPU and GPU on a CPU-selected class and failed at 1.162e-06 on one orbit. The D33 form compares each backend with a Double64 reference on all orbits. At n = 1e5 the single launch of 1024 orbits is estimated at 2.1 s, above the budget, so `propagate` runs it on the CPU and the FALLBACK line is the result; at n = 4e4 the criterion holds: 18 orbits above 1e-6 for each backend (chaotic layer, about 2 percent) and a CPU-GPU gap of 3.0e-07 on the orbits where both agree with the reference. The maxima over all orbits are chaotic-layer orbits, where no backend pair agrees.
+- AC13. On an idle machine the GPU is faster than 4 CPU threads for Float64 (5.1x in this run, 4.3x in the earlier one), so the record has `gpu_faster = true` for Float64 and `auto` resolves to the GPU for Float64 on this machine once CUDA is loaded. The CPU times in the CPU section of this report (185.6 and 851.1 ns/orbit-step) were taken while other jobs ran. The record (`data/gpu-benchmark.toml`, git-ignored) holds the numbers of the last run.
+- Double64 does not compile for the GPU: the kernel reaches a lazily initialised `__subtf3` call from Quadmath (reached through DoubleFloats) and allocations of objects with references (`Vector{Base.Padding}`). The probe returns `compiles = false`; `resolve_backend` gives CPU with reason 3 for `:gpu` and `:auto`, and an explicit `:gpu` run completes on the CPU with that reason in its provenance.
+- Launch time. A launch is bounded by the number of steps per orbit, not by the number of orbits: 256 and 1024 orbits x 1e4 steps took 0.38 s and 0.30 s, 1024 x 1e5 steps 1.5 to 2.9 s. The launch budget of D33 therefore refuses such a run instead of relying on the watchdog delay.

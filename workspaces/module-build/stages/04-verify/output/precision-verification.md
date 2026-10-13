@@ -65,3 +65,15 @@ Findings on the evidence:
 - AC11: Double64 costs about 46 to 64 times Float64 per step on CPU and BigFloat(256) about 550 times, on a loaded machine. Float64 at 150 to 180 ns per step is itself several times slower than an unloaded core would give (a sin plus a few additions), which compresses or inflates ratios depending on how the load fell on each run; the first run gave Double64/Float64 of 57.6 and 56.1 and BigFloat/Float64 of 364 and 576. Treat the ratios as an order of magnitude. BigFloat scaling to 4 threads (3.2x) is allocation-bound.
 - AC1 uses Float32-free type set (D24); AC7 omits the four Float32 rows. AC9 and AC11 GPU parts await `verify/gpu.jl`.
 - The package tests for AC1 to AC8, 12, 13 use the same helpers and seeds, so verify and suite measure the same orbits; the verify run adds 10^4 points for AC3 (suite: 3 x 10^3 per function) and reports the realised values.
+
+## GPU
+
+Measured by `verify/gpu.jl` (decisions D29 and D33), raw output `gpu-verify-log.txt`. Machine: GeForce GTX 1050 (sm_61, 3 GB, display GPU, WDDM driver 581.83), CUDA.jl 6.4.2 with runtime 12.9.0, Julia 1.13.1, 4 CPU threads. Windows TDR registry: TdrDelay 8 s, TdrLevel 3 (the default delay is 2 s). Every GPU line below was checked for `provenance.backend == gpu`; an element type or run that ended on the CPU is printed as FALLBACK(reason), which is a result of the fallback path and not a kernel pass. Since D33 a launch is kept under a 1 s estimated budget (gpu_ns_per_step x N x orbits, at least one wave of 1024 orbits); a run beyond it goes to the CPU with the reason "launch exceeds the display watchdog".
+
+| Criterion | Quantity | Value | Bound | Verdict |
+|---|---|---|---|---|
+| AC9 | Float64, 200 seeded orbits K = 5 (BigFloat reference, n_H min/median/max 14/19/100), n = min(n_H, 10) and n = n_H: max \|x_cpu - x_gpu\| / (2 c eps M_n Gamma_n), c = 8 | 0.02607 | 1 | PASS |
+| AC9 | Double64, same orbits (n_H 39/55/100) | - | 2 c eps M_n Gamma_n | FALLBACK(kernel does not compile for the element type) |
+| AC11 | GPU Double64/Float64 time ratio, AC13 ensemble: Float64 on the GPU 20.2 ns/orbit-step; CPU ratio Double64/Float64 in the same run 29.31 (4 threads) | - | reported, no threshold | FALLBACK(kernel does not compile for the element type) |
+
+Float64 on the GPU meets the orbit bound with a ratio of 0.026, so the CPU and GPU orbits agree to a few percent of the allowed error over the whole perturbative horizon. Double64 does not compile for the GTX 1050 kernel (cause in the tangent-core GPU section); the recorded outcome is the fallback reason of criterion 7, which is a pass of the fallback and not of the kernel (spec criterion 9). The Float64 GPU/CPU ratio is in the tangent-core GPU section (5.1x faster than 4 threads in the last run).

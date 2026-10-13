@@ -160,7 +160,7 @@ end
 @testset "AC7 fallback matrix" begin
     # 9 cases (T x request) with a no-CUDA probe, plus one row per remaining reason; BigFloat never consults the probe
     @test Chaoslab.FALLBACK_REASONS == ["CUDA.jl not loadable", "no functional device", "kernel does not compile for the element type",
-        "device out of memory", "NumericalHealthError raised only on the GPU", "reducer is CPU-only", "GPU not faster for the element type"]
+        "device out of memory", "NumericalHealthError raised only on the GPU", "reducer is CPU-only", "GPU not faster for the element type", "launch exceeds the display watchdog"]
     compile_reason = "kernel does not compile for the element type"
     for T in (Float64, Double64, BigFloat), req in (:auto, :gpu, :cpu)
         probe = (T === BigFloat && req !== :cpu) ? pr_probe_boom : pr_probe_noload

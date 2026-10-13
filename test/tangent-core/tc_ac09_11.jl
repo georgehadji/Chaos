@@ -31,10 +31,10 @@ end
     @test FALLBACK_REASONS == [
         "CUDA.jl not loadable", "no functional device", "kernel does not compile for the element type",
         "device out of memory", "NumericalHealthError raised only on the GPU", "reducer is CPU-only",
-        "GPU not faster for the element type",
+        "GPU not faster for the element type", "launch exceeds the display watchdog",
     ]
     # (a) CI without CUDA: default probe
-    c = resolve_backend(:auto, Float64)
+    c = tc_with_device(() -> resolve_backend(:auto, Float64), tc_F.NoDevice())
     @test c isa BackendChoice && c.backend === :cpu && c.device == "cpu"
     @test c.reason in ("CUDA.jl not loadable", "no functional device")
     # (b) cpu request never falls back
@@ -74,7 +74,7 @@ end
     ident = tc_Lin(SMatrix{2,2,Float64}(1, 0, 0, 1))
     x0 = [SVector(0.0, 0.0) for _ in 1:200]
     for req in (:auto, :gpu, :cpu)
-        p = propagate(ident, x0, 4; k = 2, tau = 2, seed = seed, backend = req, chunk = 64).provenance
+        p = tc_with_device(() -> propagate(ident, x0, 4; k = 2, tau = 2, seed = seed, backend = req, chunk = 64), tc_F.NoDevice()).provenance
         for name in (:backend, :device, :backend_fallback_reason, :precision, :threads, :cpu, :seed, :tau, :k, :chunk_size)
             @test hasproperty(p, name)
         end

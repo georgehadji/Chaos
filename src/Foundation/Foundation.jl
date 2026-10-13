@@ -50,11 +50,11 @@ end
 "Value of a [`CompensatedSum`](@ref): `s + c`."
 total(acc::CompensatedSum) = acc.s + acc.c
 
-"The seven recorded reasons for a CPU fallback, in `_config/architecture.md` \"Compute\" order."
+"The eight recorded reasons for a CPU fallback, in `_config/architecture.md` \"Compute\" order."
 const FALLBACK_REASONS = [
     "CUDA.jl not loadable", "no functional device", "kernel does not compile for the element type",
     "device out of memory", "NumericalHealthError raised only on the GPU", "reducer is CPU-only",
-    "GPU not faster for the element type",
+    "GPU not faster for the element type", "launch exceeds the display watchdog",
 ]
 
 "Resolved compute backend: `backend` is `:cpu` or `:gpu`, `reason` is empty unless a GPU was passed over."
@@ -64,25 +64,44 @@ struct BackendChoice
     reason::String
 end
 
+"Compute device a package extension can install; `NoDevice` (no extension, or no functional GPU) is the CPU."
+abstract type AbstractDevice end
+struct NoDevice <: AbstractDevice end
+
+"The device used when a run resolves to the GPU; the CUDA extension sets it on load (decision D29)."
+const DEVICE = Ref{AbstractDevice}(NoDevice())
+
 # No CUDA dependency in the library: only report whether the package could be found, never load it.
-default_probe() = (loadable = Base.find_package("CUDA") !== nothing, functional = false,
-                   device = "", compiles = false, gpu_faster = false)
+probe(::NoDevice, ::Type) = (loadable = Base.find_package("CUDA") !== nothing, functional = false,
+                             device = "", compiles = false, gpu_faster = false)
+
+"Free memory in bytes of the device a chunk runs on; the CUDA extension adds a method."
+free_memory(::NoDevice) = Sys.free_memory()
+"Whether an exception thrown by a device chunk is the device running out of memory."
+is_oom(::Exception) = false
+"Whether an exception thrown by a device chunk is the kernel failing to compile for the element type."
+is_compile_error(::Exception) = false
+"Whether an exception thrown by a device call means the device or its context is lost (e.g. a launch timeout of the display watchdog)."
+is_device_lost(::Exception) = false
+"Measured GPU time per orbit-step in nanoseconds for `T` on `device` (the per-machine record), or `nothing` when unknown."
+gpu_step_ns(::AbstractDevice, ::Type) = nothing
 
 cpu_choice(reason) = BackendChoice(:cpu, "cpu", reason)
 
 """
-    resolve_backend(request, T; cpu_only_reducer=false, probe=default_probe) -> BackendChoice
+    resolve_backend(request, T; cpu_only_reducer=false, probe=nothing) -> BackendChoice
 
 Resolve `:auto`, `:gpu` or `:cpu` to a concrete backend; order of checks: element type, CPU-only
-reducer, loadable, functional, compiles, GPU faster (spec tangent-core E10).
+reducer, loadable, functional, compiles, GPU faster (spec tangent-core E10). `probe` is a zero-argument function
+returning the probe record; by default the record of `DEVICE[]` for `T`.
 """
 function resolve_backend(request::Symbol, ::Type{T}; cpu_only_reducer::Bool = false,
-                         probe = default_probe) where {T}
+                         probe = nothing) where {T}
     request in (:auto, :gpu, :cpu) || throw(ArgumentError("backend must be :auto, :gpu or :cpu, got :$request"))
     request === :cpu && return cpu_choice("")
     T === BigFloat && return cpu_choice(FALLBACK_REASONS[3])
     cpu_only_reducer && return cpu_choice(FALLBACK_REASONS[6])
-    p = probe()
+    p = probe === nothing ? Foundation.probe(DEVICE[], T) : probe()
     p.loadable || return cpu_choice(FALLBACK_REASONS[1])
     p.functional || return cpu_choice(FALLBACK_REASONS[2])
     p.compiles || return cpu_choice(FALLBACK_REASONS[3])

@@ -6,6 +6,7 @@ Propagation of orbits and deviation vectors, one KernelAbstractions kernel (tang
 module Tangent
 
 using ..Foundation
+using ..Foundation: AbstractDevice, NoDevice, DEVICE, free_memory, is_oom, is_compile_error, is_device_lost, gpu_step_ns   # device hooks, not exported
 using ..Systems
 using StaticArrays
 using LinearAlgebra

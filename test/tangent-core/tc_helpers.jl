@@ -164,3 +164,17 @@ function tc_std_residual(Kt, pts, W0, Wn, epsT)
         (Float64(err), Float64(bound))
     end
 end
+
+# Device plumbing shared by the AC10 and D29 testsets: the run-wide device is set and restored explicitly, so no test
+# depends on whether CUDA happens to be loaded.
+const tc_F = Chaoslab.Foundation
+const tc_Tg = Chaoslab.Tangent
+function tc_with_device(f, dev)
+    old = tc_F.DEVICE[]
+    tc_F.DEVICE[] = dev
+    try
+        return f()
+    finally
+        tc_F.DEVICE[] = old
+    end
+end

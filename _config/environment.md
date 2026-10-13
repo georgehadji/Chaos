@@ -13,4 +13,4 @@ Layer 3, canonical. Filled once by `setup`.
 
 ## High precision
 
-- Backend for extended precision: {{HIGH_PRECISION_BACKEND}} (BigFloat is always available for oracle runs)
+- Backend for extended precision: Double64 (DoubleFloats.jl, decision D20; effective eps measured 2^-104.4 to 2^-104.9, precision stage 04). BigFloat is always available for oracle runs.

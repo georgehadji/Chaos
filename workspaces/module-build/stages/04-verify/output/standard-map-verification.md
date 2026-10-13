@@ -103,3 +103,15 @@ Findings on the evidence:
 - **Criterion 19 convention.** No predefined map exists in the environment; the comparison is against the rule ChaosTools uses in its own tests and docs (see the section above). The conversion is the identity; the agreement ratios (at most 0.03) confirm it.
 - **Script runtime** 17 min with 4 threads on a loaded machine, above the 10 minute target; most of it is first-call compilation (Y5 Double64 sections 373 s, CairoMakie 295 s, AC14 116 s).
 - tau(n) is conservative: every measured orbit ratio is below 0.13 (largest 0.121 for AC5), so these checks would not detect an error below about ten times the rounding level; the exact-answer criteria (7, 8, 9, 10, 11, 12, 13, W4) and the independent 256-bit comparisons carry the sharper evidence.
+
+## GPU
+
+Measured by `verify/gpu.jl` (decisions D29 and D33), raw output `gpu-verify-log.txt`. Machine: GeForce GTX 1050 (sm_61, 3 GB, display GPU, WDDM driver 581.83), CUDA.jl 6.4.2 with runtime 12.9.0, Julia 1.13.1, 4 CPU threads. Windows TDR registry: TdrDelay 8 s, TdrLevel 3 (the default delay is 2 s). Every GPU line below was checked for `provenance.backend == gpu`; an element type or run that ended on the CPU is printed as FALLBACK(reason), which is a result of the fallback path and not a kernel pass. Since D33 a launch is kept under a 1 s estimated budget (gpu_ns_per_step x N x orbits, at least one wave of 1024 orbits); a run beyond it goes to the CPU with the reason "launch exceeds the display watchdog".
+
+| Criterion | Quantity | Value | Bound | Verdict |
+|---|---|---|---|---|
+| 18 | GPU vs CPU, K = 1, n = n_H = 14, 1e5 seeded orbits in [-4 pi, 4 pi]^2: max over orbits of torus distance / tau(n) (largest distance over the first 2000 orbits 5.587e-13) | 2.854e-05 | 1 | PASS |
+| 18 | GPU vs CPU, K = 5, n = n_H = 6, 1e5 orbits (largest distance over the first 2000 orbits 2.011e-11) | 1.878e-04 | 1 | PASS |
+| 18 | Double64 kernel gate (compile or reason): an explicit `:gpu` run with `StandardMap{Double64}` ends on the CPU with the reason in provenance | kernel does not compile for the element type | compile or reason | FALLBACK(kernel does not compile for the element type) |
+
+The compared quantity is the final lifted state from `propagate` with `k = 2` and the identity as initial deviation matrix, the bound is the spec's tau(n) = 16 eps M_n n Gamma_n evaluated on the plain CPU orbit of each start, and the distance is the 256-bit torus distance of the spec. The GPU stays within 2e-4 of the bound on both K. The Double64 kernel does not compile for the GPU (cause in the tangent-core GPU section).

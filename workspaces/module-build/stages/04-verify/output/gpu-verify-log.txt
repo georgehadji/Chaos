@@ -1,0 +1,33 @@
+# gpu verification, julia 1.13.1, threads 4, cpu skylake, base seed 20261012
+# device type ChaoslabCUDAExt.CUDADevice, name 'NVIDIA GeForce GTX 1050'
+# CUDA.jl 6.4.2, runtime 12.9.0, driver 13.0.0, capability 6.1.0, free memory 2488.0 MiB
+# Windows TDR registry values (GraphicsDrivers): TdrDelay    REG_DWORD    0x8; TdrLevel    REG_DWORD    0x3
+# record file: E:\Documents\Vibe-Coding\Chaos Research Orchestrator\data\gpu-benchmark.toml (exists at start)
+# probe Float64: (loadable = true, functional = true, device = "NVIDIA GeForce GTX 1050", compiles = true, gpu_faster = true)
+# probe Double64: (loadable = true, functional = true, device = "NVIDIA GeForce GTX 1050", compiles = false, gpu_faster = false)
+# format: AC<n> | quantity | value | bound | verdict
+# starting 1-thread CPU child run (AC13 sizes: Dict{DataType, Tuple{Int64, Int64}}(Double64 => (500, 1000), Float64 => (20000, 1000)))
+AC13 | tangent-core: GPU wall s, T=Float64, 100000 orbits x 1000 steps (d=2, k=2, K=2pi, LogNorm reducer, tau=1, chunk 8000): 20.2 ns/orbit-step vs CPU 1 thread(s) 368.3 ns/orbit-step; speedup 18.24; extrapolated to 1e6 x 1e4: 202 s | 2.02 | GPU<=CPU: 36.83 s | PASS
+AC13 | tangent-core: GPU wall s, T=Float64, 100000 orbits x 1000 steps (d=2, k=2, K=2pi, LogNorm reducer, tau=1, chunk 8000): 20.2 ns/orbit-step vs CPU 4 thread(s) 102.6 ns/orbit-step; speedup 5.079; extrapolated to 1e6 x 1e4: 202 s | 2.02 | GPU<=CPU: 10.26 s | PASS
+# record Float64 -> Dict{String, Any}("cpu_ns_per_step" => 102.56794400000001, "gpu_ns_per_step" => 20.195254000000002, "date" => "2026-10-13", "threads" => 4, "gpu_faster" => true)
+AC13 | tangent-core: GPU wall s, T=Double64, 2000 orbits x 1000 steps, vs CPU 1 thread(s): 2.26e+04 ns/orbit-step | - | GPU<=CPU | FALLBACK(kernel does not compile for the element type)
+AC13 | tangent-core: GPU wall s, T=Double64, 2000 orbits x 1000 steps, vs CPU 4 thread(s): 3006 ns/orbit-step | - | GPU<=CPU | FALLBACK(kernel does not compile for the element type)
+# record Double64 -> Dict{String, Any}("cpu_ns_per_step" => 3006.39945, "reason" => "kernel does not compile for the element type", "date" => "2026-10-13", "threads" => 4, "gpu_faster" => false)
+AC12b | tangent-core: K=2pi n=10 same-orbit |x_cpu - x_gpu|, max over 1024 orbits (bound 4 n eps G^n, G=9.722) | 1.231e-08 | 6.702e-05 | PASS
+AC12b | tangent-core: K=10 n=10 same-orbit |x_cpu - x_gpu|, max over 1024 orbits (bound 4 n eps G^n, G=14.93) | 7.248e-07 | 0.004898 | PASS
+AC12c | tangent-core: chaotic ensemble K=10, 1024 orbits, n=1e4, tau=10: max per-orbit |S_cpu/n - S_gpu/n| / sigma_FT (sigma_FT=0.009283); |difference of means| / SE; mean S/n cpu 1.62 gpu 1.62 | 4.599; 1.936 | 6; 4 | PASS
+AC9 | precision: GPU vs CPU orbit agreement, Float64, 200 seeded orbits K=5, at n=min(n_H,10) and n=n_H (n_H min/median/max 14/19.0/100): max |x_cpu - x_gpu| / (2 c eps M_n Gamma_n) | 0.02607 | 1 (c = 8) | PASS
+AC9 | precision: GPU vs CPU orbit agreement, Double64, 200 seeded orbits K=5 (n_H min/median/max 39/55.0/100) | - | 2 c eps M_n Gamma_n | FALLBACK(kernel does not compile for the element type)
+AC11 | diagnostics: item 1 integer maps x1000 steps, Float64: max residual GPU / CPU | 0.0 / 0.0 | 0 | PASS
+AC11 | diagnostics: item 1 integer maps x1000 steps, Double64: residual maxima GPU vs CPU | - | 0 (exact) | FALLBACK(kernel does not compile for the element type)
+AC11 | diagnostics: item 5 det fault (theta=2.665e-15): raise on both backends (GPU raises via CPU rerun) / quiet on the GPU with det_max within theta of the CPU | 1/1, 1/1 | all | PASS
+AC11 | diagnostics: item 6 panel (50 starts x 1e4 steps per K): health errors; max |det_max GPU - CPU| / det threshold in force | 0; 0 | 0; 1 | PASS
+AC18 | standard-map: GPU vs CPU, K=1.0 n=n_H=14, 100000 orbits: max over orbits of torus distance / tau(n) (max distance over the first 2000: 5.587e-13) | 2.854e-05 | 1 | PASS
+AC18 | standard-map: GPU vs CPU, K=5.0 n=n_H=6, 100000 orbits: max over orbits of torus distance / tau(n) (max distance over the first 2000: 2.011e-11) | 0.0001878 | 1 | PASS
+AC18 | standard-map: Double64 kernel gate: compile or reason (explicit :gpu run ends on the CPU with the reason recorded in provenance) | kernel does not compile for the element type | compile or reason | FALLBACK(kernel does not compile for the element type)
+AC11 | precision: GPU Double64/Float64 time ratio, same ensemble as AC13: Float64 GPU 20.2 ns/orbit-step; CPU ratio 29.31 (4 threads, this run) | - | reported, no threshold | FALLBACK(kernel does not compile for the element type)
+# after the record: resolve_backend(:auto, Float64) = BackendChoice(:gpu, "NVIDIA GeForce GTX 1050", ""); (:auto, Double64) = BackendChoice(:cpu, "cpu", "kernel does not compile for the element type")
+AC12a | tangent-core: K=0.5, 1024 orbits, n=100000, tau=10 (D33 symmetric form) | - | count diff <= 3; gap <= 2e-6 | FALLBACK(launch exceeds the display watchdog)
+AC12a | tangent-core: K=0.5, 1024 orbits, n=40000, tau=10, one launch (1.415 s): orbits above 1e-6 against the Double64 reference, CPU / GPU; max CPU-GPU gap over the 1006 orbits where both agree with the reference | 18 / 18 (diff 0); 3.016e-07 | count diff <= 3; gap <= 2e-6 | PASS
+AC12a | tangent-core: same, maxima over all 1024 orbits (chaotic layer included): |S_cpu - S_ref| 0.05609, |S_gpu - S_ref| 0.06607, |S_cpu - S_gpu| 0.04523 | 0.04523 | - | INFO
+# SUMMARY FALLBACK=7, INFO=1, PASS=12 (20 lines)

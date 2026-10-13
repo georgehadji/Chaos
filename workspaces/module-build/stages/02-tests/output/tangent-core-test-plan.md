@@ -17,7 +17,7 @@ Files in `test/tangent-core/`: `runtests.jl` (includes the rest), `tc_helpers.jl
 | AC7 seeded initialization | "AC7 seeded initialization" | orbit ids 1..1e4 for (d,k) in {(2,1), (2,2), (4,4), (8,8)}, Float64; 200 orbits in Double64; 1e4 for (b) and (c) | (a) 8 k eps(T); (b) bitwise equal across repeats, reversed order, `Threads.@threads`, chunk positions (via `propagate` with the identity map, chunks 64 and 1000), 1e4 distinct matrices, seed+1 differs; (c) KS <= 1.63/sqrt(1e4) |
 | AC8 numerical health | "AC8 numerical health" | 6 orbits, one flagged, chunk = 2; overflow map diag(e^3, e^-3) | (a) Inf at step 7, tau = 5: orbit, step 10, "state", :cpu, no result; (b) NaN in W at step 3: step 5, "deviation matrix"; (c) tau = 200 no error, tau = 300 and tau = 100 (N = 300) step 300; `threshold == Inf`, value non-finite; exact steps; (d) contract: N in {7 (tau 5), 0, -5} raises `ArgumentError` before any work (the map throws if called) |
 | AC9 compensated summation | "AC9 compensated summation" | 1e8 Float64 terms, 1e7 Double64 terms, 4-term Neumaier case | (a) relative error vs rational <= eps(Float64); (b) plain sum error > 100x the compensated error + 1e-10 (negative control, last assertion; spec measured 1.9e-9); (c) <= eps(Double64) against the exact rational (hi + lo); `[1, 1e100, 1, -1e100]` totals exactly 2 |
-| AC10 backend and provenance | "AC10 backend resolution and provenance" | custom probes; 200-orbit runs for provenance | exact strings; FALLBACK_REASONS is the seven strings in order; (a) default probe on CI; (b) `:cpu` reason ""; (c) `:gpu` without device; (d) BigFloat never calls the probe; (e) reasons 1, 2, 3, 6, 7 forced by probe or `cpu_only_reducer`, check order element type > cpu_only_reducer > loadable > functional > compiles > gpu_faster; (f) provenance fields, `backend` never auto, `chunk_size` equals the chunk given |
+| AC10 backend and provenance | "AC10 backend resolution and provenance" | custom probes; 200-orbit runs for provenance | exact strings; FALLBACK_REASONS is the seven strings in order (eight after Amendment D33); (a) default probe on CI; (b) `:cpu` reason ""; (c) `:gpu` without device; (d) BigFloat never calls the probe; (e) reasons 1, 2, 3, 6, 7 forced by probe or `cpu_only_reducer`, check order element type > cpu_only_reducer > loadable > functional > compiles > gpu_faster; (f) provenance fields, `backend` never auto, `chunk_size` equals the chunk given |
 | AC11 chunk size | "AC11 chunk size" | free = 2^30, f = 0.5 | 0: 5592405, 2236962, halved 2796202 and 1118481, plus reducer_bytes, f = 0.25, Double64 (176 B per orbit), `bytes_per_orbit` 96, 240 |
 | AC12 CPU vs GPU | stage 04 | | local, report in 04-verify |
 | AC13 performance record | stage 04 | | local, report in 04-verify |
@@ -80,3 +80,30 @@ Test file `test/tangent-core/tc_state_length.jl` (included last from `runtests.j
 ### RED log (Amendment D28)
 
 Run: `tc_helpers.jl` plus `tc_state_length.jl` only, before any source change. W9: 2 Pass, 5 Error, 0 Fail. The 2 passes are the default-call assertions that hold today (`bytes_per_orbit` 96 and `chunk_size` 5592405). The errors are not missing names but missing capability of existing names: MethodError `bytes_per_orbit(::Val{2}, ::Val{2}, ::Type{Float64}, ::Int64)` (three assertions), MethodError `chunk_size(...; s)` unsupported keyword (one assertion), and MethodError `_orbit_body(::tc_Long{Float64}, ::SVector{4, Float64}, ::SMatrix{2, 1, Float64, 2}, ...)` ending the testset at the per-orbit body loop (assertion groups (b) to (g) are not reached).
+
+## Amendment D29 (2026-10-13)
+
+Test file `test/tangent-core/tc_device.jl` (included last from `runtests.jl`), one testset "D29 device hook and fallbacks". No GPU in CI: `tc_FakeDevice <: Chaoslab.Foundation.AbstractDevice` has `device_backend = CPU()`, a probe that reports functional and compiling, and a free memory of 2^28 bytes; the test sets and restores `Foundation.DEVICE[]` in `try/finally`. Faults are injected on the host side of a device chunk: a `W0` vector that throws on its n-th access (out-of-memory and compile exceptions classified by test methods of `is_oom` and `is_compile_error` on test-only exception types), a standard map whose first `forward` call anywhere returns NaN (a health error only the first run of a chunk raises), and a reducer with a `BigFloat` state.
+
+| Criterion | Assertion group | Sample size | Tolerance |
+|---|---|---|---|
+| D29 hooks | defaults: `NoDevice`, `device_backend`, `workgroup`, `free_memory`, `is_oom`, `is_compile_error`, probe record, hooks not exported | one call each | exact |
+| D29a | `:gpu` and `:auto` on the fake device vs `:cpu`; `:auto` with `gpu_faster = false`; chunk size from `free_memory` | 40 orbits, 100 steps, tau 4, chunk 16 | bitwise; exact reason strings |
+| D29b reason 6 | reducer chain with a `BigFloat` state | 40 orbits | cpu, "reducer is CPU-only", results equal the CPU run |
+| D29b reasons 4 and 3 | fault in the first, middle and last chunk | 40 orbits, chunks of 16, 16, 8 | cpu, device `cpu`, exact reason, results bitwise equal |
+| D29b reason 5 | NaN only in the first run; an Inf the CPU raises too; an unclassified exception | 40 and 6 orbits | reason string; `NumericalHealthError` with backend `cpu`, orbit 3, step 10; the exception propagates |
+
+Reason 5 cannot be forced on real hardware (a chunk whose health check fails on the device but not on the CPU needs a device-only arithmetic difference); the fake device forces it with a fault that fires once. Run on the CPU backend only; the GPU measurements are `verify/gpu.jl` (D29c).
+
+## Amendment D33 (2026-10-13)
+
+`tc_device.jl` grows by four testsets and the list assertions change. `tc_with_device` and the aliases `tc_F`, `tc_Tg` moved to `tc_helpers.jl`; the AC10 tests that used the default device (`tc_ac09_11.jl`: the default probe and the provenance loop) and the D29 defaults now set `Foundation.DEVICE[]` to `NoDevice()` explicitly and restore it, so no test depends on whether CUDA is loaded. `FALLBACK_REASONS` is asserted with eight strings in `tc_ac09_11.jl` and `test/precision/runtests.jl`.
+
+| Criterion | Assertion group | Sample size | Tolerance |
+|---|---|---|---|
+| D33a | fake device with a recorded ns per step: chunk capped at 1100; explicit smaller chunk kept; N beyond one wave goes to the CPU with the eighth reason; the default of 100 ns (N = 1e4 gives 1000 orbits, below one wave) | 40 orbits | exact chunk size and reason string; results equal the CPU run |
+| D33b | W0 vector throwing a lost-device exception in the middle chunk | 40 orbits, chunks of 16 | eighth reason, `gpu_chunks` 1, `DEVICE[]` is `NoDevice()` after the run |
+| D33c | device whose `free_memory` throws out-of-memory; device whose backend `allocate` throws it | 40 orbits | reason 4, `gpu_chunks` 0, results equal the CPU run |
+| D33d | provenance after a switch with a small fake free memory; clean device run; CPU run | 40 orbits | `gpu_chunk_size`, `chunk_size` greater than it after the switch, `gpu_chunks` |
+
+The record reader of the extension cannot run in CI; it was exercised locally (absent file, unparsable file, wrong shape, wrong value types) in a scratch script, all giving an empty entry.

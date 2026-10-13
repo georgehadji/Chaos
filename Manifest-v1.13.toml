@@ -2,7 +2,7 @@
 
 julia_version = "1.13.1"
 manifest_format = "2.1"
-project_hash = "a1973438a0772443dfd915ee96a9265a7f06053d"
+project_hash = "ade072030bdc4c7e59a4e59e7911732db3586ae8"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra"]
@@ -64,10 +64,16 @@ uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 version = "0.5.0"
 
 [[deps.Chaoslab]]
-deps = ["DoubleFloats", "KernelAbstractions", "LinearAlgebra", "StableRNGs", "StaticArrays"]
+deps = ["DoubleFloats", "KernelAbstractions", "LinearAlgebra", "StableRNGs", "StaticArrays", "TOML"]
 path = "."
 uuid = "1d9ee621-a3a2-43c0-acfa-d3a4a467f53c"
 version = "0.0.1"
+
+    [deps.Chaoslab.extensions]
+    ChaoslabCUDAExt = "CUDA"
+
+    [deps.Chaoslab.weakdeps]
+    CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 
 [[deps.Compat]]
 deps = ["TOML", "UUIDs"]

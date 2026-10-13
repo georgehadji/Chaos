@@ -56,7 +56,7 @@ Delay embedding (Takens, false nearest neighbours) is a supporting module for L1
 
 Analytic Jacobian (default, ground truth); automatic differentiation (forward mode, ForwardDiff.jl) for maps without hand-written Jacobians, validated against the analytic one; complex-step derivative for tests. AD tangents are part of research line R3. Oracles: ChaosTools `lyapunov` / `lyapunovspectrum` (no SALI, MEGNO, FLI there), TaylorIntegration `lyap_taylorinteg` at BigFloat.
 
-Status: verified (M2 Batch A, tangent-core: analytic Jacobians checked against ForwardDiff and complex step; stage 04 reports in `workspaces/module-build/stages/04-verify/output/`, decision D22).
+Status: verified (M2 Batch A, tangent-core: analytic Jacobians checked against ForwardDiff and complex step; integration commit abef540, decision D22).
 
 ## D3. Benchmark values (pointer)
 
@@ -66,10 +66,10 @@ Geist1990, damped-driven Toda chain: relative CPU times and the finite-time lamb
 
 Float64 (default); Double64 (DoubleFloats.jl) or MultiFloats; BigFloat for short oracle runs. Precision is a run parameter recorded in the manifest, never a code fork.
 
-Status: verified (M2 Batch A, precision: Float64, Double64, BigFloat; stage 04 reports in `workspaces/module-build/stages/04-verify/output/`, decision D22).
+Status: verified (M2 Batch A, precision: Float64, Double64, BigFloat; integration commit abef540, decision D22).
 
 ## F. Built-in checks every estimator reports
 
 symplectic pairing residual eps_pair(n); eps_det(n) for maps; orthogonality loss ||Q^T Q - I||; sum of exponents (zero for Hamiltonian); agreement of SALI decay with lambda_1 - lambda_2 (when both are run).
 
-Status: verified (M2 Batch A, diagnostics: pairing, det, orthogonality and sum residuals; stage 04 reports in `workspaces/module-build/stages/04-verify/output/`, decision D22).
+Status: verified (M2 Batch A, diagnostics: pairing, det, orthogonality and sum residuals; integration commit abef540, decision D22).

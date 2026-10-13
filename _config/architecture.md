@@ -57,6 +57,7 @@ bench/                           BenchmarkTools suites (perf budgets)
 python/nbody/                    optional N-body adapters (own pyproject, GPL deps)
 bin/chaoslab.jl                  Julia entry point (panel, run, analyze, figures) into Experiments/Figures
 scripts/                         ICM mechanical scripts (Python stdlib)
+verify/                          oracle cross-checks for module-build stage 04: own Project.toml + Manifest (ChaosTools, CairoMakie, BenchmarkTools), one script per slug (D27)
 schema/run-store.md              HDF5 layout shared by Julia and Python
 ```
 

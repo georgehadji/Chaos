@@ -51,5 +51,5 @@ Not exported, for extensions and tests: `AbstractDevice`, `NoDevice`, `DEVICE`, 
 | Float32 element type | D24, revisit at M4 |
 | CPU-only reducer marker (reason 6 fires today only for a reducer state that is not isbits) | lyap-householder-qr, D25, D30 |
 | A separate reason string for a lost device (reason 8 is reused) | proposal in `tangent-core-impl-notes.md`, Amendment D33 |
-| Test of `exact(Double64, ::BigFloat)` and `exact(Double64, ::BigInt)` | `precision-impl-notes.md`, "Known limits" |
+| Test of `exact(Double64, ::BigFloat)` | `precision-impl-notes.md`, "Known limits" |
 | Double64 on the GPU: does not compile, run falls back with reason 3 | `tangent-core-verification.md`, section GPU |

@@ -248,3 +248,5 @@ end
     @info "AC13 median n*" median = sort(nstar)[50]
     @test count(<=(60), nstar) >= 80
 end
+
+include(joinpath(@__DIR__, "pr_exact_int.jl"))

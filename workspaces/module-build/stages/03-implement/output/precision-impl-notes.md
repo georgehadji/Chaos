@@ -19,9 +19,13 @@ Code: `src/Foundation/Foundation.jl` (precision items: `precision_label`, `parse
 
 ## Known limits
 
-- `exact(Double64, x::BigFloat)` / `exact(Double64, x::BigInt)` rely on the DoubleFloats constructor; not tested.
+- `exact(Double64, x::BigFloat)` relies on the DoubleFloats constructor; not tested. Integers and rationals: see "Fix (Batch B stage 02)".
 - `precision_label(BigFloat)` reads `precision(BigFloat)` at call time; callers must set the precision before building labels.
 
 ## Review fixes (stage 04)
 
 - `parse_precision` accepts `AbstractString`, anchors with `\z` (no trailing newline accepted), parses bits with `tryparse` and throws `ArgumentError` for unparsable bits or bits < 64.
+
+## Fix (Batch B stage 02)
+
+`exact(T, ::Integer)` used `T(x)`, and `Double64(::Int64)` rounds through Float64, so integers above 2^53 lost their low bits (found by the lyap-gram-schmidt test writer: `exact(Double64, 2^60 + 1)` dropped the `+ 1`), against spec E2. Integers now pass through a BigFloat of enough precision, so the only rounding is the final one into T; rationals use the same path for numerator and denominator. Test `test/precision/pr_exact_int.jl` (RED, then GREEN with 9 assertions). The integer path allocates; `exact` is a setup function and no hot loop calls it.

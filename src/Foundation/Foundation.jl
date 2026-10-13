@@ -132,8 +132,10 @@ end
 Convert `x` into `T` without a Float64 detour: integers, floats (exact widening), rationals, irrationals
 and decimal strings (parsed in `T`).
 """
-exact(::Type{T}, x::Union{Integer,AbstractFloat,Irrational}) where {T} = T(x)
-exact(::Type{T}, x::Rational) where {T} = T(numerator(x)) / T(denominator(x))
+exact(::Type{T}, x::Union{AbstractFloat,Irrational}) where {T} = T(x)
+# Integers pass through an exact BigFloat, so the only rounding is the final one into T (Double64(::Int64) rounds via Float64).
+exact(::Type{T}, x::Integer) where {T} = T(BigFloat(x; precision = max(64, ndigits(x; base = 2) + 1)))
+exact(::Type{T}, x::Rational) where {T} = exact(T, numerator(x)) / exact(T, denominator(x))
 exact(::Type{T}, s::String) where {T} = parse(T, s)
 
 end

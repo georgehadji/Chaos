@@ -7,7 +7,7 @@ __pycache__/
 *.jl.mem
 .ruff_cache/
 # Manifests are committed from M2 on, one per Julia version (decision D13)
-Manifest*.toml
+# (Manifest.toml and Manifest-v1.13.toml are committed, D13)
 # Windows N-body build outputs (python/nbody/windows-build/build_windows.py)
 python/nbody/windows-build/venv/
 python/nbody/windows-build/_work/

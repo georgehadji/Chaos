@@ -10,7 +10,7 @@ Layer 3, canonical. `Status` is `planned` or `verified`; only module-build/05 wr
 | Y2 | Henon area-preserving quadratic map | 2 | second 2D benchmark, escaping orbits | det = 1 | Henon1969 | M4 | planned |
 | Y3 | Coupled standard maps / Froeschle 4D map | 4 | GALI_k, full spectra, Arnold diffusion | pairing lambda_1 = -lambda_4, lambda_2 = -lambda_3 | Froeschle1972 | M5 | planned |
 | Y4 | N coupled standard maps (chain) | 2N | spectrum scaling, k-vector cost | pairing for all i | Skokos2004, Skokos2007 | M5 | planned |
-| Y5 | Linear symplectic maps (rotation, hyperbolic) | 2N | exact exponents for unit tests | lambda = ln|eigenvalue| exactly | none needed | M2 | planned |
+| Y5 | Linear symplectic maps (rotation, hyperbolic) | 2N | exact exponents for unit tests | lambda = ln|eigenvalue| exactly | none needed | M2 | verified |
 
 ## B. Hamiltonian flows (need integrators)
 

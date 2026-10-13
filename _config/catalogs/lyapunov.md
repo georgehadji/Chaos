@@ -23,7 +23,7 @@ Shared step: propagate k tangent vectors, every `tau` steps factor W = Q R, accu
 | L6 | Givens rotations QR | O(d k^2) | stable; cheap for d = 2, 4 and banded tangent maps (assumption, counts derived in the lyap-householder-qr spec) | Householder1958, DanielGragg1976 | M2 | planned |
 | L4b | Repeated (re-orthogonalized) Gram-Schmidt, RGS | O(d k^2), ~2x GS | restores orthogonality for nearly parallel columns | DanielGragg1976, Geist1990 | M2 | planned |
 | L5b | Householder variants H1 (treppen iteration path) / H2 (diagonal iteration path); the augmented block [W, I] is bookkeeping that returns Q explicitly | O(d k^2) | as L5; H1 deferred, H2 built in M2 (D30) | Householder1958, Geist1990 | M2 | planned |
-| L7 | Reorthonormalization interval study, fixed `tau` | n/a | `tau` too long: overflow / alignment; too short: cost | Skokos2010 | M2 (parameter, not module) | planned |
+| L7 | Reorthonormalization interval study, fixed `tau` | n/a | `tau` too long: overflow / alignment; too short: cost | Skokos2010 | M2 (parameter, not module) | verified |
 | L7b | Adaptive reorthonormalization (trigger on measured orthogonality loss or local stretching) | n/a | research line R3; must not bias estimates | open | M5 | planned |
 | L7c | Block / sparse QR exploiting banded tangent maps of coupled maps and lattices | O(d k b) for bandwidth b | research line R3 | open | M5 | planned |
 
@@ -56,6 +56,8 @@ Delay embedding (Takens, false nearest neighbours) is a supporting module for L1
 
 Analytic Jacobian (default, ground truth); automatic differentiation (forward mode, ForwardDiff.jl) for maps without hand-written Jacobians, validated against the analytic one; complex-step derivative for tests. AD tangents are part of research line R3. Oracles: ChaosTools `lyapunov` / `lyapunovspectrum` (no SALI, MEGNO, FLI there), TaylorIntegration `lyap_taylorinteg` at BigFloat.
 
+Status: verified (M2 Batch A, tangent-core: analytic Jacobians checked against ForwardDiff and complex step; stage 04 reports in `workspaces/module-build/stages/04-verify/output/`, decision D22).
+
 ## D3. Benchmark values (pointer)
 
 Geist1990, damped-driven Toda chain: relative CPU times and the finite-time lambda_1 and lambda_28 values were checked against the paper (Tables II and III, pp.885-886, decision D30, O12) and live in _config/bibliography/benchmarks.md, rows with source key Geist1990. A reproduction target only, never a test oracle.
@@ -64,6 +66,10 @@ Geist1990, damped-driven Toda chain: relative CPU times and the finite-time lamb
 
 Float64 (default); Double64 (DoubleFloats.jl) or MultiFloats; BigFloat for short oracle runs. Precision is a run parameter recorded in the manifest, never a code fork.
 
+Status: verified (M2 Batch A, precision: Float64, Double64, BigFloat; stage 04 reports in `workspaces/module-build/stages/04-verify/output/`, decision D22).
+
 ## F. Built-in checks every estimator reports
 
 symplectic pairing residual eps_pair(n); eps_det(n) for maps; orthogonality loss ||Q^T Q - I||; sum of exponents (zero for Hamiltonian); agreement of SALI decay with lambda_1 - lambda_2 (when both are run).
+
+Status: verified (M2 Batch A, diagnostics: pairing, det, orthogonality and sum residuals; stage 04 reports in `workspaces/module-build/stages/04-verify/output/`, decision D22).

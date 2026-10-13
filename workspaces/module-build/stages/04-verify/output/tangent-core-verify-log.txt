@@ -1,0 +1,80 @@
+# tangent-core verification, julia 1.13.1, threads 4, cpu skylake (12 hardware threads), base seed 20261012
+# format: AC<n> | quantity | value | bound | verdict
+AC1 | mismatching entries of W_n and x_n vs integer A^n, n=1..35 (largest entry 308061521170129 < 2^53) | 0 | 0 | PASS
+AC2a | tau=1 max over 100 orbits |S_n + ln||w_n|| - ln||A^n w0||_BigFloat(256)| | 1.819e-12 | 1.776e-11 | PASS
+AC2b | tau=1 max |S_n/n - ln((3+sqrt5)/2)| (exact value 0.9624) | 0.0007012 | 0.002 | PASS
+AC2c | tau=1 handoff count N/tau and I2 spacing on all 100 orbits | true | true | PASS
+AC2a | tau=5 max over 100 orbits |S_n + ln||w_n|| - ln||A^n w0||_BigFloat(256)| | 1.819e-12 | 1.776e-11 | PASS
+AC2b | tau=5 max |S_n/n - ln((3+sqrt5)/2)| (exact value 0.9624) | 0.0007012 | 0.002 | PASS
+AC2c | tau=5 handoff count N/tau and I2 spacing on all 100 orbits | true | true | PASS
+AC2a | tau=10 max over 100 orbits |S_n + ln||w_n|| - ln||A^n w0||_BigFloat(256)| | 1.819e-12 | 1.776e-11 | PASS
+AC2b | tau=10 max |S_n/n - ln((3+sqrt5)/2)| (exact value 0.9624) | 0.0007012 | 0.002 | PASS
+AC2c | tau=10 handoff count N/tau and I2 spacing on all 100 orbits | true | true | PASS
+AC3a | n=1 mismatching entries of W_n = [[1,n],[0,1]] and x_n = x0 + n p0 (bitwise) | 0 | 0 | PASS
+AC3a | n=10 mismatching entries of W_n = [[1,n],[0,1]] and x_n = x0 + n p0 (bitwise) | 0 | 0 | PASS
+AC3a | n=1000 mismatching entries of W_n = [[1,n],[0,1]] and x_n = x0 + n p0 (bitwise) | 0 | 0 | PASS
+AC3a | n=1000000 mismatching entries of W_n = [[1,n],[0,1]] and x_n = x0 + n p0 (bitwise) | 0 | 0 | PASS
+AC3b | n=1e4 |S_n - 0.5 ln(n^2+1)| | 1.776e-15 | 1.776e-11 | PASS
+AC3c | n=1e4 S_n/n - ln(n)/n (must be <= 1e-12; negative means below ln n / n) | 5e-13 | 1e-12 | PASS
+AC4 | T=Float64 K=0.5 n=100 max over 20 orbits of ||W_n-W_ref||_F / (8 n eps prod||M||_F ||W0||_F) [orbit mismatches vs forward: 0] | 1.305e-22 | 1 | PASS
+AC4 | T=Float64 K=2pi n=20 max over 20 orbits of ||W_n-W_ref||_F / (8 n eps prod||M||_F ||W0||_F) [orbit mismatches vs forward: 0] | 0.0003144 | 1 | PASS
+AC4 | T=Double64 K=0.5 n=100 max over 20 orbits of ||W_n-W_ref||_F / (8 n eps prod||M||_F ||W0||_F) [orbit mismatches vs forward: 0] | 6.693e-23 | 1 | PASS
+AC4 | T=Double64 K=2pi n=20 max over 20 orbits of ||W_n-W_ref||_F / (8 n eps prod||M||_F ||W0||_F) [orbit mismatches vs forward: 0] | 9.357e-06 | 1 | PASS
+AC4 | T=Float64 K=0.5 max of the same ratio over all n in 1..100 (figure data) | 0.0425 | 1 | PASS
+AC4 | T=Float64 K=2pi max of the same ratio over all n in 1..40 (figure data) | 0.05644 | 1 | PASS
+AC4 | T=Double64 K=0.5 max of the same ratio over all n in 1..100 (figure data) | 0.01779 | 1 | PASS
+AC4 | T=Double64 K=2pi max of the same ratio over all n in 1..40 (figure data) | 0.02519 | 1 | PASS
+ORACLE-BF | T=Float64 K=0.5 n=100 max over 20 orbits of ||W_n(T orbit) - W_n(full BigFloat(256) orbit)||_F / ||W_n^BF||_F | 3.317e-12 | 1.776e-11 | PASS
+ORACLE-BF | T=Float64 K=0.5 max over n=1..100 of (relative error / (16 K n^2 eps)) | 0.1905 | 1 | PASS
+ORACLE-BF | T=Double64 K=0.5 n=100 max over 20 orbits of ||W_n(T orbit) - W_n(full BigFloat(256) orbit)||_F / ||W_n^BF||_F | 1.065e-27 | 3.944e-27 | PASS
+ORACLE-BF | T=Double64 K=0.5 max over n=1..100 of (relative error / (16 K n^2 eps)) | 0.2801 | 1 | PASS
+ORACLE-CT1 | ChaosTools regular orbit K=0.5 n=1e5 |lambda_1 Chaoslab - ChaosTools| <= 1e-4 | - | 0.0001 | DEFERRED lyap-benettin 04
+ORACLE-CT2 | ChaosTools chaotic ensemble K=2pi 1000 points n=1e4 difference of means <= 4 SE | - | 4 SE | DEFERRED lyap-benettin 04
+AC5 | bytes allocated by propagate_orbit after warm-up, n=1e4, k=2, chain (LogNorm, Reader), tau=1 / tau=4 / empty chain n=100 | 0 / 0 / 0 | 0 | PASS
+# starting 1-thread child run (AC6 digests and AC13 timings)
+AC6 | bitwise-equal digests (x, W, logs, reader state) of 4096 orbits n=1e3: 1 thread vs 4 threads, chunk 64 and 1000, and serial propagate_orbit; agreeing comparisons of 7 | 7 | 7 | PASS
+AC7a | Float64 d=2 k=1 max over 1e4 orbits ||Q'Q - I||_max | 8.882e-16 | 1.776e-15 | PASS
+AC7a | Float64 d=2 k=2 max over 1e4 orbits ||Q'Q - I||_max | 8.882e-16 | 3.553e-15 | PASS
+AC7a | Float64 d=4 k=4 max over 1e4 orbits ||Q'Q - I||_max | 1.332e-15 | 7.105e-15 | PASS
+AC7a | Float64 d=8 k=8 max over 1e4 orbits ||Q'Q - I||_max | 1.554e-15 | 1.421e-14 | PASS
+AC7a | Double64 d=2 k=1 max over 200 orbits ||Q'Q - I||_max | 2.773e-32 | 3.944e-31 | PASS
+AC7a | Double64 d=2 k=2 max over 200 orbits ||Q'Q - I||_max | 2.773e-32 | 7.889e-31 | PASS
+AC7a | Double64 d=4 k=4 max over 200 orbits ||Q'Q - I||_max | 3.39e-32 | 1.578e-30 | PASS
+AC7a | Double64 d=8 k=8 max over 200 orbits ||Q'Q - I||_max | 3.828e-32 | 3.155e-30 | PASS
+AC7b | bitwise reproducibility (repeat, reversed order, 4 threads, chunk 64 and 1000), 1e4 distinct matrices, seed sensitivity; passing of 6 | 6 | 6 | PASS
+AC7c | KS statistic of the angle of the single deviation vector, d=2 k=1, 1e4 orbits | 0.01042 | 0.0163 | PASS
+AC8 | control without a flagged orbit raises no error and reaches x[1] = 20 | true | true | PASS
+AC8a | inf_state injected at step 7, tau=5: (orbit, step, what, backend), nothing stored: true | (orbit = 3, step = 10, what = "state", backend = :cpu) | (orbit = 3, step = 10, what = "state", backend = :cpu) | PASS
+AC8b | nan_W injected at step 3, tau=5: (orbit, step, what, backend), nothing stored: true | (orbit = 5, step = 5, what = "deviation matrix", backend = :cpu) | (orbit = 5, step = 5, what = "deviation matrix", backend = :cpu) | PASS
+AC8c | tau=200 n=200: finite W, relative deviation of W[1] from e^600 | 1.554e-15 | 1e-10 | PASS
+AC8c | N=300, tau=300 overflow e^900: (step, what, orbit) | (step = 300, what = "deviation matrix", orbit = 1) | (step = 300, what = "deviation matrix", orbit = 1) | PASS
+AC8c | N=300, tau=100 overflow e^900: (step, what, orbit) | (step = 300, what = "deviation matrix", orbit = 1) | (step = 300, what = "deviation matrix", orbit = 1) | PASS
+AC8d | N not a positive multiple of tau ((7,5), (0,1), (-5,5)): ArgumentError before any work, count of 3 | 3 | 3 | PASS
+AC9a | compensated sum of 1e8 copies of fl(0.1): relative error | 5.551e-17 | 2.22e-16 | PASS
+AC9b | plain running sum, same input (negative control; must exceed the bound, i.e. FAIL (a)) | 1.887e-09 | 2.22e-16 | PASS
+AC9c | Double64 compensated sum of 1e7 copies of fl(0.1): relative error | 0 | 4.93e-32 | PASS
+AC9d | Neumaier branch check [1, 1e100, 1, -1e100] sums to 2 (extra) | 2 | 2 | PASS
+AC10 | backend resolution and provenance checks passing of 24; default-probe reason here: "CUDA.jl not loadable"; failed: none | 24 | 24 | PASS
+# AC10 provenance record of a run: (backend = :cpu, device = "cpu", backend_fallback_reason = "", precision = "Float64", threads = 4, cpu = "skylake", seed = 20261022, tau = 2, k = 2, chunk_size = 64, headroom = 0.5)
+AC11 | M(2,2,Float64), M(4,4,Float64), chunk at 2^30 (d=2,k=2 / d=4,k=4), chunk at 2^29 (d=2,k=2 / d=4,k=4) | [96, 240, 5592405, 2236962, 2796202, 1118481] | [96, 240, 5592405, 2236962, 2796202, 1118481] | PASS
+AC12a | regular class K=0.5, 1024 orbits, n=1e5: max |S_cpu/n - S_gpu/n| | - | 1e-6 | STAGE04-GPU
+AC12c | chaotic ensemble K=10, 1024 orbits, n=1e4: per-orbit <= 6 sigma_FT, difference of means <= 4 SE | - | 6 sigma_FT, 4 SE | STAGE04-GPU
+AC12b | K=2pi n=10 same-orbit |x_cpu - x_gpu| (bound 4 n eps G^n, G=9.722) | - | 6.702e-05 | STAGE04-GPU
+AC12b | K=10 n=10 same-orbit |x_cpu - x_gpu| (bound 4 n eps G^n, G=14.93) | - | 0.004898 | STAGE04-GPU
+AC13 | CPU wall s, T=Float64, 100000 orbits x 1000 steps (d=2, k=2, K=2pi, LogNorm reducer, tau=1), 1 thread: 851.1 ns/orbit-step; extrapolated to 1e6 x 1e4: 8511 s | 85.11 | GPU<=CPU | STAGE04-GPU
+AC13 | CPU wall s, T=Float64, 100000 orbits x 1000 steps, 4 threads: 185.6 ns/orbit-step; extrapolated to 1e6 x 1e4: 1856 s; speedup vs 1 thread 4.586 | 18.56 | GPU<=CPU | STAGE04-GPU
+AC13 | CPU wall s, T=Double64, 2000 orbits x 1000 steps (d=2, k=2, K=2pi, LogNorm reducer, tau=1), 1 thread: 2.984e+04 ns/orbit-step; extrapolated to 1e6 x 1e4: 2.984e+05 s | 59.68 | GPU<=CPU | STAGE04-GPU
+AC13 | CPU wall s, T=Double64, 2000 orbits x 1000 steps, 4 threads: 7568 ns/orbit-step; extrapolated to 1e6 x 1e4: 7.568e+04 s; speedup vs 1 thread 3.943 | 15.14 | GPU<=CPU | STAGE04-GPU
+# AC14 sites: forward(sys: Tuple{String, Int64, SubString{String}}[("orbit.jl", 33, "x = forward(sys, x)")]; tangent(sys: Tuple{String, Int64, SubString{String}}[("orbit.jl", 32, "W = tangent(sys, x) * W")]; _orbit_body callers: Tuple{String, Int64, SubString{String}}[("orbit.jl", 67, "x, W, states, code, step = _orbit_body(sys, x0, W0, Int(N), Int(tau), reducers)"), ("propagate.jl", 31, "x, W, st, c, h = _orbit_body(sys, x0[i], W0[i], N, tau, reducers)")]
+# AC14 outside src/Tangent (Foundation, Diagnostics) forward/propagate mentions: none
+AC14 | per-step update sites in src/Tangent (forward(sys, x) at orbit.jl:33, tangent(sys, x) at orbit.jl:32, both inside `_orbit_body`); callers of `_orbit_body`: orbit.jl:67 and propagate.jl:31 (`_orbit_kernel!` and `propagate_orbit`) | 1 / 1 sites | 1 / 1 | PASS
+W9a | k in {1,2} x tau in {1,3}: mismatches of the 4-component state and the 2 x k matrix vs manual iteration (bitwise), 4 cases | 0 | 0 | PASS
+W9b | 257 seeded orbits, chunk 16 and default, k x tau cases: chunked != serial (of 8 comparisons x 2 arrays) | 0 | 0 | PASS
+W9c | component 3 / component 4 set to Inf at step 7, tau=3: (what, step) | Any[(what = "state", step = 9), (what = "state", step = 9)] | [(what = "state", step = 9), (what = "state", step = 9)] | PASS
+W9d | bytes allocated by propagate_orbit with s=4 after warm-up (chain (LenReader), n=12 / empty chain, n=100) | 0 / 0 | 0 | PASS
+W9e | length of the point handed to a reducer | 4 | 4 | PASS
+W9f | bytes per orbit s=4 d=2 k=2 / default, chunk at 2^30 for s=4 / default | [112, 96, 4793490, 5592405] | [112, 96, 4793490, 5592405] | PASS
+W9g | k=3 with d=2 (state length 4) rejected before any work | ArgumentError | ArgumentError | PASS
+W9h | existing s = d suites unchanged: FAIL lines among AC1 to AC14 above (package suite is run by test/runtests.jl) | 0 | 0 | PASS
+# figures: tangent-core-ac4-bigfloat-product.png, tangent-core-oracle-fullbigfloat.png in E:\Documents\Vibe-Coding\Chaos Research Orchestrator\workspaces\module-build\stages\04-verify\output
+# SUMMARY DEFERRED lyap-benettin 04=2, PASS=62, STAGE04-GPU=8 (72 lines)

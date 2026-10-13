@@ -1,0 +1,83 @@
+# diagnostics verify, threads=4, Julia 1.13.1, seed=20261012, started 1.791879360875e9
+# format: AC<n> | quantity | value | bound | verdict
+AC1 | Float64 integer maps x1000 steps: max(eps_det, eps_symp, monitor maxima), health errors=0 | 0.0000e+00 | 0.0000e+00 | PASS
+AC1 | Double64 integer maps x1000 steps: max(eps_det, eps_symp, monitor maxima), health errors=0 | 0.0000e+00 | 0.0000e+00 | PASS
+AC2 | Float64 rotation 0.7311, 1000000 steps: max eps_det/eps (threshold violations=0) | 0.0000e+00 | 8.0000e+00 | PASS
+AC2 | Float64 rotation 0.7311, 1000000 steps: max eps_orth/eps (reference MGS) | 2.0000e+00 | 8.0000e+00 | PASS
+AC2 | Double64 rotation 0.7311, 1000000 steps: max eps_det/eps (threshold violations=0) | 2.5000e-01 | 8.0000e+00 | PASS
+AC2 | Double64 rotation 0.7311, 1000000 steps: max eps_orth/eps (reference MGS) | 1.0000e+00 | 8.0000e+00 | PASS
+AC3 | cat map tau=1 n=100000: G_max (vs mu^2 = 6.8541) | 6.8541e+00 | 6.8541e+00 | PASS
+AC3 | cat map: max_n eps_sum / (eps (G_max/tau + M_max)), violations of theta_sum=0 | 2.8236e-01 | 1.6000e+01 | PASS
+AC3 | cat map: |eps_pair - eps_sum| at n=100000; |lambda_1 - ln mu| | 0.0000e+00 | 0.0000e+00 | PASS
+AC4 | Float64 N=1: max(|eps_pair-d|,|eps_sum-d|)/tol | 0.0000e+00 | 1.0000e+00 | PASS
+AC4 | Float64 N=2: max(|eps_pair-d2|,|eps_sum-(d1+d2)|)/tol, pair=3.814697265625e-6 (adjacent would be 1.27) | 0.0000e+00 | 1.0000e+00 | PASS
+AC4 | Double64 N=1: max(|eps_pair-d|,|eps_sum-d|)/tol | 0.0000e+00 | 1.0000e+00 | PASS
+AC4 | Double64 N=2: max(|eps_pair-d2|,|eps_sum-(d1+d2)|)/tol, pair=3.814697265625e-6 (adjacent would be 1.27) | 0.0000e+00 | 1.0000e+00 | PASS
+AC5 | det fault Float64 theta=2.6645e-15: raise-side ok (bitwise value) / quiet-side ok | 1/1, 1/1 | all | PASS
+AC5 | det fault Double64 theta=5.9165e-31: raise-side ok (bitwise value) / quiet-side ok | 1/1, 1/1 | all | PASS
+AC5 | orthogonality fault Float64 tol=9.3132e-10: raise ok / quiet ok; max |eps_orth-(2d+d^2)|/eps=0.004 | 1/1, 1/1 | all | PASS
+AC5 | orthogonality fault Double64 tol=8.6736e-19: raise ok / quiet ok; max |eps_orth-(2d+d^2)|/eps=0.0 | 1/1, 1/1 | all | PASS
+AC5 | sum+pairing fault Float64 theta_sum=3.1456e-14: raise ok / quiet ok (values within eps(|L|+1)) | 1/1, 1/1 | all | PASS
+AC5 | sum+pairing fault Double64 theta_sum=6.9847e-30: raise ok / quiet ok (values within eps(|L|+1)) | 1/1, 1/1 | all | PASS
+AC5 | symplecticity fault Float64 theta_symp=3.1974e-14: raise ok / quiet ok / det-1 non-symplectic named correctly | 1/1, 1/1, true | all | PASS
+AC5 | symplecticity fault Double64 theta_symp=7.0997e-30: raise ok / quiet ok / det-1 non-symplectic named correctly | 1/1, 1/1, true | all | PASS
+AC5 | non-finite Float64 (threshold Inf): correctly named errors / never-clipped (residuals stay non-finite) | 16/16, true | all | PASS
+AC5 | non-finite Double64 (threshold Inf): correctly named errors / never-clipped (residuals stay non-finite) | 16/16, true | all | PASS
+AC6 | Float64 K=0.5 50 starts x 1e4 steps: max eps_det/(eps M), threshold violations=0 | 5.0000e-01 | 1.5000e+00 | PASS
+AC6 | Float64 K=0.9716354 50 starts x 1e4 steps: max eps_det/(eps M), threshold violations=0 | 4.9999e-01 | 1.5000e+00 | PASS
+AC6 | Float64 K=2.0 50 starts x 1e4 steps: max eps_det/(eps M), threshold violations=0 | 5.0000e-01 | 1.5000e+00 | PASS
+AC6 | Float64 K=5.0 50 starts x 1e4 steps: max eps_det/(eps M), threshold violations=0 | 5.0000e-01 | 1.5000e+00 | PASS
+AC6 | Float64 K=10.0 50 starts x 1e4 steps: max eps_det/(eps M), threshold violations=0 | 4.9999e-01 | 1.5000e+00 | PASS
+AC6 | Double64 K=0.5 50 starts x 1e4 steps: max eps_det/(eps M), threshold violations=0 | 2.4207e-01 | 1.5000e+00 | PASS
+AC6 | Double64 K=0.9716354 50 starts x 1e4 steps: max eps_det/(eps M), threshold violations=0 | 2.4068e-01 | 1.5000e+00 | PASS
+AC6 | Double64 K=2.0 50 starts x 1e4 steps: max eps_det/(eps M), threshold violations=0 | 2.4998e-01 | 1.5000e+00 | PASS
+AC6 | Double64 K=5.0 50 starts x 1e4 steps: max eps_det/(eps M), threshold violations=0 | 2.5000e-01 | 1.5000e+00 | PASS
+AC6 | Double64 K=10.0 50 starts x 1e4 steps: max eps_det/(eps M), threshold violations=0 | 2.4997e-01 | 1.5000e+00 | PASS
+# AC6 panel wall time (s): 30.0
+AC7 | Float64 K=0.5 n=1000000: max_n eps_sum/(eps (G_max/tau + M_max)) [G_max=2.026, M_max=1.0, snapshots>4: 0, >16: 0, lambda_1=0.0, 35.3 s] | 1.9621e-01 | 4.0000e+00 | PASS
+AC6 | Float64 K=0.5 one orbit of n=1000000 (during AC7): max eps_det/(eps M) | 0.0000e+00 | 1.5000e+00 | PASS
+AC7 | Float64 K=0.9716354 n=1000000: max_n eps_sum/(eps (G_max/tau + M_max)) [G_max=4.583, M_max=1.573, snapshots>4: 0, >16: 0, lambda_1=0.0, 55.0 s] | 1.8715e-01 | 4.0000e+00 | PASS
+AC6 | Float64 K=0.9716354 one orbit of n=1000000 (during AC7): max eps_det/(eps M) | 5.0000e-01 | 1.5000e+00 | PASS
+AC7 | Float64 K=2.0 n=1000000: max_n eps_sum/(eps (G_max/tau + M_max)) [G_max=14.93, M_max=3.0, snapshots>4: 0, >16: 0, lambda_1=0.4422, 26.6 s] | 4.3491e-02 | 4.0000e+00 | PASS
+AC6 | Float64 K=2.0 one orbit of n=1000000 (during AC7): max eps_det/(eps M) | 5.0000e-01 | 1.5000e+00 | PASS
+AC7 | Float64 K=5.0 n=1000000: max_n eps_sum/(eps (G_max/tau + M_max)) [G_max=62.98, M_max=6.0, snapshots>4: 0, >16: 0, lambda_1=0.9777, 41.9 s] | 1.0700e-01 | 4.0000e+00 | PASS
+AC6 | Float64 K=5.0 one orbit of n=1000000 (during AC7): max eps_det/(eps M) | 5.0000e-01 | 1.5000e+00 | PASS
+AC7 | Float64 K=10.0 n=1000000: max_n eps_sum/(eps (G_max/tau + M_max)) [G_max=223.0, M_max=11.0, snapshots>4: 0, >16: 0, lambda_1=1.6199, 37.9 s] | 8.6206e-02 | 4.0000e+00 | PASS
+AC6 | Float64 K=10.0 one orbit of n=1000000 (during AC7): max eps_det/(eps M) | 5.0000e-01 | 1.5000e+00 | PASS
+AC7 | Double64 K=0.5 n=1000000: max_n eps_sum/(eps (G_max/tau + M_max)) [G_max=2.026, M_max=1.0, snapshots>4: 0, >16: 0, lambda_1=0.0, 20.1 s] | 7.1744e-02 | 4.0000e+00 | PASS
+AC6 | Double64 K=0.5 one orbit of n=1000000 (during AC7): max eps_det/(eps M) | 1.2500e-01 | 1.5000e+00 | PASS
+AC7 | Double64 K=0.9716354 n=1000000: max_n eps_sum/(eps (G_max/tau + M_max)) [G_max=4.583, M_max=1.573, snapshots>4: 0, >16: 0, lambda_1=0.0, 21.2 s] | 4.3787e-02 | 4.0000e+00 | PASS
+AC6 | Double64 K=0.9716354 one orbit of n=1000000 (during AC7): max eps_det/(eps M) | 2.4462e-01 | 1.5000e+00 | PASS
+AC7 | Double64 K=2.0 n=1000000: max_n eps_sum/(eps (G_max/tau + M_max)) [G_max=14.93, M_max=3.0, snapshots>4: 0, >16: 0, lambda_1=0.4355, 47.6 s] | 5.0739e-02 | 4.0000e+00 | PASS
+AC6 | Double64 K=2.0 one orbit of n=1000000 (during AC7): max eps_det/(eps M) | 2.4999e-01 | 1.5000e+00 | PASS
+AC7 | Double64 K=5.0 n=1000000: max_n eps_sum/(eps (G_max/tau + M_max)) [G_max=62.98, M_max=6.0, snapshots>4: 0, >16: 0, lambda_1=0.974, 116.6 s] | 5.1329e-02 | 4.0000e+00 | PASS
+AC6 | Double64 K=5.0 one orbit of n=1000000 (during AC7): max eps_det/(eps M) | 2.4999e-01 | 1.5000e+00 | PASS
+AC7 | Double64 K=10.0 n=1000000: max_n eps_sum/(eps (G_max/tau + M_max)) [G_max=223.0, M_max=11.0, snapshots>4: 0, >16: 0, lambda_1=1.6214, 41.3 s] | 3.2052e-02 | 4.0000e+00 | PASS
+AC6 | Double64 K=10.0 one orbit of n=1000000 (during AC7): max eps_det/(eps M) | 2.4998e-01 | 1.5000e+00 | PASS
+AC7 | ChaosTools full-spectrum sum of exponents next to eps_sum (comparison only) | n/a | n/a | DEFERRED lyap-benettin 04
+AC8 | K=5, 1e3 steps, stored entries: max |eps_det(Float64) - eps_det(256 bit)| / eps | 5.0000e-01 | 1.0000e+00 | PASS
+AC8 | K=0.5 100000 steps, stored entries vs 256 bit: max |diff| / eps | 5.0000e-01 | 1.0000e+00 | PASS
+AC8 | K=0.9716354 100000 steps, stored entries vs 256 bit: max |diff| / eps | 5.0000e-01 | 1.0000e+00 | PASS
+AC8 | K=2.0 100000 steps, stored entries vs 256 bit: max |diff| / eps | 5.0000e-01 | 1.0000e+00 | PASS
+AC8 | K=5.0 100000 steps, stored entries vs 256 bit: max |diff| / eps | 5.0000e-01 | 1.0000e+00 | PASS
+AC8 | K=10.0 100000 steps, stored entries vs 256 bit: max |diff| / eps | 5.0000e-01 | 1.0000e+00 | PASS
+AC8 | K=0.5 10000 steps, 256-bit QR estimator on recomputed entries: max eps_sum/(eps_256 (G+M)) [binary64 eps_sum max = 1.6653e-16, max|lambda_1(64) - lambda_1(256)| = 3.0731e-15] | 2.0945e-01 | 1.6000e+01 | PASS
+AC8 | K=0.9716354 10000 steps, 256-bit QR estimator on recomputed entries: max eps_sum/(eps_256 (G+M)) [binary64 eps_sum max = 2.2204e-16, max|lambda_1(64) - lambda_1(256)| = 3.2058e-15] | 7.4577e-02 | 1.6000e+01 | PASS
+AC8 | K=2.0 10000 steps, 256-bit QR estimator on recomputed entries: max eps_sum/(eps_256 (G+M)) [binary64 eps_sum max = 2.2204e-16, max|lambda_1(64) - lambda_1(256)| = 2.7756e-16] | 7.5020e-02 | 1.6000e+01 | PASS
+AC8 | K=5.0 10000 steps, 256-bit QR estimator on recomputed entries: max eps_sum/(eps_256 (G+M)) [binary64 eps_sum max = 1.1102e-15, max|lambda_1(64) - lambda_1(256)| = 4.4409e-16] | 5.9013e-02 | 1.6000e+01 | PASS
+AC8 | K=10.0 10000 steps, 256-bit QR estimator on recomputed entries: max eps_sum/(eps_256 (G+M)) [binary64 eps_sum max = 9.3259e-15, max|lambda_1(64) - lambda_1(256)| = 4.4409e-16] | 1.6396e-01 | 1.6000e+01 | PASS
+# AC8 panel wall time (s): 9.4
+AC9 | Float64 bytes allocated (propagate_orbit 100 steps, reducer_update, monitor_exponents) | 0/0/0 | 0/0/0 | PASS
+AC9 | Float64 reducer_update time per call, ns (loaded machine; informational) | 3.0400e+02 | none | INFO
+AC9 | Double64 bytes allocated (propagate_orbit 100 steps, reducer_update, monitor_exponents) | 0/0/0 | 0/0/0 | PASS
+AC9 | Double64 reducer_update time per call, ns (loaded machine; informational) | 5.1940e+03 | none | INFO
+AC10 | 64 orbits: x, W, residual maxima bitwise equal, 4 threads vs 1 thread(s) (max eps_det in run = 2.2204e-16) | true | true | PASS
+AC10 | 64 orbits: propagate bitwise equal to serial propagate_orbit map | true | true | PASS
+AC10 | fault orbit ids reported (4 threads / 1 thread) for targets (33), (17,40), (40,17) | 33,17,17/33,17,17 | 33,17,17 | PASS
+AC11 | CPU kernel item 1 Float64: max residual over 4 integer maps x1000 steps | 0.0000e+00 | 0.0000e+00 | PASS
+AC11 | CPU kernel item 1 Double64: max residual over 4 integer maps x1000 steps | 0.0000e+00 | 0.0000e+00 | PASS
+AC11 | CPU kernel item 5 (det fault, theta=2.6645e-15): raise ok / quiet ok | 1/1, 1/1 | all | PASS
+AC11 | CPU kernel item 6 (panel, 50 starts x 1e4 steps): health errors; max det_max/eps; max |kernel - direct loop| det_max | 0; 4.0; 0.0000e+00 | 0; -; 0 | PASS
+AC11 | resolve_backend(:gpu, BigFloat): backend / reason | cpu / kernel does not compile for the element type | cpu / kernel does not compile for the element type | PASS
+AC11 | GPU-vs-CPU verdicts and residual differences on the GTX 1050 (items 1, 5, 6) | see verify/gpu.jl | <= threshold in force | STAGE04-GPU
+# figures written to E:\Documents\Vibe-Coding\Chaos Research Orchestrator\workspaces\module-build\stages\04-verify\output

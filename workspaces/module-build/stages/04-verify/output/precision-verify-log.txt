@@ -1,0 +1,38 @@
+# precision verify; threads = 4, julia 1.13.1, seed base 20261012
+AC1 | max |K_T-K_ref|/bound, T=Float64 | 0.8 | 1 | PASS
+AC1 | max |K_T-K_ref|/bound, T=Double64 | 0.03125 | 1 | PASS
+AC1 | max |K_T-K_ref|/bound, T=BigFloat | 0.1133 | 1 | PASS
+AC2 | round-trip failures of 10^4 values, Double64 / BigFloat(256) | 0 / 0 | 0 / 0 | PASS
+AC3 | sin max err/max(1,|f|) in units of eps_D=2^-104 (n=10000 points) | 0.524 | 16 | PASS
+AC3 | sin effective eps = max err/max(1,|f|) | 2^-104.93 = 2.584e-32 | 2^-100 (amendment) | PASS
+AC3 | cos max err/max(1,|f|) in units of eps_D=2^-104 (n=10000 points) | 0.662 | 16 | PASS
+AC3 | cos effective eps = max err/max(1,|f|) | 2^-104.60 = 3.264e-32 | 2^-100 (amendment) | PASS
+AC3 | log max err/max(1,|f|) in units of eps_D=2^-104 (n=10000 points) | 0.7549 | 16 | PASS
+AC3 | log effective eps = max err/max(1,|f|) | 2^-104.41 = 3.722e-32 | 2^-100 (amendment) | PASS
+AC4 | Float64 realised n_H min/median/max (capped at 100: 7 orbits) | 14/19.0/100 | >= 15 | see exclusions
+AC4 | Float64 orbits with n_H < 15 (excluded) | 7 | <= 10 (5 percent) | PASS
+AC4 | Float64 max |e_n|/(eps M_n Gamma_n), n <= n_H | 0.9055 | 8 | PASS
+AC4 | Double64 realised n_H min/median/max (capped at 100: 9 orbits) | 39/55.0/100 | >= 40 | see exclusions
+AC4 | Double64 orbits with n_H < 40 (excluded) | 1 | <= 10 (5 percent) | PASS
+AC4 | Double64 max |e_n|/(eps M_n Gamma_n), n <= n_H | 0.403 | 8 | PASS
+AC5 | max |e_n|/(eps_256 M_n Gamma_n), n <= 100 | 0.6191 | 8 | PASS
+AC5 | max |e_10| | 8.169e-71 | 1e-60 | PASS
+AC6 | realised horizon min(n_H(D64),40): min/median/max | 40/40.0/40 | - | INFO
+AC6 | max |S_n(D64)-S_n(ref)|/(64(1+K) eps M_n Gamma_n) | 2.605 | 1 (per orbit) | see count
+AC6 | 99th percentile / median ratio | 0.055 / 0.0003761 | - | INFO
+AC6 | orbits with ratio > 1 (of 200) | 1 | <= 10 (amendment) | PASS
+AC7 | fallback-matrix mismatches over 21 cases (9 type x request cases + probe cases; Float32 rows dropped D24) | 0 | 0 | PASS
+AC8 | precision-string failures (Float64, Double64, BigFloat(64/128/256/512)) | 0 | 0 | PASS
+AC9 | GPU vs CPU orbit agreement (Float64, Double64) | see verify/gpu.jl | 2 c eps M_n Gamma_n | STAGE04-GPU
+AC10 | Float32 GPU gate (>= 4x Float64 CPU) | Float32 dropped from M2 | - | DROPPED D24
+AC11 | time ratio Double64/Float64, 1 thread(s), 4000x500 steps (Float64 365.5 ms) | 64.19 | reported, no threshold | PASS
+AC11 | time ratio BigFloat(256)/Float64, 1 thread(s) | 566.1 | reported, no threshold | PASS
+AC11 | time ratio Double64/Float64, 4 thread(s), 4000x500 steps (Float64 118.4 ms) | 46.03 | reported, no threshold | PASS
+AC11 | time ratio BigFloat(256)/Float64, 4 thread(s) | 547.1 | reported, no threshold | PASS
+AC11 | thread scaling 1 -> 4 threads, speedup Float64 / Double64 / BigFloat | 3.088 / 4.306 / 3.195 | - | INFO
+AC11 | GPU Double64/Float64 ratio | see verify/gpu.jl | - | STAGE04-GPU
+AC12 | closure violations (Float64, Double64, BigFloat) | 0 | 0 | PASS
+AC12 | max allocated bytes in 100-step hot loops (Float64, Double64) | 0 | 0 | PASS
+AC13 | median n* (separation > 1e-8), min/max | 16.0 (12/200) | reported | INFO
+AC13 | fraction of ICs with n* <= 60 | 0.99 | >= 0.8 | PASS
+# figure: E:\Documents\Vibe-Coding\Chaos Research Orchestrator\workspaces\module-build\stages\04-verify\output\precision-orbit-error.png

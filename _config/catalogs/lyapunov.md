@@ -31,8 +31,8 @@ Shared step: propagate k tangent vectors, every `tau` steps factor W = Q R, accu
 
 | ID | Method | Gives | Main issue | Source | Phase | Status |
 |----|--------|-------|-----------|--------|-------|--------|
-| L8 | Continuous QR (ODE for Q on the orthogonal group, flows only): dQ/dt = Q S, d(ln R_ii)/dt = (Q^T J Q)_ii | full spectrum | orthogonality drift (needs projection, Cayley or a nu (Q^T Q - I) correction); reported ~40x slower than discrete QR on a 29-dim Toda chain (Geist1990, to verify) | Goldhirsch1987, Dieci1997, ChristiansenRugh1997 | M5 | planned |
-| L9 | Discrete SVD of the finite-time product, stabilized (product SVD / QR-accumulated SVD, no naive multiplication) | finite-time singular values sigma_i(n); spectrum as n grows | finite-time singular values are not term-by-term equal to QR diagonals | GreeneKim1987, Dieci1997 | M2 | planned |
+| L8 | Continuous QR (ODE for Q on the orthogonal group, flows only): dQ/dt = Q S, d(ln R_ii)/dt = (Q^T J Q)_ii | full spectrum | orthogonality drift (needs projection, Cayley or a nu (Q^T Q - I) correction); reported ~40x slower than discrete QR on a 29-dim Toda chain (Geist1990, Table III p.886) | Goldhirsch1987, Dieci1997, ChristiansenRugh1997 | M5 | planned |
+| L9 | Discrete SVD of the finite-time product, stabilized (product SVD / QR-accumulated SVD, no naive multiplication) | finite-time singular values sigma_i(n); spectrum as n grows | finite-time singular values are not term-by-term equal to QR diagonals | GreeneKim1987, Dieci1997, Stewart1997, OliveiraStewart2000 | M2 (d = 2); general d M3 (D32) | planned |
 | L10 | Continuous SVD (Greene-Kim): ODEs for U and ln sigma_i | spectrum + singular vectors | singular when exponents are (nearly) degenerate, i.e. on tori and periodic orbits, which Hamiltonian systems always have (lambda_i = 0 pairs); costliest | GreeneKim1987, Dieci1997, DieciVanVleck2007 | catalog only (degeneracy makes it unsuitable for symplectic systems) | planned |
 | L10b | Single large-time SVD of the full product | spectrum | overflow / loss of small singular values; kept only as a negative control | Geist1990 | catalog only | planned |
 | L11 | Rangarajan-Habib-Ryne parametrization (no rescaling, no reorthonormalization) | full spectrum | parametrization singularities; derived ODEs per dimension | Rangarajan1998 | M5 (catalog only) | planned |
@@ -56,9 +56,9 @@ Delay embedding (Takens, false nearest neighbours) is a supporting module for L1
 
 Analytic Jacobian (default, ground truth); automatic differentiation (forward mode, ForwardDiff.jl) for maps without hand-written Jacobians, validated against the analytic one; complex-step derivative for tests. AD tangents are part of research line R3. Oracles: ChaosTools `lyapunov` / `lyapunovspectrum` (no SALI, MEGNO, FLI there), TaylorIntegration `lyap_taylorinteg` at BigFloat.
 
-## D3. Candidate benchmark values (user-supplied scoping review, verify before use)
+## D3. Benchmark values (pointer)
 
-Geist1990, damped-driven Toda chain: relative CPU time GS 1.00, RGS 1.02, H1 1.07, H2 1.17, continuous QR 40; discrete QR variants agree on lambda_1 and lambda_28 within finite-time fluctuation. Bibliographic record verified (Geist1990); the numbers themselves are UNVERIFIED (full text not accessible on 2026-10-12, see `chaos-bibliography.md`). Confirm against the paper in literature-review/03-verify before any use; even then a reproduction target only, never a test oracle.
+Geist1990, damped-driven Toda chain: relative CPU times and the finite-time lambda_1 and lambda_28 values were checked against the paper (Tables II and III, pp.885-886, decision D30, O12) and live in _config/bibliography/benchmarks.md, rows with source key Geist1990. A reproduction target only, never a test oracle.
 
 ## E. Precision variants (apply to every row)
 

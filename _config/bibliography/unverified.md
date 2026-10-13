@@ -2,7 +2,6 @@
 
 Layer 3, canonical. Never cite anything listed here. Items leave this file only through literature-review/05.
 
-- **Geist, Parlitz & Lauterborn 1990, Toda-chain relative CPU times (GS 1.00, RGS 1.02, H1 1.07, H2 1.17, continuous QR 40) and lambda_1 values**: Bibliographic record CONFIRMED (Geist1990, Prog. Theor. Phys. 83(5), 875-893, doi 10.1143/ptp.83.875). Full text NOT accessible: OUP PDF returns a Cloudflare challenge (HTTP 403), Unpaywall only lists the same OUP link, WebFetch redirected to a token URL. The CPU-time ratios and lambda_1 values are therefore UNCONFIRMED and are not in the benchmark table.
 - **Skokos, Bountis & Antonopoulos 2008, 'The GALI method for the study of local dynamics in Hamiltonian systems'**: Crossref and web search found no paper with this title. Closest verified items: Skokos2007 (Physica D 231, 30; the GALI paper) and Skokos2008 (EPJ ST 165, 5, GALI in FPU lattices).
 - **Greene & Kim 1989 (Physica D 36, 83) described as continuous SVD**: Physica D 36(1-2), 83-91 resolves to 'Introduction of a metric tensor into linearized evolution equations' (GreeneKim1989 included). The SVD description could not be confirmed.
 - **Chen, Djidjeli & Price 2006 described as 'simple discrete QR algorithm' (pii S0096300305005254)**: pii resolves to AMC 174, 982 'Computing Lyapunov exponents based on the solution expression of the variational system' (included). Characterisation not confirmed.

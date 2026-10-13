@@ -29,7 +29,7 @@ Rank = novelty x feasibility with the planned library x venue fit. Ideas that re
 | 12 | Parallel block-QR CLVs for Hamiltonian lattices (distributed) | hardware | R3 | cluster only |
 | 13 | LDI vs SALI vs GALI in high-dimensional maps | indicators | R1 | Sales2026 |
 | 14 | Stability exponents and CLVs vs plain LE spectra (Cvitanovic-style) | indicators | R1 | ChaosBook lecture notes, grey lit |
-| 15 | Entropy-based indicators and recurrence plots on symplectic maps | indicators | R1 | I16 |
+| 15 | Entropy-based indicators and recurrence plots on symplectic maps | indicators | R1 | I16; literature-review topic `recurrence-indicators` before M4 (owner, 2026-10-13): recurrence time entropy for stickiness (identifiers checked by bibcheck, not yet in the bibliography: doi:10.1016/j.physleta.2026.132224 = arXiv:2606.23501; doi:10.1063/5.0140613; doi:10.1016/j.physleta.2009.12.057; doi:10.1007/978-3-031-91062-3_6), Lagrangian-descriptor and persistent-homology indicators, plus arXiv:1008.2538 (SALI, 2 and 3 DOF) |
 | 16 | Performance of indicators on symplectic Henon-like polynomial maps in higher dimension (CERN line) | indicators | R1 | Bazzani2023, Montanari2025 |
 | 17 | Indicator "packages" per task (global map vs single orbit), formalized | indicators | R1 | part of idea 1 |
 | 18 | Surrogate ML models predicting LE / indicators from short orbits | ML | R1 | leakage risk; needs idea-1 data |

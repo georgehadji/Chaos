@@ -96,3 +96,8 @@ Common data unless stated: K = 5 (exactly representable, so no conversion enters
 - `schema/run-store.md`, root attributes `precision`, `backend`, `device`, `backend_fallback_reason`; `_config/coding-conventions.md`, "Tests".
 - `_config/bibliography/benchmarks.md`: row "Lyapunov exponent, single chaotic orbit" (0.298 at K = pi/2; 1.172 at K = 2 pi), SalaArtuso2015, p. 9 as stated in the row, Eq. 5 (McMillan form, converted in Equations 2); row "Standard map largest Lyapunov exponent, large K", Shevchenko2004. Both used for horizon sizing only (K18).
 - Derived (no outside source): Equations 2, 3, 4, 5 and the Float32 lattice heuristic; the pi rounding errors were computed from a 60-digit value of pi.
+
+## Amendments (stage 02 checkpoint, 2026-10-13, owner approved)
+
+- Criterion 6: at most 5 percent of the orbits (10 of 200) may exceed the bound, the same rule as criterion 4. Reason: BigFloat 256 versus 512 already exceeds the first-order bound by a factor 10 on one orbit, so the bound, not the precision, is the limit.
+- Double64 effective epsilon is 2^-100 in every Double64 tolerance of the M2 specs (DoubleFloats sin and cos measured at about 2^-100.4 against BigFloat 256). Criterion 3 and standard-map criterion 14 still measure the effective value and report it; a value above 2^-100 goes to the owner.

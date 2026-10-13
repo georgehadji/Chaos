@@ -11,4 +11,5 @@ using Test, Chaoslab, StaticArrays, LinearAlgebra, StableRNGs, DoubleFloats, For
     include("sm_ac14.jl")
     include("sm_y5.jl")
     include("sm_ac18.jl")
+    include("sm_wrapped.jl")
 end

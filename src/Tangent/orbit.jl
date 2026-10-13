@@ -21,8 +21,9 @@ function _reducer_error(rs::Tuple, ss::Tuple, orbit, backend)
 end
 
 # The single per-orbit body (spec I1, I2): tangent at the OLD point, then advance x; handoff every tau steps.
+# The state has s >= d components (D28 winding counts ride along), W is d x k with d the system dimension.
 # Non-throwing so the same code runs in the kernel: returns (x, W, states, status, step of the bad handoff).
-@inline function _orbit_body(sys, x0::SVector{d, T}, W0::SMatrix{d, k}, N::Int, tau::Int, reducers::Tuple) where {d, k, T}
+@inline function _orbit_body(sys, x0::SVector{s, T}, W0::SMatrix{d, k}, N::Int, tau::Int, reducers::Tuple) where {s, d, k, T}
     x, W = x0, W0
     states = _init_states(reducers, T, Val(d), Val(k))
     n = 0

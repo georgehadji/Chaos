@@ -77,3 +77,37 @@ Command (repo root): `julia --project=<scratchpad>/m2/testenv -e 'using Test, Ch
 | SC1 non-finite input | 1 Error | UndefVarError `StandardMap` |
 
 No parse errors, no errors inside helpers.
+
+## Amendment D28 (2026-10-13)
+
+Test file `test/standard-map/sm_wrapped.jl` (included last from `runtests.jl`, inside the outer testset). One testset per criterion W1 to W8 of the spec amendment. Helpers carry the prefix `smw_`; they reuse `sm_tau`, `sm_nH`, `sm_tdist`, `sm_absdiff`, `sm_orbit`. Seeds: `SM_SEED` plus 5001 to 5062 (distinct per criterion and element type). K in {0.5, 2, 5, 10}.
+
+| Criterion | Testset | Sample sizes | Tolerance |
+|---|---|---|---|
+| W1 torus agreement | W1 torus agreement with the lifted map | 200 orbits per K, n = 1..n_H(K), Float64 and Double64 | torus distance <= tau(n); also x, p in [0, 2 pi), m, n integers |
+| W2 lifted reconstruction | W2 lifted reconstruction | same orbits as W1; torus_state and lift checks on 100 seeded points in [-100, 100]^2 and one known point | lift at 256 bits vs lifted orbit <= tau(n); lift(torus_state(z)) - z <= 16 eps(100) |
+| W3 counts exact and bounded | W3 counts exact and bounded | 1 orbit, 10^6 steps, K = 5; first 50 steps teacher-forced; free run n_H(5) = 6 steps | range, isinteger, below 2^53; increments equal; torus <= tau(n) and counts equal |
+| W4 K = 0 | W4 K = 0 known answer | 20 seeded dyadic orbits (i / 1024, i in 0:6433), k <= 1000 | p, n unchanged; m_k equal to the 256-bit floor |
+| W5 tangent agreement | W5 tangent agreement | 100 (Float64) and 50 (Double64) orbits per K, n <= n_H(K) | AC4 bound against the 256-bit product at the same points; vs lifted product: 2 x bound + n abs(K) tau(n) Gamma_n sqrt 2 |
+| W6 inverse round trip | W6 inverse round trip | 200 orbits per K, n in {1, n_H(K)}, both orders, Float64 and Double64 | torus <= tau(n); counts exactly 0 |
+| W7 zero allocation | W7 zero allocation | forward, inverse, tangent, inverse_tangent, propagate_orbit (100 steps), Float64 and Double64 | 0 bytes |
+| W8 overflow guard | W8 overflow guard | m and n at maxintfloat - 1 (forward), m at -(maxintfloat - 1) (inverse), m two below the limit | NaN in all four components; NumericalHealthError "state" from propagate_orbit and propagate; exact count below the limit |
+
+Deviation from the orchestrator's W3 wording (design point that does not hold): the first 50 steps cannot be compared by a free-running 256-bit orbit, because the orbit is chaotic. Measured at K = 5 from (1, 2): torus distance between the binary64 and 256-bit orbits is 2.7e-12 at step 10, 7e-7 at step 20, 6e-3 at step 30, 1.6 at step 40; first distance above 1e-3 at step 27, first count mismatch at step 34. So W3 recomputes the count increments at 256 bits from the exact binary64 state of each of the first 50 steps (teacher-forced), and compares the free-running 256-bit orbit only up to n_H(5) = 6 steps.
+
+Worst observed ratios (error over bound, 1 = bound): W1 0.026 (Float64), 2.4e-4 (Double64); W2 0.024, 3.7e-4; W5 against 256 bits 0.069, 2.3e-3, against lifted 1.1e-3, 9.9e-6; W6 0.063, 2.8e-3; W3 free run 2.3e-3. W4: the closest approach of any x0 + k p0 to a multiple of 2 pi over the 20 seeded orbits is 4.9e-4, far above the 1e-12 scale where a floor could differ.
+
+### RED log (Amendment D28)
+
+Run: helpers plus `sm_wrapped.jl` only, before any source change. 13 Error, 0 Pass, 0 Fail; no parse errors, no errors inside helpers.
+
+| Testset | Result | First error |
+|---|---|---|
+| W1 torus agreement with the lifted map | 1 Error | UndefVarError `WrappedStandardMap` |
+| W2 lifted reconstruction | 3 Error | UndefVarError `WrappedStandardMap` (two), `torus_state` |
+| W3 counts exact and bounded | 1 Error | UndefVarError `WrappedStandardMap` |
+| W4 K = 0 known answer | 1 Error | UndefVarError `WrappedStandardMap` |
+| W5 tangent agreement | 1 Error | UndefVarError `WrappedStandardMap` |
+| W6 inverse round trip | 1 Error | UndefVarError `WrappedStandardMap` |
+| W7 zero allocation | 1 Error | UndefVarError `WrappedStandardMap` |
+| W8 overflow guard | 4 Error | UndefVarError `WrappedStandardMap` |

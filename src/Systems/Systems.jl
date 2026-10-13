@@ -8,7 +8,7 @@ module Systems
 using StaticArrays
 using LinearAlgebra
 
-export AbstractMap, StandardMap, LinearSymplecticMap
+export AbstractMap, StandardMap, LinearSymplecticMap, WrappedStandardMap, torus_state, lift
 export rotation_block, hyperbolic_block, block_diagonal, conjugated
 export dimension, forward, inverse, tangent, inverse_tangent
 export wrap, symplectic_form, det_residual, symplectic_residual
@@ -52,6 +52,7 @@ Jacobian of one inverse step, evaluated at the image point `z_image = forward(sy
 function inverse_tangent end
 
 include("standard_map.jl")
+include("wrapped_standard_map.jl")
 include("linear_symplectic.jl")
 include("residuals.jl")
 

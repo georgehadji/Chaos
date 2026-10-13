@@ -123,3 +123,53 @@ Verified keys used (all in `_config/bibliography/references.bib`, none marked `?
 - Layer 3: `_config/research-question.md` "Ground truth"; `_config/bibliography/benchmarks.md` rows "Stability of the central fixed point at (1/2, 0)", "Eigenvectors of the fixed point (0,0)", "Island centre and unstable 4/9 orbit point", "Confinement and escape time of a sticky orbit" (form only), "Lyapunov exponent, single chaotic orbit" (form only); `_config/catalogs/systems.md` rows Y1, Y5; owner decisions, M2 kickoff (double-double extended precision, arbitrary precision for short CPU oracle runs, oracles in a separate environment); decision D17; risks K15, K18.
 - Chirikov1979 and Greene1979 are listed for Y1 in the catalog but were not read here and are not cited for any equation or number.
 Findings for the owner: (a) the Datseris stable-eigenvector formula (Eq. (7)) disagrees with the derived eigenvector except near k = 1, and the printed components follow the order (p, theta); (b) the 4/9 orbit point P1 has period 18, not 9, and O1 has period 2, which the benchmarks row does not say; (c) double-double sin and cos accuracy is unmeasured.
+
+## Amendment D28 (2026-10-13)
+
+Decision D28: long runs store the state wrapped (exact reduction modulo 2 pi each step) plus integer winding counts per coordinate. This amendment adds the wrapped system with counts as a second map next to the lifted one of Equations item 1. The lifted map is unchanged and stays the reference for the wrapped-vs-lifted sensitivity study. Pattern 10 applies: Julia names appear only in the Compute subsection of this amendment.
+
+### Equations (wrapped system with counts)
+
+Notation. tp is 2 pi built in the element type T (a rounded number, not the real 2 pi). State (x, p, m, n): x, p in [0, tp), m and n integers stored exactly in T. Lifted coordinates X = x + 2 pi m and P = p + 2 pi n. The phase-space (tangent) dimension stays 2; the state has 4 components.
+
+W-E1. Reduction (derived). For a finite u, red(u) = (r, a) with a = floor(u / tp) and r = u - tp a, followed by two guards in this order: if r < 0 then r += tp and a -= 1; if r >= tp then r -= tp and a += 1. Why: floor(u / tp) can be one too large when u / tp rounds up to an integer (r is then a tiny negative number, the first guard fires, and r + tp may round to tp, which the second guard maps to 0 with the count restored); it can be one too small when tp a rounds low (r >= tp, second guard). Result: r in [0, tp) and u = r + tp a up to one rounding. For a non-finite u the result is non-finite and the count is meaningless (W-I5).
+
+W-E2. Forward step (derived from Equations item 1):
+- p~ = p + K sin x; (p', a) = red(p~); n' = n + a.
+- x~ = x + p'; (x', b) = red(x~); m' = m + n' + b.
+Check: P' = P + K sin X = p + 2 pi n + K sin x = p~ + 2 pi n = p' + 2 pi (n + a) = p' + 2 pi n'. X' = X + P' = x + p' + 2 pi (m + n') = x~ + 2 pi (m + n') = x' + 2 pi (m + n' + b) = x' + 2 pi m'. So (x', p', m', n') reproduces the lifted map exactly in real arithmetic. The arguments are bounded: |p~| <= tp + |K| and x~ < 2 tp, so each reduction costs one rounding of size O(eps_T), the same order as one rounding of the lifted step.
+
+W-E3. Tangent step (derived): the matrix of Equations item 3 evaluated at x, DT = [[1 + c, 1], [c, 1]] with c = K cos x. The lifted point enters only through cos, which has period 2 pi, so the wrapped and lifted tangents coincide in real arithmetic; in T the cos argument is x (below tp) instead of X, so it is at least as accurate as in the lifted mode. det DT = 1. The counts carry no tangent component.
+
+W-E4. Inverse step (derived from Equations item 4). From (x', p', m', n'): x~ = x' - p' (in (-tp, tp)); (x, b) = red(x~); m = m' - n' + b. Then p~ = p' - K sin x; (p, a) = red(p~); n = n' + a. Check: X = X' - P' = x~ + 2 pi (m' - n') = x + 2 pi (b + m' - n') = x + 2 pi m. P = P' - K sin X = p' - K sin x + 2 pi n' = p~ + 2 pi n' = p + 2 pi (a + n') = p + 2 pi n. Inverse tangent at the image point (derived): DT^-1 = [[1, -1], [-c, 1 + c]] with c = K cos(x' - p') (cos of the unreduced preimage coordinate, equal to cos x up to the period).
+
+W-E5. Torus conversion and lift (derived). From a lifted point (X, P): (x, m) = red(X) and (p, n) = red(P). The lift of a state is (x + tp m, p + tp n) in T. In T the lift has absolute error about |m| tp eps_T, so for |m| beyond 1 / eps_T it is meaningless in T and is formed in a wider type from the exact counts.
+
+W-E6. Circle length (derived). The wrapped system in T is the exact map on a circle of circumference tp, not 2 pi. Each wrap shifts the point by |2 pi - tp| <= pi eps_T, so after n steps with w wraps in total the cumulative shift is at most w pi eps_T. w is at most (M_n / 2 pi) + 2 n, so the shift is O(M_n eps_T) and lies inside the error budget tau(n) of Invariants (whose factor 16 and growth Gamma_n are far larger).
+
+### Invariants (wrapped system)
+
+- W-I1: after n <= n_H(K) steps, x and p are in [0, tp) and m, n are integers, and the torus distance of (x, p) to the lifted orbit wrapped at step n is at most tau(n) (M_n on the lifted orbit).
+- W-I2: the lift of the state, computed in arbitrary precision from the exact counts, differs from the lifted orbit by at most tau(n) in the plain max norm.
+- W-I3: counts are exact integers while |m| and |n| stay below the largest integer T stores exactly (2^53 for binary64, 2^106 for double-double, 2^precision for arbitrary precision); every update m' = m + n' + b and n' = n + a is then an exact addition.
+- W-I4: inverse(forward(s)) = s: x, p to tau(n), counts exactly. A count can flip by one only when a coordinate lies within tau(n) of 0 or tp, a null set for continuous seeded data; a flip is reported with the orbit and step, not tolerated.
+- W-I5 (health): if |m'| or |n'| reaches the limit of W-I3, forward and inverse return NaN in all four components, so the health check of tangent-core fires; a silently wrong count is not allowed. Non-finite input gives non-finite output as in Scope.
+- W-I6: K = 0 is exact: p and n never change, and m_k = floor((x0 + k p0) / tp) in exact arithmetic when x0, p0 are dyadic and the sums are exact in T.
+
+### Compute (amendment)
+
+Per orbit: 4 state numbers plus 4 tangent numbers (a 2 x 2 matrix, k = 2 deviation vectors of 2 numbers) = 8 numbers: 64 bytes in binary64, 128 bytes in double-double, before reducer state and the 16-byte index. With tangent-core's formula and state length s = 4, d = 2, k = 2: sizeof(T) (4 + 4 + 4) + 16 = 112 bytes in binary64. Cost per step: one sin, two floors and a few additions, about the lifted cost.
+
+Interface. System `WrappedStandardMap{T}(K)`, state `SVector{4,T}` = (x, p, m, n), exported with `torus_state(z)` (lifted pair to state) and `lift(s)` (state to lifted pair in T). `dimension` returns 2. `forward`, `inverse`, `tangent`, `inverse_tangent` use the lifted system's names; the tangents are 2 x 2. tp is `2 * pi` built in T (Systems imports nothing from Foundation, decision D23). The exactness limit is `maxintfloat(T)`.
+
+### Acceptance criteria (amendment)
+
+Seeded data: x0, p0 uniform in [0, tp) drawn in Float64 and cast to T (the lifted and wrapped orbits start from identical data), m = n = 0, K in {0.5, 2, 5, 10}.
+- W1 Torus agreement with the lifted map: for every n <= n_H(K), 200 seeded orbits per K, Float64 and Double64 (effective eps as in criterion 14), the torus distance between the wrapped state (x, p) and the lifted orbit is at most tau(n).
+- W2 Lifted reconstruction: the lift of the state, with the state widened exactly to 256-bit arithmetic and 2 pi taken at 256 bits, differs from the lifted-mode orbit by at most tau(n) (plain max norm) for n <= n_H(K), same orbits as W1.
+- W3 Counts exact and bounded: after 10^6 steps at K = 5 (Float64), x and p are in [0, tp) and m, n are integer-valued. The counts are recomputed independently at 256 bits for the first 50 steps. Free-running a 256-bit orbit for 50 steps cannot be compared with the binary64 orbit (chaotic divergence: the exponent at K = 5 is about 0.9 per step, so a 1e-16 difference reaches order 1 after about 40 steps, see the impl notes for the measured step); the recomputation is therefore teacher-forced: at each of the first 50 steps the 256-bit increments a and b are computed from the exact binary64 state of that step and compared with the increments the binary64 map produced (n' - n and m' - m - n'). Additionally the free-running 256-bit orbit is compared for n <= n_H(K) in x, p (tau(n)) and counts (exact).
+- W4 K = 0 known answer: p and n never change; for k <= 1000, m_k equals floor((x0 + k p0) / (2 pi)) computed at 256 bits, with x0 and p0 dyadic multiples of 2^-10 in [0, 2 pi). The binary64 state is exact in these sums, and the 256-bit floor differs from the binary64 floor only if x0 + k p0 lies within about 2 pi eps of a multiple of 2 pi; with dyadic data of 2^-10 spacing the distance of such a sum from a multiple of the irrational 2 pi is far above that (checked for the seeded cases in the test plan).
+- W5 Tangent agreement: along the wrapped orbit for n <= n_H(K), the product of the tangent matrices satisfies the tangent-core criterion 4 bound (8 n eps_T times the product of Frobenius norms times ||W_0||_F against the 256-bit product at the same realized points), and differs from the lifted-mode tangent product by at most twice that bound plus the first-order orbit term n |K| tau(n) Gamma_n ||W_0||_F (derived: the orbits differ by at most tau(j) in x after j steps, so each tangent entry K cos x differs by at most |K| tau(j); a perturbation of one factor is amplified by at most Gamma over the other steps).
+- W6 Inverse round trip: n forward then n inverse steps recover the state for n = 1 and n = n_H(K): x, p within tau(n) (torus distance) and counts exactly equal, 200 orbits per K, Float64 and Double64; likewise inverse then forward.
+- W7 Zero allocation: forward, tangent, inverse and the per-orbit propagation of tangent-core with the wrapped system allocate 0 bytes after warm-up, Float64 and Double64.
+- W8 Overflow guard: a state with m one below the binary64 exactness limit 2^53 and a step that increases m (the new x~ is at least tp) gives NaN in all four components; likewise for n; propagation of that state raises the numerical health error with kind "state"; a state with m two below the limit stays finite with the exact count.

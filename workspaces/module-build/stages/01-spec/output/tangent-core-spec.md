@@ -106,3 +106,24 @@ Verified bibliography key (all read in `data/literature/lyapunov-algorithms/Skok
 - Shevchenko2004 and SalaArtuso2015 only through the benchmarks.md rows quoted above ("Standard map largest Lyapunov exponent, large K"; "Lyapunov exponent, single chaotic orbit"), not read again here. Both are used as the lambda scale for an upper bound, never as a pass condition (K18).
 Layer 3 facts: `_config/research-question.md` "Ground truth"; `_config/architecture.md` "Compute", "Layering", "Scalability"; `_config/numerics-policy.md`; `_config/coding-conventions.md` "Tests"; `schema/run-store.md` root attributes; `_config/risks.md` K15, K16, K18.
 Non-bibliography facts read 2026-10-13 (for K15 only): CUDA.jl README support matrix (github.com/JuliaGPU/CUDA.jl); CUDA.jl installation overview (cuda.juliagpu.org, documents pinning a runtime version); NVIDIA CUDA Toolkit release notes 13.0, cuFFT and cuSPARSE deprecation entries. Measured here: plain vs compensated sum of 10^8 copies of 0.1 in Float64 (Julia 1.13.1).
+
+## Amendment D28 (2026-10-13)
+
+Decision D28 (wrapped state with winding counts) needs a state vector longer than the phase-space dimension. This amendment generalizes the stream; behaviour for a state of length d stays bit-identical.
+
+### Equations and contract change
+
+- A1 (derived). State length s >= d. The system gives a one-step map on the state (s components) and a one-step tangent action on the phase-space deviation (a d x d matrix, d the system's dimension). The extra s - d components (winding counts) carry no tangent. W is d x k and evolves as W_{n+1} = M_n W_n with M_n the tangent at the OLD state, as in E2.
+- A2. The deviation matrix has d rows, with d taken from the system, not from the state length; 1 <= k <= d. The seeded initial vectors are d x k as before (the orbit-keyed stream does not depend on s).
+- A3. Numerical health covers all s state components and all d k entries of W at every handoff and after the last step. A non-finite entry of the extra components reports as "state".
+- A4. Memory per orbit: M(s, d, k, T) = sizeof(T) (s + d k + 2 k) + 16 bytes; s = d gives the old formula. Worked value: s = 4, d = 2, k = 2, Float64: 8 (4 + 4 + 4) + 16 = 112 bytes. The chunk size formula is unchanged with this M.
+- A5. Reducers receive the full state vector (s components) as the point. A reducer written for s = d is unchanged.
+- A6. Orbit independence (I5) and thread and chunk invariance (AC6) hold for any s.
+
+### Compute (amendment)
+
+The single stepping body stays the only kernel. Buffers of states hold s components, buffers of deviation matrices d x k. Zero allocation (I8) holds for s > d. Interface: the row count d is read from the system's dimension (every Batch A system defines it); `bytes_per_orbit(Val(d), Val(k), T, s)` takes the state length as an optional fourth argument (default d) and `chunk_size` takes the keyword `s` (default d).
+
+### Acceptance criteria (amendment)
+
+- W9 State longer than the tangent dimension: with a test map of state length 4 and dimension 2 (the last two components are a step counter and a running sum of x; the tangent is the standard-map matrix at x), k in {1, 2}, tau in {1, 3}: (a) the per-orbit propagation returns a state of 4 components equal bitwise to the manual iteration of the map and a 2 x k deviation matrix equal bitwise to the manual tangent product; (b) the chunked propagation over 257 seeded orbits equals the serial map of the per-orbit propagation bitwise (chunk sizes 16 and default); (c) a non-finite value in component 3 or in component 4 raises the numerical health error of kind "state" at the correct handoff; (d) the per-orbit propagation allocates 0 bytes after warm-up; (e) a reducer sees the 4-component state; (f) the memory formula gives 112 bytes for s = 4, d = 2, k = 2 in Float64 and 96 for the default call, and the chunk size follows; (g) k = 3 with d = 2 is rejected before any work; (h) the existing suites (s = d) are unchanged.

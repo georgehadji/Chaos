@@ -65,3 +65,22 @@ Code: `src/Tangent/` (`Tangent.jl` protocol functions and exports, `initial.jl`,
 - `add(::CompensatedSum{T}, x)` no longer narrows: accepts `x::T`, any `Integer`, and floats with `promote_type(T, typeof(x)) === T`; otherwise `ArgumentError`. The check folds at compile time.
 - `propagate`: a `W0` entry with element type wider than T throws `ArgumentError` (checked per orbit as chunks are filled, before any result is returned).
 - Provenance gains `headroom` (the `chunk_size` fraction, constant `CHUNK_HEADROOM = 0.5`); existing fields unchanged.
+
+## Amendment D28 (2026-10-13)
+
+Code: `src/Tangent/orbit.jl` (`_orbit_body` binds state length `s` and tangent dimension `d` separately; arithmetic unchanged), `src/Tangent/propagate.jl` (`propagate` reads `d = dimension(sys)`, checks `s >= d` and `1 <= k <= d`, passes `Val(d)` into `_propagate`; state buffers hold `SVector{s,T}`, deviation buffers `SMatrix{d,k,T}`; `bytes_per_orbit(Val(d), Val(k), T, s = d)` and `chunk_size(...; s = d)`).
+
+### Result
+`test/tangent-core/runtests.jl` with the full Chaoslab: 465 pass, 0 fail, 0 error (423 before, 42 new in W9). Machine loaded: the run took 4 min 15 s. Bit-identity for s = d: no arithmetic changed, and every existing assertion (including the bitwise thread and chunk invariance of AC6) still passes.
+
+### Deviations
+- `propagate` now needs `dimension(sys)`; every Batch A system and every test map defines it. A map without it fails with a MethodError at the k check.
+- `propagate_orbit` is untyped in the state length already; it accepts s > d with no check. A mismatch between `size(W0, 1)` and the map's tangent size shows up as a DimensionMismatch in the first step.
+- Health: `_status` already scanned every component of the state, so counts in components 3 and 4 are covered without a code change; the test W9 (c) pins this.
+
+### Performance
+No measurable change for s = d (same method bodies after specialization). For s = 4, d = 2, `propagate_orbit` costs the map's own time (see the standard-map notes: about 260 ns per step wrapped, Float64, k = 2, loaded machine) and allocates 0 bytes.
+
+### Known limits
+- The memory formula adds `sizeof(T) (s - d)` per orbit (32 bytes in Float64 for the wrapped system); reducer state is separate.
+- A reducer sees the full s-component state; reducers written for d components that index `x` by position keep working, since the first d components are the phase-space point by convention.

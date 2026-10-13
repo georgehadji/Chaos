@@ -26,21 +26,26 @@ function inverse(m::StandardMap, z::SVector{2})
     return SVector(x, z[2] - m.K * _sin(x))
 end
 
-function tangent(m::StandardMap, z::SVector{2})
-    c = m.K * _cos(z[1])
+# DT at x (spec item 3); shared with the wrapped system
+function _dt(K, x)
+    c = K * _cos(x)
     o = one(c)
     return SMatrix{2, 2}(o + c, c, o, o)
 end
 
 # c at the preimage x; spec item 4: DT^-1 = [[1, -1], [-c, 1 + c]]
-function inverse_tangent(m::StandardMap, z::SVector{2})
-    c = m.K * _cos(z[1] - z[2])
+function _dtinv(K, x)
+    c = K * _cos(x)
     o = one(c)
     return SMatrix{2, 2}(o, -c, -o, o + c)
 end
 
-# pi in the element type of x (BigFloat at the precision of x)
-_pi(x) = oftype(x, pi)
+tangent(m::StandardMap, z::SVector{2}) = _dt(m.K, z[1])
+inverse_tangent(m::StandardMap, z::SVector{2}) = _dtinv(m.K, z[1] - z[2])
+
+# pi in the element type of x (BigFloat at the precision of x). hi + lo is pi to 106 bits: Float64 gives pi itself and
+# Double64 the correctly rounded double-double pi, without the allocating BigFloat detour of `oftype(x, pi)`.
+_pi(x) = oftype(x, 3.141592653589793) + oftype(x, 1.2246467991473532e-16)
 _pi(x::BigFloat) = BigFloat(pi, precision(x))
 
 # x mod 2pi in [0, 2pi), spec item 2; a result that rounds up to 2pi is the torus point 0.

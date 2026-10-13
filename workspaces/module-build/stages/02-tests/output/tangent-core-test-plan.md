@@ -61,3 +61,22 @@ Run (the extra outer `@testset` makes a failing testset not abort the file; `tes
 Total: 24 Error, 0 Pass, 0 Fail. No parse errors and no errors inside helpers: the type and method definitions in `tc_helpers.jl` are guarded with `@static if isdefined(Chaoslab, ...)`, so the file loads before the module exists and the testsets fail on the missing names.
 
 Helper validation (not committed): a throwaway serial stub of the API, kept in the session scratchpad, makes all 423 assertions pass. A mutant that evaluates the tangent at the new point instead of the old one fails 60 of 160 assertions in AC4 (AC1 to AC3 cannot see it, since their maps have constant tangents).
+
+## Amendment D28 (2026-10-13)
+
+Test file `test/tangent-core/tc_state_length.jl` (included last from `runtests.jl`). One testset, "W9 state longer than the tangent dimension". It defines a local test map `tc_Long` (state length 4, dimension 2: standard map on (x, p), a step counter, a running sum of x; optional Inf in component 3 or 4 at a chosen step) and a reducer `tc_StateLen`, so the suite does not depend on the Systems wrapped map. Seed `TC_SEED + 9`.
+
+| Criterion | Assertion group | Sample size | Tolerance |
+|---|---|---|---|
+| W9 (a) | `propagate_orbit` vs manual loop, state of 4 components, W is 2 x k | k in {1, 2}, tau in {1, 3}, 30 steps | bitwise |
+| W9 (b) | `propagate` vs serial map of `propagate_orbit` (x, W, reducer finals) | 257 orbits, chunk 16 and default, k in {1, 2}, tau = 3, reducers (log norm, reader) | bitwise |
+| W9 (c) | Inf in component 3 or 4 | poison at step 7, tau = 5, 5 orbits, chunk 2 | error "state", step 10, orbit 1 |
+| W9 (d) | zero allocation of `propagate_orbit` | 1000 steps with two reducers, 100 steps without | 0 bytes |
+| W9 (e) | reducer sees the state | `tc_StateLen` | length 4 |
+| W9 (f) | `bytes_per_orbit(Val(2), Val(2), T, 4)` and `chunk_size(...; s = 4)` | Float64, Double64 | 112, 208, floor(2^29 / 112); default call unchanged (96, 5592405) |
+| W9 (g) | k = 3 with dimension 2 | one call | ArgumentError before any work |
+| W9 (h) | existing suites unchanged | stage 03 run of all of `test/tangent-core` | 423 pass before, 423 + 42 after |
+
+### RED log (Amendment D28)
+
+Run: `tc_helpers.jl` plus `tc_state_length.jl` only, before any source change. W9: 2 Pass, 5 Error, 0 Fail. The 2 passes are the default-call assertions that hold today (`bytes_per_orbit` 96 and `chunk_size` 5592405). The errors are not missing names but missing capability of existing names: MethodError `bytes_per_orbit(::Val{2}, ::Val{2}, ::Type{Float64}, ::Int64)` (three assertions), MethodError `chunk_size(...; s)` unsupported keyword (one assertion), and MethodError `_orbit_body(::tc_Long{Float64}, ::SVector{4, Float64}, ::SMatrix{2, 1, Float64, 2}, ...)` ending the testset at the per-orbit body loop (assertion groups (b) to (g) are not reached).

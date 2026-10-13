@@ -1,19 +1,20 @@
 """
-    bytes_per_orbit(Val(d), Val(k), T) -> Int
+    bytes_per_orbit(Val(d), Val(k), T, s = d) -> Int
 
-Resident bytes per orbit: `sizeof(T) (d + d k + 2 k) + 16` (spec Compute).
+Resident bytes per orbit: `sizeof(T) (s + d k + 2 k) + 16` for state length `s` (default `d`; spec Compute, amendment D28).
 """
-bytes_per_orbit(::Val{d}, ::Val{k}, ::Type{T}) where {d, k, T} = sizeof(T) * (d + d * k + 2k) + 16
+bytes_per_orbit(::Val{d}, ::Val{k}, ::Type{T}, s::Integer = d) where {d, k, T} = sizeof(T) * (s + d * k + 2k) + 16
 
 const CHUNK_HEADROOM = 0.5   # fraction of free memory a chunk may use
 
 """
-    chunk_size(free_bytes, Val(d), Val(k), T; f=0.5, reducer_bytes=0) -> Int
+    chunk_size(free_bytes, Val(d), Val(k), T; f=0.5, reducer_bytes=0, s=d) -> Int
 
-Orbits per chunk: `floor(f free_bytes / (bytes_per_orbit + reducer_bytes))`, at least 1.
+Orbits per chunk: `floor(f free_bytes / (bytes_per_orbit + reducer_bytes))`, at least 1; `s` is the state length.
 """
-function chunk_size(free_bytes::Integer, v::Val{d}, kv::Val{k}, ::Type{T}; f = CHUNK_HEADROOM, reducer_bytes::Integer = 0) where {d, k, T}
-    return max(1, floor(Int, f * free_bytes / (bytes_per_orbit(v, kv, T) + reducer_bytes)))
+function chunk_size(free_bytes::Integer, v::Val{d}, kv::Val{k}, ::Type{T}; f = CHUNK_HEADROOM, reducer_bytes::Integer = 0,
+                    s::Integer = d) where {d, k, T}
+    return max(1, floor(Int, f * free_bytes / (bytes_per_orbit(v, kv, T, s) + reducer_bytes)))
 end
 
 "Result of [`propagate`](@ref): final points `x`, deviation matrices `W`, per-orbit reducer summaries `finals`, run `provenance`."
@@ -64,19 +65,19 @@ function _run_chunk!(out, bufs, r, args, choice)
     end
 end
 
-function _propagate(sys, x0::AbstractVector{SVector{d, T}}, N, tau, ::Val{k}, seed, reducers, backend, chunk, W0) where {d, T, k}
+function _propagate(sys, x0::AbstractVector{SVector{s, T}}, N, tau, ::Val{d}, ::Val{k}, seed, reducers, backend, chunk, W0) where {s, d, T, k}
     n = length(x0)
     choice = resolve_backend(backend, T)
     choice.backend === :cpu || error("GPU propagation needs the CUDA package extension")
     s0 = _init_states(reducers, T, Val(d), Val(k))
     csize = chunk !== nothing ? chunk :
-            chunk_size(Sys.free_memory(), Val(d), Val(k), T; f = CHUNK_HEADROOM, reducer_bytes = isbitstype(typeof(s0)) ? sizeof(s0) : 0)
+            chunk_size(Sys.free_memory(), Val(d), Val(k), T; f = CHUNK_HEADROOM, reducer_bytes = isbitstype(typeof(s0)) ? sizeof(s0) : 0, s = s)
     m = min(csize, n)
-    bufs = (Vector{SVector{d, T}}(undef, m), Vector{SMatrix{d, k, T, d * k}}(undef, m),
-            Vector{SVector{d, T}}(undef, m), Vector{SMatrix{d, k, T, d * k}}(undef, m),
+    bufs = (Vector{SVector{s, T}}(undef, m), Vector{SMatrix{d, k, T, d * k}}(undef, m),
+            Vector{SVector{s, T}}(undef, m), Vector{SMatrix{d, k, T, d * k}}(undef, m),
             Vector{typeof(s0)}(undef, m), Vector{Int8}(undef, m), Vector{Int}(undef, m))
     f0 = map(reducer_final, reducers, s0)
-    out = (x = Vector{SVector{d, T}}(undef, n), W = Vector{SMatrix{d, k, T, d * k}}(undef, n),
+    out = (x = Vector{SVector{s, T}}(undef, n), W = Vector{SMatrix{d, k, T, d * k}}(undef, n),
            finals = Vector{typeof(f0)}(undef, n))
     args = (; sys, x0, seed, W0, N, tau, reducers, T, dims = (Val(d), Val(k)))
     for lo in 1:csize:n
@@ -92,15 +93,18 @@ end
     propagate(sys, x0, N; k, tau=1, seed, reducers=(), backend=:cpu, chunk=nothing, W0=nothing) -> PropagationResult
 
 Propagate every orbit of `x0` for `N` steps (a positive multiple of `tau`) with `k` deviation vectors, one kernel
-launch per chunk of orbits. Orbit ids are `1:length(x0)`; `W0` overrides the seeded initial deviations. Results equal
+launch per chunk of orbits. The state may be longer than `dimension(sys)` (winding counts, D28): deviation matrices
+are `dimension(sys) x k`, and every state component is health-checked. Orbit ids are `1:length(x0)`; `W0` overrides the seeded initial deviations. Results equal
 a serial `map` of [`propagate_orbit`](@ref) bitwise for any chunk size and thread count.
 """
-function propagate(sys, x0::AbstractVector{SVector{d, T}}, N::Integer; k::Integer, tau::Integer = 1, seed::Integer,
+function propagate(sys, x0::AbstractVector{SVector{s, T}}, N::Integer; k::Integer, tau::Integer = 1, seed::Integer,
                    reducers::Tuple = (), backend::Symbol = :cpu, chunk::Union{Int, Nothing} = nothing,
-                   W0 = nothing) where {d, T}
+                   W0 = nothing) where {s, T}
     _check_steps(N, tau)
+    d = dimension(sys)
+    s >= d || throw(ArgumentError("state length $s is below the system dimension $d"))
     1 <= k <= d || throw(ArgumentError("k must be in 1:$d, got $k"))
     chunk === nothing || chunk >= 1 || throw(ArgumentError("chunk must be positive, got $chunk"))
     W0 === nothing || length(W0) == length(x0) || throw(DimensionMismatch("W0 needs one matrix per orbit"))
-    return _propagate(sys, x0, Int(N), Int(tau), Val(Int(k)), seed, reducers, backend, chunk, W0)
+    return _propagate(sys, x0, Int(N), Int(tau), Val(Int(d)), Val(Int(k)), seed, reducers, backend, chunk, W0)
 end

@@ -1,7 +1,7 @@
 """
     Lyapunov
 
-Lyapunov-exponent estimators as reducers of the tangent stream: Benettin (lyap-benettin) and its shared helpers.
+Lyapunov-exponent estimators as reducers of the tangent stream: Benettin (lyap-benettin), the Gram-Schmidt QR spectrum (lyap-gram-schmidt) and their shared helpers.
 """
 module Lyapunov
 
@@ -13,9 +13,12 @@ using LinearAlgebra
 
 import ..Tangent: reducer_init, reducer_update, reducer_final, reducer_step, reducer_failed, reducer_error, reducer_provenance
 
-export safe_norm, Benettin
+export safe_norm, Benettin, Orthonormalizer, CGS, MGS, RGS, orthonormalize, QR_OK, QR_PIVOT, QR_PASSES,
+       window_Gw, window_G, orthogonality_threshold, QRSpectrum
 
 include("norm.jl")
 include("benettin.jl")
+include("orthonormalize.jl")
+include("qr_spectrum.jl")
 
 end

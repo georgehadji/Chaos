@@ -9,6 +9,9 @@ const L2_SEED = 20261012                  # base seed, _config/numerics-defaults
 const L2_BASE = L2_SEED + 25000           # this slug uses 20261012 + 25000 .. 25999; testset AC<n> uses 50 n + sub (sub < 50)
 l2_seed(ac::Integer, sub::Integer = 0) = L2_BASE + 50 * ac + sub
 const L2_TWO_PI = 2 * pi
+# Package suite (D38, under 3 minutes) or full sizes: verify/lyap-two-trajectory.jl defines L2_FULL_RUN = true before including runtests.jl. The testsets are
+# top-level code (not functions): wrapping them in functions made inference of the whole body cost 5 to 15 s per testset.
+const L2_FULL = isdefined(Main, :L2_FULL_RUN) && Main.L2_FULL_RUN
 
 # ---- BigFloat helpers (call inside setprecision(BigFloat, b) do ... end)
 l2_big(x::Double64) = BigFloat(x.hi) + BigFloat(x.lo)

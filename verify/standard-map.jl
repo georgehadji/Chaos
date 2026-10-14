@@ -471,6 +471,29 @@ section("W") do
 end
 
 # ---------------------------------------------------------------------------------------------------
+# Moved from the package suite (D38). The package suite was cut to stay under 3 minutes; the sizes it used before are run here
+# with the package seeds (SM_SEED + 1001 ...), so the earlier package-suite assertions stay checked at their earlier size.
+# Not repeated here because a section above already runs the same claim at equal or larger size (different seeds):
+#   AC3, AC5, AC6 (200 orbits per listed K in "AC1-6"), AC7 to AC13 (same sizes in "AC7-13"), AC14 (1000 per K in "AC14"),
+#   AC15 to AC17 (N in {1, 2, 3, 5}, 10 draws, both types in "AC15-17"), W1 (500 / 200), W2 (500 / 200), W5 (200 / 100),
+#   W6 (200 / 200) in "W".
+section("moved-D38") do
+    cF = sm_cases(StableRNG(SM_SEED + 1001), 1000)
+    cD = sm_cases(StableRNG(SM_SEED + 1002), 200)
+    ad, cs = sm_ac1_ratios(Float64, cF; complexstep = true)
+    ad2, _ = sm_ac1_ratios(Double64, cD; complexstep = false)
+    ratio_line("AC1", "moved from package suite: max ratio |DT - J_ForwardDiff| / 8 eps (1+|K|), Float64, $(length(cF)) pts", ad)
+    ratio_line("AC1", "moved from package suite: max ratio |DT - J_complexstep(1e-30)| / 8 eps (1+|K|), Float64, $(length(cF)) pts", cs)
+    ratio_line("AC1", "moved from package suite: max ratio |DT - J_ForwardDiff| / 8 eps (1+|K|), Double64 (eps 2^-100), $(length(cD)) pts", ad2)
+    ratio_line("AC2", "moved from package suite: max ratio of |det DT - 1| and |DT' Om DT - Om| to 8 eps (1+|K|), Float64, $(length(cF)) pts",
+               sm_ac2_ratios(Float64, sm_cases(StableRNG(SM_SEED + 2001), 1000)))
+    ratio_line("AC2", "moved from package suite: same, Double64 (eps 2^-100), $(length(cD)) pts", sm_ac2_ratios(Double64, sm_cases(StableRNG(SM_SEED + 2002), 200)))
+    ratio_line("AC4", "moved from package suite: max ratio |DT DT_inv(Tz) - I| / 8 eps (1+|K|)^2, Float64, $(length(cF)) pts",
+               sm_ac4_ratio(Float64, sm_cases(StableRNG(SM_SEED + 4001), 1000)))
+    ratio_line("AC4", "moved from package suite: same, Double64 (eps 2^-100), $(length(cD)) pts", sm_ac4_ratio(Double64, sm_cases(StableRNG(SM_SEED + 4002), 200)))
+end
+
+# ---------------------------------------------------------------------------------------------------
 # Timings (loaded machine) for the record
 section("timings") do
     for T in (Float64, Double64)

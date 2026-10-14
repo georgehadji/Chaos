@@ -178,3 +178,55 @@ function tc_with_device(f, dev)
         tc_F.DEVICE[] = old
     end
 end
+
+# Moved here by D38 so that verify/tangent-core.jl includes one home: the state-longer-than-dimension map and reducer (W9) and the
+# provenance reducers (D34b).
+# Standard map on (x, p) plus two extra components: z[3] counts steps, z[4] sums x. Tangent is the 2 x 2 standard-map matrix at x.
+# `bad` = 3 or 4 sets that extra component to Inf when the counter reaches `at`.
+struct tc_Long{T} <: tc_AbstractMap
+    K::T
+    bad::Int
+    at::Int
+end
+tc_Long(K) = tc_Long(K, 0, 0)
+
+Chaoslab.dimension(::tc_Long) = 2
+function Chaoslab.forward(m::tc_Long, z)
+    p2 = z[2] + m.K * sin(z[1])
+    n = z[3] + 1
+    c = (m.bad == 3 && n == m.at) ? oftype(n, Inf) : n
+    s = (m.bad == 4 && n == m.at) ? oftype(n, Inf) : z[4] + z[1]
+    return SVector(z[1] + p2, p2, c, s)
+end
+function Chaoslab.tangent(m::tc_Long, z)
+    c = m.K * cos(z[1])
+    return SMatrix{2, 2}(1 + c, c, one(c), one(c))
+end
+
+# Reducer that records the length of the state it is handed.
+struct tc_StateLen end
+Chaoslab.reducer_init(::tc_StateLen, ::Type{T}, ::Val, ::Val) where {T} = (0,)
+Chaoslab.reducer_update(::tc_StateLen, st, n::Int, x, W) = ((length(x),), W)
+Chaoslab.reducer_final(::tc_StateLen, st) = (len = st[1],)
+
+# Plain iteration: tangent at the old state, then advance.
+function tc_manual(sys, x, W, N)
+    for _ in 1:N
+        W = tangent(sys, x) * W
+        x = forward(sys, x)
+    end
+    return x, W
+end
+
+# Two read-only reducers that only differ in their provenance; the provenance methods are added only when the name exists, so a
+# missing `reducer_provenance` errors the testset that needs it and not the whole file.
+struct tc_ProvA end
+struct tc_ProvB end
+const tc_ProvAB = Union{tc_ProvA, tc_ProvB}
+Chaoslab.reducer_init(::tc_ProvAB, ::Type, ::Val, ::Val) = nothing
+Chaoslab.reducer_update(::tc_ProvAB, st, n::Int, x, W) = (st, W)
+Chaoslab.reducer_final(::tc_ProvAB, st) = (;)
+@static if isdefined(Chaoslab, :reducer_provenance)
+    Chaoslab.reducer_provenance(::tc_ProvA) = (alpha = 1, shared = "a")
+    Chaoslab.reducer_provenance(::tc_ProvB) = (beta = 2.5, shared = "b")
+end

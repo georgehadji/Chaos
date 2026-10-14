@@ -60,3 +60,7 @@ None dropped; the tail rule and the neutral-orbit bound of the first draft are w
 Re-run after the Amendment D35 edits (`hh_theta_psi`, `hh_Psi`, guarded include of `lb_psi.jl`; tail rule removed): 17 testsets, 17 Error, 0 Pass (48 s), the same names; no error from a helper or an include.
 
 `scratchpad/m2/red-lyap-householder-qr.log`, run once in `scratchpad/m2/testenv` (no `Chaoslab.Lyapunov`, command `julia --project=testenv -t 4 -e 'using Test, Chaoslab; @testset "lyap-householder-qr" begin include("test/lyap-householder-qr/runtests.jl") end'`): 17 testsets, 17 Error, 0 Pass, exit 1, no crash. Missing names raised: `effective_eps` (7 testsets), `HouseholderQR` (6), `CGS`, `LapackQR`, `QRSpectrum`, `SVDSpectrum` (1 each).
+
+## Amendment D38 (2026-10-15)
+
+Runtime: the package suite carries a reduced set of types, shapes, variants and sample sizes (the reductions are marked "D38" in the test files); everything removed runs at stage 04 in `verify/` with identical assertions (decision-log D38). Double64 parts reduced in the package suite: HouseholderQR only (was every variant) in criteria 1, 2, 4, 5, 6, 7, 10, 11(c), 12 and 13, HouseholderQR plus GivensQR in criterion 3; shapes (4,2) only in criteria 1 to 3, (2,2) and (4,4) in criterion 10, (2,2) in criterion 11(c); moved: criterion 4(b) (K = 0, k = 1), criterion 6 non-normal and N = 3, criterion 7 K other than 2, criterion 12 k = 1.

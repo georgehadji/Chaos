@@ -74,7 +74,7 @@ end
     ident = tc_Lin(SMatrix{2,2,Float64}(1, 0, 0, 1))
     x0 = [SVector(0.0, 0.0) for _ in 1:200]
     for req in (:auto, :gpu, :cpu)
-        p = tc_with_device(() -> propagate(ident, x0, 4; k = 2, tau = 2, seed = seed, backend = req, chunk = 64), tc_F.NoDevice()).provenance
+        p = tc_with_device(() -> propagate(ident, x0, 4; k = 2, tau = 2, seed = seed, backend = req, chunk = 64, reducers = (tc_Reader(2),)), tc_F.NoDevice()).provenance
         for name in (:backend, :device, :backend_fallback_reason, :precision, :threads, :cpu, :seed, :tau, :k, :chunk_size)
             @test hasproperty(p, name)
         end

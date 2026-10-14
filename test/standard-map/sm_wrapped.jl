@@ -204,19 +204,19 @@ function smw_health(f)
 end
 
 @testset "W1 torus agreement with the lifted map" begin
-    # wrapped state vs lifted orbit, torus distance <= tau(k), k <= n_H(K), 200 orbits per K in {0.5, 2, 5, 10}
-    ok, worst = smw_w1(Float64, 200, SM_SEED + 5001)
+    # wrapped state vs lifted orbit, torus distance <= tau(k), k <= n_H(K), 40 orbits per K in {0.5, 2, 5, 10} (D38: 500 / 200 in verify)
+    ok, worst = smw_w1(Float64, 40, SM_SEED + 5001)
     @test ok
     @test worst <= 1
-    ok, worst = smw_w1(Double64, 200, SM_SEED + 5002)
+    ok, worst = smw_w1(Double64, 40, SM_SEED + 5002)
     @test ok
     @test worst <= 1
 end
 
 @testset "W2 lifted reconstruction" begin
-    # lift(state) at 256 bits from the exact counts vs the lifted orbit, plain max norm <= tau(k); torus_state and lift round trip
-    @test smw_w2(Float64, 200, SM_SEED + 5011) <= 1
-    @test smw_w2(Double64, 200, SM_SEED + 5012) <= 1
+    # lift(state) at 256 bits from the exact counts vs the lifted orbit, plain max norm <= tau(k), 40 orbits per K (D38: 500 / 200 in verify); torus_state and lift round trip
+    @test smw_w2(Float64, 40, SM_SEED + 5011) <= 1
+    @test smw_w2(Double64, 40, SM_SEED + 5012) <= 1
     z = SVector(7.0, -1.0)   # x = 7 - 2 pi, m = 1; p = -1 + 2 pi, n = -1
     s = torus_state(z)
     @test s isa SVector{4, Float64}
@@ -252,21 +252,21 @@ end
 end
 
 @testset "W5 tangent agreement" begin
-    # product of wrapped tangents: 8 n eps prod||M||_F bound vs the 256-bit product at the same points; vs lifted product with orbit term
-    a, b = smw_w5(Float64, 100, SM_SEED + 5051)
+    # product of wrapped tangents: 8 n eps prod||M||_F bound vs the 256-bit product at the same points; vs lifted product with orbit term; 20 orbits per K Float64, 10 Double64 (D38: 200 / 100 in verify)
+    a, b = smw_w5(Float64, 20, SM_SEED + 5051)
     @test a <= 1
     @test b <= 1
-    a, b = smw_w5(Double64, 50, SM_SEED + 5052)
+    a, b = smw_w5(Double64, 10, SM_SEED + 5052)
     @test a <= 1
     @test b <= 1
 end
 
 @testset "W6 inverse round trip" begin
-    # n forward then n inverse (and reverse order): torus distance <= tau(n), counts exactly equal, n in {1, n_H(K)}, 200 orbits per K
-    counts_ok, worst = smw_w6(Float64, 200, SM_SEED + 5061)
+    # n forward then n inverse (and reverse order): torus distance <= tau(n), counts exactly equal, n in {1, n_H(K)}, 40 orbits per K (D38: 200 in verify)
+    counts_ok, worst = smw_w6(Float64, 40, SM_SEED + 5061)
     @test counts_ok
     @test worst <= 1
-    counts_ok, worst = smw_w6(Double64, 200, SM_SEED + 5062)
+    counts_ok, worst = smw_w6(Double64, 40, SM_SEED + 5062)
     @test counts_ok
     @test worst <= 1
 end

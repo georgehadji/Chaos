@@ -75,7 +75,7 @@ Chaoslab.reducer_final(::tc_HeapSum, st) = (sum = st[1],)
     n, N, tau, chunk = 40, 100, 4, 16   # 3 chunks of 16, 16, 8
     sys = tc_Std(5.0)
     x0 = [SVector(0.1 * j, 0.3) for j in 1:n]
-    red = (tc_LogNorm(),)
+    red = (tc_LogNorm(), tc_Reader(tau))   # D38: the chain of AC6, so the kernel specialization is shared
     run(s = sys; kw...) = propagate(s, x0, N; k = 2, tau = tau, seed = seed, reducers = red, chunk = chunk, kw...)
     same(a, b) = a.x == b.x && a.W == b.W && a.finals == b.finals
     ref = run(backend = :cpu)

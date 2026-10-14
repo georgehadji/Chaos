@@ -51,7 +51,7 @@ function hh_ac7(::Type{T}, K::Float64, starts, seed) where {T}
     cprime = 0.0
     for tau in (1, 2)
         lam, thetas = Dict(), Dict()
-        for alg in hh_algs(T)
+        for alg in (T === Float64 ? hh_pick(hh_algs(T), (HouseholderQR(), GivensQR())) : hh_sel_algs(T))   # package suite: V-H and V-G kernels (pair check (b) stays)
             res = propagate(sys, x0s, n; k = 2, tau = tau, seed = seed, W0 = W0s, reducers = (QRSpectrum(alg),))
             f = [res.finals[j][1] for j in 1:m]
             th = [hh_theta(T, f[j].G_max, tau, orb[j][2]) for j in 1:m]
@@ -81,7 +81,7 @@ end
     # (c) |lambda_1 + lambda_2| <= theta_sum (all Amendment D35; no tail rule: every orbit is held to the bound)
     seed = hh_seed(7)
     cprime = 0.0
-    for (iK, K) in enumerate(HH_AC7_KS)
+    for (iK, K) in hh_sel(HH_AC7_KS, (3,))                         # package suite: K = 2
         rng = StableRNG(seed + iK)
         starts = K == 0.5 ? hh_regular_starts(K, 50, rng)[1] : hh_starts(rng, 50)
         cprime = max(cprime, hh_ac7(Float64, K, starts, seed + 10 + iK))
@@ -99,7 +99,7 @@ end
         sys = StandardMap(T(HH_TWO_PI))
         x0 = hh_cast(T, hh_starts(StableRNG(seed), 1)[1])
         Mmax = hh_Mmax(sys, x0, n)
-        for alg in hh_algs(T)
+        for alg in hh_one_alg(T)
             f = Dict(tau => propagate(sys, [x0], n; k = 2, tau = tau, seed = seed, reducers = (QRSpectrum(alg),)).finals[1][1] for tau in (1, 2, 4))
             th = Dict(tau => hh_theta(T, f[tau].G_max, tau, Mmax) for tau in (1, 2, 4))
             for tau in (1, 2, 4)

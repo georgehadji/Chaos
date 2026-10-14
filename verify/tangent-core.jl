@@ -1,10 +1,12 @@
 # Stage 04 verification script for tangent-core (spec: workspaces/module-build/stages/01-spec/output/tangent-core-spec.md,
 # including Amendment D28). Run from the repo root:  julia --project=verify -t 4 verify/tangent-core.jl
+# Only the section moved from the package suite (D38):  julia --project=verify -t 2 verify/tangent-core.jl d38
 # One line per criterion: AC<n> | quantity | value | bound | verdict.  Child mode (-t 1 runs) is started by this script itself.
 using Chaoslab, StaticArrays, LinearAlgebra, StableRNGs, DoubleFloats, Printf, Serialization
 
 const CHILD = length(ARGS) >= 2 && ARGS[1] == "child"
-CHILD || @eval using CairoMakie
+const D38_ONLY = length(ARGS) >= 1 && ARGS[1] == "d38"   # only the section "moved from the package suite (D38)"
+CHILD || D38_ONLY || @eval using CairoMakie
 
 const SEED = 20261012
 const ROOT = normpath(joinpath(@__DIR__, ".."))
@@ -195,6 +197,189 @@ if CHILD
     end
     serialize(ARGS[2], res)
     exit(0)
+end
+
+# ------------------------------------------------------------------------------------ moved from the package suite (D38)
+# Cases taken out of test/tangent-core to bring the package suite under 3 minutes (decision D38). The assertions are the package
+# suite's, verbatim, with the original systems, reducer chains and sizes; the helpers, test maps and reducers come from the
+# package suite's tc_helpers.jl (one home). Where this script already checks the same claim at equal or larger size (AC3 b/c =
+# AC3b/AC3c; AC4 Double64 (2pi, 20) = the AC4 rows, same orbit count and horizon but another sample seed; AC6 chunk 1000 = the AC6
+# digests; AC7 Float64 8x8 and Double64 (2,1), (4,4), (8,8) = the AC7a rows; AC8 (c) = AC8c) the package-suite text is still run
+# below, because it is cheap in a script and gives the moved assertions one visible home.
+include(joinpath(ROOT, "test", "tangent-core", "tc_helpers.jl"))
+
+# Run f() as a testset; one row with the pass count (failures and errors print through Test as usual).
+function d38_case(f, id, desc)
+    npass, nbad = try
+        ts = @testset "$id" begin f() end
+        (ts.n_passed, 0)
+    catch e
+        e isa Test.TestSetException || rethrow()
+        (e.pass, e.fail + e.error)
+    end
+    row(id, desc, "$npass pass, $nbad fail", "no fail", pf(nbad == 0))
+end
+
+function moved_d38()
+    d38_case("D38-AC2", "chain order: a reducer that reads first sees the unreplaced matrix (maxabs > 1.5)") do
+        seed = TC_SEED + 2
+        N = 10_000
+        sys = tc_Lin(SMatrix{2,2,Float64}(2, 1, 1, 1))
+        x0 = [SVector(0.0, 0.0) for _ in 1:100]
+        W0 = [initial_deviations(seed, j, Val(2), Val(1), Float64) for j in 1:100]
+        tau = 5
+        before = propagate(sys, x0[1:10], N; k = 1, tau = tau, seed = seed, W0 = W0[1:10], reducers = (tc_Reader(tau), tc_LogNorm()))
+        @test all(f -> f[1].maxabs > 1.5, before.finals)
+    end
+    d38_case("D38-AC3", "K = 0 standard map, k = 1 from e_2: S_n = 0.5 ln(n^2 + 1), n = 1e4") do
+        seed = TC_SEED + 3
+        sys = tc_Std(0.0)
+        x0 = SVector(0.25, 0.5)
+        n = 10_000
+        res = propagate(sys, [x0], n; k = 1, tau = 1, seed = seed, W0 = [SMatrix{2,1,Float64}(0, 1)], reducers = (tc_LogNorm(),))
+        S = res.finals[1][1].logs[1]
+        @test abs(S - 0.5 * log(float(n)^2 + 1)) <= 8 * n * eps(Float64)
+        @test S / n <= log(n) / n + 1e-12
+    end
+    d38_case("D38-AC4", "BigFloat tangent product, Double64, K = 2pi, n = 20, 20 orbits") do
+        seed = TC_SEED + 4
+        for (T, K, n) in ((Double64, 2pi, 20),)
+            sys = tc_Std(T(K))
+            rng = StableRNG(seed + (T === Float64 ? 0 : 1000) + n)
+            x0 = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:20]
+            W0 = [initial_deviations(seed, j, Val(2), Val(2), T) for j in 1:20]
+            res = propagate(sys, x0, n; k = 2, tau = 1, seed = seed, W0 = W0)
+            for j in 1:20
+                pts = Vector{SVector{2,T}}(undef, n)
+                z = x0[j]
+                for i in 1:n
+                    pts[i] = z
+                    z = forward(sys, z)
+                end
+                @test isequal(res.x[j], z)   # the kernel realizes the orbit of forward
+                err, bound = tc_std_residual(sys.K, pts, W0[j], res.W[j], eps(T))
+                @test err <= bound
+            end
+        end
+    end
+    d38_case("D38-AC6", "thread and chunk invariance, 4096 orbits n = 1e3, chunks 64, 1000, default vs serial propagate_orbit") do
+        seed = TC_SEED + 6
+        n_orb, N = 4096, 1000
+        sys = tc_Std(2pi)
+        rng = StableRNG(seed)
+        x0 = [SVector(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:n_orb]
+        W0 = [initial_deviations(seed, j, Val(2), Val(2), Float64) for j in 1:n_orb]
+        reducers = (tc_LogNorm(), tc_Reader(1))
+        serial = [propagate_orbit(sys, x0[j], W0[j], N, 1, reducers; orbit = j) for j in 1:n_orb]
+        xs = [s[1] for s in serial]
+        Ws = [s[2] for s in serial]
+        fs = [map(reducer_final, reducers, s[3]) for s in serial]
+        for chunk in (64, 1000, nothing)
+            res = propagate(sys, x0, N; k = 2, tau = 1, seed = seed, reducers = reducers, chunk = chunk, W0 = W0)
+            @test isequal(res.x, xs)
+            @test isequal(res.W, Ws)
+            @test isequal(res.finals, fs)
+        end
+        res = propagate(sys, x0, N; k = 2, tau = 1, seed = seed, reducers = reducers, chunk = 64)
+        @test isequal(res.W, Ws)
+    end
+    d38_case("D38-AC7", "Q'Q = I: Float64 d = k = 8 (1e4 orbits), Double64 (d, k) = (2,1), (4,4), (8,8) (200 orbits)") do
+        seed = TC_SEED + 7
+        n = 10_000
+        for (d, k) in ((8, 8),)
+            worst = 0.0
+            for j in 1:n
+                Q = initial_deviations(seed, j, Val(d), Val(k), Float64)
+                worst = max(worst, maximum(abs, Q' * Q - I))
+            end
+            @test worst <= 8 * k * eps(Float64)
+            @test initial_deviations(seed, 1, Val(d), Val(k), Float64) isa SMatrix{d,k,Float64}
+        end
+        for (d, k) in ((2, 1), (4, 4), (8, 8))
+            worst = 0.0
+            for j in 1:200
+                Q = initial_deviations(seed, j, Val(d), Val(k), Double64)
+                worst = max(worst, Float64(maximum(abs, Q' * Q - I)))
+            end
+            @test worst <= 8 * k * Float64(eps(Double64))
+        end
+    end
+    d38_case("D38-AC8", "overflow: A = diag(e^3, e^-3), finite at n = 200, NumericalHealthError at the handoff 300") do
+        seed = TC_SEED + 8
+        mu = exp(3.0)
+        sys = tc_Lin(SMatrix{2,2,Float64}(mu, 0, 0, 1 / mu))
+        z0 = [SVector(0.0, 0.0)]
+        w0 = [SMatrix{2,1,Float64}(1, 0)]
+        r200 = propagate(sys, z0, 200; k = 1, tau = 200, seed = seed, W0 = w0)
+        @test isapprox(r200.W[1][1], exp(600.0); rtol = 1e-10)
+        for tau in (300, 100)   # only handoffs are checked: the error carries the handoff index 300 in both cases
+            err = tc_health_error(() -> propagate(sys, z0, 300; k = 1, tau = tau, seed = seed, W0 = w0))
+            @test err isa NumericalHealthError
+            @test err.step == 300 && err.what == "deviation matrix" && err.orbit == 1
+        end
+    end
+    d38_case("D38-W9", "state longer than the dimension: k = 1 of (a) and (b); (c) with k = 1 and no reducers; (e) with a single reducer") do
+        seed = TC_SEED + 9
+        sys = tc_Long(2.0)
+        rng = StableRNG(seed)
+        x0s = [SVector(2pi * rand(rng), 2pi * rand(rng), 0.0, 0.0) for _ in 1:257]
+        for k in (1,), tau in (1, 3)
+            W0 = initial_deviations(seed, 5, Val(2), Val(k), Float64)
+            x, W, st = propagate_orbit(sys, x0s[5], W0, 30, tau, ())
+            xm, Wm = tc_manual(sys, x0s[5], W0, 30)
+            @test x isa SVector{4, Float64} && W isa SMatrix{2, k, Float64}
+            @test isequal(x, xm) && isequal(W, Wm)
+            @test x[3] == 30 && x[4] != 0
+        end
+        for k in (1,)
+            reducers = (tc_LogNorm(), tc_Reader(3))
+            W0 = [initial_deviations(seed, j, Val(2), Val(k), Float64) for j in 1:257]
+            serial = [propagate_orbit(sys, x0s[j], W0[j], 30, 3, reducers; orbit = j) for j in 1:257]
+            for chunk in (16, nothing)
+                res = propagate(sys, x0s, 30; k = k, tau = 3, seed = seed, reducers = reducers, chunk = chunk, W0 = W0)
+                @test isequal(res.x, [s[1] for s in serial])
+                @test isequal(res.W, [s[2] for s in serial])
+                @test isequal(res.finals, [map(reducer_final, reducers, s[3]) for s in serial])
+            end
+            res = propagate(sys, x0s, 30; k = k, tau = 3, seed = seed, reducers = reducers, chunk = 16)   # seeded W0
+            @test isequal(res.W, [propagate_orbit(sys, x0s[j], W0[j], 30, 3, reducers)[2] for j in 1:257])
+        end
+        for bad in (3, 4)
+            psys = tc_Long(2.0, bad, 7)
+            err = tc_health_error(() -> propagate(psys, x0s[1:5], 20; k = 1, tau = 5, seed = seed, chunk = 2))
+            @test err isa NumericalHealthError
+            @test err.what == "state" && err.step == 10 && err.orbit == 1 && err.backend === :cpu
+        end
+        res = propagate(sys, x0s[1:3], 6; k = 2, tau = 3, seed = seed, reducers = (tc_StateLen(),))
+        @test all(f -> f[1].len == 4, res.finals)
+    end
+    d38_case("D38-D34b", "reducer_provenance: reversed chain (later reducer wins), chain without provenance, mixed chain") do
+        sys = tc_Std(1.0)
+        x0 = [SVector(0.3 + 0.1j, 0.2) for j in 1:4]
+        run(reducers) = propagate(sys, x0, 10; k = 1, tau = 2, seed = TC_SEED + 3410, reducers = reducers, chunk = 16).provenance
+        base = run(())
+        ab = run((tc_ProvA(), tc_ProvB()))
+        ba = run((tc_ProvB(), tc_ProvA()))
+        @test ab.alpha == 1 && ab.beta == 2.5
+        @test ab.shared == "b" && ba.shared == "a"
+        @test Set(keys(ab)) == union(Set(keys(base)), Set((:alpha, :beta, :shared)))
+        @test all(k -> isequal(ab[k], base[k]), keys(base))
+        @test all(k -> isequal(ba[k], base[k]), keys(base))
+        none = run((tc_LogNorm(), tc_Reader(2)))
+        @test isequal(none, base)
+        mixed = run((tc_LogNorm(), tc_ProvA(), tc_Reader(2)))
+        @test mixed.alpha == 1 && mixed.shared == "a" && !haskey(mixed, :beta)
+        @test Set(keys(mixed)) == union(Set(keys(base)), Set((:alpha, :shared)))
+    end
+    return nothing
+end
+
+if D38_ONLY
+    println("# tangent-core, section moved from the package suite (D38) only, julia ", VERSION, ", threads ", Threads.nthreads())
+    t0 = time()
+    moved_d38()
+    println("# D38 section time ", round(time() - t0; digits = 1), " s; ", count(r -> r[2] == "PASS", ROWS), " PASS, ", count(r -> r[2] == "FAIL", ROWS), " FAIL")
+    exit(count(r -> r[2] == "FAIL", ROWS) == 0 ? 0 : 1)
 end
 
 # ------------------------------------------------------------------------------------------------------------- header
@@ -704,6 +889,9 @@ let
     nfail = count(r -> r[2] == "FAIL" && !startswith(r[1], "W9"), ROWS)
     row("W9h", "existing s = d suites unchanged: FAIL lines among AC1 to AC14 above (package suite is run by test/runtests.jl)", nfail, 0, pf(nfail == 0))
 end
+
+# -------------------------------------------------------------------------------------- moved from the package suite (D38)
+moved_d38()
 
 # ------------------------------------------------------------------------------------------------------------- figures
 function make_figures()

@@ -112,42 +112,42 @@ function sm_ac6_ratio(::Type{T}, cases) where {T}
 end
 
 @testset "AC1 tangent vs derivative" begin
-    # DT entries vs ForwardDiff and complex step h=1e-30, bound 8 eps (1+|K|); Float64: 1000 points per listed K plus 1000 with K uniform, Double64: 200 per K
-    cases = sm_cases(StableRNG(SM_SEED + 1001), 1000)
+    # DT entries vs ForwardDiff and complex step h=1e-30, bound 8 eps (1+|K|); Float64: 200 points per listed K plus 200 with K uniform, Double64: 40 per K (D38: the 1000 / 200 sizes run in verify/standard-map.jl)
+    cases = sm_cases(StableRNG(SM_SEED + 1001), 200)
     ad64, cs64 = sm_ac1_ratios(Float64, cases; complexstep = true)
     @test ad64 <= 1
     @test cs64 <= 1
     # Complex{Double64} is not assumed available, so Double64 uses ForwardDiff only
-    ad_dd, _ = sm_ac1_ratios(Double64, sm_cases(StableRNG(SM_SEED + 1002), 200); complexstep = false)
+    ad_dd, _ = sm_ac1_ratios(Double64, sm_cases(StableRNG(SM_SEED + 1002), 40); complexstep = false)
     @test ad_dd <= 1
 end
 
 @testset "AC2 determinant and symplecticity" begin
-    # |det DT - 1|, max|DT' Omega DT - Omega| <= 8 eps (1+|K|) in Float64 and Double64; 1000 points per K (Double64: 200 per K)
-    @test sm_ac2_ratios(Float64, sm_cases(StableRNG(SM_SEED + 2001), 1000)) <= 1
-    @test sm_ac2_ratios(Double64, sm_cases(StableRNG(SM_SEED + 2002), 200)) <= 1
+    # |det DT - 1|, max|DT' Omega DT - Omega| <= 8 eps (1+|K|) in Float64 and Double64; 200 points per K (Double64: 40 per K; D38: 1000 / 200 in verify)
+    @test sm_ac2_ratios(Float64, sm_cases(StableRNG(SM_SEED + 2001), 200)) <= 1
+    @test sm_ac2_ratios(Double64, sm_cases(StableRNG(SM_SEED + 2002), 40)) <= 1
 end
 
 @testset "AC3 inverse round trip" begin
-    # forward^n then inverse^n (and reverse order) within tau(n)=16 eps M_n n Gamma_n, n in {1, n_H}, 200 orbits per listed K
-    @test sm_ac3_ratio(Float64, sm_cases(StableRNG(SM_SEED + 3001), 200; uniform = false)) <= 1
-    @test sm_ac3_ratio(Double64, sm_cases(StableRNG(SM_SEED + 3002), 200; uniform = false)) <= 1
+    # forward^n then inverse^n (and reverse order) within tau(n)=16 eps M_n n Gamma_n, n in {1, n_H}, 40 orbits per listed K (D38: 200 in verify)
+    @test sm_ac3_ratio(Float64, sm_cases(StableRNG(SM_SEED + 3001), 40; uniform = false)) <= 1
+    @test sm_ac3_ratio(Double64, sm_cases(StableRNG(SM_SEED + 3002), 40; uniform = false)) <= 1
 end
 
 @testset "AC4 inverse tangent" begin
-    # max|DT(z) DT_inv(T z) - I| <= 8 eps (1+|K|)^2, 1000 points per K (Double64: 200 per K)
-    @test sm_ac4_ratio(Float64, sm_cases(StableRNG(SM_SEED + 4001), 1000)) <= 1
-    @test sm_ac4_ratio(Double64, sm_cases(StableRNG(SM_SEED + 4002), 200)) <= 1
+    # max|DT(z) DT_inv(T z) - I| <= 8 eps (1+|K|)^2, 200 points per K (Double64: 40 per K; D38: 1000 / 200 in verify)
+    @test sm_ac4_ratio(Float64, sm_cases(StableRNG(SM_SEED + 4001), 200)) <= 1
+    @test sm_ac4_ratio(Double64, sm_cases(StableRNG(SM_SEED + 4002), 40)) <= 1
 end
 
 @testset "AC5 lifted vs wrapped" begin
-    # wrapped(lifted orbit) vs wrap-after-each-step orbit, torus distance <= tau(k) for k <= n_H, 200 orbits per listed K
-    @test sm_ac5_ratio(Float64, sm_cases(StableRNG(SM_SEED + 5001), 200; uniform = false)) <= 1
-    @test sm_ac5_ratio(Double64, sm_cases(StableRNG(SM_SEED + 5002), 200; uniform = false)) <= 1
+    # wrapped(lifted orbit) vs wrap-after-each-step orbit, torus distance <= tau(k) for k <= n_H, 40 orbits per listed K (D38: 200 in verify)
+    @test sm_ac5_ratio(Float64, sm_cases(StableRNG(SM_SEED + 5001), 40; uniform = false)) <= 1
+    @test sm_ac5_ratio(Double64, sm_cases(StableRNG(SM_SEED + 5002), 40; uniform = false)) <= 1
 end
 
 @testset "AC6 K to -K symmetry" begin
-    # T_{-K}(x+pi, p) = (x'+pi, p'); torus distance after shifting back <= tau(k), k <= n_H, 200 orbits per listed K
-    @test sm_ac6_ratio(Float64, sm_cases(StableRNG(SM_SEED + 6001), 200; uniform = false)) <= 1
-    @test sm_ac6_ratio(Double64, sm_cases(StableRNG(SM_SEED + 6002), 200; uniform = false)) <= 1
+    # T_{-K}(x+pi, p) = (x'+pi, p'); torus distance after shifting back <= tau(k), k <= n_H, 40 orbits per listed K (D38: 200 in verify)
+    @test sm_ac6_ratio(Float64, sm_cases(StableRNG(SM_SEED + 6001), 40; uniform = false)) <= 1
+    @test sm_ac6_ratio(Double64, sm_cases(StableRNG(SM_SEED + 6002), 40; uniform = false)) <= 1
 end

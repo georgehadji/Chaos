@@ -111,3 +111,7 @@ Run: helpers plus `sm_wrapped.jl` only, before any source change. 13 Error, 0 Pa
 | W6 inverse round trip | 1 Error | UndefVarError `WrappedStandardMap` |
 | W7 zero allocation | 1 Error | UndefVarError `WrappedStandardMap` |
 | W8 overflow guard | 4 Error | UndefVarError `WrappedStandardMap` |
+
+## Amendment D38 (2026-10-15)
+
+Runtime: the package suite carries a reduced set of types, shapes, variants and sample sizes (the reductions are marked "D38" in the test files); everything removed runs at stage 04 in `verify/` with identical assertions (decision-log D38). Where a Double64 part listed above is reduced or moved, the D38 note in the test file names it.

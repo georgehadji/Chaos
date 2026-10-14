@@ -28,13 +28,13 @@ function sm_ac14_ratio(::Type{T}, cases, epsT) where {T}
 end
 
 @testset "AC14 element-type agreement" begin
-    # |orbit_T - orbit_256| <= tau(n_H) with eps of the lower precision; 200 orbits per listed K; 256 bits via setprecision(do)
-    cases = sm_cases(StableRNG(SM_SEED + 14001), 200; uniform = false)
+    # |orbit_T - orbit_256| <= tau(n_H) with eps of the lower precision; 40 orbits per listed K (D38: 1000 in verify); 256 bits via setprecision(do)
+    cases = sm_cases(StableRNG(SM_SEED + 14001), 40; uniform = false)
     setprecision(BigFloat, SM_BITS) do
         @test sm_ac14_ratio(Float64, cases, sm_eps(Float64)) <= 1
         # sanity: the Chaoslab 256-bit orbit agrees with an independent plain-formula 256-bit orbit
         worst = 0.0
-        for (K, z) in cases[1:400]
+        for (K, z) in cases[1:200]
             nH = sm_nH(K)
             a = sm_orbit(StandardMap(BigFloat(K)), sm_cast(BigFloat, z), nH)
             b = sm_ref_orbit(BigFloat(K), sm_cast(BigFloat, z), nH)

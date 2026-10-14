@@ -4,9 +4,11 @@
 l2_nX2(f) = f.sum + f.comp
 
 @testset "AC1 linear map at the origin" begin
+    # package suite: Float64 on the full grid, Double64 only (tau, n) = (5, 100); verify/ runs both types on the full grid
     # Y5 map A = [[2,1],[1,1]], start 0, shadow at d0 u_0 with u_0 = (1,0), d0 = 2^-20: |n X2 - ln||A^n u_0||| <= B_S(n); G_first = ||A^tau||_F^2
     seed = l2_seed(1)
     for T in (Float64, Double64), tau in (1, 5, 10), n in (20, 100, 1000)
+        (L2_FULL || T === Float64 || (tau, n) == (5, 100)) || continue
         sys = LinearSymplecticMap(SMatrix{2, 2, T}(2, 1, 1, 1))
         res = propagate_shadow(sys, [zero(SVector{2, T})], n; d0 = T(2.0^-20), tau = tau, seed = seed, U0 = [SVector{2, T}(1, 0)])
         f = res.finals[1][1]
@@ -20,11 +22,13 @@ l2_nX2(f) = f.sum + f.comp
 end
 
 @testset "AC2 K = 0 shear at the origin" begin
+    # package suite: Float64 on the full grid, Double64 only (d0, tau, n) = (2^-20, 10, 100); verify/ runs both types on the full grid
     # StandardMap K = 0 at the origin (T9): |n X2 - ln sqrt((a + n b)^2 + b^2)| <= B_S(n), G_first = 2 + tau^2; seeded u_0 = (a, b) (unit to rounding; the reference divides by its exact norm)
     seed = l2_seed(2)
     rng = StableRNG(seed)
     angles = [2pi * rand(rng) for _ in 1:20]
     for T in (Float64, Double64), d0 in (T(2.0^-20), T === Float64 ? 1e-9 : exact(Double64, "1e-9")), tau in (1, 10), n in (10, 100, 10_000)
+        (L2_FULL || T === Float64 || (d0 == 2.0^-20 && tau == 10 && n == 100)) || continue
         sys = StandardMap(T(0))
         U0 = [SVector{2, T}(cos(th), sin(th)) for th in angles]
         res = propagate_shadow(sys, [zero(SVector{2, T}) for _ in angles], n; d0 = d0, tau = tau, seed = seed, U0 = U0)
@@ -107,10 +111,12 @@ end
 end
 
 @testset "AC5 identical reference orbit" begin
+    # package suite: Float64 lifted (K = 0.5, tau = 1) and wrapped (K = 2 pi, tau = 4), Double64 wrapped (K = 2 pi, tau = 4); verify/ runs both types on the full grid
     # reference orbit bitwise equal to the plain forward iteration and to the stream orbit of an L1 run (Benettin renormalises, so W cannot overflow), K in {0.5, 2 pi}, tau in {1, 4},
     # both modes, handoff counts N in {4, 8, 40, 400, 1000} (prefix invariance); Float64 100 starts, Double64 20 starts
     seed = l2_seed(5)
     for T in (Float64, Double64), mode in (:lifted, :wrapped), K in (0.5, L2_TWO_PI), tau in (1, 4)
+        L2_FULL || (T, mode, K, tau) in ((Float64, :lifted, 0.5, 1), (Float64, :wrapped, L2_TWO_PI, 4), (Double64, :wrapped, L2_TWO_PI, 4)) || continue
         sys = l2_sys(mode, T(K))
         m = T === Float64 ? 100 : 20
         x0s = [l2_state(mode, T, z) for z in l2_starts(StableRNG(seed), m)]

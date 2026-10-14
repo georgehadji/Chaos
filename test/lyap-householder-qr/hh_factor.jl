@@ -19,7 +19,7 @@ end
 
 function hh_ac1(::Type{T}, vd::Val{d}, vk::Val{k}, seed) where {T, d, k}
     eps_T = Float64(effective_eps(T))
-    algs = hh_algs(T)
+    algs = hh_sel_algs(T)
     worst = [(0.0, 0.0, 0.0) for _ in algs]
     structural = zeros(Int, length(algs))   # status, shapes, zeros below the diagonal, positive diagonal, counts
     for W in hh_panel(T, vd, vk, seed)
@@ -44,7 +44,7 @@ end
 
 @testset "AC1 factor identities" begin
     # (d,k) in the seven pairs, 200 seeded W each, column scales 10^u; V-H library (Float64 only), V-H, V-A, V-G kernels; both T
-    for (it, T) in enumerate((Float64, Double64)), (idk, (vd, vk)) in enumerate(HH_DK)
+    for (it, T, idk, vd, vk) in hh_ac1_cases()
         hh_ac1(T, vd, vk, hh_seed(1, 10 * it + idk))
     end
 end
@@ -60,7 +60,7 @@ end
         R22ref = setprecision(BigFloat, 256) do
             hh_ref_qr(W)[2][2, 2]
         end
-        for alg in hh_algs(T)
+        for alg in hh_sel_algs(T)
             Q, R, cnt, status, col = orthonormalize(alg, W)
             @test status == QR_OK
             loss, err = setprecision(BigFloat, 256) do
@@ -73,9 +73,11 @@ end
     end
 end
 
+hh_pair_algs(::Type{T}) where {T} = (HH_FULL || T === Float64) ? hh_algs(T) : (HouseholderQR(), GivensQR())   # AC3 needs pairs
+
 function hh_ac3(::Type{T}, ::Val{d}, ::Val{k}, seed) where {T, d, k}
     eps_T = Float64(effective_eps(T))
-    algs = hh_algs(T)
+    algs = hh_pair_algs(T)
     npair = length(algs) * (length(algs) - 1) ÷ 2
     worstR, worstQ = zeros(npair), zeros(npair)
     for W in hh_panel(T, Val(d), Val(k), seed)
@@ -97,7 +99,7 @@ end
 
 @testset "AC3 variant agreement" begin
     # data of AC1; pairs of variants: max_i |R_ii^A - R_ii^B| <= 16 d eps kappa_{i-1} ||W e_i||, max |Q^A e_i - Q^B e_i| <= 16 d eps kappa_i
-    for (it, T) in enumerate((Float64, Double64)), (idk, (vd, vk)) in enumerate(HH_DK)
+    for (it, T, idk, vd, vk) in hh_ac1_cases()
         hh_ac3(T, vd, vk, hh_seed(1, 10 * it + idk))
     end
 end

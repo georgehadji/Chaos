@@ -4,7 +4,7 @@
     # (a) shear [[1,1],[0,1]], W_0 = I: Q = I and S_1 = S_2 = 0 bitwise at every handoff (n = 1e4); (b) standard map K = 0, k = 1 from e_2:
     # S_1(n) = (1/2) ln(n^2 + 1) to 8 n eps, S_1(n)/n <= ln(n)/n + 1e-12 (E12)
     seed = hh_seed(4)
-    for T in (Float64, Double64), alg in hh_algs(T)
+    for T in (Float64, Double64), alg in hh_one_alg(T)
         eps_T = Float64(effective_eps(T))
         W0 = SMatrix{2, 2, T}(1, 0, 0, 1)
         shear = LinearSymplecticMap(SMatrix{2, 2, T}(1, 0, 1, 1))
@@ -14,6 +14,7 @@
         @test dv.maxdev == 0 && dv.count == 10_000
         @test res.W[1] == W0
 
+        HH_FULL || T === Float64 || continue              # package suite: (b) in Float64 only
         sys = StandardMap(T(0))
         x0 = SVector{2, T}(T(0.25), T(0.5))
         e2 = SMatrix{2, 1, T}(0, 1)
@@ -53,7 +54,7 @@ hh_fibbig(m) = (a = big(0); b = big(1); for _ in 1:m; a, b = b, a + b; end; a)
         sys = LinearSymplecticMap(SMatrix{2, 2, T}(2, 1, 1, 1))
         x0 = zero(SVector{2, T})
         W0 = SMatrix{2, 2, T}(1, 0, 0, 1)
-        for tau in (1, 2, 5), n in (10, 100, 1000, 10_000), alg in hh_algs(T)
+        for tau in (1, 2, 5), n in (10, 100, 1000, 10_000), alg in hh_one_alg(T)
             f = propagate(sys, [x0], n; k = 2, tau = tau, seed = seed, W0 = [W0], reducers = (QRSpectrum(alg),)).finals[1][1]
             S1, S2 = f.sum[1] + f.comp[1], f.sum[2] + f.comp[2]
             Gfirst = Float64(hh_fibbig(2tau + 1)^2 + 2 * hh_fibbig(2tau)^2 + hh_fibbig(2tau - 1)^2)
@@ -101,7 +102,7 @@ function hh_y5(::Type{T}, mus, nonnormal::Bool, ::Val{d}, seed) where {T, d}
         B = [log(abs(hh_det(V[:, 1:i]' * Q0b[:, 1:i]))) for i in 1:d]
         (lv, Lam, B)
     end
-    for alg in hh_algs(T)
+    for alg in hh_pick(hh_algs(T), (HouseholderQR(),))
         f = propagate(sys, [zero(SVector{d, T})], n; k = d, tau = 1, seed = seed, W0 = [Q0], reducers = (QRSpectrum(alg),)).finals[1][1]
         setprecision(BigFloat, 2048) do
             C = cumsum([hh_big(f.sum[j]) + hh_big(f.comp[j]) for j in 1:d])
@@ -119,7 +120,9 @@ end
     # block-diagonal hyperbolic A, N = 2 mu = (0.45, 0.2) and N = 3 mu = (0.45, 0.3, 0.1), plus the non-normal A_S; k = d, tau = 1, seeded Q_0, n = 500, start 0:
     # (a) |C_i - ln vol_i| <= i n theta_sum (2048-bit Gram determinants); (b) A normal: |C_i/n - Lambda_i - B_i/n| <= i theta_sum; (c) |sum lambda| <= theta_sum
     seed = hh_seed(6)
+    # package suite: N = 2 only (Float64 normal and non-normal, Double64 normal); the N = 3 maps and the rest of the product are in verify/
     for (it, T) in enumerate((Float64, Double64)), (im, mus) in enumerate(((0.45, 0.2), (0.45, 0.3, 0.1))), (inn, nn) in enumerate((false, true))
+        HH_FULL || (it, im, inn) in ((1, 1, 1), (1, 1, 2), (2, 1, 1)) || continue
         hh_y5(T, mus, nn, Val(2 * length(mus)), seed + 10 * it + 2 * im + inn)
     end
 end

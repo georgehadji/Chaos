@@ -61,3 +61,7 @@ AC4 exponent of the plain-difference double ln(2 pi/d0) (unobservable by design,
 Re-run after the Amendment D35 edits (`l2_pathbound`, `l2_Psis`, AC4 control, guarded include of `lb_psi.jl`): 12 testsets, 12 Error, 0 Pass, exit 1 (19 s), the same names (`effective_eps` 6, `propagate_shadow` 4, `Benettin` 1, `propagate_shadow_orbit` 1); no error from a helper or an include.
 
 `scratchpad/m2/red-lyap-two-trajectory.log`, run once in `scratchpad/m2/testenv` (no `Chaoslab.Lyapunov`, command `julia --project=testenv -t 4 -e 'using Test, Chaoslab; @testset "lyap-two-trajectory" begin include("test/lyap-two-trajectory/runtests.jl") end'`): 12 testsets, 12 Error, 0 Pass, exit 1, no crash. Missing names raised: `effective_eps` (6 testsets), `propagate_shadow` (4), `Benettin` (1), `propagate_shadow_orbit` (1).
+
+## Amendment D38 (2026-10-15)
+
+Runtime: the package suite carries a reduced set of types, shapes, variants and sample sizes (the reductions are marked "D38" in the test files); everything removed runs at stage 04 in `verify/` with identical assertions (decision-log D38). Double64 parts reduced in the package suite: criterion 1 keeps (tau, n) = (5, 100), criterion 2 keeps (d0, tau, n) = (2^-20, 10, 100), criterion 5 keeps wrapped K = 2pi, tau = 4; moved: criterion 8 at K = 2pi. Criterion 10(d) and the criterion 11 allocation checks keep their Double64 parts in full.

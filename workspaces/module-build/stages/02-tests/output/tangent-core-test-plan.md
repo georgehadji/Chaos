@@ -129,3 +129,7 @@ Counts: 2 testsets, 28 assertions when green. No existing assertion compares a `
 Run in the test environment (Chaoslab dev'd at the unmodified repo), whole `test/tangent-core` suite inside one testset: 537 existing assertions pass, 3 Fail and 8 Error in the new file, all of them missing capability of the new fields and names, none a helper bug. D34a: Pass 2, Error 2 (`FieldError: type NumericalHealthError has no field column`; `MethodError` for the seven-argument constructor, which ends the testset, so the remaining D34a assertions are not reached). D34b: Pass 4, Fail 3 (`Base.isexported(.., :reducer_provenance)` false, provenance key sets without `alpha` and `shared`), Error 6 (`UndefVarError: reducer_provenance`, `FieldError` on `alpha`). Log: scratchpad `m2/red-d34-tangent-core.log`.
 
 Helper check: the file was also run against a throwaway patched copy of `src/` (scratchpad `m2/lb_patch`, never committed) implementing A1 to A3 as written in the contract: all 28 D34 assertions pass and the 537 existing assertions still pass.
+
+## Amendment D38 (2026-10-15)
+
+Runtime: the package suite carries a reduced set of types, shapes, variants and sample sizes (the reductions are marked "D38" in the test files); everything removed runs at stage 04 in `verify/` with identical assertions (decision-log D38). Where a Double64 part listed above is reduced or moved, the D38 note in the test file names it.

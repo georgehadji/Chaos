@@ -8,7 +8,7 @@
     seed = hh_seed(8, 1)
     n = 10_000
     eps64 = Float64(effective_eps(Float64))
-    for (iK, K) in enumerate((0.5, 2.0, 5.0, HH_TWO_PI))
+    for (iK, K) in hh_sel((0.5, 2.0, 5.0, HH_TWO_PI), (1, 4))     # package suite: K = 0.5 and 2 pi
         sys = StandardMap(K)
         starts = hh_starts(StableRNG(seed + iK), 50)
         Psi = [lb_Psi(sys, starts[j], initial_deviations(seed, j, Val(2), Val(1), Float64)[:, 1], n) for j in 1:50]
@@ -16,7 +16,7 @@
             X = propagate(sys, starts, n; k = 1, tau = tau, seed = seed, reducers = (Benettin(),))
             lam = [X.finals[j][1].lambda[1] for j in 1:50]
             bound = [16 * eps64 * Psi[j] / n for j in 1:50]
-            for alg in hh_algs(Float64)
+            for alg in hh_one_alg(Float64)
                 Q = propagate(sys, starts, n; k = 1, tau = tau, seed = seed, reducers = (QRSpectrum(alg),))
                 @test all(j -> abs(Q.finals[j][1].lambda[1] - lam[j]) <= bound[j], 1:50)
             end
@@ -28,7 +28,7 @@ end
     # K in {0.5, 2, 5, 10, 2 pi}, 50 orbits, n = 1e3, tau in {1, 2, 4}: |lambda_i^QR - lambda_i^GS| <= theta_psi^QR(n) + theta_psi^GS(n), i = 1, 2 (Amendment D35)
     seed = hh_seed(8, 2)
     n = 1000
-    for (iK, K) in enumerate((0.5, 2.0, 5.0, HH_TWO_PI))
+    for (iK, K) in hh_sel((0.5, 2.0, 5.0, HH_TWO_PI), (1, 4))     # package suite: K = 0.5 and 2 pi, MGS as the Gram-Schmidt reference
         sys = StandardMap(K)
         starts = hh_starts(StableRNG(seed + iK), 50)
         Mmax = [hh_Mmax(sys, z, n) for z in starts]
@@ -36,8 +36,8 @@ end
         for tau in (1, 2, 4)
             runq(alg) = propagate(sys, starts, n; k = 2, tau = tau, seed = seed, reducers = (QRSpectrum(alg),)).finals
             theta(f, j) = hh_theta_psi(Float64, f[j][1].G_max, tau, Mmax[j], Psi[j], n)       # theta_psi(n), Amendment D35
-            gs = [(alg, runq(alg)) for alg in (CGS(), MGS(), RGS())]
-            for alg in hh_algs(Float64)
+            gs = [(alg, runq(alg)) for alg in hh_pick((CGS(), MGS(), RGS()), (MGS(),))]
+            for alg in hh_one_alg(Float64)
                 fq = runq(alg)
                 for (_, fg) in gs
                     @test all(j -> maximum(abs(fq[j][1].lambda[i] - fg[j][1].lambda[i]) for i in 1:2) <= theta(fq, j) + theta(fg, j), 1:50)
@@ -53,7 +53,7 @@ end
     # and |lambda_1^SVD + lambda_2^SVD| <= theta_sum (strict)
     seed = hh_seed(8, 3)
     n = 1000
-    for (iK, K) in enumerate((0.5, 2.0, 5.0, HH_TWO_PI))
+    for (iK, K) in hh_sel((0.5, 2.0, 5.0, HH_TWO_PI), (1, 4))     # package suite: K = 0.5 and 2 pi
         sys = StandardMap(K)
         starts = hh_starts(StableRNG(seed + iK), 50)
         Mmax = [hh_Mmax(sys, z, n) for z in starts]
@@ -62,7 +62,7 @@ end
             fs = propagate(sys, starts, n; k = 2, tau = tau, seed = seed, reducers = (SVDSpectrum(),)).finals
             ths = [hh_theta_psi(Float64, fs[j][1].G_max, tau, Mmax[j], Psi[j], n) for j in 1:50]
             @test all(j -> abs(fs[j][1].lambda[1] + fs[j][1].lambda[2]) <= hh_theta(Float64, fs[j][1].G_max, tau, Mmax[j]), 1:50)
-            for alg in hh_algs(Float64)
+            for alg in hh_one_alg(Float64)
                 fq = propagate(sys, starts, n; k = 2, tau = tau, seed = seed, reducers = (QRSpectrum(alg),)).finals
                 function sandwich(j)
                     f = fs[j][1]
@@ -87,15 +87,17 @@ hh_se(a, b) = 4 * sqrt(hh_var(a) / length(a) + hh_var(b) / length(b))
     # pathwise: K = 0.5 (screened), 50 starts, n = 1e3, tau = 1, d0 = 1e-6: |lambda_1^QR - X2| <= Delta_2T(1e-6) Psi_n/n + (B_S^QR + 2 B_S^L1)/n
     seed = hh_seed(8, 4)
     eps64 = Float64(effective_eps(Float64))
-    sysW = WrappedStandardMap(HH_TWO_PI)
-    starts = hh_starts(StableRNG(seed), 1000)
-    x0w = [torus_state(z) for z in starts]
-    d0 = hh_d0star(HH_TWO_PI, HH_TWO_PI, eps64)
-    q = propagate(sysW, x0w, 10_000; k = 2, tau = 1, seed = seed, reducers = (QRSpectrum(HouseholderQR()),))
-    s = propagate_shadow(sysW, x0w, 10_000; d0 = d0, tau = 1, seed = seed)
-    lq = [q.finals[j][1].lambda[1] for j in 1:1000]
-    x2 = [s.finals[j][1].X2 for j in 1:1000]
-    @test abs(hh_mean(lq) - hh_mean(x2)) <= hh_se(lq, x2)
+    if HH_FULL                                  # the ensemble (1000 starts, n = 1e4) runs in verify/ only; the pathwise part below is in the package suite
+        sysW = WrappedStandardMap(HH_TWO_PI)
+        starts = hh_starts(StableRNG(seed), 1000)
+        x0w = [torus_state(z) for z in starts]
+        d0 = hh_d0star(HH_TWO_PI, HH_TWO_PI, eps64)
+        q = propagate(sysW, x0w, 10_000; k = 2, tau = 1, seed = seed, reducers = (QRSpectrum(HouseholderQR()),))
+        s = propagate_shadow(sysW, x0w, 10_000; d0 = d0, tau = 1, seed = seed)
+        lq = [q.finals[j][1].lambda[1] for j in 1:1000]
+        x2 = [s.finals[j][1].X2 for j in 1:1000]
+        @test abs(hh_mean(lq) - hh_mean(x2)) <= hh_se(lq, x2)
+    end
 
     K = 0.5
     sysK = WrappedStandardMap(K)

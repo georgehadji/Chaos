@@ -1,4 +1,5 @@
 # AC1 to AC4: exactness, renormalization algebra, K = 0 standard map, BigFloat tangent product.
+# D38: kept to one case per criterion; the cases moved out are in verify/tangent-core.jl (section "moved from the package suite (D38)").
 
 @testset "AC1 Y5 exactness" begin
     # W_n = A^n (Fibonacci entries, E9) and x_n = A^n x0, bitwise, n = 1..35, k = 2, tau = 1.
@@ -41,12 +42,11 @@ end
         # I2: handoffs exactly at multiples of tau, N/tau of them
         @test all(f -> f[2].count == N ÷ tau && f[2].last == N && f[2].bad == 0, res.finals)
     end
-    # Chain order: a later reducer sees the matrix replaced by an earlier one (E7); reading first sees the unreplaced matrix.
+    # Chain order: a later reducer sees the matrix replaced by an earlier one (E7). The reading-first chain (a second kernel
+    # specialization) moved to verify/tangent-core.jl (D38).
     tau = 5
     after = propagate(sys, x0[1:10], N; k = 1, tau = tau, seed = seed, W0 = W0[1:10], reducers = (tc_LogNorm(), tc_Reader(tau)))
-    before = propagate(sys, x0[1:10], N; k = 1, tau = tau, seed = seed, W0 = W0[1:10], reducers = (tc_Reader(tau), tc_LogNorm()))
     @test all(f -> f[2].maxabs <= 1 + 4 * eps(Float64), after.finals)
-    @test all(f -> f[1].maxabs > 1.5, before.finals)
 end
 
 @testset "AC3 K = 0 standard map" begin
@@ -60,17 +60,14 @@ end
         @test res.W[1] == SMatrix{2,2,Float64}(1, 0, n, 1)
         @test res.x[1] == SVector(0.25 + 0.5 * n, 0.5)   # lifted coordinates, never wrapped (I7)
     end
-    n = 10_000
-    res = propagate(sys, [x0], n; k = 1, tau = 1, seed = seed, W0 = [SMatrix{2,1,Float64}(0, 1)], reducers = (tc_LogNorm(),))
-    S = res.finals[1][1].logs[1]
-    @test abs(S - 0.5 * log(float(n)^2 + 1)) <= 8 * n * eps(Float64)
-    @test S / n <= log(n) / n + 1e-12
+    # D38: the k = 1 exponent check (S_n = 0.5 ln(n^2 + 1), a separate kernel specialization) moved to verify/tangent-core.jl.
 end
 
 @testset "AC4 BigFloat tangent product" begin
     # ||W_n - W_ref||_F <= 8 n eps(T) prod||M_i||_F ||W0||_F, W_ref at BigFloat(256) along the realized orbit points.
     seed = TC_SEED + 4
-    for T in (Float64, Double64), (K, n) in ((0.5, 100), (2pi, 20))
+    # D38: Double64 keeps its smoke case (K = 0.5); (2pi, 20) moved to verify/tangent-core.jl (also its AC4 rows).
+    for (T, K, n) in ((Float64, 0.5, 100), (Float64, 2pi, 20), (Double64, 0.5, 100))
         sys = tc_Std(T(K))
         rng = StableRNG(seed + (T === Float64 ? 0 : 1000) + n)
         x0 = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:20]

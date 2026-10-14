@@ -17,12 +17,12 @@ end
     # K = 2 pi, 4096 seeded orbits, n = 1e3, k = 2, tau = 1; propagate (any thread count of this process) equals the serial map of
     # propagate_orbit bitwise for chunk sizes 64, 1000 and the default; kernel path here, library path in the nested testset
     seed = hh_seed(9)
-    m, n = 4096, 1000
+    m, n = hh_pick(4096, 1500), 1000                 # package suite: 1500 orbits (two chunks of 1000), verify/: 4096
     sys = StandardMap(HH_TWO_PI)
     x0 = hh_starts(StableRNG(seed), m)
     W0 = [initial_deviations(seed, j, Val(2), Val(2), Float64) for j in 1:m]
-    for alg in hh_kernel_algs()
-        hh_ac9(alg, sys, x0, W0, seed, n, alg isa HouseholderQR ? (1000, nothing) : (1000,))
+    for alg in hh_pick(hh_kernel_algs(), (HouseholderQR(),))      # package suite: V-H kernel (V-A, V-G in verify/)
+        hh_ac9(alg, sys, x0, W0, seed, n, alg isa HouseholderQR ? hh_pick((1000, nothing), (1000,)) : (1000,))
     end
     @testset "AC9 library path (alignment-dependent library kernels may differ: record and ask the owner)" begin
         hh_ac9(LapackQR(), sys, x0, W0, seed, n, (1000,))
@@ -43,20 +43,22 @@ function hh_ac10(alg, ::Type{T}, vd::Val{d}, vk::Val{k}, seed) where {T, d, k}
     return hh_step_bytes(QRSpectrum(alg), st, zero(SVector{d, T}), W)
 end
 const HH_AC10_DK = ((Val(2), Val(1)), (Val(2), Val(2)), (Val(4), Val(4)), (Val(8), Val(8)))
+hh_ac10_dk() = hh_sel(HH_AC10_DK, (2, 3))      # package suite: (2,2) and (4,4)
+hh_ac10_algs(::Type{T}) where {T} = (HH_FULL || T === Float64) ? hh_kernel_algs() : (HouseholderQR(),)
 
 @testset "AC10 zero allocation" begin
     # one handoff update (reducer_step) allocates 0 bytes after warm-up: kernel path, T in {Float64, Double64}, (d,k) in {(2,1), (2,2), (4,4), (8,8)};
     # plus propagate_orbit with the standard map (kernel path, d = k = 2); BigFloat exempt
     seed = hh_seed(10)
-    for T in (Float64, Double64), alg in hh_kernel_algs(), (i, (vd, vk)) in enumerate(HH_AC10_DK)
+    for T in (Float64, Double64), alg in hh_ac10_algs(T), (i, (vd, vk)) in hh_ac10_dk()
         @test hh_ac10(alg, T, vd, vk, seed + i) == 0
     end
-    for T in (Float64, Double64), alg in hh_kernel_algs()
+    for T in (Float64, Double64), alg in hh_pick(hh_ac10_algs(T), (HouseholderQR(),))
         sys = StandardMap(T(HH_TWO_PI))
         @test hh_orbit_bytes(sys, SVector{2, T}(T(1.0), T(2.0)), SMatrix{2, 2, T}(1, 0, 0, 1), 100, 1, (QRSpectrum(alg),)) == 0
     end
     @testset "AC10 library path (reducer_step with the reused workspace; report to the owner if it cannot reach 0)" begin
-        for (i, (vd, vk)) in enumerate(HH_AC10_DK)
+        for (i, (vd, vk)) in hh_ac10_dk()
             @test hh_ac10(LapackQR(), Float64, vd, vk, seed + 10 + i) == 0
         end
     end
@@ -123,20 +125,21 @@ end
              ("zero column 1", SMatrix{2, 2, Float64}(0, 0, 1, 2), 1))
     Wgood = SMatrix{2, 2, Float64}(2, 1, 0.5, 3)
     for alg in hh_algs(Float64), (name, M, col) in cases
-        @testset "AC11 $(hh_name(alg)) $name through the stream" begin
+        (HH_FULL || alg isa Union{HouseholderQR, LapackQR}) && @testset "AC11 $(hh_name(alg)) $name through the stream" begin   # package suite: V-H kernel and library through the stream
             hh_ac11_stream(alg, M, col)
         end
         @testset "AC11 $(hh_name(alg)) $name direct" begin
             hh_ac11_direct(alg, M, Wgood, col)
         end
     end
-    for alg in hh_algs(Float64)
+    for alg in hh_pick(hh_algs(Float64), (HouseholderQR(),))
         @testset "AC11 $(hh_name(alg)) identical columns, d = 4" begin
             hh_ac11_direct(alg, SMatrix{4, 2, Float64}(1, 0, 0, 0, 1, 0, 0, 0), SMatrix{4, 2, Float64}(1, 2, 0, 1, 0, 1, 3, 0.5), 2)
         end
     end
     # (c) W = s Q_test, s in {1e-200, 1e200}
-    for T in (Float64, Double64), (i, (vd, vk)) in enumerate(((Val(2), Val(2)), (Val(4), Val(4)), (Val(4), Val(2)))), s in (1e-200, 1e200), alg in hh_algs(T)
+    for T in (Float64, Double64), (i, (vd, vk)) in hh_sel(((Val(2), Val(2)), (Val(4), Val(4)), (Val(4), Val(2))), T === Float64 ? (1, 3) : (1,)),
+        s in (1e-200, 1e200), alg in hh_sel_algs(T)
         hh_ac11_scale(T, vd, vk, s, alg, seed + 20 + i)
     end
 end
@@ -145,7 +148,8 @@ end
     # tangent-core W9 map (state length 4, dimension 2) against the plain length-2 system: lambda, G, Q bitwise identical, k in {1, 2}
     seed = hh_seed(12)
     N, tau = 500, 2
-    for T in (Float64, Double64), k in (1, 2), alg in hh_algs(T)
+    for T in (Float64, Double64), k in (1, 2), alg in hh_one_alg(T)
+        HH_FULL || k == 2 || continue                 # package suite: k = 2 only
         K = T(HH_TWO_PI)
         z2 = [hh_cast(T, z) for z in hh_starts(StableRNG(seed), 20)]
         z4 = [SVector(z[1], z[2], zero(T), zero(T)) for z in z2]

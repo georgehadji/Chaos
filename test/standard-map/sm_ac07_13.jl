@@ -95,9 +95,9 @@ function sm_ac9_jordan_defects(::Type{T}) where {T}
 end
 
 @testset "AC7 K=0 exactness" begin
-    # x_n = x_0 + n p_0 exactly (0 ulp) over 1000 steps (1000 orbits Float64, 200 Double64); product of n tangents = [[1,n],[0,1]] exactly; grid data multiples of 2^-10
-    @test sm_ac7_orbit_defects(Float64, StableRNG(SM_SEED + 7001), 1000) == 0
-    @test sm_ac7_orbit_defects(Double64, StableRNG(SM_SEED + 7002), 200) == 0
+    # x_n = x_0 + n p_0 exactly (0 ulp) over 1000 steps (100 orbits Float64, 20 Double64; D38: 1000 / 200 in verify); product of n tangents = [[1,n],[0,1]] exactly; grid data multiples of 2^-10
+    @test sm_ac7_orbit_defects(Float64, StableRNG(SM_SEED + 7001), 100) == 0
+    @test sm_ac7_orbit_defects(Double64, StableRNG(SM_SEED + 7002), 20) == 0
     # the tangent at K = 0 does not depend on the point, so 20 starting points suffice for the 10^4-step products
     @test sm_ac7_product_defects(Float64, StableRNG(SM_SEED + 7003), 20) == 0
     @test sm_ac7_product_defects(Double64, StableRNG(SM_SEED + 7004), 20) == 0

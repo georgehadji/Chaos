@@ -4,19 +4,6 @@
 #        over the chain in order (later reducers win on a shared key).
 # RED for this file is mostly Fail or MethodError on existing names (no `column` field yet) plus UndefVarError `reducer_provenance`.
 
-# Two read-only reducers that only differ in their provenance; the provenance methods are added only when the name exists, so a
-# missing `reducer_provenance` errors the testset that needs it and not the whole file.
-struct tc_ProvA end
-struct tc_ProvB end
-const tc_ProvAB = Union{tc_ProvA, tc_ProvB}
-Chaoslab.reducer_init(::tc_ProvAB, ::Type, ::Val, ::Val) = nothing
-Chaoslab.reducer_update(::tc_ProvAB, st, n::Int, x, W) = (st, W)
-Chaoslab.reducer_final(::tc_ProvAB, st) = (;)
-@static if isdefined(Chaoslab, :reducer_provenance)
-    Chaoslab.reducer_provenance(::tc_ProvA) = (alpha = 1, shared = "a")
-    Chaoslab.reducer_provenance(::tc_ProvB) = (beta = 2.5, shared = "b")
-end
-
 @testset "D34a NumericalHealthError column" begin
     # six-argument constructor: column 0; seven-argument constructor: column set; field order and types; showerror unchanged in
     # content; every error Batch A raises (propagate state / deviation matrix, check_residual, monitor) has column 0.
@@ -55,21 +42,15 @@ end
     @test reducer_provenance(tc_LogNorm()) === NamedTuple()
     @test reducer_provenance(tc_Reader(1)) === NamedTuple()
     @test reducer_provenance(tc_ProvA()) == (alpha = 1, shared = "a")
-    sys = tc_Std(1.0)
-    x0 = [SVector(0.3 + 0.1j, 0.2) for j in 1:4]
+    sys = tc_Fault(:inf_state, 0)   # D38: no orbit is flagged (z[3] = 0), so this is a plain run; the map only shares D34a's kernel specialization
+    x0 = [SVector(0.0, 0.0, 0.0) for j in 1:4]
     run(reducers) = propagate(sys, x0, 10; k = 1, tau = 2, seed = TC_SEED + 3410, reducers = reducers, chunk = 16).provenance
     base = run(())
     @test haskey(base, :backend) && base.seed == TC_SEED + 3410 && base.tau == 2 && base.k == 1 && base.chunk_size == 16
-    ab = run((tc_ProvA(), tc_ProvB()))
-    ba = run((tc_ProvB(), tc_ProvA()))
+    ab = run((tc_ProvA(), tc_Reader(2), tc_ProvB()))   # a reducer without a method between two with one adds nothing
     @test ab.alpha == 1 && ab.beta == 2.5
-    @test ab.shared == "b" && ba.shared == "a"
+    @test ab.shared == "b"   # D38: the reversed chain (later reducer wins, ba.shared == "a") moved to verify/tangent-core.jl
     @test Set(keys(ab)) == union(Set(keys(base)), Set((:alpha, :beta, :shared)))
     @test all(k -> isequal(ab[k], base[k]), keys(base))
-    @test all(k -> isequal(ba[k], base[k]), keys(base))
-    none = run((tc_LogNorm(), tc_Reader(2)))
-    @test isequal(none, base)
-    mixed = run((tc_LogNorm(), tc_ProvA(), tc_Reader(2)))
-    @test mixed.alpha == 1 && mixed.shared == "a" && !haskey(mixed, :beta)
-    @test Set(keys(mixed)) == union(Set(keys(base)), Set((:alpha, :shared)))
+    # D38: the chains without provenance and the mixed chain (reducers with and without a method) moved to verify/tangent-core.jl.
 end

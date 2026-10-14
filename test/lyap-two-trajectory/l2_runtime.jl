@@ -74,12 +74,12 @@ end
     # K = 2 pi, 4096 seeded orbits, n = 1e3, d0 = 1e-8: propagate_shadow equals the serial map of propagate_shadow_orbit bitwise for chunk sizes 64, 1000
     # and the default; 0 bytes allocated per orbit after warm-up, n = 1e4, Float64 and Double64, wrapped and lifted
     seed = l2_seed(11)
-    m, n, d0 = 4096, 1000, 1e-8
+    m, n, d0 = L2_FULL ? 4096 : 1024, 1000, 1e-8          # package suite 1024 orbits
     sys = WrappedStandardMap(L2_TWO_PI)
     x0 = [l2_state(:wrapped, Float64, z) for z in l2_starts(StableRNG(seed), m)]
     u0s = [SVector{2, Float64}(initial_deviations(seed, j, Val(2), Val(1), Float64)[:, 1]) for j in 1:m]
     serial = [propagate_shadow_orbit(sys, x0[j], u0s[j], n, 1, d0; orbit = j) for j in 1:m]
-    for chunk in (64, 1000, nothing)
+    for chunk in (L2_FULL ? (64, 1000, nothing) : (64, nothing))
         res = propagate_shadow(sys, x0, n; d0 = d0, tau = 1, seed = seed, chunk = chunk)
         @test isequal(res.x, [s[1] for s in serial])
         @test isequal(res.W, [s[2] for s in serial])
@@ -99,8 +99,9 @@ end
     # are tested; a lifted run at n = 1e3 (valid for every start) is added so that the lifted check cannot be vacuous.
     seed = l2_seed(12)
     K, d0, eps64 = 5.0, 1e-8, Float64(effective_eps(Float64))
-    starts = l2_starts(StableRNG(seed), 100)
-    for (n, modes) in ((1000, (:lifted, :wrapped)), (100_000, (:wrapped, :lifted)))
+    # package suite: the n = 1e5 run is wrapped only on 50 starts; verify/ runs both modes on 100 starts
+    for (n, modes, nstart) in ((1000, (:lifted, :wrapped), 100), (100_000, L2_FULL ? (:wrapped, :lifted) : (:wrapped,), L2_FULL ? 100 : 50))
+        starts = l2_starts(StableRNG(seed), nstart)
         for mode in modes
             sys = l2_sys(mode, K)
             x0s = [l2_state(mode, Float64, z) for z in starts]
@@ -132,7 +133,7 @@ end
                     Ero > 0.5 ? (reported += 1) : (errored += 1)
                 end
             end
-            n == 1000 && @test tested == 100 && errored == 0
+            n == 1000 && @test tested == nstart && errored == 0
             @info "lyap-two-trajectory AC12: lifted, n = $n: tested $tested, reported (E_ro > 0.5) $reported, unexpected separation errors $errored"
         end
     end

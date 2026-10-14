@@ -16,6 +16,21 @@ const HH_DK = ((Val(2), Val(1)), (Val(2), Val(2)), (Val(3), Val(2)), (Val(4), Va
 
 hh_algs(::Type{T}) where {T} = T === Float64 ? (HouseholderQR(), AugmentedQR(), GivensQR(), LapackQR()) :
                                                (HouseholderQR(), AugmentedQR(), GivensQR())
+
+# Decision D38 (package suite under 3 minutes; the suite is compile-bound, cost = distinct (T, d, k, variant) specializations):
+# the package suite keeps one representative per criterion; verify/lyap-householder-qr.jl defines HH_FULL_RUN = true before
+# including runtests.jl and so runs the full cross-product of the same testsets (hh_sel_algs, hh_pick, hh_ac1_cases, ...).
+const HH_FULL = @isdefined(HH_FULL_RUN) ? HH_FULL_RUN : false
+hh_sel_algs(::Type{T}) where {T} = (HH_FULL || T === Float64) ? hh_algs(T) : (HouseholderQR(),)   # Double64: V-H kernel only
+hh_one_alg(::Type{T}) where {T} = HH_FULL ? hh_algs(T) : (HouseholderQR(),)                        # V-H kernel only (propagate-level cases)
+hh_pick(full, reduced) = HH_FULL ? full : reduced
+# (index, element) pairs of `xs` at the indices `idx` (all of them in the full run); the index keeps the seed offsets of the full run
+hh_sel(xs, idx) = [(i, xs[i]) for i in (HH_FULL ? eachindex(xs) : idx)]
+# AC1 data cases (T index, T, shape index, Val d, Val k) shared by AC1 and AC3
+function hh_ac1_cases()
+    all = [(it, T, idk, vd, vk) for (it, T) in enumerate((Float64, Double64)) for (idk, (vd, vk)) in enumerate(HH_DK)]
+    return HH_FULL ? all : filter(c -> (c[1], c[3]) in ((1, 2), (1, 4), (2, 4)), all)   # Float64 (2,2), (4,2); Double64 (4,2)
+end
 hh_kernel_algs() = (HouseholderQR(), AugmentedQR(), GivensQR())
 hh_name(alg) = string(nameof(typeof(alg)))
 

@@ -20,7 +20,7 @@ const HH_PROV = Dict("HouseholderQR" => ("V-H", "kernel"), "AugmentedQR" => ("V-
     @test p.backend === :cpu && p.backend_fallback_reason == "CUDA.jl not loadable"
     p = hh_with_device(() -> run15(HouseholderQR(), :gpu), hh_FakeDevice(true, false)).provenance
     @test p.backend === :cpu && p.backend_fallback_reason == "no functional device"
-    p = hh_with_device(() -> run15(GivensQR(), :auto), none).provenance        # CI default: either string, depending on whether CUDA.jl is findable
+    p = hh_with_device(() -> run15(hh_pick(GivensQR(), HouseholderQR()), :auto), none).provenance   # CI default: either string, depending on whether CUDA.jl is findable
     @test p.backend === :cpu && p.backend_fallback_reason in ("CUDA.jl not loadable", "no functional device")
     # (c) BigFloat with a gpu request: element-type reason in both paths (P9 precedence)
     setprecision(BigFloat, 128) do
@@ -34,11 +34,11 @@ const HH_PROV = Dict("HouseholderQR" => ("V-H", "kernel"), "AugmentedQR" => ("V-
     end
     @test_throws ArgumentError reducer_init(QRSpectrum(LapackQR()), Double64, Val(2), Val(2))   # library path is Float64 only (Q8)
     # (d) a cpu request records an empty reason for every variant
-    for alg in hh_algs(Float64)
+    for alg in hh_pick(hh_algs(Float64), (HouseholderQR(), LapackQR()))     # package suite: V-H kernel and library path
         @test run15(alg, :cpu).provenance.backend_fallback_reason == ""
     end
     # (e) provenance: estimator keys (exact values, order free) merged with tangent-core's fields; backend is never auto
-    for alg in hh_algs(Float64)
+    for alg in hh_pick(hh_algs(Float64), (HouseholderQR(), LapackQR()))
         name, impl = HH_PROV[hh_name(alg)]
         expected = (estimator = "qr", orthonormalizer = name, iteration_path = "diagonal", implementation = impl, orthogonality_tol = 8.0)
         @test hh_nt_eq(reducer_provenance(QRSpectrum(alg)), expected)

@@ -13,7 +13,7 @@ end
 @testset "AC6 thread and chunk invariance" begin
     # propagate (chunk 64, 1000, default) equals the serial map of propagate_orbit, bitwise: x, W and accumulated logs.
     seed = TC_SEED + 6
-    n_orb, N = 4096, 1000
+    n_orb, N = 1024, 1000   # D38: 4096 orbits (and chunk 1000) are in verify/tangent-core.jl
     sys = tc_Std(2pi)
     rng = StableRNG(seed)
     x0 = [SVector(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:n_orb]
@@ -23,7 +23,7 @@ end
     xs = [s[1] for s in serial]
     Ws = [s[2] for s in serial]
     fs = [map(reducer_final, reducers, s[3]) for s in serial]
-    for chunk in (64, 1000, nothing)
+    for chunk in (64, nothing)   # D38: chunk 1000 moved to verify/tangent-core.jl (its AC6 digests cover it)
         res = propagate(sys, x0, N; k = 2, tau = 1, seed = seed, reducers = reducers, chunk = chunk, W0 = W0)
         @test isequal(res.x, xs)
         @test isequal(res.W, Ws)
@@ -38,7 +38,8 @@ end
     # Q^T Q = I to 8 k eps; (s, j) -> matrix is a pure function; uniform angle for d = 2, k = 1 (KS, 1% level 1.63/sqrt(n)).
     seed = TC_SEED + 7
     n = 10_000
-    for (d, k) in ((2, 1), (2, 2), (4, 4), (8, 8))
+    # D38: Float64 d = k = 8 and Double64 d = 2 k = 1, d = k = 4, d = k = 8 moved to verify/tangent-core.jl (also its AC7a rows).
+    for (d, k) in ((2, 1), (2, 2), (4, 4))
         worst = 0.0
         for j in 1:n
             Q = initial_deviations(seed, j, Val(d), Val(k), Float64)
@@ -47,7 +48,7 @@ end
         @test worst <= 8 * k * eps(Float64)
         @test initial_deviations(seed, 1, Val(d), Val(k), Float64) isa SMatrix{d,k,Float64}
     end
-    for (d, k) in ((2, 1), (2, 2), (4, 4), (8, 8))
+    for (d, k) in ((2, 2),)
         worst = 0.0
         for j in 1:200
             Q = initial_deviations(seed, j, Val(d), Val(k), Double64)
@@ -69,7 +70,7 @@ end
     # (b) chunk positions: through propagate with the identity map the default W0 equals initial_deviations(seed, j).
     ident = tc_Lin(SMatrix{2,2,Float64}(1, 0, 0, 1))
     for chunk in (64, 1000)
-        res = propagate(ident, [SVector(0.0, 0.0) for _ in 1:300], 4; k = 2, tau = 2, seed = seed, chunk = chunk)
+        res = propagate(ident, [SVector(0.0, 0.0) for _ in 1:300], 4; k = 2, tau = 2, seed = seed, chunk = chunk, reducers = (tc_Reader(2),))   # D38: AC1's kernel specialization (a read-only reducer leaves W unchanged)
         @test all(j -> isequal(res.W[j], ref[j]), 1:300)
     end
     # (c) angle of the single deviation vector is uniform on [0, 2 pi)
@@ -98,18 +99,8 @@ end
     @test res === nothing
     @test err.orbit == 5 && err.step == 5 && err.what == "deviation matrix" && err.backend === :cpu
     @test err.threshold == Inf && !isfinite(err.value)
-    # (c) overflow: A = diag(mu, 1/mu), mu = e^3, w = e_1 grows as e^(3 n); finite at n = 200, Inf from n = 238 (3 n > 709.78)
-    mu = exp(3.0)
-    sys = tc_Lin(SMatrix{2,2,Float64}(mu, 0, 0, 1 / mu))
+    # (c) overflow (A = diag(e^3, e^-3), a k = 1 kernel specialization of its own): moved to verify/tangent-core.jl (D38)
     z0 = [SVector(0.0, 0.0)]
-    w0 = [SMatrix{2,1,Float64}(1, 0)]
-    r200 = propagate(sys, z0, 200; k = 1, tau = 200, seed = seed, W0 = w0)
-    @test isapprox(r200.W[1][1], exp(600.0); rtol = 1e-10)
-    for tau in (300, 100)   # only handoffs are checked: the error carries the handoff index 300 in both cases
-        err = tc_health_error(() -> propagate(sys, z0, 300; k = 1, tau = tau, seed = seed, W0 = w0))
-        @test err isa NumericalHealthError
-        @test err.step == 300 && err.what == "deviation matrix" && err.orbit == 1
-    end
     # (d) contract: N must be a positive multiple of tau; ArgumentError before any work (tc_Boom throws if the map is called)
     @test_throws ArgumentError propagate(tc_Boom(), z0, 7; k = 1, tau = 5, seed = seed)
     @test_throws ArgumentError propagate(tc_Boom(), z0, 0; k = 1, tau = 1, seed = seed)

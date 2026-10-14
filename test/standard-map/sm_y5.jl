@@ -120,9 +120,10 @@ function sm_ac17_ratios(::Type{T}, rng, ::Val{N}) where {T, N}
 end
 
 @testset "AC15 Y5 symplecticity" begin
-    # max|A' Omega A - Omega| <= 16 eps ||A||^2 and |det A - 1| <= 16 eps ||A||^N for A and A_S; 10 draws per N in {1,2,3,5}
+    # max|A' Omega A - Omega| <= 16 eps ||A||^2 and |det A - 1| <= 16 eps ||A||^N for A and A_S; 10 draws: Float64 at N = 2, Double64 at N = 1
+    # D38: Y5 compile cost is per (element type, N); N in {1, 2, 3, 5} with 10 draws each, both types, runs in verify/standard-map.jl
     rng = StableRNG(SM_SEED + 15001)
-    for T in (Float64, Double64), N in (1, 2, 3, 5), _ in 1:10
+    for (T, N) in ((Float64, 2), (Double64, 1)), _ in 1:10
         worst, ok, omega_ok = sm_ac15_ratios(T, rng, Val(N))
         @test worst <= 1
         @test ok
@@ -134,7 +135,7 @@ end
     # |(1/n) ln smax(A^n) - lambda_1| <= 16 eps and |(1/n) ln smax(A^-n) + lambda_2N| <= 16 eps, n in {10, 50}; A_S adds ln(kappa(S))/n
     # Float64 only: sigma_max needs an SVD, which is not available for Double64 in the test environment
     rng = StableRNG(SM_SEED + 16001)
-    for N in (1, 2, 3, 5), _ in 1:10
+    for N in (2,), _ in 1:10
         worst_n, worst_s = sm_ac16_ratios(rng, Val(N))
         @test worst_n <= 1
         @test worst_s <= 1
@@ -142,9 +143,9 @@ end
 end
 
 @testset "AC17 Y5 inverse" begin
-    # A^-1 A = A A^-1 = I and Omega^-1 A' Omega = block inverse, max entry <= 16 eps ||A||^2; 10 draws per N
+    # A^-1 A = A A^-1 = I and Omega^-1 A' Omega = block inverse, max entry <= 16 eps ||A||^2; 10 draws: Float64 at N = 2, Double64 at N = 1 (D38: N in {1, 2, 3, 5} in verify)
     rng = StableRNG(SM_SEED + 17001)
-    for T in (Float64, Double64), N in (1, 2, 3, 5), _ in 1:10
+    for (T, N) in ((Float64, 2), (Double64, 1)), _ in 1:10
         @test sm_ac17_ratios(T, rng, Val(N)) <= 1
     end
 end

@@ -29,3 +29,17 @@ Code: `src/Foundation/Foundation.jl` (precision items: `precision_label`, `parse
 ## Fix (Batch B stage 02)
 
 `exact(T, ::Integer)` used `T(x)`, and `Double64(::Int64)` rounds through Float64, so integers above 2^53 lost their low bits (found by the lyap-gram-schmidt test writer: `exact(Double64, 2^60 + 1)` dropped the `+ 1`), against spec E2. Integers now pass through a BigFloat of enough precision, so the only rounding is the final one into T; rationals use the same path for numerator and denominator. Test `test/precision/pr_exact_int.jl` (RED, then GREEN with 9 assertions). The integer path allocates; `exact` is a setup function and no hot loop calls it.
+
+## Amendment D34 (2026-10-14)
+
+Code: `src/Foundation/Foundation.jl` (A1b: `effective_eps(::Type{T}) = eps(T)`, `effective_eps(::Type{Double64}) = Double64(2^-100)`, exported with a docstring; 2^-100 is a power of two, so the Float64 literal widens exactly).
+
+### Result
+`test/precision/`: 150 pass, 0 fail, 0 error (136 before including `pr_exact_int.jl`, 14 new in `pr_d34.jl`), Julia 1.13.1, 2 threads, 49 s.
+
+### Deviations and notes
+- None. Float64 and BigFloat return `eps(T)` (BigFloat at the precision in force at the call); Double64 is exactly 16 `eps(Double64)`.
+- `effective_eps` is a pure constant function, so thresholds built from it stay allocation-free and kernel-compatible.
+
+### Known limits
+- Only Diagnostics adopts it in this amendment; the Lyapunov estimators use it for their own thresholds as they are built.

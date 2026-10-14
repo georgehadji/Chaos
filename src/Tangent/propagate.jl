@@ -178,7 +178,7 @@ function _propagate(sys, x0::AbstractVector{SVector{s, T}}, N, tau, ::Val{d}, ::
             precision = precision_label(T), threads = Threads.nthreads(), cpu = Sys.CPU_NAME,
             seed = seed, tau = tau, k = k, chunk_size = csize, headroom = CHUNK_HEADROOM,
             gpu_chunks = gpu_chunks, gpu_chunk_size = gpu_csize)
-    return PropagationResult(out.x, out.W, out.finals, prov)
+    return PropagationResult(out.x, out.W, out.finals, merge(prov, map(reducer_provenance, reducers)...))
 end
 
 """

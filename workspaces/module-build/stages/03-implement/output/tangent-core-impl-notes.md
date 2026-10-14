@@ -115,3 +115,18 @@ Code: `src/Foundation/Foundation.jl` (eighth `FALLBACK_REASONS` string, hooks `i
 - `DEFAULT_GPU_NS = 100` is a judgement (about 5 times the measured 21.4 ns); with it an explicit `:gpu` run without a record refuses N above 9765 with one wave. `verify/gpu.jl` measures AC13 first so a fresh machine records its own value before the long-N lines.
 - The device chunk is capped by the budget even when the caller passes a larger `chunk`.
 - A real 702 cannot be provoked on purpose; the lost-device path is tested with a fake exception, and `is_device_lost(CuError(ERROR_LAUNCH_TIMEOUT))` was checked in a scratch script.
+
+## Amendment D34 (2026-10-14)
+
+Code: `src/Foundation/Foundation.jl` (A1a: `NumericalHealthError` gets the seventh field `column::Int`, the six-argument constructor is kept and sets 0; the docstring lists the kinds of `what`), `src/Tangent/Tangent.jl` (A2: `reducer_provenance(r) = NamedTuple()`, exported), `src/Tangent/propagate.jl` (the provenance returned by `_propagate` is `merge(prov, map(reducer_provenance, reducers)...)`).
+
+### Result
+`test/tangent-core/`: 565 pass, 0 fail, 0 error (537 before, 28 new in `tc_d34.jl`), Julia 1.13.1, 2 threads, 3 min 22 s.
+
+### Deviations and notes
+- None from the contract. Later reducers win on a shared key (`merge` order); the Batch A keys are never removed, but a reducer that names one of them would overwrite it (none does).
+- `reducer_provenance` is also called for the chain of an empty `reducers` tuple: `merge(prov)` returns `prov` unchanged, so runs without reducers are bitwise the old provenance.
+- `column` is not set by any Batch A path (all keep 0); Lyapunov reducers set it through their `reducer_error`.
+
+### Known limits
+- `reducer_provenance` is evaluated on the host after the run; it must not depend on the reducer state.

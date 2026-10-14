@@ -13,7 +13,7 @@ using LinearAlgebra
 using KernelAbstractions
 using StableRNGs
 
-export initial_deviations, reducer_init, reducer_update, reducer_final, reducer_step, reducer_failed, reducer_error
+export initial_deviations, reducer_init, reducer_update, reducer_final, reducer_step, reducer_failed, reducer_error, reducer_provenance
 export PropagationResult, propagate, propagate_orbit, chunk_size, bytes_per_orbit
 
 """
@@ -59,6 +59,14 @@ reducer_failed(r, state) = false
 Host-side error for a state with `reducer_failed(r, state)`, carrying the orbit id and backend.
 """
 function reducer_error end
+
+"""
+    reducer_provenance(r) -> NamedTuple
+
+Provenance keys reducer `r` adds to the run record (default `NamedTuple()`); `propagate` merges them over the chain
+in order, later reducers winning on a shared key (D34 A2).
+"""
+reducer_provenance(r) = NamedTuple()
 
 include("initial.jl")
 include("orbit.jl")

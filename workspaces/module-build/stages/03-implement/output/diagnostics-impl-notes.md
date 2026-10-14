@@ -38,3 +38,17 @@ This also matches the spec ("a kernel records the first-exceedance record per or
 
 - `monitor_exponents` raises a failure already recorded in the state (det, symplecticity, orthogonality) before the sum and pairing checks; error construction shared with `reducer_error` through `_failure`.
 - `det_residual` for D > 3 no longer allocates a dense matrix (see standard-map notes); the D > 3 allocation caveat above no longer applies.
+
+## Amendment D34 (2026-10-14)
+
+Code: `src/Diagnostics/residuals.jl` (A1b: `det_threshold`, `symp_threshold` and `sum_threshold` use `effective_eps(T)` instead of `eps(T)`; docstrings say `eps_eff`), `src/Diagnostics/monitor.jl` (A3: `reducer_final(::ResidualMonitor, st)` adds `M_max` and `G_max`; the state already tracked both).
+
+### Result
+`test/diagnostics/`: 245 pass, 0 fail, 0 error (195 before, 50 new in `dg_d34.jl`), Julia 1.13.1, 2 threads, 2 min 10 s. No Batch A testset needed a change (none compares the final NamedTuple as a whole).
+
+### Deviations and notes
+- Float64 and BigFloat thresholds are bitwise unchanged; Double64 thresholds are 16 times looser (2^-100 instead of 2^-104), which removes the false det alarm of a Double64 chain at a residual that meets the rounding model.
+- `G_max` in the final is 0 in a plain run (only `monitor_exponents` raises it); the caller forms the end-of-run sum check as `sum_threshold(pairing_tol, T, f.G_max, tau, f.M_max)` (Q1, decision D34).
+
+### Known limits
+- None new.

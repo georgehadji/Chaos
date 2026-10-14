@@ -87,4 +87,5 @@ function monitor_exponents(st::MonitorState{T}, lambda::StaticVector, G, n; pair
 end
 
 reducer_final(::ResidualMonitor, st::MonitorState) =
-    (det_max = st.det_max, symp_max = st.symp_max, orth_max = st.orth_max, sum_max = st.sum_max, pair_max = st.pair_max)
+    (det_max = st.det_max, symp_max = st.symp_max, orth_max = st.orth_max, sum_max = st.sum_max, pair_max = st.pair_max,
+     M_max = st.M_max, G_max = st.G_max)

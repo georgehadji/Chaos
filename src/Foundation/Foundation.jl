@@ -10,9 +10,14 @@ using StaticArrays
 using LinearAlgebra
 
 export NumericalHealthError, CompensatedSum, add, total, FALLBACK_REASONS, BackendChoice,
-       resolve_backend, precision_label, parse_precision, exact, Double64
+       resolve_backend, precision_label, parse_precision, exact, Double64, effective_eps
 
-"Thrown when a numerical health check fails (non-finite value or residual above its threshold)."
+"""
+Thrown when a numerical health check fails (non-finite value or residual above its threshold). `column` is the
+deviation-vector column concerned, 0 when none (D34 A1a); the six-argument constructor sets it to 0. Kinds in use (`what`):
+"state", "deviation matrix", "det", "symplecticity", "orthogonality", "sum", "pairing",
+"orthonormalisation breakdown", "separation".
+"""
 struct NumericalHealthError <: Exception
     what::String
     value::Float64
@@ -20,12 +25,24 @@ struct NumericalHealthError <: Exception
     step::Int
     orbit::Int
     backend::Symbol
+    column::Int
 end
+NumericalHealthError(what, value, threshold, step, orbit, backend) =
+    NumericalHealthError(what, value, threshold, step, orbit, backend, 0)
 
 function Base.showerror(io::IO, e::NumericalHealthError)
     print(io, "NumericalHealthError: ", e.what, " = ", e.value, " (threshold ", e.threshold,
           ") at step ", e.step, ", orbit ", e.orbit, ", backend ", e.backend)
 end
+
+"""
+    effective_eps(T) -> T
+
+The unit roundoff the tolerances are written in: `eps(T)`, except Double64 where the rounding model of its elementary
+functions gives `2^-100` (precision spec, Amendments; D34 A1b). Single home for every threshold that scales with eps.
+"""
+effective_eps(::Type{T}) where {T} = eps(T)
+effective_eps(::Type{Double64}) = Double64(ldexp(1.0, -100))
 
 "Neumaier compensated running sum: `s` is the sum, `c` the accumulated rounding correction."
 struct CompensatedSum{T}

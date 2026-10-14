@@ -19,17 +19,17 @@ end
 
 _maxabs(::Type{T}, M) where {T} = T(maximum(abs, M))
 
-"Det threshold `tol eps(T) (1 + max|M|)`."
-det_threshold(tol, ::Type{T}, M) where {T} = T(tol) * eps(T) * (1 + _maxabs(T, M))
+"Det threshold `tol eps_eff(T) (1 + max|M|)`, `eps_eff = effective_eps`."
+det_threshold(tol, ::Type{T}, M) where {T} = T(tol) * effective_eps(T) * (1 + _maxabs(T, M))
 
-"Symplecticity threshold `tol eps(T) N^2 (1 + max|M|)^2`, with `2N = size(M, 1)`."
+"Symplecticity threshold `tol eps_eff(T) N^2 (1 + max|M|)^2`, with `2N = size(M, 1)`."
 function symp_threshold(tol, ::Type{T}, M) where {T}
     N = size(M, 1) ÷ 2
-    return T(tol) * eps(T) * N^2 * (1 + _maxabs(T, M))^2
+    return T(tol) * effective_eps(T) * N^2 * (1 + _maxabs(T, M))^2
 end
 
-"Sum and pairing threshold `tol eps(T) (G_max / tau + M_max)`, independent of the run length."
-sum_threshold(tol, ::Type{T}, G_max, tau, M_max) where {T} = T(tol) * eps(T) * (T(G_max) / tau + T(M_max))
+"Sum and pairing threshold `tol eps_eff(T) (G_max / tau + M_max)`, independent of the run length."
+sum_threshold(tol, ::Type{T}, G_max, tau, M_max) where {T} = T(tol) * effective_eps(T) * (T(G_max) / tau + T(M_max))
 
 """
     check_residual(what, value, threshold; step, orbit, backend=:cpu)

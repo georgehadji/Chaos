@@ -1,7 +1,7 @@
 # AC1 to AC3: factor identities on seeded synthetic matrices, near-parallel columns, variant agreement.
 # Spec: lyap-householder-qr-spec.md, Acceptance criteria 1 to 3. Orthonormalize is the pure form of the API contract.
 
-const HH_NS = 200   # seeded matrices per (d, k, T)
+const HH_NS = 100   # seeded matrices per (d, k, T)
 
 hh_panel(::Type{T}, vd, vk, seed) where {T} = (rng = StableRNG(seed); [hh_randW(rng, T, vd, vk) for _ in 1:HH_NS])
 

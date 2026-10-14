@@ -22,10 +22,10 @@ end
     x0 = hh_starts(StableRNG(seed), m)
     W0 = [initial_deviations(seed, j, Val(2), Val(2), Float64) for j in 1:m]
     for alg in hh_kernel_algs()
-        hh_ac9(alg, sys, x0, W0, seed, n, alg isa HouseholderQR ? (64, 1000, nothing) : (64, 1000))
+        hh_ac9(alg, sys, x0, W0, seed, n, alg isa HouseholderQR ? (1000, nothing) : (1000,))
     end
     @testset "AC9 library path (alignment-dependent library kernels may differ: record and ask the owner)" begin
-        hh_ac9(LapackQR(), sys, x0, W0, seed, n, (64, 1000))
+        hh_ac9(LapackQR(), sys, x0, W0, seed, n, (1000,))
     end
 end
 

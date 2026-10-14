@@ -108,6 +108,8 @@ end
 `G_w = ||R||_F ||R^-1||_F` of the upper triangle `R` (spec G10), by back substitution.
 """
 function window_Gw(R::SMatrix{k, k, T}) where {k, T}
+    m = maximum(abs, R)   # G_w is scale invariant: rescale far-from-unit triangles so the squared sums neither overflow nor underflow
+    (m > T(1e100) || m < T(1e-100)) && isfinite(m) && m > 0 && return window_Gw(R / m)
     Ri = zero(SMatrix{k, k, T})
     for j in 1:k
         Ri = setindex(Ri, inv(R[j, j]), j + (j - 1) * k)

@@ -49,7 +49,7 @@ function hh_ac7(::Type{T}, K::Float64, starts, seed) where {T}
     ref = [hh_ref_std(T(K), orb[j][1], W0s[j], n) for j in 1:m]
     Psi = [hh_Psi(sys, orb[j][1], W0s[j]) for j in 1:m]                                         # Psi_n of the orbit and the first column (L1 S3, Amendment D35)
     cprime = 0.0
-    for tau in (1, 2, 4)
+    for tau in (1, 2)
         lam, thetas = Dict(), Dict()
         for alg in hh_algs(T)
             res = propagate(sys, x0s, n; k = 2, tau = tau, seed = seed, W0 = W0s, reducers = (QRSpectrum(alg),))

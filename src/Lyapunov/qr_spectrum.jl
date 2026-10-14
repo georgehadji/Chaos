@@ -47,9 +47,13 @@ function _factor_failure(st, R, status, column, n)
     return _failed(st, 1, column, pivot, isfinite(pivot) ? 0.0 : Inf, n)
 end
 
-function reducer_step(r::QRSpectrum, st::QRState{T, K}, n::Int, x::SVector, W::SMatrix) where {T, K}
+reducer_step(r::QRSpectrum, st::QRState, n::Int, x::SVector, W::SMatrix) =
+    st.code == 0 ? _qr_step(r, st, n, W, orthonormalize(r.alg, W)) : (st, W)
+
+# One handoff given the factorisation `fact` of W (shared with the LapackQR state, which owns a workspace).
+function _qr_step(r::QRSpectrum, st::QRState{T, K}, n::Int, W::SMatrix, fact) where {T, K}
     st.code == 0 || return st, W
-    Q, R, count, status, column = orthonormalize(r.alg, W)
+    Q, R, count, status, column = fact
     status == QR_OK || return _factor_failure(st, R, status, column, n), W
     Gw = window_Gw(R)
     eps_ = effective_eps(T)

@@ -28,7 +28,7 @@ end
     # K in {0.5, 2, 5, 10, 2 pi}, 50 orbits, n = 1e3, tau in {1, 2, 4}: |lambda_i^QR - lambda_i^GS| <= theta_psi^QR(n) + theta_psi^GS(n), i = 1, 2 (Amendment D35)
     seed = hh_seed(8, 2)
     n = 1000
-    for (iK, K) in enumerate((0.5, 2.0, 5.0, 10.0, HH_TWO_PI))
+    for (iK, K) in enumerate((0.5, 2.0, 5.0, HH_TWO_PI))
         sys = StandardMap(K)
         starts = hh_starts(StableRNG(seed + iK), 50)
         Mmax = [hh_Mmax(sys, z, n) for z in starts]

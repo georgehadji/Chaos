@@ -6,3 +6,6 @@ include(joinpath(@__DIR__, "tc_ac05_08.jl"))
 include(joinpath(@__DIR__, "tc_ac09_11.jl"))
 include(joinpath(@__DIR__, "tc_state_length.jl"))
 include(joinpath(@__DIR__, "tc_device.jl"))
+
+# Amendment D34 (reducer_provenance, NumericalHealthError.column): workspaces/module-build/stages/02-tests/output/tangent-core-test-plan.md
+include(joinpath(@__DIR__, "tc_d34.jl"))

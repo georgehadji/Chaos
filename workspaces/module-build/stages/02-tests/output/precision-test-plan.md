@@ -53,3 +53,11 @@ Total 15 errors, 0 failures, 10 testsets. Helper check: with temporary stubs of 
 ## Rework (stage 03 audit, 2026-10-13)
 
 AC12 allocation checks moved behind a function barrier (`pr_allocs`): on Julia 1.10 `@allocated` at testset scope counted the boxing of the returned SVector (16 or 32 bytes), not library allocation. Criterion and tolerance unchanged.
+
+## Amendment D34 (2026-10-14)
+
+Source: M2 Batch B API contract `api-batch-b.md`, A1b (approved, D34): `Foundation.effective_eps`, exported. New file `test/precision/pr_d34.jl`, included last from `runtests.jl`; existing testsets untouched. One testset, "D34 effective_eps": exported from Foundation and Chaoslab; `effective_eps(Float64) == eps(Float64) == 2^-52`; `eps(Double64) == 2^-104` (the premise of the amendment, asserted so that a change of DoubleFloats shows up); `Float64(effective_eps(Double64)) == 2^-100` and `effective_eps(Double64) == 16 eps(Double64)`; `effective_eps(BigFloat) == eps(BigFloat)` at 128 and 256 bits inside `setprecision(BigFloat, bits) do`; strictly looser than nominal for Double64 and equal for Float64. Only values are asserted, not the return type. The thresholds that consume it are tested in the diagnostics amendment. 14 assertions when green.
+
+### RED log (Amendment D34)
+
+Whole `test/precision` suite in the unmodified repo: 127 existing assertions pass; D34 effective_eps: Pass 1, Fail 2 (`Base.isexported(.., :effective_eps)` false for Foundation and for Chaoslab), Error 11 (`UndefVarError: effective_eps`). Log: scratchpad `m2/red-d34-precision.log`. Against the throwaway patched copy: all 14 pass, existing 127 still pass.

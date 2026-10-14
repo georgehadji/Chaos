@@ -87,3 +87,30 @@ Recorded line R2 (not a criterion, no threshold): the oracle with a wrapped (mod
 - Derived here, not cited: T1 (placement), T2 to T9, the bounds in criteria 3 to 9, 12 to 14.
 
 Open points: (P1) stream contract for a reducer-owned second orbit (Scope) (D30). (P2) The sweep grids and the validity limits of T5 and T6 are proposals for the study preregistration; no toml key is added (D30). (P3) Constants (factor 2 in Delta_2T, slope intervals in criterion 7, the 1e-4 in criterion 13) are proposals; stage 04 reports realized ratios (D30). (P4) Finding (D30): the external package's own wrapped standard-map rule would corrupt its two-trajectory estimate at boundary straddles; the oracle in `verify/` for L2 must use lifted coordinates, which differs from the rule used for the standard-map orbit comparison.
+
+
+## Amendment D35 (2026-10-14)
+
+Source: the stage 02 test plan of this slug, which replaced the pathwise bound of criteria 6, 8, 9 and 12 by slack factors (4 for X >= 0.1, 1 + 4 sqrt(n) for X < 0.1), and the measurements in `scratchpad/m2/batch-b-bound-table.md` (Julia 1.13.1, a throwaway estimator written from the Batch B contract, never in the repo; to be reproduced at stage 04). Criterion numbers are unchanged. B_S is B_S of `lyap-benettin` S3 as amended by its Amendment D35 (closed form with the n^2 term); the amplification sum Psi_n is defined there.
+
+### T5, T6 as amended: the pathwise bound
+
+T4 to T6 bound the relative error of the norm of the separation vector in one step. That is not the error of X2: an error injected at step j is a perturbation of the separation vector, and its effect on ln of the final separation norm is amplified by the remaining product exactly as a rounding error is in L1 S3 (amended). To first order and for tau = 1: n abs(X2(n) - X(n)) <= (E_nl + E_ro) Psi_n, Psi_n the amplification sum of the reference orbit and the seeded direction u_0 (L1 S3 as amended). With the factor 2 of T5 kept as the margin of the derivation:
+
+|X2(n) - X(n)| <= Delta_2T(d0) Psi_n / n + B_S^L1(n) / n   (T5a),
+
+and for general tau, by T6, sigma(K)^(2 (tau - 1)) Delta_2T(d0) Psi_n / n + B_S^L1(n) / n (T6a). Psi_n / n >= 1, so T5a contains the old per-step statement; it is larger by Psi_n / n, which is about 3 to 5 for hyperbolic starts and grows to the order of n for shear-like orbits. The statement "Delta_2T is a worst-case bound on abs(X2 - X)" in T5 and the bound printed in criteria 6, 8, 9 and 12 are replaced by T5a and T6a, with Psi_n of the run under test (lifted or wrapped mode, each its own orbit in criterion 12). The validity limits of T5 and T6 are unchanged.
+
+Measured gap of the old form (Delta_2T alone). 10000 cells: K in {0.5 (regular class, S7), 2, 5, 2 pi}, 50 starts each, Float64, wrapped, tau = 1, n in {1e2, 3e2, 1e3, 3e3, 1e4}, d0 = 10^-m for m = 3..12 (all inside the validity limits). abs(X2 - X) / Delta_2T exceeded 1 in 134 cells (1.3 percent), at most 16.0 for X >= 0.1 (K = 5, n = 300, d0 = 1e-6, one start: n (X2 - X) jumps by 0.21 between n = 200 and 300 and stays there; Psi_n / n = 818) and at most 33.4 for X < 0.1 (K = 0.5, n = 1e4, d0 = 1e-5; the neutral maxima grow with n from 0.2 at n = 100 to 33 at n = 1e4, roughly like n^0.8 to n). The stage 02 slack rules do not fit: the factor 4 for X >= 0.1 is exceeded in 4 cells (its own class), and 1 + 4 sqrt(n) overshoots the neutral maximum by 12 at n = 1e4. No function of n alone is both valid and informative here (the first event needs a factor 16 at n = 300, the neutral maximum 33 at n = 1e4, so 1 + n/9 would be needed, i.e. 1100 at n = 1e4): the events are orbits whose separation vector is far from the expanding direction for a while, which is what Psi_n measures. With T5a: abs(X2 - X) / (Delta_2T Psi_n / n) is at most 0.029 over the same 10000 cells (margin 34); the K = 5 event has Psi_n / n = 818.
+
+### Criteria 6, 8, 9, 12
+
+Pass: abs(X2 - X) <= Delta_2T(d0) Psi_n / n + B_S^L1(n) / n (criteria 6, 8, 12), and sigma(K)^(2 (tau - 1)) Delta_2T(d0) Psi_n / n + B_S^L1(n) / n (criterion 9, gated cases), with eps the effective eps of the element type (Double64 in criterion 8; Psi_n is evaluated in Float64 from the Float64 widening of the tangents). The realized ratio abs(X2 - X) / (Delta_2T Psi_n / n) is reported per d0 (criterion 6) next to the old ratio abs(X2 - X) / Delta_2T. The binding hierarchy of T8 (criteria 7 and 8, median errors, no slack) is unchanged.
+
+### Criterion 4: the plain-difference control
+
+The negative control as written ("a test double that takes the plain wrapped difference gives abs(n X2) >= 10 at n = 1") cannot be observed: Algorithm item 1 computes d_0^+ from the stored states through the system's `separation` hook and rejects the run before any work with a health error of kind separation when it lies outside [d0/2, 2 d0]. With the plain difference the straddling pair reads d_0^+ of about 2 pi, so the double is rejected at step 0 and no exponent exists. The control becomes, in observable terms: (i) the plain-difference double on the straddling pair is rejected before any work with kind separation, step 0, the orbit id and the backend; (ii) the same double on the same pair placed at x = 1 (away from the boundary) runs and agrees with the correct hook within 2 E_ro(d0); (iii) at hook level the plain difference of the straddling pair has norm about 2 pi, so ln(norm / d0) >= 10 (15.7 at d0 = 2^-20, the artifact of T3 itself), while `separation` of the same pair returns entries of absolute value at most pi with norm d0 within 4 E_ro(d0) d0. The criterion discriminates the plain difference by (i) and (iii); the exponent value ln(2 pi / d0) is not observable through `propagate_shadow` by design.
+
+### Open points added
+
+(P5) The factor 2 of Delta_2T and the margin 34 of T5a are proposals; stage 04 reports the realized ratios. (P6) The validity statement of criterion 12 for the lifted mode at n = 1e5 (E_ro > 0.5 for 98 of the 100 seeded starts at K = 5; the other two are valid and tested) is unchanged by this amendment.

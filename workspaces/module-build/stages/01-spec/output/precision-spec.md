@@ -101,3 +101,7 @@ Common data unless stated: K = 5 (exactly representable, so no conversion enters
 
 - Criterion 6: at most 5 percent of the orbits (10 of 200) may exceed the bound, the same rule as criterion 4. Reason: BigFloat 256 versus 512 already exceeds the first-order bound by a factor 10 on one orbit, so the bound, not the precision, is the limit.
 - Double64 effective epsilon is 2^-100 in every Double64 tolerance of the M2 specs (DoubleFloats sin and cos measured at about 2^-100.4 against BigFloat 256). Criterion 3 and standard-map criterion 14 still measure the effective value and report it; a value above 2^-100 goes to the owner.
+
+## Amendment D35 (Double64 trig floor)
+
+The effective eps 2^-100 of Double64 (Amendments) was measured on samples with |x| below about 1e3. For lifted coordinates beyond that, the argument reduction of `sin` and `cos` loses accuracy roughly in proportion to |x|; the Batch B test writers saw a 1.63 times excess over the bound at K = 2 pi in lifted mode. Long runs use the wrapped state (D28), which keeps |x| below 2 pi and is unaffected. Lifted Double64 runs beyond |x| = 1e3 carry a measured trig floor, recorded by Batch B stage 04 (lyap-benettin) and stated here when measured; until then a lifted Double64 bound beyond |x| = 1e3 is report-only.

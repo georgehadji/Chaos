@@ -249,4 +249,6 @@ end
     @test count(<=(60), nstar) >= 80
 end
 
+# Amendment D34 (Foundation.effective_eps): workspaces/module-build/stages/02-tests/output/precision-test-plan.md
+include(joinpath(@__DIR__, "pr_d34.jl"))
 include(joinpath(@__DIR__, "pr_exact_int.jl"))

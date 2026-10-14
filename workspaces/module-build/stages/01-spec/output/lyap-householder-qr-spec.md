@@ -106,3 +106,33 @@ Verified keys, all read in full text under `data/literature/lyapunov-algorithms/
 - DanielGragg1976: Sect. 3 "Givens Matrices" p.3-4.
 Layer 3 facts: `_config/research-question.md` "Ground truth", "Test panel"; `_config/architecture.md` "Module map", "Layering", "Compute", "Scalability"; `_config/numerics-policy.md`; `_config/numerics-defaults.toml`; `_config/coding-conventions.md` "Code", "Tests"; `_config/catalogs/lyapunov.md` rows L5, L5b, L6, D2, D3, F; `_config/decision-log.md` D17, D20, D24, D25, D27, D28, D29; `_config/risks.md` K15, K16, K18; `_config/bibliography/benchmarks.md` rows quoted in AC7 and AC18; Batch A specs by item: tangent-core (Contract, tau, Accumulated logarithms, Numerical health, E7 to E9, AC2, AC3, AC10, AC12, Amendment D28 W9, Oracle), diagnostics (D1 to D5, B1, B4, I2, O3), precision (Amendments, Algorithm 4), standard-map (Equations items 9, 10).
 Derived here, not cited: E3 consequence, E5 sign identity, E8 rotation, E9 counts, E11 (A1 and B1), E12, E13, E14, I2 sign invariance, the treppen equivalence (Algorithm 5), memory counts. Measured here (Julia 1.13.1, Float64, scratch): the library factorization returns negative diagonal entries (R_11 = -2.236 for [[2,1],[1,1]]); the generic factorization accepts BigFloat and also returns negative entries; the observed ratios in brackets in the criteria.
+
+
+## Amendment D35 (2026-10-14)
+
+Source: the stage 02 test plan of this slug (ambiguities A1, A1b, A2, A3), which added a tail rule (at most 6 percent of 50 orbits over a bound, none by more than 16 times), a neutral-orbit bound for AC8(a) and a factor 4 on Delta_2T, and the measurements in `scratchpad/m2/batch-b-bound-table.md` (Julia 1.13.1, a throwaway estimator written from the Batch B contract, never in the repo; to be reproduced at stage 04). Criterion numbers are unchanged. B_S is B_S of `lyap-benettin` S3 as amended by its Amendment D35, and Psi_n the amplification sum defined there.
+
+### Why the spec bounds fail on a few orbits, and the rule that replaces the tail rule
+
+theta_sum (GS G13) is derived for the sum identity (diagnostics B4) and does not grow with n. The error of an individual exponent has a second part, the same-orbit rounding of the first column, which L1 S3 (amended) bounds by B_S^Psi(n)/n = 8 eps Psi_n / n for lambda_1 (lambda_1 is computed by the arithmetic of the k = 1 estimator, S4(a)), and which the sum identity passes to lambda_2: abs(lambda_2 - lambda_2^ref) <= abs(lambda_1 - lambda_1^ref) + abs(lambda_1 + lambda_2), the reference sum being zero. An orbit that sticks near an island has no expanding direction for as long as it sticks, so Psi_n / n is large and bounds linear in n are exceeded. Measured on 6000 chaotic orbits (K in {2, 5}, 3000 starts each, n = 1e3, tau = 1, kernel Householder variant, 256-bit reference on the same orbit points): 5 orbits exceed theta_sum (4 at K = 2, worst 5.97; 1 at K = 5, 1.08); their Psi_n / n lies between 560 and 14600, the median over all orbits is 3.8; abs(lambda_1 - lambda_1^ref) / (eps Psi_n / n) is at most 0.81 over all 6000 orbits. With the unit
+
+theta_psi(n) = theta_sum + 8 eps(T) Psi_n / n
+
+the worst ratio max_i abs(lambda_i - lambda_i^ref) / theta_psi(n) is 0.076 (margin 13), and the bulk of the orbits stays as tight as before (the added term is about 30 eps against a theta_sum of 100 to 1000 eps for a median orbit). With the closed form B_S/n instead (16 K n eps = 3.2e4 eps at K = 2, n = 1e3) the same orbits pass by a factor 38 or more but the bound is orders of magnitude looser than the data for the bulk; the choice of theta_psi over the closed form is an owner question. The sum identity itself holds strictly on every orbit: abs(lambda_1 + lambda_2) / theta_sum is at most 0.0035 over the 6000 orbits.
+
+### Criteria 7 and 8 as amended
+
+- 7(a): max_i abs(lambda_i - lambda_i^ref) <= theta_psi(n), Psi_n of the orbit and the first column of Q_0. 7(b): every pair of variants within theta_psi^A(n) + theta_psi^B(n). 7(c): abs(lambda_1 + lambda_2) <= theta_sum, unchanged.
+- 8(a): abs(lambda_1^QR - X) <= (B_S^Psi,QR + B_S^Psi,L1)/n = 16 eps Psi_n / n for all orbits (S4(a) with the sharp form); the neutral-orbit bound of the stage 02 plan is withdrawn.
+- 8(b): abs(lambda_i^QR - lambda_i^GS) <= theta_psi^QR(n) + theta_psi^GS(n), i = 1, 2. 8(c): the V7 sandwich with theta_sum^QR + theta_sum^SVD replaced by theta_psi^QR(n) + theta_psi^SVD(n), and abs(lambda_1^SVD + lambda_2^SVD) <= theta_sum (strict).
+- 8(d): ensemble line unchanged; pathwise line: abs(lambda_1^QR - X2) <= Delta_2T(d0) Psi_n / n + (B_S^QR(n) + 2 B_S^L1(n))/n (`lyap-two-trajectory` T5a; B_S of L1 S3 as amended); the factor 4 of the stage 02 plan is withdrawn.
+- No sample-fraction tail rule: every orbit of every sample is held to the bound. The tolerance unit of the other criteria (1 to 6, 9 to 13) is unchanged.
+- Evidence limits: tau = 2 and 4 were measured on 300 orbits per K in {2, 5, 10} (largest ratio to theta_sum 0.11); the sharp form was verified at tau = 1 only. Double64 is not measured for this unit (the trig floor of L1 S3 applies to lifted orbits).
+
+### Criteria 5(a) and 5(c)
+
+5(a): the bound is B_S of `lyap-benettin` S3 as amended; the inline formula in this item is superseded by that pointer (the map is linear with a constant tangent, so K_s = 0 and B_S(n) = 8 eps (n + G_first)). 5(c): the printed asymptote drops the O(mu^-4n) term that E13 itself carries, and at small n that term (4e-18 at n = 10) is above B_S/n for Double64 (about 1e-29): the reference is the exact form from `lyap-benettin` E10, S_1(n) = n ln mu + ln c + (1/2) ln(1 + r_0 mu^(-4n)) with r_0 = (1 - c^2)/c^2, which has no remainder, and the pass is abs(lambda_1(n) - S_1(n)/n) <= B_S(n)/n.
+
+### Open points added
+
+(P10) theta_psi is built from two homes (GS G13 and L1 S3 amended); if the owner moves the corrected unit to GS G13 the other Batch B comparisons (GS criteria 5 and 10, SVD criteria 3 and 4) share the same latent defect, not seen in their 50-orbit samples.

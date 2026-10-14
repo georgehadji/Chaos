@@ -78,3 +78,26 @@ CPU backend, d = k = 2, Float64 and Double64; linear Y5 maps (cat map, rotation)
 - Layer 3: `_config/catalogs/lyapunov.md` rows L9, L10, L10b, section C; `_config/architecture.md` "Module map", "Layering", "Compute"; `_config/numerics-policy.md`; `_config/coding-conventions.md` "Tests"; `_config/risks.md` K15, K18; decisions D17, D20, D21, D24, D27, D28.
 - Batch A and GS specs by item: GS G1, G3, G5, G6, G7, G8, G9, G12, G13, Algorithm items 1 to 5, I5, I7; tangent-core E3, AC4, AC6, AC7, AC12; diagnostics I3, I4, I5; standard-map item 9 and the wrapped system.
 - Derived here, not cited: V4 to V10 and Algorithm item 3. Scratch runs (Julia 1.13.1, Float64, author's script, not in the repo): the d = 2 recursion against a 256-bit product at K in {0.5, 2 pi, 5}, n up to 2000 (sandwich V7 held in every case; error in lambda about 7 eps at n = 2000), the naive-product failure at n = 20, c values 1.27 (K = 2 pi), 1.07 (K = 5), -0.19 (K = 0.5); to be reproduced in stage 04.
+
+
+## Amendment D35 (2026-10-14)
+
+Source: the stage 02 test plan of this slug (ambiguity on AC3(c) and AC5) and the measurements in `scratchpad/m2/batch-b-bound-table.md` (Julia 1.13.1, a throwaway estimator written from the Batch B contract, never in the repo; to be reproduced at stage 04). Criterion numbers are unchanged.
+
+### Criterion 3(c): the class of orbits, not the sample
+
+The convergence of c rests on Algorithm item 3: the increment of c at handoff j is at most sigma(K)^(2 tau) exp(S_2 - S_1) taken before the window (r_12 / r_11 <= ||M^tau||^2), which decays only where S_1 grows. The spec scored every orbit with S_1(500) < 25 "as the K = 0.5 case" with the constant 0.02, which is wrong for two reasons: the constant was taken from four shear frames, and orbits near elliptic points or accelerator modes (S_1 stays near 0) have increments that do not decay at all, so c does not converge and no rule of this kind can hold for them. Measured on 1800 orbits (K in {0.5, 2, 5, 2 pi}, tau in {1, 2, 4}; 200 starts for K = 0.5 and 2, 100 for K = 5 and 2 pi; n = 500 against n = 1000): 744 orbits have S_1(500) < 25 and 129 of them exceed 0.02; by class of S_1(500): below 0 (9 orbits) up to 9.9 relative change, [0, 2) (27) up to 1.45, [2, 5) (312) up to 0.41, [5, 25) (396 orbits) at most 0.0261 (3 above 0.02), at least 25 (1056) exactly 0. The corrected rule, with the class defined by S_1(500) and applied to every orbit of the panel:
+
+- S_1(500) >= 25: abs(c_1000 - c_500) <= 8 eps max(1, abs(c)) (unchanged; the late increments are absorbed).
+- 5 <= S_1(500) < 25 (shear-dominated: K = 0.5 regular orbits, slow chaotic orbits): abs(c_1000 - c_500) <= 0.06 max(1, abs(c_500)) (algebraic convergence like 1/j^2; the worst of the 396 orbits is 0.0261, margin 2.3). The constant 0.06 is a proposal.
+- S_1(500) < 5 (near elliptic points and accelerator modes): no convergence claim; the value of abs(c_1000 - c_500) / max(1, abs(c_500)) is reported with the class counts, not scored. The orbits are not dropped from the panel: criteria 3(a), 3(b), 4 and 7 hold for them.
+
+The per-orbit bound abs(c_n - c_m) <= ((n - m) / tau) sigma(K)^(2 tau) exp(-2 s_min + |S_1 + S_2|), s_min the minimum of S_1 over the handoffs in [m, n) (|S_1 + S_2| taken as 2e-12 in the measurement), holds on all 1800 orbits (largest ratio of the change to the bound 0.104) and is informative only where s_min is large; it is the derivation of the classes, not a scored criterion.
+
+### Criterion 5: the orbit
+
+The spec's "one seeded orbit" does not determine the control: the plain Float64 product keeps sigma_2 as long as 1/sigma_1 is above its rounding floor (about eps sigma_1), so the gap abs(ln sigma_2^naive - ln sigma_2^ref) exceeds 10 only for strongly stretching orbits. Measured on 60 seeded starts at K = 2 pi, n = 20 (ln sigma_1(20) from 14.2 to 31.9, median 24.0): the gap exceeds 10 (or the plain product has an exactly zero smallest singular value, gap infinite) for every orbit with ln sigma_1(20) >= 24.9; among orbits with a finite gap of 10 or less the largest ln sigma_1 is 24.25, and the smallest ln sigma_1 among orbits with gap above 10 is 20.6 (an exactly zero singular value). The control therefore uses an orbit with ln sigma_1(20) >= 25, the first one in the seeded sequence of starts (21 of the 60 qualify); the scratch orbit of the spec (ln sigma_1(20) = 25.8, gap 13.3) is of this kind. The overflow statement (non-finite plain product before n = 700) is unchanged.
+
+### Coverage
+
+Package suite: the Double64 parts of criteria 3, 5, 8, 9 and 12 run at stage 04 (the stage 02 plan cut them for the 3 minute budget; the spec header says "Float64 and Double64" for every criterion); criteria 1, 2, 4, 6 and 7 run both types. Whether any returns to the package suite is decided by the stage 03 runtime measurement (owner question, see the table).

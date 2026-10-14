@@ -57,3 +57,19 @@ Command (repo root): `julia --project=<scratchpad>\m2\testenv -e "using Test, Ch
 | AC11 CPU backend items 1, 5, 6 | 1 | 0 | UndefVarError `AbstractMap` in `Chaoslab` |
 
 Helper check: the suite was also run against a throwaway stub implementation of the whole API kept outside the repo (scratchpad `m2/dg_fake`, never committed). All pass except the four AC9 allocation checks, which fail only because the stub is not isbits; the helpers, thresholds and window selection are therefore consistent.
+
+## Amendment D34 (2026-10-14)
+
+Source: M2 Batch B API contract `api-batch-b.md`, A1b (Diagnostics adopts `Foundation.effective_eps`, Q6) and A3 (`reducer_final(::ResidualMonitor, st)` gains `M_max` and `G_max`, Q1). New file `test/diagnostics/dg_d34.jl`, included from `runtests.jl` after the closing `end` of the existing top-level testset (the existing testsets and their helpers are unchanged; the file reuses `dg_catch`, `dg_DET_TOL`, `dg_TYPES`, `dg_SEED`). Probe maps are `LinearSymplecticMap` and `StandardMap` (no test-defined map type, hence no world-age workaround); the file defines its own renormalising reducer `dg34_Renorm`. Seeds: `dg_SEED` + 2900.
+
+| Criterion | Testset | Sample | Tolerance |
+|---|---|---|---|
+| A1b thresholds | "D34 thresholds use effective_eps" | `det_threshold`, `symp_threshold` (N = 1 and N = 2), `sum_threshold`, Float64 and Double64 | equal to `tol * epsE * (...)` within 4 eps(T) relative; Double64 exactly 16 times the nominal-eps threshold; Float64 unchanged (exact) |
+| A1b no false alarm (Double64) | "D34 Double64 no false alarm" | tangent diag(1 + delta, 1) (det residual exactly delta), delta a power of two in the quiet band (theta/4, theta/2] over 100 handoffs and in the raise band [2 theta, 4 theta) at one handoff, bands built from the effective threshold, both types; plus a seeded Double64 standard-map orbit (K = 5, 2000 steps) | quiet: no error (with the nominal eps(Double64) the quiet delta, about 2^-98, is sixteen times the threshold and raises: this is the signal that separates old and new code); raise: kind "det", value delta, step 1, `column` 0, reported threshold equal to the effective one to 1e-9 relative |
+| A3 final fields | "D34 ResidualMonitor final M_max and G_max" | 100 steps of the standard map K = 2 (renormalised), Float64 and Double64; then `monitor_exponents` with G = 6.8, M_max = 10 and a smaller second call | `M_max` equals the maximum over the handoffs of `maximum(abs, tangent(sys, x_n))` recomputed independently, bitwise; `G_max == 0` in a plain run; after `monitor_exponents` the final shows G_max = 6.8 and M_max = 10 and keeps them after a smaller second call; `sum_threshold(16, T, G_max, 1, M_max)` from the final accepts the exponent sum; existing fields unchanged |
+
+Counts: 3 testsets, 50 assertions when green. Existing assertions: none compares a `ResidualMonitor` final NamedTuple as a whole (checked with `grep -F`; the tests read `det_max`, `symp_max`, `orth_max` and compare finals of `propagate` with finals of `propagate_orbit` with `===`, which survives extra fields), so no existing comparison was edited.
+
+### RED log (Amendment D34)
+
+Whole `test/diagnostics` suite in the unmodified repo: 195 existing assertions pass. D34 thresholds: Error 1 and D34 Double64 no false alarm: Error 1 (both stop at `UndefVarError: effective_eps` before any threshold value is compared; the threshold and false-alarm assertions are first exercised against the implementation). D34 ResidualMonitor final: Pass 12, Fail 4 (`hasproperty(fin, :M_max)` and `:G_max` false, both types), Error 12 (`FieldError: type NamedTuple has no field M_max` or `G_max`). Log: scratchpad `m2/red-d34-diagnostics.log`. Against the throwaway patched copy of `src/` (A1 to A3 as written): all 50 D34 assertions pass and the 195 existing ones still pass with the effective thresholds.

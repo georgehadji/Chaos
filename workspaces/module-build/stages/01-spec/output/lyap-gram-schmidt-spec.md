@@ -96,3 +96,12 @@ Recorded line R3 (not a criterion, no threshold; moved from `lyap-benettin` R1, 
 - Layer 3: `_config/catalogs/lyapunov.md` rows L3, L4, L4b, section F; `_config/architecture.md` "Module map", "Layering", "Compute"; `_config/numerics-policy.md`; `_config/numerics-defaults.toml`; `_config/coding-conventions.md` "Tests"; `_config/risks.md` K15, K16, K18; decisions D17, D20, D21, D24, D25, D27, D28.
 - Batch A specs: tangent-core (E2, E3, E5-E7, Algorithm, Compute, AC3-AC7, AC12, Amendment D28), diagnostics (D1, D4, D5, B4, Tolerances, O3), standard-map (items 9, 10, wrapped system), precision (effective eps).
 - Derived here, not cited: G4, G7, G8, G10, G12, the RGS pass-count expectation, the breakdown rule. Scratch measurements (Julia 1.13.1, Float64, author's script, not in the repo) quoted in Tolerances, AC4, AC6, AC7: to be reproduced in stage 04.
+
+
+## Amendment D35 (2026-10-14)
+
+Source: the stage 02 test plan of this slug and the measurements in `scratchpad/m2/batch-b-bound-table.md`. Criterion numbers are unchanged.
+
+- Criterion 10: the bound (B_S^GS(n) + B_S^L1(n))/n uses B_S of `lyap-benettin` S3 as amended by its Amendment D35 (closed form with the n^2 term for standard-map orbits). The inline "B_S/n = 8 eps (1 + G_first/n)" of this criterion is superseded by that pointer; B_S is written only in L1 S3. The expected result is unchanged: identical arithmetic gives 0, asserted bitwise for the k = 1 run.
+- Coverage (owner question, see the table): the package suite runs the Double64 parts of criteria 1, 3, 4 and 7 only (RGS); the Double64 parts of criteria 2, 5, 6, 8, 9, 10, 11 and 14 run at stage 04, where the precision axis is carried. The stage 02 plan made this cut for the 3 minute budget; the stage 03 runtime measurement decides whether any of them returns.
+- Open point (P): the unit theta_sum of G13 is an n-independent bound for the sum identity; for the individual exponents criteria 4 and 5 compare against the 256-bit chain or between variants with theta_sum alone. `lyap-householder-qr` Amendment D35 shows that this fails on rare sticky orbits (5 of 6000 chaotic orbits, to 5.97 theta_sum) and replaces the unit there by theta_psi(n) = theta_sum + 8 eps Psi_n / n. The 50-orbit samples of this slug did not meet such an orbit in the stage 02 stub run; the same unit applies in principle. Left to the owner (table, question 3): move theta_psi to G13 or keep it local to the Householder criteria.

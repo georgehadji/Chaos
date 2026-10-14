@@ -107,3 +107,25 @@ Reason 5 cannot be forced on real hardware (a chunk whose health check fails on 
 | D33d | provenance after a switch with a small fake free memory; clean device run; CPU run | 40 orbits | `gpu_chunk_size`, `chunk_size` greater than it after the switch, `gpu_chunks` |
 
 The record reader of the extension cannot run in CI; it was exercised locally (absent file, unparsable file, wrong shape, wrong value types) in a scratch script, all giving an empty entry.
+
+## Amendment D34 (2026-10-14)
+
+Source: M2 Batch B API contract `api-batch-b.md`, "Amendments to Batch A code", A1a and A2 (approved, D34). New file `test/tangent-core/tc_d34.jl`, included last from `runtests.jl` (one line appended there); the existing testsets are untouched. Two testsets, `tc_` prefix, test reducers `tc_ProvA` and `tc_ProvB` (read-only, differing only in their provenance; the provenance methods are defined under `@static if isdefined(Chaoslab, :reducer_provenance)`, as `tc_helpers.jl` does for the reducer protocol). Seeds: `TC_SEED` + 3400 to 3410 (above the Batch A offsets).
+
+| Criterion | Testset | Sample | Tolerance |
+|---|---|---|---|
+| A1a six-argument constructor | "D34a NumericalHealthError column" | `NumericalHealthError("det", 1.5, 0.5, 3, 2, :cpu)` | `column == 0`, other fields as given |
+| A1a seven-argument constructor, field order | same | `NumericalHealthError(what, value, threshold, step, orbit, backend, column)` with column 3 | `fieldnames == (:what, :value, :threshold, :step, :orbit, :backend, :column)`, `column::Int` |
+| A1a `showerror` | same | both constructors | still names the kind, step and orbit |
+| A1a Batch A raisers keep column 0 | same | `propagate` with `tc_Fault(:inf_state)` and `(:nan_W)`, `check_residual`, a `ResidualMonitor` det error through `propagate_orbit` | `column == 0`, kind, orbit, step as before |
+| A2 default and export | "D34b reducer_provenance" | `tc_LogNorm`, `tc_Reader`, a reducer with a method | `reducer_provenance(r) === NamedTuple()` by default; exported from Tangent and Chaoslab |
+| A2 merge in chain order | same | 4 orbits, `tc_ProvA`, `tc_ProvB` in both orders, `chunk = 16` | later reducer wins a shared key (`shared`); keys added exactly (`alpha`, `beta`, `shared`); all Batch A keys equal to the run without reducers |
+| A2 reducers without provenance | same | `(tc_LogNorm, tc_Reader)` and `(tc_LogNorm, tc_ProvA, tc_Reader)` | provenance identical to the empty chain, resp. plus `alpha` and `shared` only |
+
+Counts: 2 testsets, 28 assertions when green. No existing assertion compares a `NumericalHealthError` field count or a provenance key set, so nothing in Batch A had to be edited.
+
+### RED log (Amendment D34)
+
+Run in the test environment (Chaoslab dev'd at the unmodified repo), whole `test/tangent-core` suite inside one testset: 537 existing assertions pass, 3 Fail and 8 Error in the new file, all of them missing capability of the new fields and names, none a helper bug. D34a: Pass 2, Error 2 (`FieldError: type NumericalHealthError has no field column`; `MethodError` for the seven-argument constructor, which ends the testset, so the remaining D34a assertions are not reached). D34b: Pass 4, Fail 3 (`Base.isexported(.., :reducer_provenance)` false, provenance key sets without `alpha` and `shared`), Error 6 (`UndefVarError: reducer_provenance`, `FieldError` on `alpha`). Log: scratchpad `m2/red-d34-tangent-core.log`.
+
+Helper check: the file was also run against a throwaway patched copy of `src/` (scratchpad `m2/lb_patch`, never committed) implementing A1 to A3 as written in the contract: all 28 D34 assertions pass and the 537 existing assertions still pass.

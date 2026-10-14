@@ -583,3 +583,6 @@ end
     end
 
 end
+
+# Amendment D34 (thresholds with effective_eps, ResidualMonitor final M_max and G_max): see diagnostics-test-plan.md
+include(joinpath(@__DIR__, "dg_d34.jl"))

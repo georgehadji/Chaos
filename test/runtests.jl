@@ -1,7 +1,7 @@
 using Test
 using Chaoslab
 
-@testset "Chaoslab" begin
+@testset "Chaoslab" verbose = true begin   # verbose: per-suite times for the D35 ceilings
     @testset "quality" begin
         include("quality.jl")
     end

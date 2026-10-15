@@ -1,0 +1,263 @@
+# lyap-gram-schmidt verification, julia 1.13.1, threads 2, base seed 20261012, seed block +50000 (packages tests +20000), time 1.792057799e9 (unix)
+# timings in this log were taken on a loaded machine (other agents were running concurrently)
+# effective eps: Float64 2.22e-16, Double64 7.889e-31 (= 2^-100)
+AC1 | |lambda_1 - G12a| / theta_sum, 20 frames, Float64, all variants, tau in {1,2,4}, n in {40,400} [worst at CGS tau=1 n=400] | 0.003886 | <= 1 | PASS
+AC1 | |lambda_1 + lambda_2| / theta_sum, Float64 [worst at CGS tau=1 n=40] | 0.007059 | <= 1 | PASS
+AC1 | eigenbasis frame |lambda_1 - ln mu| / theta_sum, Float64 [worst at CGS tau=1 n=400] | 0.002051 | <= 1 | PASS
+AC1 | orth_max / orthogonality bound (eigenbasis frame runs), Float64 [worst at RGS tau=1 n=40] | 0.0625 | <= 1 | PASS
+AC1 | |lambda_1 - G12a| / theta_sum, 20 frames, Double64, all variants, tau in {1,2,4}, n in {40,400} [worst at CGS tau=1 n=400] | 0.0001222 | <= 1 | PASS
+AC1 | |lambda_1 + lambda_2| / theta_sum, Double64 [worst at CGS tau=1 n=400] | 0.0002206 | <= 1 | PASS
+AC1 | eigenbasis frame |lambda_1 - ln mu| / theta_sum, Double64 [worst at CGS tau=1 n=400] | 4.911e-05 | <= 1 | PASS
+AC1 | orth_max / orthogonality bound (eigenbasis frame runs), Double64 [worst at RGS tau=1 n=40] | 0.005371 | <= 1 | PASS
+# section ac1 took 26.5 s
+AC2 | |S_1(n) - (1/2) ln(n^2+1)| / (8 n eps), n in {1,10,1000,1e4}, Float64 [worst at CGS n=1] | 0.02472 | <= 1 | PASS
+AC2 | |S_2 + S_1| / (8 n eps), Float64 [worst at CGS n=1] | 0.03125 | <= 1 | PASS
+AC2 | lambda_1(1e4) / (ln(1e4)/1e4 + 1e-12), Float64 [worst at CGS n=10000] | 1 | <= 1 | PASS
+AC2 | |S_1(n) - (1/2) ln(n^2+1)| / (8 n eps), n in {1,10,1000,1e4}, Double64 [worst at CGS n=1] | 0.0009313 | <= 1 | PASS
+AC2 | |S_2 + S_1| / (8 n eps), Double64 [worst at CGS n=1] | 0.001953 | <= 1 | PASS
+AC2 | lambda_1(1e4) / (ln(1e4)/1e4 + 1e-12), Double64 [worst at CGS n=10000] | 1 | <= 1 | PASS
+# section ac2 took 10.3 s
+AC3 | (a) standard map K in {0.5,2,5,10}, tau in {1,3}, n=1200, k=2: orbit comparisons (of 808 in 8 cases) where CGS and MGS differ in S_i, comp or final Q, Float64 | 808 | 0 | FAIL
+AC3 | (a) magnitude: max over orbits of |S_i(CGS) - S_i(MGS)| / eps, Float64 | 2.968e+06 | (information) | INFO
+AC3 | (a) standard map K in {0.5,2,5,10}, tau in {1,3}, n=1200, k=2: orbit comparisons (of 168 in 8 cases) where CGS and MGS differ in S_i, comp or final Q, Double64 | 0 | 0 | PASS
+AC3 | (a) magnitude: max over orbits of |S_i(CGS) - S_i(MGS)| / eps, Double64 | 0 | (information) | INFO
+AC3 | (a) orthonormalize Q and R, CGS vs MGS, 600 random 2 x 2 matrices, Float64: mismatches | 134 | 0 | FAIL
+AC3 | (a) orthonormalize Q and R, CGS vs MGS, 600 random 4 x 2 matrices, Float64: mismatches | 0 | 0 | PASS
+AC3 | (a) orthonormalize Q and R, CGS vs MGS, 600 random 2 x 2 matrices, Double64: mismatches | 0 | 0 | PASS
+AC3 | diagnosis: of 2000 random 2x2 Float64 matrices, R12 of CGS equals plain q1*w1+q2*w2 / fma(q1,w1,q2*w2) / fma(q2,w2,q1*w1) / none: 1510 / 1386 / 2000 / 0 (equal counts mean the two roundings coincide on that matrix) | recorded | - | INFO
+AC3 | diagnosis: of 2000 random 2x2 Float64 matrices, R12 of MGS equals plain q1*w1+q2*w2 / fma(q1,w1,q2*w2) / fma(q2,w2,q1*w1) / none: 2000 / 1522 / 1510 / 0 (equal counts mean the two roundings coincide on that matrix) | recorded | - | INFO
+AC3 | (b) A_S k=4 tau=3: windows (of 200) where the CGS and MGS chains differ in Q, Float64 | 200 | >= 1 | PASS
+AC3 | (b) A_S k=4 tau=3: windows (of 200) where the CGS and MGS chains differ in Q, Double64 | 200 | >= 1 | PASS
+AC3 | (b) final Q of CGS and MGS streams differ (A_S, tau=3, Float64) | true | true | PASS
+# section ac3 took 96.7 s
+AC4 | |lambda_i - lambda_i^256|/theta_sum, i=1,2, K panel, n=1000, all variants, tau in {1,2,4}, 4 K x 20 orbits, Float64 (eps_eff = 2.22e-16) [worst at K=0.5 CGS tau=1] | 0.03685 | <= 1 | PASS
+AC4 | scratch constant: max |lambda_i - ref| / (eps (G_max/tau + M_max)) [worst at K=0.5 CGS tau=1], Float64 | 0.5897 | <= 16 (spec scratch 0.9) | PASS
+AC4 | |lambda_i - lambda_i^256|/theta_sum, i=1,2, K panel, n=1000, all variants, tau in {1,2,4}, 3 K x 8 orbits, Double64 (eps_eff = 7.889e-31) [worst at K=2.0 CGS tau=2] | 0.0002499 | <= 1 | PASS
+AC4 | scratch constant: max |lambda_i - ref| / (eps (G_max/tau + M_max)) [worst at K=2.0 CGS tau=2], Double64 | 0.003999 | <= 16 (spec scratch 0.9) | PASS
+# section ac4 took 131.0 s
+AC5 | pair bound |lambda_i^A - lambda_i^B| / (theta^A + theta^B), K panel x 50 orbits, n=1000, 36 (variant,tau) pairs, i=1,2, Float64 [worst at K=0.5 CGS tau=1 vs RGS tau=4 i=2 orbit 18] | 0.05935 | <= 1 | PASS
+AC5 | pair bound |lambda_i^A - lambda_i^B| / (theta^A + theta^B), K panel x 50 orbits, n=1000, 36 (variant,tau) pairs, i=1,2, Double64 [worst at K=0.5 CGS tau=1 vs RGS tau=2 i=1 orbit 18] | 0.004805 | <= 1 | PASS
+AC5 | A_S k=4 n=600 Float64 CGS tau=2 raised health error 'orthogonality' at step 4 (reported, not scored when CGS)| - | - | INFO
+AC5 | A_S k=4 n=600 pair bound, 5 completed (variant,tau) runs of 6, 10 frames, Float64 [worst at ("MGS", 2) vs ("RGS", 1) i=3 frame 9] | 0.007704 | <= 1 | PASS
+AC5 | A_S k=4 n=600 pair bound, 6 completed (variant,tau) runs of 6, 10 frames, Double64 [worst at ("MGS", 2) vs ("CGS", 1) i=3 frame 9] | 9.741e-05 | <= 1 | PASS
+# section ac5 took 419.3 s
+AC6 | (a) RGS orth_max / (8 k eps), K panel x tau {1,2,4} x 20 orbits, n=1000, Float64 [worst at K=0.5 tau=1] | 0.1875 | <= 1 | PASS
+AC6 | (b) CGS orth_max / (8 k (G_max+1) eps), same runs, Float64 [worst at K=2.0 tau=2] | 0.07724 | <= 1 | PASS
+AC6 | (b) MGS orth_max / (8 k (G_max+1) eps), same runs, Float64 [worst at K=2.0 tau=2] | 0.07724 | <= 1 | PASS
+AC6 | recorded: max loss / (eps G_w) per window, CGS, k=2, [worst at K=twopi tau=4], Float64 | 1.261 | <= 8 k = 16 (spec scratch 1.05) | PASS
+AC6 | recorded: max loss / (eps G_w) per window, MGS, k=2, [worst at K=twopi tau=2], Float64 | 1.287 | <= 8 k = 16 (spec scratch 1.05) | PASS
+AC6 | (a) RGS orth_max / (8 k eps), K panel x tau {1,2,4} x 20 orbits, n=1000, Double64 [worst at K=2.0 tau=1] | 0.01437 | <= 1 | PASS
+AC6 | (b) CGS orth_max / (8 k (G_max+1) eps), same runs, Double64 [worst at K=0.5 tau=4] | 0.003929 | <= 1 | PASS
+AC6 | (b) MGS orth_max / (8 k (G_max+1) eps), same runs, Double64 [worst at K=0.5 tau=4] | 0.003929 | <= 1 | PASS
+AC6 | recorded: max loss / (eps G_w) per window, CGS, k=2, [worst at K=5.0 tau=2], Double64 | 0.08832 | <= 8 k = 16 (spec scratch 1.05) | PASS
+AC6 | recorded: max loss / (eps G_w) per window, MGS, k=2, [worst at K=5.0 tau=2], Double64 | 0.08832 | <= 8 k = 16 (spec scratch 1.05) | PASS
+AC6 | (c) A_S k=4 tau=3: CGS orthogonality errors raised (of 20 frames), key 8 | 20 | = 20 | PASS
+AC6 | (c) A_S k=4 tau=3: MGS / RGS orthogonality errors raised (of 20 frames each) | 0 / 0 | 0 / 0 | PASS
+AC6 | (c) tau=3: min over frames of loss(CGS)/loss(MGS) | 358.2 | >= 100 (spec scratch 407) | PASS
+AC6 | (c) tau=3: min over frames of loss(MGS)/loss(RGS) | 1032 | >= 100 (spec scratch 2000) | PASS
+AC6 | (c) tau=1: frames (of 20) with loss(CGS) > loss(MGS) > loss(RGS) | 20 | = 20 | PASS
+AC6 | (c) tau=1: min loss(CGS)/loss(MGS) and min loss(MGS)/loss(RGS) (recorded; spec scratch 3.2 and 7.3) | 2.747 / 5.958 | > 1 | PASS
+# section ac6 took 142.1 s
+AC7 | breakdown raised at handoff 1 with orbit, step=1, backend=:cpu: A^20 Float64 CGS; frames raised / correct fields (of 200) | 200 / 200 | 200 / 200 | PASS
+AC7 |   cause split: fifth-pass frames / conditioning-rule frames; min eps_eff G_w over the frames whose factorisation completed | 0 / 200 ; 1.336 | min eps G_w >= 1/2 expected on completed frames (spec scratch 0.99 CGS/MGS, 1.74 RGS) | PASS
+AC7 | A^16 no breakdown, n=200, 20 frames: orth_max / bound, G_max=2.375e+13, eps G_w ~ 0.005273, Float64 CGS | 0.04051 | <= 1 | PASS
+AC7 | breakdown raised at handoff 1 with orbit, step=1, backend=:cpu: A^20 Float64 MGS; frames raised / correct fields (of 200) | 200 / 200 | 200 / 200 | PASS
+AC7 |   cause split: fifth-pass frames / conditioning-rule frames; min eps_eff G_w over the frames whose factorisation completed | 0 / 200 ; 1.313 | min eps G_w >= 1/2 expected on completed frames (spec scratch 0.99 CGS/MGS, 1.74 RGS) | PASS
+AC7 | A^16 no breakdown, n=200, 20 frames: orth_max / bound, G_max=2.375e+13, eps G_w ~ 0.005273, Float64 MGS | 0.04051 | <= 1 | PASS
+AC7 | breakdown raised at handoff 1 with orbit, step=1, backend=:cpu: A^20 Float64 RGS; frames raised / correct fields (of 200) | 200 / 200 | 200 / 200 | PASS
+AC7 |   cause split: fifth-pass frames / conditioning-rule frames; min eps_eff G_w over the frames whose factorisation completed | 0 / 200 ; 1.959 | min eps G_w >= 1/2 expected on completed frames (spec scratch 0.99 CGS/MGS, 1.74 RGS) | PASS
+AC7 | A^16 no breakdown, n=200, 20 frames: orth_max / bound, G_max=2.375e+13, eps G_w ~ 0.005273, Float64 RGS | 0.125 | <= 1 | PASS
+AC7 | breakdown raised at handoff 1 with orbit, step=1, backend=:cpu: A^40 Double64 CGS; frames raised / correct fields (of 200) | 200 / 200 | 200 / 200 | PASS
+AC7 |   cause split: fifth-pass frames / conditioning-rule frames; min eps_eff G_w over the frames whose factorisation completed | 0 / 200 ; 27.77 | min eps G_w >= 1/2 expected on completed frames (spec scratch 0.99 CGS/MGS, 1.74 RGS) | PASS
+AC7 | A^32 no breakdown, n=200, 20 frames: orth_max / bound, G_max=5.629e+26, eps G_w ~ 0.000444, Double64 CGS | 0.001007 | <= 1 | PASS
+AC7 | breakdown raised at handoff 1 with orbit, step=1, backend=:cpu: A^40 Double64 MGS; frames raised / correct fields (of 200) | 200 / 200 | 200 / 200 | PASS
+AC7 |   cause split: fifth-pass frames / conditioning-rule frames; min eps_eff G_w over the frames whose factorisation completed | 0 / 200 ; 27.77 | min eps G_w >= 1/2 expected on completed frames (spec scratch 0.99 CGS/MGS, 1.74 RGS) | PASS
+AC7 | A^32 no breakdown, n=200, 20 frames: orth_max / bound, G_max=5.629e+26, eps G_w ~ 0.000444, Double64 MGS | 0.001007 | <= 1 | PASS
+AC7 | breakdown raised at handoff 1 with orbit, step=1, backend=:cpu: A^40 Double64 RGS; frames raised / correct fields (of 200) | 200 / 200 | 200 / 200 | PASS
+AC7 |   cause split: fifth-pass frames / conditioning-rule frames; min eps_eff G_w over the frames whose factorisation completed | 0 / 200 ; 62.24 | min eps G_w >= 1/2 expected on completed frames (spec scratch 0.99 CGS/MGS, 1.74 RGS) | PASS
+AC7 | A^32 no breakdown, n=200, 20 frames: orth_max / bound, G_max=5.629e+26, eps G_w ~ 0.000444, Double64 RGS | 0.003418 | <= 1 | PASS
+AC7 | I6: CGS and MGS finals and Q bitwise equal at k=2 on A^16, Float64 | false | true | FAIL
+AC7 | injected zero column 3 and 1 (propagate and reducer_update): kind, column, step, orbit correct; Float64 CGS; error fields: col3 value=0 threshold=0; col1 value=0 threshold=0 | true | true | PASS
+AC7 | injected NaN: propagate fires 'deviation matrix' first, reducer_update alone 'orthonormalisation breakdown' (column 3, threshold Inf), Float64 CGS | true | true | PASS
+AC7 | injected zero column 3 and 1 (propagate and reducer_update): kind, column, step, orbit correct; Float64 MGS; error fields: col3 value=0 threshold=0; col1 value=0 threshold=0 | true | true | PASS
+AC7 | injected NaN: propagate fires 'deviation matrix' first, reducer_update alone 'orthonormalisation breakdown' (column 3, threshold Inf), Float64 MGS | true | true | PASS
+AC7 | injected zero column 3 and 1 (propagate and reducer_update): kind, column, step, orbit correct; Float64 RGS; error fields: col3 value=0 threshold=0; col1 value=0 threshold=0 | true | true | PASS
+AC7 | injected NaN: propagate fires 'deviation matrix' first, reducer_update alone 'orthonormalisation breakdown' (column 3, threshold Inf), Float64 RGS | true | true | PASS
+AC7 | injected zero column 3 and 1 (propagate and reducer_update): kind, column, step, orbit correct; Double64 CGS; error fields: col3 value=0 threshold=0; col1 value=0 threshold=0 | true | true | PASS
+AC7 | injected NaN: propagate fires 'deviation matrix' first, reducer_update alone 'orthonormalisation breakdown' (column 3, threshold Inf), Double64 CGS | true | true | PASS
+AC7 | injected zero column 3 and 1 (propagate and reducer_update): kind, column, step, orbit correct; Double64 MGS; error fields: col3 value=0 threshold=0; col1 value=0 threshold=0 | true | true | PASS
+AC7 | injected NaN: propagate fires 'deviation matrix' first, reducer_update alone 'orthonormalisation breakdown' (column 3, threshold Inf), Double64 MGS | true | true | PASS
+AC7 | injected zero column 3 and 1 (propagate and reducer_update): kind, column, step, orbit correct; Double64 RGS; error fields: col3 value=0 threshold=0; col1 value=0 threshold=0 | true | true | PASS
+AC7 | injected NaN: propagate fires 'deviation matrix' first, reducer_update alone 'orthonormalisation breakdown' (column 3, threshold Inf), Double64 RGS | true | true | PASS
+# section ac7 took 39.0 s
+AC8 | wrapped state (length 4), K in {2,5}, tau in {1,3}, 3 variants: orbits (of 240) with mismatch, x, W vs manual, Float64 | 0 | 0 | PASS
+AC8 | wrapped state (length 4), K in {2,5}, tau in {1,3}, 3 variants: orbits (of 240) with mismatch, S_i vs orthonormalize+add loop, Float64 | 0 | 0 | PASS
+AC8 | wrapped state (length 4), K in {2,5}, tau in {1,3}, 3 variants: orbits (of 240) with mismatch, stream vs manual loop, Float64 | 0 | 0 | PASS
+AC8 | 1000000 steps, K=5, 8 orbits, tau=1, RGS: |lambda_1 + lambda_2| / theta_sum (M_max = 1+K), all finite=true, no health error, 35.45 s, Float64 [worst at orbit 3] | 5.021e-08 | <= 1 | PASS
+AC8 | bytes allocated by propagate_orbit after warm-up (wrapped K=5, 1e4 steps), Float64 CGS | 0 | 0 | PASS
+AC8 | bytes allocated by propagate_orbit after warm-up (wrapped K=5, 1e4 steps), Float64 MGS | 0 | 0 | PASS
+AC8 | bytes allocated by propagate_orbit after warm-up (wrapped K=5, 1e4 steps), Float64 RGS | 0 | 0 | PASS
+AC8 | wrapped state (length 4), K in {2,5}, tau in {1,3}, 3 variants: orbits (of 240) with mismatch, x, W vs manual, Double64 | 0 | 0 | PASS
+AC8 | wrapped state (length 4), K in {2,5}, tau in {1,3}, 3 variants: orbits (of 240) with mismatch, S_i vs orthonormalize+add loop, Double64 | 0 | 0 | PASS
+AC8 | wrapped state (length 4), K in {2,5}, tau in {1,3}, 3 variants: orbits (of 240) with mismatch, stream vs manual loop, Double64 | 0 | 0 | PASS
+AC8 | 1000000 steps, K=5, 8 orbits, tau=1, RGS: |lambda_1 + lambda_2| / theta_sum (M_max = 1+K), all finite=true, no health error, 296.9 s, Double64 [worst at orbit 3] | 2.524e-05 | <= 1 | PASS
+AC8 | bytes allocated by propagate_orbit after warm-up (wrapped K=5, 1e4 steps), Double64 CGS | 0 | 0 | PASS
+AC8 | bytes allocated by propagate_orbit after warm-up (wrapped K=5, 1e4 steps), Double64 MGS | 0 | 0 | PASS
+AC8 | bytes allocated by propagate_orbit after warm-up (wrapped K=5, 1e4 steps), Double64 RGS | 0 | 0 | PASS
+# section ac8 took 552.5 s
+AC9 | propagate (2 threads, chunk=64) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Float64 CGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=1000) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Float64 CGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=default) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Float64 CGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=64) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Float64 MGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=1000) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Float64 MGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=default) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Float64 MGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=64) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Float64 RGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=1000) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Float64 RGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=default) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Float64 RGS | 0 | 0 | PASS
+AC9 | bytes allocated by propagate_orbit after warm-up, A_S d=k=4, 1e4 steps, Float64 CGS | 0 | 0 | PASS
+AC9 | bytes allocated by propagate_orbit after warm-up, A_S d=k=4, 1e4 steps, Float64 MGS | 0 | 0 | PASS
+AC9 | bytes allocated by propagate_orbit after warm-up, A_S d=k=4, 1e4 steps, Float64 RGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=64) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Double64 CGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=1000) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Double64 CGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=default) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Double64 CGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=64) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Double64 MGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=1000) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Double64 MGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=default) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Double64 MGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=64) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Double64 RGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=1000) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Double64 RGS | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk=default) vs serial propagate_orbit: orbits (of 4096) with x, W, S_i, comp, record not bitwise equal, K=2pi n=1000, Double64 RGS | 0 | 0 | PASS
+AC9 | bytes allocated by propagate_orbit after warm-up, A_S d=k=4, 1e4 steps, Double64 CGS | 0 | 0 | PASS
+AC9 | bytes allocated by propagate_orbit after warm-up, A_S d=k=4, 1e4 steps, Double64 MGS | 0 | 0 | PASS
+AC9 | bytes allocated by propagate_orbit after warm-up, A_S d=k=4, 1e4 steps, Double64 RGS | 0 | 0 | PASS
+# AC9 note: this run has 2 threads; the spec compares 1 and 4 threads. The comparison here is serial propagate_orbit versus the threaded propagate at three chunk sizes; the tangent-core AC6 child-process test covers 1 versus 4 threads.
+# section ac9 took 1757.0 s
+AC6 | (a)/(b) CGS/MGS (8 k G_w eps): max orth_max / bound over all runs of AC1, AC4, AC5, AC6, AC8, AC9 [worst at AC5 K=0.5 CGS tau=1], Double64 | 0.006126 | <= 1 | PASS
+AC6 | (a)/(b) RGS (8 k eps): max orth_max / bound over all runs of AC1, AC4, AC5, AC6, AC8, AC9 [worst at AC5 K=0.5 RGS tau=1], Double64 | 0.01991 | <= 1 | PASS
+AC6 | (a)/(b) CGS/MGS (8 k G_w eps): max orth_max / bound over all runs of AC1, AC4, AC5, AC6, AC8, AC9 [worst at AC4 K=2.0 CGS tau=2], Float64 | 0.08896 | <= 1 | PASS
+AC6 | (a)/(b) RGS (8 k eps): max orth_max / bound over all runs of AC1, AC4, AC5, AC6, AC8, AC9 [worst at AC8 long orbit 3], Float64 | 0.1983 | <= 1 | PASS
+# RGS pass histogram (count_max of final records, all RGS runs above) Double64: maximum passes 1: 19 records
+# RGS pass histogram (count_max of final records, all RGS runs above) Double64: maximum passes 2: 1185 records
+# RGS pass histogram (count_max of final records, all RGS runs above) Float64: maximum passes 1: 26 records
+# RGS pass histogram (count_max of final records, all RGS runs above) Float64: maximum passes 2: 1346 records
+O3 | max |sum_i lambda_i| / (eps (G_max/tau + M_max)) over AC5 and AC8 runs [worst at K=0.5 CGS tau=1], Double64 | 0.001892 | <= 4 (diagnostics c; spec scratch 0.015 / 0.056) | PASS
+O3 | max |sum_i lambda_i| / (eps (G_max/tau + M_max)) over AC5 and AC8 runs [worst at Y5 MGS tau=1], Float64 | 0.1127 | <= 4 (diagnostics c; spec scratch 0.015 / 0.056) | PASS
+# CGS orthogonality trip recorded: ("AC5 Y5", "Float64", 2, "CGS")
+# section ac6sum took 0.3 s
+AC10 | k=1: |lambda_1^GS - X| / ((B_S^GS + B_S^L1)/n), K panel x tau {1,4} x 50 orbits, n=10000, all variants, Float64 [worst at K=0.5 tau=1 CGS] | 0 | <= 1 | PASS
+AC10 | k=1: runs (of 1200) whose sum or compensation is not bitwise equal to Benettin; realised max |lambda_1^GS - X| = 0, Float64 | 0 | 0 | PASS
+AC10 | k=2 same first column, first 10 orbits: |lambda_1 - X| / bound, Float64 [worst at K=0.5 tau=1 CGS] | 0 | <= 1 | PASS
+AC10 | k=1: |lambda_1^GS - X| / ((B_S^GS + B_S^L1)/n), K panel x tau {1,4} x 50 orbits, n=10000, all variants, Double64 [worst at K=0.5 tau=1 CGS] | 0 | <= 1 | PASS
+AC10 | k=1: runs (of 1200) whose sum or compensation is not bitwise equal to Benettin; realised max |lambda_1^GS - X| = 0, Double64 | 0 | 0 | PASS
+AC10 | k=2 same first column, first 10 orbits: |lambda_1 - X| / bound, Double64 [worst at K=0.5 tau=1 CGS] | 0 | <= 1 | PASS
+# section ac10 took 903.0 s
+AC11 | A_S k=4 n=60 Float64 CGS tau=2 raised health error 'orthogonality' at step 2 (reported, not scored when CGS) | - | - | INFO
+AC11 | A_S k=4 n=60 Float64 CGS tau=3 raised health error 'orthogonality' at step 3 (reported, not scored when CGS) | - | - | INFO
+AC11 | |sum_{i<=p} lambda_i - (1/n) ln vol_p| / (p theta_sum), p=1..4, A_S n=60, 10 frames, tau in {1,2,3}, completed runs, Float64 [worst at CGS tau=1 p=1] | 0.001245 | <= 1 | PASS
+AC11 | |sum_i lambda_i| / theta_sum, Float64 [worst at CGS tau=1] | 0.003523 | <= 1 | PASS
+AC11 | |sum_{i<=p} lambda_i - (1/n) ln vol_p| / (p theta_sum), p=1..4, A_S n=60, 10 frames, tau in {1,2,3}, completed runs, Double64 [worst at CGS tau=1 p=2] | 2.982e-05 | <= 1 | PASS
+AC11 | |sum_i lambda_i| / theta_sum, Double64 [worst at RGS tau=2] | 6.702e-05 | <= 1 | PASS
+# AC11 sandwich: Jacobi eigen-residual max |Y'Y V - V L| / max|Y'Y| = 1e-154, max |V'V - I| = 2.238e-154 (512 bits, n=12), Float64
+AC11 | G8 sandwich: (lower bound - sum_p lambda) or (sum_p lambda - upper bound), divided by p theta_sum (negative = inside), n=12, 512 bits, A_S, Float64 [worst at CGS tau=1 p=2 frame 9] | 0.001761 | <= 1 | PASS
+AC11 | G8 sandwich: exact (1/n) ln vol_p, violation of the lower/upper bound (absolute, negative = inside), Float64 [worst at p=4 frame 5] | 3.639e-17 | <= 1e-12 | PASS
+AC11 | G8 sandwich width (upper - lower) / (p theta_sum), smallest over p=1..3 (information: the sandwich is wider than the tolerance, so the check is not vacuous only if this is > 1), Float64 | 1.631e+08 | > 1 (information) | INFO
+# AC11 sandwich: Jacobi eigen-residual max |Y'Y V - V L| / max|Y'Y| = 1e-154, max |V'V - I| = 2.238e-154 (512 bits, n=12), Double64
+AC11 | G8 sandwich: (lower bound - sum_p lambda) or (sum_p lambda - upper bound), divided by p theta_sum (negative = inside), n=12, 512 bits, A_S, Double64 [worst at MGS tau=1 p=4 frame 3] | 5.406e-05 | <= 1 | PASS
+AC11 | G8 sandwich: exact (1/n) ln vol_p, violation of the lower/upper bound (absolute, negative = inside), Double64 [worst at p=4 frame 10] | 1.078e-33 | <= 1e-12 | PASS
+AC11 | G8 sandwich width (upper - lower) / (p theta_sum), smallest over p=1..3 (information: the sandwich is wider than the tolerance, so the check is not vacuous only if this is > 1), Double64 | 4.59e+22 | > 1 (information) | INFO
+# section ac11 took 69.6 s
+AC14 | provenance record fields (estimator, orthonormalizer, orthogonality_tol, k, tau, seed, precision, backend, device, fallback reason, absent Householder keys): failed checks of 126, Float64 | 0 | 0 | PASS
+AC14 | provenance record fields (estimator, orthonormalizer, orthogonality_tol, k, tau, seed, precision, backend, device, fallback reason, absent Householder keys): failed checks of 126, Double64 | 0 | 0 | PASS
+AC14 | QRSpectrum(RGS()).orthogonality_tol === 8.0 (key value) | true | true | PASS
+# section ac14 took 11.6 s
+AC12 | CPU vs GPU, RGS and MGS, S_i/n for i=1..k (tangent-core AC12 tolerances), Float64 and Double64 | not run by this script | tangent-core AC12 | DEFERRED
+# section ac12 took 0.0 s
+ORACLE | lyapunovspectrum with seeded Q0 vs identity frame, N=1 (equal means Q0 is ignored); seeded-frame manual QR gives 0.7577 | 0 | 0 (finding) | INFO
+ORACLE | ChaosTools lifted rule vs Chaoslab forward, K=2, 1000 steps: max |difference| (same arithmetic) | 0 | 0 (information) | INFO
+AC13 | regular K=0.5 (S7 screen, 0 candidates rejected), 1 orbit, n=100000, identity frame, CGS: |lambda_1 - lambda_1^oracle| (lambda_1 = 0.000104, oracle 0.000104) | 2.342e-15 | <= 1e-4 | PASS
+AC13 | regular K=0.5, CGS: |lambda_1 + lambda_2| / theta_sum (oracle sum -9.487e-19) | 1.272e-05 | <= 1 | PASS
+AC13 | regular K=0.5, CGS: |lambda_2 - lambda_2^oracle| / (2 theta_sum) (pathwise, information beyond the spec) | 0.06872 | <= 1 | PASS
+AC13 | regular K=0.5 (S7 screen, 0 candidates rejected), 1 orbit, n=100000, identity frame, MGS: |lambda_1 - lambda_1^oracle| (lambda_1 = 0.000104, oracle 0.000104) | 2.342e-15 | <= 1e-4 | PASS
+AC13 | regular K=0.5, MGS: |lambda_1 + lambda_2| / theta_sum (oracle sum -9.487e-19) | 2.306e-05 | <= 1 | PASS
+AC13 | regular K=0.5, MGS: |lambda_2 - lambda_2^oracle| / (2 theta_sum) (pathwise, information beyond the spec) | 0.06872 | <= 1 | PASS
+AC13 | regular K=0.5 (S7 screen, 0 candidates rejected), 1 orbit, n=100000, identity frame, RGS: |lambda_1 - lambda_1^oracle| (lambda_1 = 0.000104, oracle 0.000104) | 2.342e-15 | <= 1e-4 | PASS
+AC13 | regular K=0.5, RGS: |lambda_1 + lambda_2| / theta_sum (oracle sum -9.487e-19) | 1.59e-05 | <= 1 | PASS
+AC13 | regular K=0.5, RGS: |lambda_2 - lambda_2^oracle| / (2 theta_sum) (pathwise, information beyond the spec) | 0.06872 | <= 1 | PASS
+AC13 | chaotic K=2pi, 1000 orbits, n=10000, CGS, lambda_1: mean 1.171 (SE 0.0008409) vs oracle 1.171 (SE 0.0008409); |diff|/combined SE; max pathwise |diff| = 3.308e-14 | 1.867e-13 | <= 4 | PASS
+AC13 | chaotic K=2pi, 1000 orbits, n=10000, CGS, lambda_2: mean -1.171 (SE 0.0008409) vs oracle -1.171 (SE 0.0008409); |diff|/combined SE; max pathwise |diff| = 3.353e-14 | 1.867e-13 | <= 4 | PASS
+AC13 | chaotic K=2pi CGS: |lambda_1 + lambda_2| / theta_sum (M_max = 1+K) [worst at orbit 687] | 0.000614 | <= 1 | PASS
+AC13 | chaotic K=2pi, 1000 orbits, n=10000, MGS, lambda_1: mean 1.171 (SE 0.0008409) vs oracle 1.171 (SE 0.0008409); |diff|/combined SE; max pathwise |diff| = 3.308e-14 | 1.867e-13 | <= 4 | PASS
+AC13 | chaotic K=2pi, 1000 orbits, n=10000, MGS, lambda_2: mean -1.171 (SE 0.0008409) vs oracle -1.171 (SE 0.0008409); |diff|/combined SE; max pathwise |diff| = 3.353e-14 | 1.867e-13 | <= 4 | PASS
+AC13 | chaotic K=2pi MGS: |lambda_1 + lambda_2| / theta_sum (M_max = 1+K) [worst at orbit 687] | 0.000614 | <= 1 | PASS
+AC13 | chaotic K=2pi, 1000 orbits, n=10000, RGS, lambda_1: mean 1.171 (SE 0.0008409) vs oracle 1.171 (SE 0.0008409); |diff|/combined SE; max pathwise |diff| = 3.308e-14 | 1.867e-13 | <= 4 | PASS
+AC13 | chaotic K=2pi, 1000 orbits, n=10000, RGS, lambda_2: mean -1.171 (SE 0.0008409) vs oracle -1.171 (SE 0.0008409); |diff|/combined SE; max pathwise |diff| = 3.353e-14 | 1.867e-13 | <= 4 | PASS
+AC13 | chaotic K=2pi RGS: |lambda_1 + lambda_2| / theta_sum (M_max = 1+K) [worst at orbit 687] | 0.000614 | <= 1 | PASS
+# section oracle took 174.1 s
+ORACLE-D4 | ChaosTools lyapunovspectrum, A_S d=4, n=60, identity frame: |sum_{i<=p} lambda_i^CT - (1/n) ln vol_p| / (p theta_sum) [worst at p=1] | 0.006191 | <= 1 | PASS
+ORACLE-D4 | CGS tau=1, A_S d=4, n=60: |sum_{i<=p} lambda_i - exact| / (p theta_sum) [worst at p=3] | 0.002319 | <= 1 | PASS
+ORACLE-D4 | CGS vs ChaosTools, n=60: |sum_{i<=p} (lambda_i - lambda_i^CT)| / (2 p theta_sum) [worst at p=1] | 0.003083 | <= 1 | PASS
+ORACLE-D4 | MGS tau=1, A_S d=4, n=60: |sum_{i<=p} lambda_i - exact| / (p theta_sum) [worst at p=3] | 0.002319 | <= 1 | PASS
+ORACLE-D4 | MGS vs ChaosTools, n=60: |sum_{i<=p} (lambda_i - lambda_i^CT)| / (2 p theta_sum) [worst at p=1] | 0.003083 | <= 1 | PASS
+ORACLE-D4 | RGS tau=1, A_S d=4, n=60: |sum_{i<=p} lambda_i - exact| / (p theta_sum) [worst at p=3] | 0.002319 | <= 1 | PASS
+ORACLE-D4 | RGS vs ChaosTools, n=60: |sum_{i<=p} (lambda_i - lambda_i^CT)| / (2 p theta_sum) [worst at p=1] | 0.003083 | <= 1 | PASS
+ORACLE-D4 | ChaosTools lyapunovspectrum, A_S d=4, n=600, identity frame: |sum_{i<=p} lambda_i^CT - (1/n) ln vol_p| / (p theta_sum) [worst at p=1] | 0.04366 | <= 1 | PASS
+ORACLE-D4 | CGS tau=1, A_S d=4, n=600: |sum_{i<=p} lambda_i - exact| / (p theta_sum) [worst at p=3] | 0.001437 | <= 1 | PASS
+ORACLE-D4 | CGS vs ChaosTools, n=600: |sum_{i<=p} (lambda_i - lambda_i^CT)| / (2 p theta_sum) [worst at p=1] | 0.02158 | <= 1 | PASS
+# ORACLE-D4 n=600 CGS lambda = 0.9625, 1.316, -0.9619, -1.317; ChaosTools 0.9625, 1.316, -0.9619, -1.317; asymptotic +-0.9624236501, +-1.3169578969 (G12c, finite-time ln kappa(S)/n offset expected)
+ORACLE-D4 | MGS tau=1, A_S d=4, n=600: |sum_{i<=p} lambda_i - exact| / (p theta_sum) [worst at p=3] | 0.001437 | <= 1 | PASS
+ORACLE-D4 | MGS vs ChaosTools, n=600: |sum_{i<=p} (lambda_i - lambda_i^CT)| / (2 p theta_sum) [worst at p=1] | 0.02158 | <= 1 | PASS
+# ORACLE-D4 n=600 MGS lambda = 0.9625, 1.316, -0.9619, -1.317; ChaosTools 0.9625, 1.316, -0.9619, -1.317; asymptotic +-0.9624236501, +-1.3169578969 (G12c, finite-time ln kappa(S)/n offset expected)
+ORACLE-D4 | RGS tau=1, A_S d=4, n=600: |sum_{i<=p} lambda_i - exact| / (p theta_sum) [worst at p=3] | 0.001437 | <= 1 | PASS
+ORACLE-D4 | RGS vs ChaosTools, n=600: |sum_{i<=p} (lambda_i - lambda_i^CT)| / (2 p theta_sum) [worst at p=1] | 0.02158 | <= 1 | PASS
+# ORACLE-D4 n=600 RGS lambda = 0.9625, 1.316, -0.9619, -1.317; ChaosTools 0.9625, 1.316, -0.9619, -1.317; asymptotic +-0.9624236501, +-1.3169578969 (G12c, finite-time ln kappa(S)/n offset expected)
+# section oracle4 took 15.0 s
+R3 | K=0.5, n=1000000, CGS: ChaosTools lambda_1+lambda_2 = -2.897e-19; Chaoslab |lambda_1+lambda_2| = 2.151e-19; theta_sum = 2.048e-14 (M_max = 1.5, G_max = 4.266); lambda_1 Chaoslab 1.2e-05 vs CT 1.2e-05 | 2.897e-19 | (recorded, no threshold) | INFO
+R3 | K=0.5, n=1000000, MGS: ChaosTools lambda_1+lambda_2 = -2.897e-19; Chaoslab |lambda_1+lambda_2| = 1.592e-19; theta_sum = 2.048e-14 (M_max = 1.5, G_max = 4.266); lambda_1 Chaoslab 1.2e-05 vs CT 1.2e-05 | 2.897e-19 | (recorded, no threshold) | INFO
+R3 | K=0.5, n=1000000, RGS: ChaosTools lambda_1+lambda_2 = -2.897e-19; Chaoslab |lambda_1+lambda_2| = 1.237e-19; theta_sum = 2.048e-14 (M_max = 1.5, G_max = 4.266); lambda_1 Chaoslab 1.2e-05 vs CT 1.2e-05 | 2.897e-19 | (recorded, no threshold) | INFO
+R3 | K=0.9716354, n=1000000, CGS: ChaosTools lambda_1+lambda_2 = 2.776e-17; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 3.074e-14 (M_max = 1.972, G_max = 6.682); lambda_1 Chaoslab 0.1284 vs CT 0.1284 | 2.776e-17 | (recorded, no threshold) | INFO
+R3 | K=0.9716354, n=1000000, MGS: ChaosTools lambda_1+lambda_2 = 2.776e-17; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 3.074e-14 (M_max = 1.972, G_max = 6.682); lambda_1 Chaoslab 0.1284 vs CT 0.1284 | 2.776e-17 | (recorded, no threshold) | INFO
+R3 | K=0.9716354, n=1000000, RGS: ChaosTools lambda_1+lambda_2 = 2.776e-17; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 3.074e-14 (M_max = 1.972, G_max = 6.682); lambda_1 Chaoslab 0.1284 vs CT 0.1284 | 2.776e-17 | (recorded, no threshold) | INFO
+R3 | K=2.0, n=1000000, CGS: ChaosTools lambda_1+lambda_2 = 5.551e-17; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 6.371e-14 (M_max = 3, G_max = 14.93); lambda_1 Chaoslab 0.4392 vs CT 0.4392 | 5.551e-17 | (recorded, no threshold) | INFO
+R3 | K=2.0, n=1000000, MGS: ChaosTools lambda_1+lambda_2 = 5.551e-17; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 6.371e-14 (M_max = 3, G_max = 14.93); lambda_1 Chaoslab 0.4392 vs CT 0.4392 | 5.551e-17 | (recorded, no threshold) | INFO
+R3 | K=2.0, n=1000000, RGS: ChaosTools lambda_1+lambda_2 = 5.551e-17; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 6.371e-14 (M_max = 3, G_max = 14.93); lambda_1 Chaoslab 0.4392 vs CT 0.4392 | 5.551e-17 | (recorded, no threshold) | INFO
+R3 | K=5.0, n=1000000, CGS: ChaosTools lambda_1+lambda_2 = 0; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 2.451e-13 (M_max = 6, G_max = 62.98); lambda_1 Chaoslab 0.9766 vs CT 0.9766 | 0 | (recorded, no threshold) | INFO
+R3 | K=5.0, n=1000000, MGS: ChaosTools lambda_1+lambda_2 = 0; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 2.451e-13 (M_max = 6, G_max = 62.98); lambda_1 Chaoslab 0.9766 vs CT 0.9766 | 0 | (recorded, no threshold) | INFO
+R3 | K=5.0, n=1000000, RGS: ChaosTools lambda_1+lambda_2 = 0; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 2.451e-13 (M_max = 6, G_max = 62.98); lambda_1 Chaoslab 0.9766 vs CT 0.9766 | 0 | (recorded, no threshold) | INFO
+R3 | K=10.0, n=1000000, CGS: ChaosTools lambda_1+lambda_2 = -1.11e-15; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 8.313e-13 (M_max = 11, G_max = 223); lambda_1 Chaoslab 1.62 vs CT 1.62 | 1.11e-15 | (recorded, no threshold) | INFO
+R3 | K=10.0, n=1000000, MGS: ChaosTools lambda_1+lambda_2 = -1.11e-15; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 8.313e-13 (M_max = 11, G_max = 223); lambda_1 Chaoslab 1.62 vs CT 1.62 | 1.11e-15 | (recorded, no threshold) | INFO
+R3 | K=10.0, n=1000000, RGS: ChaosTools lambda_1+lambda_2 = -1.11e-15; Chaoslab |lambda_1+lambda_2| = 0; theta_sum = 8.313e-13 (M_max = 11, G_max = 223); lambda_1 Chaoslab 1.62 vs CT 1.62 | 1.11e-15 | (recorded, no threshold) | INFO
+SANITY | K=10 lambda_1 = 1.62 vs ln(K/2) = 1.609 (single orbit; non-scored, risk K18) | 0.0106 | none | INFO
+# section r3 took 92.8 s
+DEV1 | CGS: failed status leaves the pivot in R[col,col] (zero column: R33 = 0.0, error value 0.0; NaN column: error value NaN, threshold Inf) | true | true | PASS
+DEV1 | MGS: failed status leaves the pivot in R[col,col] (zero column: R33 = 0.0, error value 0.0; NaN column: error value NaN, threshold Inf) | true | true | PASS
+DEV1 | RGS: failed status leaves the pivot in R[col,col] (zero column: R33 = 0.0, error value 0.0; NaN column: error value NaN, threshold Inf) | true | true | PASS
+DEV2 | Double64 health error field types (value, threshold) | Float64, Float64 | Float64, Float64 | PASS
+DEV3 | CGS: after a failing handoff G_max, orth_max, count_max, sums, n are those of the last good handoff; code=1, step=2 | true | true | PASS
+DEV3 | MGS: after a failing handoff G_max, orth_max, count_max, sums, n are those of the last good handoff; code=1, step=2 | true | true | PASS
+DEV3 | RGS: after a failing handoff G_max, orth_max, count_max, sums, n are those of the last good handoff; code=1, step=2 | true | true | PASS
+DEV4 | window_G == _G_from_Gw(window_Gw) (2000 random 2x2) | true | true | PASS
+DEV4 | k=2: max relative difference of window_G and cond_2(R) (SVD) over 2000 random triangles with entries over 6 decades [worst at R=[411.95201387757385 -0.0016989425229966503; 0.0 410.2131264399987]] | 2.366e-14 | <= 1e-6 | PASS
+DEV4 | k=3: max cond_2(R) / window_G (upper bound claim, must be <= 1+1e-12) | 0.9999 | <= 1 | PASS
+DEV5 | window_Gw scale invariance with the rescale guard: max |G_w(1e200 R)/G_w(R) - 1|, |G_w(1e-200 R)/G_w(R) - 1| (notes: 'no overflow guard'; code has one at lines 111-112) | 0 | <= 1e-12 | PASS
+DEV6 | orthonormalize.jl line 3 reads: # changes for them. Everything is immutable SMatrix/SVector arithmetic (mutable MMatrix scratch allocated per call). | true | (information: stale if it mentions MMatrix scratch; the notes say it was replaced) | NOTE
+DEV7 | bytes allocated by orthonormalize (4x4) after warm-up, Float64 CGS | 0 | 0 | PASS
+DEV7 | bytes allocated by orthonormalize (4x4) after warm-up, Float64 MGS | 0 | 0 | PASS
+DEV7 | bytes allocated by orthonormalize (4x4) after warm-up, Float64 RGS | 0 | 0 | PASS
+DEV7 | bytes allocated by orthonormalize (4x4) after warm-up, Double64 CGS | 0 | 0 | PASS
+DEV7 | bytes allocated by orthonormalize (4x4) after warm-up, Double64 MGS | 0 | 0 | PASS
+DEV7 | bytes allocated by orthonormalize (4x4) after warm-up, Double64 RGS | 0 | 0 | PASS
+DEV8 | k=1: orth_max | 0 | 0 | PASS
+# section deviations took 3.4 s
+P1 | A^16 Float64 CGS: G_w = 2.374e+13 (eps G_w = 0.00527; band eps^-1/2 < G_w < 1/(2 eps) is 6.711e+07 .. 2.252e+15), max loss = 0.001358, threshold_orth = 0.08433, loss/(eps G_w) = 0.2577 | recorded | INFO
+P1 | A^16 Float64 MGS: G_w = 2.374e+13 (eps G_w = 0.00527; band eps^-1/2 < G_w < 1/(2 eps) is 6.711e+07 .. 2.252e+15), max loss = 0.001358, threshold_orth = 0.08433, loss/(eps G_w) = 0.2577 | recorded | INFO
+P1 | A^16 Float64 RGS: G_w = 2.373e+13 (eps G_w = 0.00527; band eps^-1/2 < G_w < 1/(2 eps) is 6.711e+07 .. 2.252e+15), max loss = 4.441e-16, threshold_orth = 3.553e-15, loss/(eps G_w) = 8.427e-14 | recorded | INFO
+P1 | A^32 Double64 CGS: G_w = 5.629e+26 (eps G_w = 0.000444; band eps^-1/2 < G_w < 1/(2 eps) is 1.126e+15 .. 6.338e+29), max loss = 1.732e-06, threshold_orth = 0.007105, loss/(eps G_w) = 0.0039 | recorded | INFO
+P1 | A^32 Double64 MGS: G_w = 5.629e+26 (eps G_w = 0.000444; band eps^-1/2 < G_w < 1/(2 eps) is 1.126e+15 .. 6.338e+29), max loss = 1.732e-06, threshold_orth = 0.007105, loss/(eps G_w) = 0.0039 | recorded | INFO
+P1 | A^32 Double64 RGS: G_w = 5.629e+26 (eps G_w = 0.000444; band eps^-1/2 < G_w < 1/(2 eps) is 1.126e+15 .. 6.338e+29), max loss = 3.39e-32, threshold_orth = 1.262e-29, loss/(eps G_w) = 7.634e-29 | recorded | INFO
+P1 | A^10 Float64 CGS: G_w = 2.288e+08 (eps G_w = 5.081e-08; band eps^-1/2 < G_w < 1/(2 eps) is 6.711e+07 .. 2.252e+15), max loss = 3.466e-09, threshold_orth = 8.13e-07, loss/(eps G_w) = 0.06822 | recorded | INFO
+P1 | A^10 Float64 MGS: G_w = 2.288e+08 (eps G_w = 5.081e-08; band eps^-1/2 < G_w < 1/(2 eps) is 6.711e+07 .. 2.252e+15), max loss = 3.466e-09, threshold_orth = 8.13e-07, loss/(eps G_w) = 0.06822 | recorded | INFO
+P1 | A^10 Float64 RGS: G_w = 2.288e+08 (eps G_w = 5.081e-08; band eps^-1/2 < G_w < 1/(2 eps) is 6.711e+07 .. 2.252e+15), max loss = 2.22e-16, threshold_orth = 3.553e-15, loss/(eps G_w) = 4.37e-09 | recorded | INFO
+# section p1band took 8.6 s
+# figure saved: lyap-gram-schmidt-orthogonality.png (windows with a failed factorisation are omitted)
+# figure saved: lyap-gram-schmidt-oracle.png
+# section figures took 643.6 s
+# total wall time 5635.5 s

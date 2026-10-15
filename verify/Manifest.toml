@@ -393,7 +393,7 @@ uuid = "608a59af-f2a3-5ad4-90b4-758bdf3122a7"
 version = "3.5.4"
 
 [[deps.Chaoslab]]
-deps = ["DoubleFloats", "KernelAbstractions", "LinearAlgebra", "StableRNGs", "StaticArrays", "TOML"]
+deps = ["DoubleFloats", "KernelAbstractions", "LinearAlgebra", "PrecompileTools", "StableRNGs", "StaticArrays", "TOML"]
 path = ".."
 uuid = "1d9ee621-a3a2-43c0-acfa-d3a4a467f53c"
 version = "0.0.1"

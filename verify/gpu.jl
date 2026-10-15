@@ -13,6 +13,10 @@ CHILD || @eval using CUDA
 
 const SEED = 20261012
 const ROOT = normpath(joinpath(@__DIR__, ".."))
+# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2) runs only those sections; the
+# default runs everything. Skipping "record" needs an existing data/gpu-benchmark.toml for the launch budget.
+const ONLY = get(ENV, "GPU_ONLY", "")
+want(tag) = isempty(ONLY) || tag in strip.(split(ONLY, ','))
 const ROWS = Tuple{String,String}[]
 
 fmt(x::AbstractFloat) = @sprintf("%.4g", x)
@@ -58,6 +62,20 @@ const AC13_SIZES = Dict(Float64 => (10^5, 10^3), Double64 => (2000, 10^3))
 const AC13_SIZES_1T = Dict(Float64 => (20_000, 10^3), Double64 => (500, 10^3))
 const AC13_GPU_CHUNK = 8_000
 
+# lyap-householder-qr AC14(c), K15: wall time of the kernel path chain at N = 1e4, K = 2 pi, tau = 2; warm-up excluded.
+function hh_perf_run(backend, no)
+    rng = StableRNG(SEED + 50000 + 1015)
+    x0 = [SVector(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:no]
+    kw = (k = 2, tau = 2, seed = SEED, reducers = (QRSpectrum(HouseholderQR()),), backend = backend)
+    propagate(StandardMap(2pi), x0[1:64], 10; kw...)
+    t = @elapsed res = propagate(StandardMap(2pi), x0, 10^4; kw...)
+    return t, res.provenance
+end
+if length(ARGS) >= 2 && ARGS[1] == "child-hh"
+    serialize(ARGS[2], first(hh_perf_run(:cpu, 10^6)))
+    exit(0)
+end
+
 if CHILD
     res = Dict{Any,Any}(:nthreads => Threads.nthreads())
     for (T, (no, N)) in AC13_SIZES_1T
@@ -89,7 +107,8 @@ println("# gpu verification, julia ", VERSION, ", threads ", Threads.nthreads(),
 println("# device type ", typeof(DEV), ", name '", DEVNAME, "'")
 if !(DEV isa F.NoDevice)
     println("# CUDA.jl ", pkgversion(CUDA), ", runtime ", CUDA.runtime_version(), ", driver ", CUDA.driver_version(),
-            ", capability ", CUDA.capability(CUDA.device()), ", free memory ", round(CUDA.free_memory() / 2^20), " MiB")
+            ", capability ", CUDA.capability(CUDA.device()), ", free memory ", round(CUDA.free_memory() / 2^20), " MiB",
+            ", stack limit ", CUDA.limit(CUDA.LIMIT_STACK_SIZE), " B (extension minimum D40)")
 end
 println("# Windows TDR registry values (GraphicsDrivers): ", tdr_values())
 println("# record file: ", RECORD, " (", isfile(RECORD) ? "exists" : "absent", " at start)")
@@ -123,7 +142,7 @@ MODTAG[] = "tangent-core: "
 gpu_ns = Dict{Any,Float64}()
 cpu_ns = Dict{Any,Float64}()
 cpu1_ns = Dict{Any,Float64}()
-let
+want("record") && let
     tmp = tempname()
     cmd = `$(Base.julia_cmd()) --project=$(joinpath(ROOT, "verify")) -t 1 $(@__FILE__) child $tmp`
     println("# starting 1-thread CPU child run (AC13 sizes: ", AC13_SIZES_1T, ")")
@@ -177,7 +196,7 @@ end
 
 # ------------------------------------------------------------------------------------------------------ AC12b (tangent-core)
 MODTAG[] = "tangent-core: "
-for K in (2pi, 10.0)
+want("tc") && for K in (2pi, 10.0)
     G = sqrt((1 + K)^2 + K^2 + 2)
     bound = 4 * 10 * epsf(Float64) * G^10
     rng = StableRNG(SEED + 1202)
@@ -191,7 +210,7 @@ for K in (2pi, 10.0)
 end
 
 # ------------------------------------------------------------------------------------------------------ AC12c (tangent-core)
-let
+want("tc") && let
     K, no, N, tau = 10.0, 1024, 10^4, 10
     rng = StableRNG(SEED + 1203)
     x0 = [SVector(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:no]
@@ -210,7 +229,7 @@ end
 
 # --------------------------------------------------------------------------------------------------------- AC9 (precision)
 MODTAG[] = "precision: "
-let
+want("precision") && let
     ics = pr_ics(PR_SEED + 4, 200)
     refs = setprecision(BigFloat, 256) do
         [pr_reference(BigFloat(5), x0, p0, PR_NMAX) for (x0, p0) in ics]
@@ -246,7 +265,7 @@ end
 
 # ------------------------------------------------------------------------------------------------------- AC11 (diagnostics)
 MODTAG[] = "diagnostics: "
-let
+want("diagnostics") && let
     DET_TOL, ORTH_TOL = 4.0, 1.0e-6
     above(theta) = [exp2(j) for j in -130:20 if 2theta <= exp2(j) < 4theta]
     below(theta) = [exp2(j) for j in -130:20 if theta / 4 < exp2(j) <= theta / 2]
@@ -312,7 +331,7 @@ end
 
 # --------------------------------------------------------------------------------------------------- AC18 (standard-map)
 MODTAG[] = "standard-map: "
-let
+want("standard-map") && let
     rng = StableRNG(SM_SEED + 40181)
     lim = 4 * Float64(pi)
     Z = [SVector((2 * rand(rng) - 1) * lim, (2 * rand(rng) - 1) * lim) for _ in 1:100_000]
@@ -346,13 +365,194 @@ end
 
 # ------------------------------------------------------------------------------------------------- AC11 (precision), from AC13
 MODTAG[] = "precision: "
-if haskey(gpu_ns, Double64) && haskey(gpu_ns, Float64)
+if !want("record")
+elseif haskey(gpu_ns, Double64) && haskey(gpu_ns, Float64)
     row("AC11", "GPU Double64/Float64 time ratio, same ensemble as AC13 (per orbit-step)", gpu_ns[Double64] / gpu_ns[Float64], "reported, no threshold", "PASS")
 else
     row("AC11", "GPU Double64/Float64 time ratio, same ensemble as AC13: Float64 GPU $(fmt(get(gpu_ns, Float64, NaN))) ns/orbit-step; CPU ratio $(fmt(cpu_ns[Double64] / cpu_ns[Float64])) (4 threads, this run)",
         "-", "reported, no threshold", fb(gpu_reason(Double64)))
 end
 println("# after the record: resolve_backend(:auto, Float64) = ", F.resolve_backend(:auto, Float64), "; (:auto, Double64) = ", F.resolve_backend(:auto, Double64))
+
+# ---------------------------------------------------- Batch B: tangent-core AC12 tolerances on the Lyapunov estimators
+# One protocol for lyap-svd-stabilized AC10, lyap-gram-schmidt AC12, lyap-householder-qr AC14(a) and lyap-two-trajectory AC17:
+# (a) regular class K = 0.5 (lyap-benettin S7 screening: Benettin X(1e5) <= 5e-4 on the CPU, failing starts replaced by the next
+# id), D33 symmetric form against a Double64 CPU reference, at n = 4e4 (the largest one-wave launch within the budget, as AC12a),
+# tau = 10; (c) chaotic ensemble K = 10, 1024 orbits, n = 1e4, tau = 2 (RGS window), Float64 and Double64 where the kernel
+# compiles: max per-orbit |cpu - gpu| <= 6 sigma_FT and |difference of means| <= 4 SE. `est(sys, x0, N, tau, backend)` returns a
+# PropagationResult, `lam(final)` the exponents of one orbit.
+const REGULAR = Ref{Any}(nothing)
+function regular_starts(no)
+    REGULAR[] === nothing || return REGULAR[]
+    rng = StableRNG(SEED + 50000 + 1001)
+    cand = [SVector(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:3 * no]
+    X = [f[1].lambda[1] for f in propagate(StandardMap(0.5), cand, 10^5; k = 1, tau = 10, seed = SEED, reducers = (Benettin(),), backend = :cpu).finals]
+    reg = findall(<=(5e-4), X)
+    m = min(no, length(reg))
+    return REGULAR[] = (cand[reg[1:m]], length(cand), reg[m] - m)   # starts, candidates, non-regular candidates skipped
+end
+lams(res, lam) = [lam(f[1]) for f in res.finals]
+gpu_why(res) = res.provenance.backend === :gpu ? nothing : res.provenance.backend_fallback_reason
+
+function ac12_regular(ac, name, est, lam, nl; extra = nothing)
+    x0, ncand, nrep = regular_starts(1024)
+    N, tau = 4 * 10^4, 10
+    gpu = est(StandardMap(0.5), x0, N, tau, :gpu)
+    why = gpu_why(gpu)
+    why === nothing || return row(ac, "(a) K=0.5 regular class, $(length(x0)) orbits, n=$(fmt(N)): $name, D33 symmetric form", "-", "count diff <= 3; gap <= 2e-6", fb(why))
+    cpu = est(StandardMap(0.5), x0, N, tau, :cpu)
+    ref = est(StandardMap(Double64(0.5)), [SVector{2,Double64}(z) for z in x0], N, tau, :cpu)
+    for i in 1:nl
+        lc, lg, lr = [l[i] for l in lams(cpu, lam)], [l[i] for l in lams(gpu, lam)], [Float64(l[i]) for l in lams(ref, lam)]
+        dcr, dgr, dcg = abs.(lc .- lr), abs.(lg .- lr), abs.(lc .- lg)
+        nc, ng = count(>(1e-6), dcr), count(>(1e-6), dgr)
+        both = (dcr .<= 1e-6) .& (dgr .<= 1e-6)
+        gap = any(both) ? maximum(dcg[both]) : Inf
+        row(ac, "(a) K=0.5 regular class (S7: $(length(x0)) of $ncand candidates regular, $nrep replaced), n=$(fmt(N)), tau=$tau, $name lambda_$i: orbits above 1e-6 against the Double64 reference CPU / GPU; max CPU-GPU gap over the $(count(both)) orbits where both agree (overall max |cpu-gpu| $(fmt(maximum(dcg))))",
+            "$nc / $ng (diff $(abs(nc - ng))); $(fmt(gap))", "count diff <= 3; gap <= 2e-6", pf(abs(nc - ng) <= 3 && gap <= 2e-6))
+    end
+    extra === nothing || extra(StandardMap(0.5), x0, N, tau, cpu, gpu)
+end
+
+# Returns (sys, x0, N, cpu, gpu) when both ran, else nothing (after the FALLBACK or health row).
+function ac12_chaotic(ac, name, est, lam, nl, ::Type{T}) where {T}
+    no, N, tau = 1024, 10^4, 2
+    label = "(c) K=10 chaotic ensemble, $T: $name, 6 sigma_FT per orbit and 4 SE for the means"
+    reason = gpu_reason(T)
+    isempty(reason) || (row(ac, label, "-", "6 sigma; 4 SE", fb(reason)); return nothing)
+    rng = StableRNG(SEED + 50000 + 1003)
+    x0 = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:no]
+    sys = StandardMap(exact(T, 10))
+    cpu = nothing; gpu = nothing
+    e = catchhe(() -> (cpu = est(sys, x0, N, tau, :cpu); gpu = est(sys, x0, N, tau, :gpu)))
+    e === nothing || (row(ac, "(c) K=10, $T, $name: health error", sprint(showerror, e), "none", "FAIL"); return nothing)
+    why = gpu_why(gpu)
+    why === nothing || (row(ac, label, "-", "6 sigma; 4 SE", fb(why)); return nothing)
+    for i in 1:nl
+        sc, sg = [Float64(l[i]) for l in lams(cpu, lam)], [Float64(l[i]) for l in lams(gpu, lam)]
+        sig = std(sc)
+        maxd = maximum(abs.(sc .- sg)) / sig
+        dm = abs(mean(sc) - mean(sg)) / sqrt((var(sc) + var(sg)) / no)
+        row(ac, "(c) K=10, $T, $no orbits, n=1e4, tau=$tau, $name lambda_$i: max per-orbit |cpu - gpu| / sigma_FT (sigma_FT=$(fmt(sig))); |difference of means| / SE; means cpu $(fmt(mean(sc))) gpu $(fmt(mean(sg)))",
+            "$(fmt(maxd)); $(fmt(dm))", "6; 4", pf(maxd <= 6 && dm <= 4))
+    end
+    return (sys, x0, N, cpu, gpu)
+end
+
+qr_run(r; k = 2) = (sys, x0, N, tau, b) -> propagate(sys, x0, N; k = k, tau = tau, seed = SEED, reducers = (r,), backend = b)
+lam_of(f) = f.lambda
+
+# AC10 (lyap-svd-stabilized): the protocol above on lambda_i^SVD, plus the c check (spec Amendment D41): on the orbits with
+# S_1(500) >= 25, max |c_cpu - c_gpu| / max(1, |c_cpu|) <= the max over the same orbits of the relative CPU change of c under a
+# 1-ulp shift of x0[1] (c is ill-conditioned on some orbits, so a fixed bound does not hold).
+MODTAG[] = "lyap-svd-stabilized: "
+svdf(res, f) = [getproperty(r[1], f) for r in res.finals]
+want("svd") && let
+    est = qr_run(SVDSpectrum())
+    ac12_regular("AC10", "SVDSpectrum", est, lam_of, 2)
+    for T in (Float64, Double64)
+        out = ac12_chaotic("AC10", "SVDSpectrum", est, lam_of, 2, T)
+        out === nothing && continue
+        sys, x0, N, cpu, gpu = out
+        no = length(x0)
+        S500 = [Float64(f[1].sum[1] + f[1].comp[1]) for f in est(sys, x0, 500, 2, :cpu).finals]
+        sel = S500 .>= 25
+        cc = Float64.(svdf(cpu, :c))
+        dc = abs.(cc .- Float64.(svdf(gpu, :c))) ./ max.(1, abs.(cc))
+        cp = Float64.(svdf(est(sys, [SVector(nextfloat(x[1]), x[2]) for x in x0], N, 2, :cpu), :c))
+        dp = abs.(cc .- cp) ./ max.(1, abs.(cc))
+        bnd = any(sel) ? maximum(dp[sel]) : NaN
+        row("AC10", "(c) K=10, $T: max |c_cpu - c_gpu| / max(1, |c_cpu|) at n=1e4 on the $(count(sel)) of $no orbits with S_1(500) >= 25, against the max over the same orbits of the CPU change under a 1-ulp shift of x0[1] (D41; others reported: max $(any(.!sel) ? fmt(maximum(dc[.!sel])) : "-"); max |c| $(fmt(maximum(abs, cc))))",
+            any(sel) ? maximum(dc[sel]) : NaN, bnd, pf(any(sel) && maximum(dc[sel]) <= bnd))
+        w = argmax(dc)
+        row("AC10", "(c) K=10, $T: conditioning of c, CPU change under a 1-ulp shift of x0[1] (relative form): max; median; at the orbit of the largest CPU-GPU difference (#$w, |c| $(fmt(abs(cc[w]))), CPU-GPU $(fmt(dc[w]))); CPU-GPU median $(fmt(sort(dc)[no ÷ 2]))",
+            "$(fmt(maximum(dp))); $(fmt(sort(dp)[no ÷ 2])); $(fmt(dp[w]))", "-", "INFO")
+    end
+end
+
+# AC12 (lyap-gram-schmidt): RGS and MGS, S_i / n for i = 1, 2 (the lambda of QRSpectrum).
+MODTAG[] = "lyap-gram-schmidt: "
+want("gs") && for (nm, alg) in (("RGS", RGS()), ("MGS", MGS()))
+    est = qr_run(QRSpectrum(alg))
+    ac12_regular("AC12", "QRSpectrum($nm)", est, lam_of, 2)
+    for T in (Float64, Double64)
+        ac12_chaotic("AC12", "QRSpectrum($nm)", est, lam_of, 2, T)
+    end
+end
+
+# AC14 (lyap-householder-qr): (a) kernel path HouseholderQR, GivensQR, AugmentedQR, k = 2, plus |lambda_1 + lambda_2| <= theta_sum
+# (GS G13, `hh_theta`: 16 eps (G_max / tau + M_max), M_max the largest tangent entry of the orbit) on both backends; (b) library
+# path (LapackQR) with a gpu or auto request resolves to cpu, reason "reducer is CPU-only"; (c) K15 performance record (hh-perf).
+MODTAG[] = "lyap-householder-qr: "
+(want("hh") || want("hh-perf")) && include(joinpath(ROOT, "test", "lyap-householder-qr", "hh_helpers.jl"))   # hh_theta, hh_Mmax
+function hh_sum_check(lbl, sys, x0, N, tau, cpu, gpu)
+    T = eltype(eltype(x0))
+    th = [hh_theta(T, f[1].G_max, tau, hh_Mmax(sys, z, N)) for (f, z) in zip(cpu.finals, x0)]
+    r(res) = maximum(Float64(abs(f[1].lambda[1] + f[1].lambda[2])) / t for (f, t) in zip(res.finals, th))
+    rc, rg = r(cpu), r(gpu)
+    row("AC14", "$lbl, $T: max over orbits of |lambda_1 + lambda_2| / theta_sum, CPU; GPU", "$(fmt(rc)); $(fmt(rg))", "<= 1", pf(rc <= 1 && rg <= 1))
+end
+want("hh") && let
+    for (nm, alg) in (("HouseholderQR", HouseholderQR()), ("GivensQR", GivensQR()), ("AugmentedQR", AugmentedQR()))
+        est = qr_run(QRSpectrum(alg))
+        ac12_regular("AC14", "QRSpectrum($nm)", est, lam_of, 2; extra = (a...) -> hh_sum_check("(a) $nm, K=0.5", a...))
+        for T in (Float64, Double64)
+            out = ac12_chaotic("AC14", "QRSpectrum($nm)", est, lam_of, 2, T)
+            out === nothing || hh_sum_check("(c) $nm, K=10", out[1], out[2], out[3], 2, out[4], out[5])
+        end
+    end
+    x0 = [SVector(0.1, 0.2), SVector(0.3, 0.4)]
+    for b in (:gpu, :auto)
+        p = propagate(StandardMap(2pi), x0, 4; k = 2, tau = 2, seed = SEED, reducers = (QRSpectrum(LapackQR()),), backend = b).provenance
+        ok = p.backend === :cpu && p.device == "cpu" && p.backend_fallback_reason == "reducer is CPU-only"
+        row("AC14", "(b) library path QRSpectrum(LapackQR), $b request on a machine with a GPU: backend; device; reason", "$(p.backend); $(p.device); \"$(p.backend_fallback_reason)\"", "cpu; cpu; \"reducer is CPU-only\"", pf(ok))
+    end
+end
+
+# AC14(c) (lyap-householder-qr, K15): kernel path chain QRSpectrum(HouseholderQR()), 10^6 orbits, d = k = 2, N = 10^4, K = 2 pi,
+# tau = 2: wall time on the GPU, on the CPU with all threads, and on the CPU with 1 thread (child process). The gate (auto may pick
+# the GPU only if GPU time <= CPU time) is reported, not changed here: the record file stays the AC13 one.
+MODTAG[] = "lyap-householder-qr: "
+want("hh-perf") && let
+    no = 10^6
+    tg, pg = hh_perf_run(:gpu, no)
+    tc, pc = hh_perf_run(:cpu, no)
+    f = tempname()
+    Base.run(`$(Base.julia_cmd()) -t 1 --project=$(dirname(Base.active_project())) $(@__FILE__) child-hh $f`)
+    t1 = deserialize(f)
+    ok = pg.backend === :gpu && pc.backend === :cpu
+    row("AC14", "(c) K15 record, QRSpectrum(HouseholderQR), $no orbits, N=1e4, tau=2, K=2pi: wall s GPU ($DEVNAME, CUDA runtime $(CUDA.runtime_version()), $(pg.gpu_chunks) chunks); CPU $(Threads.nthreads()) threads; CPU 1 thread ($(Sys.CPU_NAME)); gate GPU <= CPU $(Threads.nthreads()) threads",
+        "$(fmt(tg)); $(fmt(tc)); $(fmt(t1)); $(tg <= tc)", "recorded", ok ? "INFO" : fb(something(pg.backend_fallback_reason, "?")))
+end
+
+# AC17 (lyap-two-trajectory): X2 of propagate_shadow, d0 = 1e-8 (as AC11). (a) regular class in L2 round-off units (spec Amendment
+# D42), not the tangent-core 1e-6 count: same S7 starts, n = 4e4, tau = 1, lifted mode; per orbit |X2_cpu - X2_gpu| <= 4 E_ro(d0)
+# Psi_n / n, the round-off part of T5a (2 E_ro Psi_n / n) once per backend, E_ro with the orbit's measured M_state; orbits with
+# E_ro > 0.5 (outside the T5 validity) are reported, not gated. (c) chaotic ensemble: the common protocol.
+MODTAG[] = "lyap-two-trajectory: "
+want("l2") && include(joinpath(ROOT, "test", "lyap-two-trajectory", "l2_helpers.jl"))   # l2_Ero, l2_Mstate, l2_Psis
+want("l2") && let
+    est = (sys, x0, N, tau, b) -> propagate_shadow(sys, x0, N; d0 = eltype(eltype(x0))(1e-8), tau = tau, seed = SEED, backend = b)
+    lam = f -> SVector(f.X2)
+    x0, ncand, nrep = regular_starts(1024)
+    sys, N, d0, K = StandardMap(0.5), 4 * 10^4, 1e-8, 0.5
+    gpu = est(sys, x0, N, 1, :gpu)
+    why = gpu_why(gpu)
+    if why !== nothing
+        row("AC17", "(a) K=0.5 regular class, n=$(fmt(N)), tau=1: X2 in L2 round-off units (D42)", "-", "<= 1", fb(why))
+    else
+        cpu = est(sys, x0, N, 1, :cpu)
+        ero = [l2_Ero(K, d0, l2_Mstate(sys, z, N), eps(Float64)) for z in x0]
+        psi = l2_Psis(sys, x0, SEED, Float64, N)
+        ratio = [abs(c[1].X2 - g[1].X2) / (4 * e * p / N) for (c, g, e, p) in zip(cpu.finals, gpu.finals, ero, psi)]
+        ok = ero .<= 0.5
+        row("AC17", "(a) K=0.5 regular class (S7: $(length(x0)) of $ncand candidates regular, $nrep replaced), lifted, n=$(fmt(N)), tau=1, d0=1e-8: max over the $(count(ok)) valid orbits (E_ro <= 0.5) of |X2_cpu - X2_gpu| / (4 E_ro Psi_n / n) (D42); outside validity $(count(.!ok)) orbits, their max ratio $(any(.!ok) ? fmt(maximum(ratio[.!ok])) : "-"); max |X2_cpu - X2_gpu| $(fmt(maximum(abs(c[1].X2 - g[1].X2) for (c, g) in zip(cpu.finals, gpu.finals)))); E_ro max $(fmt(maximum(ero))); Psi_n/n median $(fmt(sort(psi)[length(psi) ÷ 2] / N))",
+            any(ok) ? maximum(ratio[ok]) : NaN, "<= 1", pf(any(ok) && maximum(ratio[ok]) <= 1))
+    end
+    for T in (Float64, Double64)
+        ac12_chaotic("AC17", "X2", est, lam, 1, T)
+    end
+end
 
 # ------------------------------------------------------------------------------------------------ AC12a (tangent-core), last
 # D33: symmetric form. Each backend is compared with a Double64 CPU reference on all 1024 seeded orbits; the numbers of orbits above
@@ -383,8 +583,10 @@ function ac12a(N)
     row("AC12a", "same, maxima over all $no orbits (chaotic layer included): |S_cpu - S_ref| $(fmt(maximum(dcr))), |S_gpu - S_ref| $(fmt(maximum(dgr))), |S_cpu - S_gpu| $(fmt(maximum(dcg)))",
         maximum(dcg), "-", "INFO")
 end
-ac12a(10^5)
-ac12a(4 * 10^4)
+if want("tc")
+    ac12a(10^5)
+    ac12a(4 * 10^4)
+end
 
 counts = Dict{String,Int}()
 for (_, v) in ROWS

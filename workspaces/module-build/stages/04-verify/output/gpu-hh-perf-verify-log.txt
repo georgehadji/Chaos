@@ -1,0 +1,13 @@
+# gpu verification, julia 1.13.1, threads 4, cpu skylake, base seed 20261012
+# device type ChaoslabCUDAExt.CUDADevice, name 'NVIDIA GeForce GTX 1050'
+# CUDA.jl 6.4.2, runtime 12.9.0, driver 13.0.0, capability 6.1.0, free memory 2452.0 MiB, stack limit 4096 B (extension minimum D40)
+# Windows TDR registry values (GraphicsDrivers): TdrDelay    REG_DWORD    0x8; TdrLevel    REG_DWORD    0x3
+# record file: E:\Documents\Vibe-Coding\Chaos Research Orchestrator\data\gpu-benchmark.toml (exists at start)
+# probe Float64: (loadable = true, functional = true, device = "NVIDIA GeForce GTX 1050", compiles = true, gpu_faster = true)
+# probe Double64: (loadable = true, functional = true, device = "NVIDIA GeForce GTX 1050", compiles = false, gpu_faster = false)
+# format: AC<n> | quantity | value | bound | verdict
+# after the record: resolve_backend(:auto, Float64) = BackendChoice(:gpu, "NVIDIA GeForce GTX 1050", ""); (:auto, Double64) = BackendChoice(:cpu, "cpu", "kernel does not compile for the element type")
+AC14 | lyap-householder-qr: (c) K15 record, QRSpectrum(HouseholderQR), 1000000 orbits, N=1e4, tau=2, K=2pi: wall s GPU (NVIDIA GeForce GTX 1050, CUDA runtime 12.9.0, 202 chunks); CPU 4 threads; CPU 1 thread (skylake); gate GPU <= CPU 4 threads | 311.3; 1971; 8109; true | recorded | INFO
+┌ Warning: linking module flags 'Dwarf Version': IDs have conflicting values ('i32 4' from globals with 'i32 2' from start)
+└ @ LLVM C:\Users\tesse\.julia\packages\LLVM\tiRVR\src\core\context.jl:209
+# SUMMARY INFO=1 (1 lines)

@@ -1,0 +1,16 @@
+# thread-count invariance, julia 1.13.1, child processes -t 1 and -t 4, 2048 orbits, K = 2 pi, n = 1e3, tau = 2, base seed 20261012
+# format: AC | quantity | value | bound | verdict
+lyap-benettin AC10b | Benettin, Float64, k = 1: hash of x, W and finals, 1 thread / 4 threads | 15168472358274250945 / 15168472358274250945 | equal | PASS
+lyap-benettin AC10b | Benettin, Double64, k = 1: hash of x, W and finals, 1 thread / 4 threads | 17347057670676741023 / 17347057670676741023 | equal | PASS
+lyap-gram-schmidt | QRSpectrum(RGS), Float64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 14943809062702266586 / 14943809062702266586 | equal | PASS
+lyap-gram-schmidt | QRSpectrum(RGS), Double64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 15180007212108201260 / 15180007212108201260 | equal | PASS
+lyap-svd-stabilized AC9 | SVDSpectrum, Float64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 9170808394900605957 / 9170808394900605957 | equal | PASS
+lyap-svd-stabilized AC9 | SVDSpectrum, Double64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 8688052509024713366 / 8688052509024713366 | equal | PASS
+lyap-householder-qr AC9 | QRSpectrum(HouseholderQR), Float64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 493920795848689866 / 493920795848689866 | equal | PASS
+lyap-householder-qr AC9 | QRSpectrum(HouseholderQR), Double64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 14073499161185930165 / 14073499161185930165 | equal | PASS
+lyap-householder-qr AC9 | QRSpectrum(GivensQR), Float64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 7498187320014014541 / 7498187320014014541 | equal | PASS
+lyap-householder-qr AC9 | QRSpectrum(GivensQR), Double64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 13307833008747447555 / 13307833008747447555 | equal | PASS
+lyap-householder-qr AC9 | QRSpectrum(AugmentedQR), Float64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 493920795848689866 / 493920795848689866 | equal | PASS
+lyap-householder-qr AC9 | QRSpectrum(AugmentedQR), Double64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 14073499161185930165 / 14073499161185930165 | equal | PASS
+lyap-householder-qr AC9 | QRSpectrum(LapackQR), Float64, k = 2: hash of x, W and finals, 1 thread / 4 threads | 15375886316209658145 / 15375886316209658145 | equal | PASS
+# SUMMARY FAIL=0

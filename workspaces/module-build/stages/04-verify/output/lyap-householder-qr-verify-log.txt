@@ -1,0 +1,209 @@
+# lyap-householder-qr verification, julia 1.13.1, threads 2, base seed 20261012 + 44000 (+ 50 ac + sub), time 1.792055233e9 (unix)
+# timings in this log were taken on a loaded machine (other agents were running concurrently); runtime is informative only
+CROSS | full cross-product (D38) assertions pass / fail / error / broken | 2035 / 0 / 0 / 0 | fail = error = 0 | PASS
+# section cross took 1549.1 s
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Float64, (d,k) = (2,1); per variant HouseholderQR 0.9082, AugmentedQR 0.9082, GivensQR 0.2649, LapackQR 0.4587; realized loss of the worst variant 7.265 k eps | 0.9082 | <= 1 | PASS
+#   AC1 Float64 (2,1): (a) per variant 0.2308, 0.2308, 0.02124, 0.07901; (d) per variant 0.05408, 0.05408, 0.05408, 0.05408; AC3 pairs (R, Q) worst 0, 0.125
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Float64, (d,k) = (2,2); per variant HouseholderQR 0.5304, AugmentedQR 0.5304, GivensQR 0.1443, LapackQR 0.2201; realized loss of the worst variant 4.243 k eps | 0.5304 | <= 1 | PASS
+#   AC1 Float64 (2,2): (a) per variant 0.4739, 0.4739, 0.1519, 0.3062; (d) per variant 0.1366, 0.1366, 0.07258, 0.1574; AC3 pairs (R, Q) worst 0.08108, 0.125
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Float64, (d,k) = (3,2); per variant HouseholderQR 0.6162, AugmentedQR 0.6621, GivensQR 0.2262, LapackQR 0.2364; realized loss of the worst variant 5.297 k eps | 0.6621 | <= 1 | PASS
+#   AC1 Float64 (3,2): (a) per variant 0.3483, 0.3508, 0.1079, 0.1666; (d) per variant 0.1393, 0.1393, 0.06901, 0.06793; AC3 pairs (R, Q) worst 0.07137, 0.07292
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Float64, (d,k) = (4,2); per variant HouseholderQR 0.4133, AugmentedQR 0.4528, GivensQR 0.2424, LapackQR 0.2426; realized loss of the worst variant 3.622 k eps | 0.4528 | <= 1 | PASS
+#   AC1 Float64 (4,2): (a) per variant 0.1631, 0.1709, 0.09694, 0.1076; (d) per variant 0.05117, 0.05117, 0.04684, 0.05227; AC3 pairs (R, Q) worst 0.0393, 0.05469
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Float64, (d,k) = (4,4); per variant HouseholderQR 0.2407, AugmentedQR 0.2348, GivensQR 0.1539, LapackQR 0.1536; realized loss of the worst variant 1.925 k eps | 0.2407 | <= 1 | PASS
+#   AC1 Float64 (4,4): (a) per variant 0.21, 0.2098, 0.1097, 0.1651; (d) per variant 0.06183, 0.06183, 0.06735, 0.04024; AC3 pairs (R, Q) worst 0.03759, 0.05469
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Float64, (d,k) = (8,3); per variant HouseholderQR 0.3892, AugmentedQR 0.4129, GivensQR 0.2547, LapackQR 0.1387; realized loss of the worst variant 3.303 k eps | 0.4129 | <= 1 | PASS
+#   AC1 Float64 (8,3): (a) per variant 0.08681, 0.09424, 0.07509, 0.06377; (d) per variant 0.02884, 0.02884, 0.03898, 0.02125; AC3 pairs (R, Q) worst 0.02457, 0.03125
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Float64, (d,k) = (8,8); per variant HouseholderQR 0.1387, AugmentedQR 0.1461, GivensQR 0.1064, LapackQR 0.07384; realized loss of the worst variant 1.169 k eps | 0.1461 | <= 1 | PASS
+#   AC1 Float64 (8,8): (a) per variant 0.1535, 0.1429, 0.09312, 0.093; (d) per variant 0.01944, 0.01944, 0.04345, 0.02687; AC3 pairs (R, Q) worst 0.02026, 0.03125
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Double64, (d,k) = (2,1); per variant HouseholderQR 0.04958, AugmentedQR 0.04958, GivensQR 0.01705; realized loss of the worst variant 0.3966 k eps | 0.04958 | <= 1 | PASS
+#   AC1 Double64 (2,1): (a) per variant 0.01275, 0.01275, 0.002585; (d) per variant 0.002163, 0.002163, 0.002163; AC3 pairs (R, Q) worst 0, 0.006348
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Double64, (d,k) = (2,2); per variant HouseholderQR 0.02409, AugmentedQR 0.02409, GivensQR 0.008165; realized loss of the worst variant 0.1927 k eps | 0.02409 | <= 1 | PASS
+#   AC1 Double64 (2,2): (a) per variant 0.02231, 0.02231, 0.008645; (d) per variant 0.004574, 0.004574, 0.004508; AC3 pairs (R, Q) worst 0.002257, 0.005859
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Double64, (d,k) = (3,2); per variant HouseholderQR 0.03584, AugmentedQR 0.03552, GivensQR 0.007361; realized loss of the worst variant 0.2867 k eps | 0.03584 | <= 1 | PASS
+#   AC1 Double64 (3,2): (a) per variant 0.01103, 0.01119, 0.004983; (d) per variant 0.002588, 0.002588, 0.00295; AC3 pairs (R, Q) worst 0.001679, 0.004069
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Double64, (d,k) = (4,2); per variant HouseholderQR 0.02123, AugmentedQR 0.02057, GivensQR 0.0156; realized loss of the worst variant 0.1699 k eps | 0.02123 | <= 1 | PASS
+#   AC1 Double64 (4,2): (a) per variant 0.006411, 0.006411, 0.00486; (d) per variant 0.002594, 0.002594, 0.002234; AC3 pairs (R, Q) worst 0.001613, 0.002808
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Double64, (d,k) = (4,4); per variant HouseholderQR 0.01237, AugmentedQR 0.01179, GivensQR 0.00566; realized loss of the worst variant 0.09893 k eps | 0.01237 | <= 1 | PASS
+#   AC1 Double64 (4,4): (a) per variant 0.01076, 0.01075, 0.005644; (d) per variant 0.001594, 0.001594, 0.002554; AC3 pairs (R, Q) worst 0.001509, 0.00293
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Double64, (d,k) = (8,3); per variant HouseholderQR 0.01205, AugmentedQR 0.01257, GivensQR 0.01141; realized loss of the worst variant 0.1006 k eps | 0.01257 | <= 1 | PASS
+#   AC1 Double64 (8,3): (a) per variant 0.003216, 0.003405, 0.002802; (d) per variant 0.000642, 0.000642, 0.001379; AC3 pairs (R, Q) worst 0.0007233, 0.00116
+AC1 | (b) max|Q'Q - I| / (8 k eps), worst over 200 W, Double64, (d,k) = (8,8); per variant HouseholderQR 0.008118, AugmentedQR 0.008276, GivensQR 0.004752; realized loss of the worst variant 0.06621 k eps | 0.008276 | <= 1 | PASS
+#   AC1 Double64 (8,8): (a) per variant 0.006231, 0.0065, 0.004225; (d) per variant 0.0007333, 0.0007333, 0.001661; AC3 pairs (R, Q) worst 0.0007911, 0.001007
+AC1 | (a) column residual ||W e_j - Q R e_j|| / (8 d eps ||W e_j||), worst over 7 shapes x 200 W x variants, Float64 | 0.4739 | <= 1 | PASS
+AC1 | (d) |R_ii - R_ii^ref(256 bit)| / (8 d eps kappa_(i-1) ||W e_i||), worst, Float64 | 0.1574 | <= 1 | PASS
+AC1 | (c)+(e) failures of: status QR_OK, shapes, exact zeros below diagonal, R_ii > 0, counts r(d,k) and g(d,k) (7 shapes x 200 W x variants), Float64 | 0 | 0 | PASS
+AC3 | variant agreement, R_ii: max_i |R_ii^A - R_ii^B| / (16 d eps kappa_(i-1) ||W e_i||), all variant pairs, Float64 | 0.08108 | <= 1 | PASS
+AC3 | variant agreement, Q: max|Q^A e_i - Q^B e_i| / (16 d eps kappa_i), all variant pairs, Float64 | 0.125 | <= 1 | PASS
+AC1 | (a) column residual ||W e_j - Q R e_j|| / (8 d eps ||W e_j||), worst over 7 shapes x 200 W x variants, Double64 | 0.02231 | <= 1 | PASS
+AC1 | (d) |R_ii - R_ii^ref(256 bit)| / (8 d eps kappa_(i-1) ||W e_i||), worst, Double64 | 0.004574 | <= 1 | PASS
+AC1 | (c)+(e) failures of: status QR_OK, shapes, exact zeros below diagonal, R_ii > 0, counts r(d,k) and g(d,k) (7 shapes x 200 W x variants), Double64 | 0 | 0 | PASS
+AC3 | variant agreement, R_ii: max_i |R_ii^A - R_ii^B| / (16 d eps kappa_(i-1) ||W e_i||), all variant pairs, Double64 | 0.002257 | <= 1 | PASS
+AC3 | variant agreement, Q: max|Q^A e_i - Q^B e_i| / (16 d eps kappa_i), all variant pairs, Double64 | 0.006348 | <= 1 | PASS
+AC2 | (a) max|Q'Q - I| / (8 k eps) at theta = 2^-10, all variants, Float64 (loss 1.649 eps) | 0.1031 | <= 1 | PASS
+AC2 | (b) |R_22 - ref| / (8 d eps ||w_2||) at theta = 2^-10, all variants, Float64 (error 0.008166 eps ||w_2||) | 0.0002552 | <= 1 | PASS
+AC2 | (a) max|Q'Q - I| / (8 k eps) at theta = 2^-20, all variants, Float64 (loss 1.649 eps) | 0.1031 | <= 1 | PASS
+AC2 | (b) |R_22 - ref| / (8 d eps ||w_2||) at theta = 2^-20, all variants, Float64 (error 0.3031 eps ||w_2||) | 0.009471 | <= 1 | PASS
+AC2 | (a) max|Q'Q - I| / (8 k eps) at theta = 2^-40, all variants, Float64 (loss 1.649 eps) | 0.1031 | <= 1 | PASS
+AC2 | (b) |R_22 - ref| / (8 d eps ||w_2||) at theta = 2^-40, all variants, Float64 (error 0.2089 eps ||w_2||) | 0.006528 | <= 1 | PASS
+AC2 | (a) max|Q'Q - I| / (8 k eps) at theta = 2^-10, all variants, Double64 (loss 0.03452 eps) | 0.002157 | <= 1 | PASS
+AC2 | (b) |R_22 - ref| / (8 d eps ||w_2||) at theta = 2^-10, all variants, Double64 (error 0.005561 eps ||w_2||) | 0.0001738 | <= 1 | PASS
+AC2 | (a) max|Q'Q - I| / (8 k eps) at theta = 2^-20, all variants, Double64 (loss 0.03452 eps) | 0.002157 | <= 1 | PASS
+AC2 | (b) |R_22 - ref| / (8 d eps ||w_2||) at theta = 2^-20, all variants, Double64 (error 0.005289 eps ||w_2||) | 0.0001653 | <= 1 | PASS
+AC2 | (a) max|Q'Q - I| / (8 k eps) at theta = 2^-40, all variants, Double64 (loss 0.03452 eps) | 0.002157 | <= 1 | PASS
+AC2 | (b) |R_22 - ref| / (8 d eps ||w_2||) at theta = 2^-40, all variants, Double64 (error 0.01201 eps ||w_2||) | 0.0003752 | <= 1 | PASS
+# section AC1-3 took 67.5 s
+AC4 | (a) shear, W_0 = I, tau = 1, n = 1e4: variants (of 4) with any nonzero S_i, lambda or |W - I|, Float64 | 0 | 0 | PASS
+AC4 | (a) shear, W_0 = I, tau = 1, n = 1e4: variants (of 3) with any nonzero S_i, lambda or |W - I|, Double64 | 0 | 0 | PASS
+AC4 | (b) |S_1(n) - (1/2) ln(n^2+1)| / (8 n eps), K = 0, k = 1, n = 10, all variants, Float64 | 0.08142 | <= 1 | PASS
+AC4 | (b) |S_1(n) - (1/2) ln(n^2+1)| / (8 n eps), K = 0, k = 1, n = 1000, all variants, Float64 | 0.007607 | <= 1 | PASS
+AC4 | (b) |S_1(n) - (1/2) ln(n^2+1)| / (8 n eps), K = 0, k = 1, n = 10000, all variants, Float64 | 0.04907 | <= 1 | PASS
+AC4 | (b) max S_1/n - ln(n)/n at n = 1e4, Float64 (E12) | 5.001e-13 | <= 1e-12 | PASS
+AC4 | (b) |S_1(n) - (1/2) ln(n^2+1)| / (8 n eps), K = 0, k = 1, n = 10, all variants, Double64 | 0.0008325 | <= 1 | PASS
+AC4 | (b) |S_1(n) - (1/2) ln(n^2+1)| / (8 n eps), K = 0, k = 1, n = 1000, all variants, Double64 | 0.003441 | <= 1 | PASS
+AC4 | (b) |S_1(n) - (1/2) ln(n^2+1)| / (8 n eps), K = 0, k = 1, n = 10000, all variants, Double64 | 0.003156 | <= 1 | PASS
+AC4 | (b) max S_1/n - ln(n)/n at n = 1e4, Double64 (E12) | 5e-13 | <= 1e-12 | PASS
+AC5 | (a) |S_1 - ln||A^n e_1|| (exact Fibonacci)| / B_S, tau in {1,2,5}, n in {10..1e4}, all variants, Float64 (tau = 1: max 1.09 n eps; spec observed 2.03) | 0.1362 | <= 1 | PASS
+AC5 | (b) |S_1 + S_2| / (n theta_sum), same grid, Float64 | 0.01157 | <= 1 | PASS
+AC5 | (c) |lambda_1 - exact E10 form| / (B_S / n), same grid, Float64 | 0.1464 | <= 1 | PASS
+AC5 | (d) |lambda_1 + lambda_2| / theta_sum, same grid, Float64 | 0.01059 | <= 1 | PASS
+AC5 | (a) |S_1 - ln||A^n e_1|| (exact Fibonacci)| / B_S, tau in {1,2,5}, n in {10..1e4}, all variants, Double64 (tau = 1: max 0.03383 n eps; spec observed 2.03) | 0.00366 | <= 1 | PASS
+AC5 | (b) |S_1 + S_2| / (n theta_sum), same grid, Double64 | 0.0005421 | <= 1 | PASS
+AC5 | (c) |lambda_1 - exact E10 form| / (B_S / n), same grid, Double64 | 0.003138 | <= 1 | PASS
+AC5 | (d) |lambda_1 + lambda_2| / theta_sum, same grid, Double64 | 0.0005515 | <= 1 | PASS
+#   AC6 Float64 N=2 normal A: (a) 0.01266, (b) 0.01591, (c) 0.02193
+#   AC6 Float64 N=2 non-normal A_S: (a) 0.007254, (b) n/a, (c) 0.01507
+#   AC6 Float64 N=3 normal A: (a) 0.01853, (b) 0.02064, (c) 0.0614
+#   AC6 Float64 N=3 non-normal A_S: (a) 0.00126, (b) n/a, (c) 0.007624
+AC6 | (a) |C_i - ln vol_i (2048-bit Gram det)| / (i n theta_sum), N in {2,3}, A and A_S, n = 500, all variants, Float64 | 0.01853 | <= 1 | PASS
+AC6 | (b) |C_i/n - Lambda_i - B_i/n| / (i theta_sum), A normal, Float64 | 0.02064 | <= 1 | PASS
+AC6 | (c) |sum lambda_i| / theta_sum, Float64 | 0.0614 | <= 1 | PASS
+#   AC6 Double64 N=2 normal A: (a) 0.0004904, (b) 0.0005338, (c) 0.001713
+#   AC6 Double64 N=2 non-normal A_S: (a) 4.678e-05, (b) n/a, (c) 0.0002186
+#   AC6 Double64 N=3 normal A: (a) 0.0004007, (b) 0.0004289, (c) 0.001319
+#   AC6 Double64 N=3 non-normal A_S: (a) 7.452e-05, (b) n/a, (c) 0.0002912
+AC6 | (a) |C_i - ln vol_i (2048-bit Gram det)| / (i n theta_sum), N in {2,3}, A and A_S, n = 500, all variants, Double64 | 0.0004904 | <= 1 | PASS
+AC6 | (b) |C_i/n - Lambda_i - B_i/n| / (i theta_sum), A normal, Double64 | 0.0005338 | <= 1 | PASS
+AC6 | (c) |sum lambda_i| / theta_sum, Double64 | 0.001713 | <= 1 | PASS
+# section AC4-6 took 21.1 s
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 0.5, n = 1e3, tau in {1,2,4}, 4 variants, 50 starts, Float64 (lambda_1 error / (eps Psi/n): 0.0338; spec observed 0.81) | 0.004176 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 0.5, n = 1e3, Float64 | 0.003762 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 0.5, n = 1e3, Float64 (c' = 0.03307) | 0.002067 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 0.5, n = 1e3, tau in {1,2,4}, 4 variants, 50 starts, Double64 (lambda_1 error / (eps Psi/n): 0.00479; spec observed 0.81) | 0.0003449 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 0.5, n = 1e3, Double64 | 0.0001806 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 0.5, n = 1e3, Double64 (c' = 0.007565) | 0.0004728 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 0.9716354, n = 1e3, tau in {1,2,4}, 4 variants, 50 starts, Float64 (lambda_1 error / (eps Psi/n): 0.1757; spec observed 0.81) | 0.01927 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 0.9716354, n = 1e3, Float64 | 0.01275 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 0.9716354, n = 1e3, Float64 (c' = 0.0529) | 0.003307 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 0.9716354, n = 1e3, tau in {1,2,4}, 4 variants, 50 starts, Double64 (lambda_1 error / (eps Psi/n): 0.00992; spec observed 0.81) | 0.001065 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 0.9716354, n = 1e3, Double64 | 0.0004668 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 0.9716354, n = 1e3, Double64 (c' = 0.007399) | 0.0004624 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 2.0, n = 1e3, tau in {1,2,4}, 4 variants, 50 starts, Float64 (lambda_1 error / (eps Psi/n): 0.4306; spec observed 0.81) | 0.02592 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 2.0, n = 1e3, Float64 | 0.01344 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 2.0, n = 1e3, Float64 (c' = 0.02883) | 0.001802 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 2.0, n = 1e3, tau in {1,2,4}, 4 variants, 50 starts, Double64 (lambda_1 error / (eps Psi/n): 0.01377; spec observed 0.81) | 0.0009777 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 2.0, n = 1e3, Double64 | 0.0004494 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 2.0, n = 1e3, Double64 (c' = 0.003581) | 0.0002238 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 5.0, n = 1e3, tau in {1,2,4}, 4 variants, 50 starts, Float64 (lambda_1 error / (eps Psi/n): 0.4725; spec observed 0.81) | 0.003765 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 5.0, n = 1e3, Float64 | 0.001485 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 5.0, n = 1e3, Float64 (c' = 0.0235) | 0.001469 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 5.0, n = 1e3, tau in {1,2,4}, 4 variants, 50 starts, Double64 (lambda_1 error / (eps Psi/n): 0.7665; spec observed 0.81) | 0.002439 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 5.0, n = 1e3, Double64 | 7.874e-05 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 5.0, n = 1e3, Double64 (c' = 0.001812) | 0.0001133 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 10.0, n = 1e3, tau in {1,2,4}, 4 variants, 50 starts, Float64 (lambda_1 error / (eps Psi/n): 0.4643; spec observed 0.81) | 0.003039 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 10.0, n = 1e3, Float64 | 0.001969 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 10.0, n = 1e3, Float64 (c' = 0.02137) | 0.001336 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 10.0, n = 1e3, tau in {1,2,4}, 4 variants, 50 starts, Double64 (lambda_1 error / (eps Psi/n): 0.5173; spec observed 0.81) | 0.0005016 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 10.0, n = 1e3, Double64 | 5.5e-05 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 10.0, n = 1e3, Double64 (c' = 0.001945) | 0.0001216 | <= 1 | PASS
+AC7 | (c) largest measured c' of E11 = |lambda_1 + lambda_2| / (eps (G_max/tau + M_max)) over all K, T, tau, variants (n = 1e3) | 0.0529 | < 4 (diagnostics reference, P8) | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 0.5, n = 1000000, tau in {1,2,4}, 4 variants, first 2 of 50 starts (reference time 163 s), Float64 (lambda_1 error / (eps Psi/n): 0.001144) | 0.000143 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 0.5, n = 1000000, full 50 starts, Float64 | 0.000153 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 0.5, n = 1000000, full 50 starts, Float64 (c' = 0.006151) | 0.0003844 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 0.9716354, n = 1000000, tau in {1,2,4}, 4 variants, first 2 of 50 starts (reference time 265.9 s), Float64 (lambda_1 error / (eps Psi/n): 0.02354) | 0.002688 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 0.9716354, n = 1000000, full 50 starts, Float64 | 0.009818 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 0.9716354, n = 1000000, full 50 starts, Float64 (c' = 0.001806) | 0.0001129 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 2.0, n = 1000000, tau in {1,2,4}, 4 variants, first 2 of 50 starts (reference time 188.3 s), Float64 (lambda_1 error / (eps Psi/n): 0.03033) | 0.0008398 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 2.0, n = 1000000, full 50 starts, Float64 | 0.00331 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 2.0, n = 1000000, full 50 starts, Float64 (c' = 0.003118) | 0.0001949 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 5.0, n = 1000000, tau in {1,2,4}, 4 variants, first 2 of 50 starts (reference time 216.4 s), Float64 (lambda_1 error / (eps Psi/n): 0.1083) | 0.0005605 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 5.0, n = 1000000, full 50 starts, Float64 | 0.0008636 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 5.0, n = 1000000, full 50 starts, Float64 (c' = 0.007248) | 0.000453 | <= 1 | PASS
+AC7 | (a) max_i |lambda_i - ref256| / theta_psi, K = 10.0, n = 1000000, tau in {1,2,4}, 4 variants, first 2 of 50 starts (reference time 265 s), Float64 (lambda_1 error / (eps Psi/n): 0.1514) | 0.0001329 | <= 1 | PASS
+AC7 | (b) pairs of variants / (theta_psi^A + theta_psi^B), K = 10.0, n = 1000000, full 50 starts, Float64 | 0.001031 | <= 1 | PASS
+AC7 | (c) |lambda_1 + lambda_2| / theta_sum, K = 10.0, n = 1000000, full 50 starts, Float64 (c' = 0.004274) | 0.0002671 | <= 1 | PASS
+AC7 | (c) largest c' at n = 1000000, Float64 | 0.007248 | < 4 (P8) | PASS
+# section AC7 took 5973.3 s
+AC8 | (a) |lambda_1^QR - X_Benettin| / (16 eps Psi_n/n), k = 1, K in {0.5,2,5,2pi}, 50 orbits, n = 1e4, tau in {1,4}; per variant AugmentedQR 0.05473, GivensQR 0, HouseholderQR 0.05473, LapackQR 0.02998 | 0.05473 | <= 1 | PASS
+AC8 | (b) max_i |lambda_i^QR - lambda_i^GS| / (theta_psi^QR + theta_psi^GS), k = 2, K in {0.5,2,5,10,2pi}, 50 orbits, n = 1e3, tau in {1,2,4}, 4 QR variants; per GS variant CGS 0.005522, MGS 0.005522, RGS 0.005522 | 0.005522 | <= 1 | PASS
+#   AC8(b) observed orthogonality loss max|Q'Q - I| / (k eps): QR variants 5.5 (bound 8), Gram-Schmidt variants (CGS, MGS, RGS) 1.722e+08
+AC8 | (c) SVD V7 sandwich: |mid - centre| / half-width (<= 1 inside), K in {0.5,2,5,2pi}, 50 orbits, tau in {1,2,4}, n = 1e3, 4 variants | 0.9996 | <= 1 | PASS
+AC8 | (c) |lambda_1^SVD + lambda_2^SVD| / theta_sum | 0.001228 | <= 1 | PASS
+AC8 | (d) ensemble K = 2pi wrapped, 1000 starts, n = 1e4, d0 = d0*: |mean lambda_1^QR - mean X2| / (4 combined SE); means 1.17 and 1.17, SE 0.002438 | 3.557e-08 | <= 1 | PASS
+AC8 | (d) pathwise K = 0.5, 50 starts, n = 1e3, d0 = 1e-6: |lambda_1^QR - X2| / (Delta_2T Psi_n/n + 3 B_S/n) | 0.002341 | <= 1 | PASS
+# section AC8 took 64.5 s
+AC9 | non-identical results (x, final Q, finals) of propagate vs serial propagate_orbit, 4096 orbits, n = 1e3, chunks 64 / 1000 / default, HouseholderQR, 2 threads | 0 | 0 | PASS
+AC9 | non-identical results (x, final Q, finals) of propagate vs serial propagate_orbit, 4096 orbits, n = 1e3, chunks 64 / 1000 / default, AugmentedQR, 2 threads | 0 | 0 | PASS
+AC9 | non-identical results (x, final Q, finals) of propagate vs serial propagate_orbit, 4096 orbits, n = 1e3, chunks 64 / 1000 / default, GivensQR, 2 threads | 0 | 0 | PASS
+AC9 | non-identical results, library path LapackQR (record; owner is asked if nonzero), chunks 64 / 1000 / default | 0 | 0 | PASS
+AC10 | max bytes allocated by one reducer_step (kernel variants, Float64 and Double64, (d,k) in {(2,1),(2,2),(4,4),(8,8)}) and by propagate_orbit n = 100, 30 measurements | 0 | 0 | PASS
+AC10 | max bytes allocated by one reducer_step, library path (LapackQR, Float64, 4 shapes) | 0 | 0 | PASS
+AC11 | (a)(b) health cases failing (of 28: 4 variants x {zero column 2, identical columns, zero column 1} x {stream, direct} + d = 4 identical columns); kind observed "orthonormalisation breakdown" (spec text says "deviation matrix", superseded by D34), orbit 3, step 15, column, value 0, accumulators unchanged | 0 | 0 | PASS
+AC11 | (c) W = s Q_test, s in {1e-200, 1e200}: max_i |R_ii/s - 1| / (8 d eps), (d,k) in {(2,2),(4,4),(4,2)}, all variants, Float64; status OK, finite Q, R, G_max: true | 0.125 | <= 1 | PASS
+AC11 | (c) max|Q - Q_test| / (16 d eps), Float64 | 0.09375 | <= 1 | PASS
+AC11 | (c) |lambda_i - ln s| / (8 d eps + 4 eps |ln s|) (no overflow or underflow of the norm), Float64 | 0 | <= 1 | PASS
+AC11 | (c) W = s Q_test, s in {1e-200, 1e200}: max_i |R_ii/s - 1| / (8 d eps), (d,k) in {(2,2),(4,4),(4,2)}, all variants, Double64; status OK, finite Q, R, G_max: true | 0.0009569 | <= 1 | PASS
+AC11 | (c) max|Q - Q_test| / (16 d eps), Double64 | 0.001343 | <= 1 | PASS
+AC11 | (c) |lambda_i - ln s| / (8 d eps + 4 eps |ln s|) (no overflow or underflow of the norm), Double64 | 0 | <= 1 | PASS
+AC12 | state length 4 vs 2: runs whose lambda, G or final Q differ bitwise (of 2 T x 2 k x variants), N = 500, tau = 2, 20 starts | 0 | 0 | PASS
+# section AC9-12 took 155.5 s
+AC13 | |lambda_1 + lambda_2| / theta_sum(tau), K = 2pi, n = 1e4, tau in {1,2,4}, all variants, Float64 | 0.000614 | <= 1 | PASS
+AC13 | |lambda_i(tau) - lambda_i(1)| / (theta_sum(tau) + theta_sum(1)), Float64 | 0.0001144 | <= 1 | PASS
+AC13 | |lambda_1 + lambda_2| / theta_sum(tau), K = 2pi, n = 1e4, tau in {1,2,4}, all variants, Double64 | 8.634e-05 | <= 1 | PASS
+AC13 | |lambda_i(tau) - lambda_i(1)| / (theta_sum(tau) + theta_sum(1)), Double64 | 2.052e-05 | <= 1 | PASS
+# section AC13 took 7.4 s
+AC15 | failed exact-string / provenance checks (of 34): reason strings for library path, no runtime, no functional device, BigFloat; provenance keys and values of all 4 variants; ArgumentError for LapackQR Double64 | 0 | 0 | PASS
+# section AC15 took 20.8 s
+ALG2 | CGS at W = A^20 Q_0 (Float64, one handoff): raises, kind "orthonormalisation breakdown", step 1 | 1 | GS raises, HH/Givens continue | PASS
+ALG2 | MGS at W = A^20 Q_0 (Float64, one handoff): raises, kind "orthonormalisation breakdown", step 1 | 1 | GS raises, HH/Givens continue | PASS
+ALG2 | RGS at W = A^20 Q_0 (Float64, one handoff): raises, kind "orthonormalisation breakdown", step 1 | 1 | GS raises, HH/Givens continue | PASS
+ALG2 | HouseholderQR at W = A^20 Q_0 (Float64): continues; max|Q'Q - I| / (8 k eps) = 0.125, |S_1 - ln||A^20 q_1||| = 5.858 eps, |lambda_1 + lambda_2| = 0.9526 against theta_sum = 71.75 (R_22 carries an O(1) relative error, the inherent conditioning of E10), G_max = 2.02e+16 | 0.125 | <= 1 | PASS
+ALG2 | AugmentedQR at W = A^20 Q_0 (Float64): continues; max|Q'Q - I| / (8 k eps) = 0.125, |S_1 - ln||A^20 q_1||| = 5.858 eps, |lambda_1 + lambda_2| = 0.9526 against theta_sum = 71.75 (R_22 carries an O(1) relative error, the inherent conditioning of E10), G_max = 2.02e+16 | 0.125 | <= 1 | PASS
+ALG2 | GivensQR at W = A^20 Q_0 (Float64): continues; max|Q'Q - I| / (8 k eps) = 0, |S_1 - ln||A^20 q_1||| = 5.858 eps, |lambda_1 + lambda_2| = 0.9526 against theta_sum = 71.75 (R_22 carries an O(1) relative error, the inherent conditioning of E10), G_max = 2.02e+16 | 0 | <= 1 | PASS
+ALG2 | LapackQR at W = A^20 Q_0 (Float64): continues; max|Q'Q - I| / (8 k eps) = 0.125, |S_1 - ln||A^20 q_1||| = 5.858 eps, |lambda_1 + lambda_2| = 0.9526 against theta_sum = 71.75 (R_22 carries an O(1) relative error, the inherent conditioning of E10), G_max = 2.02e+16 | 0.125 | <= 1 | PASS
+# section alg2 took 8.1 s
+DEV | G_w rescale (orthonormalize.jl): triangles with entries inside [1e-100, 1e100] where window_Gw differs bitwise from the pre-rescale code (40000 draws, k in {2,4}) | 0 | 0 | PASS
+DEV | G_w rescale: variants x s in {1e-200, 1e200} with non-finite G_max at W = s Q B (7 cases x 2); max rel. difference of G_max to the unscaled W = Q B: 2.871e-16 | 0 | 0 | PASS
+DEV | LapackQR reducer_init sets BLAS threads globally: Julia threads 2, BLAS threads before 1, after 1 | 1 | 1 when Julia threads > 1 | PASS
+DEV | pure LapackQR orthonormalize (fresh workspace per call) allocates bytes (documented deviation; reducer_step is 0, see AC10) | 2743 | > 0 expected | NOTE
+DEV | generic BigFloat(128) HouseholderQR 4x2: status OK, max|Q'Q - I| | 1.763e-38 | status OK (true) | PASS
+DEV | H1 (treppen path) not implemented; AC16 H1 versus H2 excluded by D30 | - | - | EXCLUDED (D30)
+# section dev took 2.9 s
+D35 | max_i |lambda_i - ref256| / theta_psi over 6000 chaotic orbits (spec: 0.076) | 0.09489 | <= 1 | PASS
+D35 | |lambda_1 + lambda_2| / theta_sum over 6000 orbits (spec: 0.0035) | 0.001812 | <= 1 | PASS
+D35 | max |lambda_1 - ref| / (eps Psi_n/n) over 6000 orbits (spec observed 0.81 on its 6000 orbits); the bound is B_S^Psi = 8 eps Psi_n/n, ratio to the bound 0.1503 | 1.203 | <= 8 | PASS
+D35 | orbits whose error exceeds theta_sum (these need the Psi term; spec found 5 of 6000) | 5 | informational | INFO
+# section D35 took 655.2 s
+AC17 | (a) regular K = 0.5, n = 1e5, HouseholderQR: |lambda_i - ChaosTools| for i = 1, 2 (lambda = 8.826e-05, -8.826e-05; ChaosTools 8.826e-05, -8.826e-05; ln(n)/n = 0.0001151) | 7.489e-15 | <= 1e-4 | PASS
+AC17 | (a) regular K = 0.5, n = 1e5, AugmentedQR: |lambda_i - ChaosTools| for i = 1, 2 (lambda = 8.826e-05, -8.826e-05; ChaosTools 8.826e-05, -8.826e-05; ln(n)/n = 0.0001151) | 7.489e-15 | <= 1e-4 | PASS
+AC17 | (a) regular K = 0.5, n = 1e5, GivensQR: |lambda_i - ChaosTools| for i = 1, 2 (lambda = 8.826e-05, -8.826e-05; ChaosTools 8.826e-05, -8.826e-05; ln(n)/n = 0.0001151) | 3.071e-15 | <= 1e-4 | PASS
+AC17 | (a) regular K = 0.5, n = 1e5, LapackQR: |lambda_i - ChaosTools| for i = 1, 2 (lambda = 8.826e-05, -8.826e-05; ChaosTools 8.826e-05, -8.826e-05; ln(n)/n = 0.0001151) | 2.723e-15 | <= 1e-4 | PASS
+AC17 | (b) chaotic K = 2pi, 1000 starts, n = 1e4, HouseholderQR: |mean lambda_1 - mean ChaosTools| / (4 combined SE); means 1.171, 1.171; max pathwise |difference| 2.975e-14 | 3.114e-14 | <= 1 | PASS
+AC17 | (b) chaotic K = 2pi, 1000 starts, n = 1e4, AugmentedQR: |mean lambda_1 - mean ChaosTools| / (4 combined SE); means 1.171, 1.171; max pathwise |difference| 2.975e-14 | 3.114e-14 | <= 1 | PASS
+AC17 | (b) chaotic K = 2pi, 1000 starts, n = 1e4, GivensQR: |mean lambda_1 - mean ChaosTools| / (4 combined SE); means 1.171, 1.171; max pathwise |difference| 1.155e-14 | 3.114e-14 | <= 1 | PASS
+AC17 | (b) chaotic K = 2pi, 1000 starts, n = 1e4, LapackQR: |mean lambda_1 - mean ChaosTools| / (4 combined SE); means 1.171, 1.171; max pathwise |difference| 1.177e-14 | 3.114e-14 | <= 1 | PASS
+# section AC17 took 113.9 s
+R4 | ensemble mean lambda_1, K = 6.283, 1000 starts, n = 1e4 (V-H) | 1.169 +- 0.002078 (SE) | benchmark rows: K = 2pi 1.172 (single orbit, T = 1e9), large K ln(K/2) = 1.145 | RECORDED
+R4 | ensemble mean lambda_1, K = 10, 1000 starts, n = 1e4 (V-H) | 1.62 +- 0.0003122 (SE) | benchmark rows: K = 2pi 1.172 (single orbit, T = 1e9), large K ln(K/2) = 1.609 | RECORDED
+R5 | tau = 8, K = 2pi, n = 1e4 | |lambda_1 + lambda_2| = 2.096e-07, theta_sum = 0.003439, G_max = 7.745e+12, |lambda_1 - lambda_1(tau=1)| = 0, time 0.1246 s | no threshold | RECORDED
+R5 | tau = 10, K = 2pi, n = 1e4 | |lambda_1 + lambda_2| = 0.000161, theta_sum = 3.087, G_max = 8.689e+15, |lambda_1 - lambda_1(tau=1)| = 0, time 0.1145 s | no threshold | RECORDED
+R5 | tau = 16, K = 2pi, n = 1e4 | raises: NumericalHealthError: orthonormalisation breakdown = 0.0 (threshold 0.0) at step 16, orbit 1, backend cpu (window product numerically rank deficient above tau_max) | no threshold | RECORDED
+R6 | orthonormalize time d = k = 2 (loaded machine) | GivensQR 0.1813 us (0.6005x), CGS 0.2756 us (0.913x), MGS 0.2801 us (0.9278x), HouseholderQR 0.3019 us (1x), RGS 0.3167 us (1.049x), AugmentedQR 0.3398 us (1.126x), LapackQR 2.322 us (7.691x) | no threshold; H1 not built (D30) | RECORDED
+R6 | orthonormalize time d = k = 8 (loaded machine) | CGS 3.575 us (0.5569x), MGS 4.457 us (0.6943x), HouseholderQR 6.42 us (1x), RGS 6.92 us (1.078x), AugmentedQR 7.24 us (1.128x), GivensQR 8.433 us (1.314x), LapackQR 15.8 us (2.461x) | no threshold; H1 not built (D30) | RECORDED
+AC14 | kernel path CPU vs GPU, backend resolution on the device, performance record for K15 | - | - | STAGE04-GPU (verify/gpu.jl, local GPU run)
+AC16 | H1 versus H2 | - | - | EXCLUDED (D30)
+# section R took 99.7 s
+# figure saved: lyap-householder-qr-factor-error.png
+# figure saved: lyap-householder-qr-theta-psi.png
+# section figure took 877.3 s
+# total wall time 9826.9 s

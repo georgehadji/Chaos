@@ -1,0 +1,157 @@
+# lyap-svd-stabilized verification, julia 1.13.1, threads 2, base seed 20261012, offsets VS(ac) = base + 50000 + 100 ac, time 1.79205117e9 (unix)
+# ChaosTools 3.5.4, DynamicalSystemsBase 3.19.3; effective eps: Float64 2.220446049250313e-16, Double64 7.888609052210118e-31 (= 2^-100)
+# timings in this log were taken on a loaded machine (other agents were running concurrently)
+# format: AC<n> | quantity | value | bound | verdict
+V6 | max ratio |(ln sigma_1, ln sigma_2) - 256-bit| / 16 eps (1 + |S_1| + |S_2| + ln(1 + c^2)), c in {0, 1.27, -0.19, 3e3} x 20, Float64 | 0.0279 | <= 1 | PASS
+V6 | max ratio |(ln sigma_1, ln sigma_2) - 256-bit| / 16 eps (1 + |S_1| + |S_2| + ln(1 + c^2)), c in {0, 1.27, -0.19, 3e3} x 20, Double64 | 0.0003869 | <= 1 | PASS
+V6 | S_1 = 1e5: finite, ordered; |sum - 3| / (16 eps 1e5) | 0 | <= 1 and finite | PASS
+V6 | sigma_1 = sigma_2 (S = 0, c = 0) finite (V3) | true | true | PASS
+# section V6 took 1.3 s
+AC1 | max ratio |lambda_1^SVD - ln mu| / theta_sum, cat map, tau 1,2,4, n 40,400, 20 frames, Float64 | 0.002051 | <= 1 | PASS
+AC1 | max ratio |lambda_2^SVD + ln mu| / theta_sum, Float64 | 0.005008 | <= 1 | PASS
+AC1 | max ratio |lambda_1^QR - G12a offset formula| / theta_sum, Float64 | 0.003886 | <= 1 | PASS
+AC1 | max ratio |lambda_1^SVD(frame/tau a) - lambda_1^SVD(b)| / (theta_a + theta_b), all pairs, Float64 | 0.001765 | <= 1 | PASS
+AC1 | order violations lambda_1 < lambda_2, Float64 | 0 | 0 | PASS
+AC1 | max ratio |lambda_1^SVD - ln mu| / theta_sum, cat map, tau 1,2,4, n 40,400, 20 frames, Double64 | 0.0001043 | <= 1 | PASS
+AC1 | max ratio |lambda_2^SVD + ln mu| / theta_sum, Double64 | 8.034e-05 | <= 1 | PASS
+AC1 | max ratio |lambda_1^QR - G12a offset formula| / theta_sum, Double64 | 0.0001222 | <= 1 | PASS
+AC1 | max ratio |lambda_1^SVD(frame/tau a) - lambda_1^SVD(b)| / (theta_a + theta_b), all pairs, Double64 | 8.272e-05 | <= 1 | PASS
+AC1 | order violations lambda_1 < lambda_2, Double64 | 0 | 0 | PASS
+# section AC1 took 9.1 s
+AC2 | max ratio |lambda_1^SVD - ln((n + sqrt(n^2 + 4))/2)/n| / theta_sum, 3 frames, n 1..1e4, Float64 | 0.01115 | <= 1 | PASS
+AC2 | max ratio |lambda_1 + lambda_2| / theta_sum, Float64 | 0.004319 | <= 1 | PASS
+AC2 | frame (e_2, e_1): max ratio |(SVD - QR) - [ln sigma_1 - (1/2) ln(n^2 + 1)]/n| / theta_sum, Float64 | 0.003153 | <= 1 | PASS
+AC2 | lambda_1^SVD(1e4) - ln(1e4)/1e4 (derived margin 1.0e-12), max over frames, Float64 | 1e-12 | <= 2e-12 | PASS
+AC2 | max ratio |lambda_1^SVD - ln((n + sqrt(n^2 + 4))/2)/n| / theta_sum, 3 frames, n 1..1e4, Double64 | 0.0001234 | <= 1 | PASS
+AC2 | max ratio |lambda_1 + lambda_2| / theta_sum, Double64 | 0.0005398 | <= 1 | PASS
+AC2 | frame (e_2, e_1): max ratio |(SVD - QR) - [ln sigma_1 - (1/2) ln(n^2 + 1)]/n| / theta_sum, Double64 | 6.909e-05 | <= 1 | PASS
+AC2 | lambda_1^SVD(1e4) - ln(1e4)/1e4 (derived margin 1.0e-12), max over frames, Double64 | 1e-12 | <= 2e-12 | PASS
+# section AC2 took 6.1 s
+AC3a | QR-family output (sum, comp, lambda_QR) not bitwise equal to QRSpectrum(RGS()): count of 600 orbits, Float64 | 0 | 0 | PASS
+AC3b | max ratio of the lower sandwich side -(lambda_1^SVD - lambda_1^QR - ln(1 + c^2)/(2n)) / theta_sum, 600 orbits, Float64 | 0.000927 | <= 1 | PASS
+AC3b | max ratio of the upper side (... - u/(2n)) / theta_sum, Float64 | 0.00164 | <= 1 | PASS
+AC3b | order/sandwich violations (lambda_1 >= lambda_2, lambda_1 + theta >= lambda_1^QR), Float64 | 0 | 0 | PASS
+# AC3(c) Float64: classes by S_1(500) over 600 orbits (K x tau x 50): S1(500)<0: 0 orbits, worst relative change 0; 0<=S1<2: 3 orbits, worst relative change 0.1374; 2<=S1<5: 72 orbits, worst relative change 0.04877; 5<=S1<25: 114 orbits, worst relative change 0.00753; S1>=25: 411 orbits, worst relative change 0
+AC3c | class S_1(500) >= 25: worst |c_1000 - c_500| / (8 eps_eff max(1, |c|)) over 411 orbits; failing orbits: 0; Float64 | 0 | <= 1 | PASS
+AC3c | class 5 <= S_1(500) < 25: worst |c_1000 - c_500| / (0.06 max(1, |c_500|)) over 114 orbits; failing: 0; Float64 | 0.1255 | <= 1 | PASS
+AC3c | class S_1(500) < 5: 75 orbits reported, worst relative change 0.1374, Float64 | 0.1374 | reported, not scored | INFO
+# AC3 measured constant Float64 K=0.5 tau=1: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.612e-06/0.0003189/0.002363; c median 0.2754, min -10.57, max 10.41
+# AC3 measured constant Float64 K=0.5 tau=2: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.612e-06/0.0003189/0.002363; c median 0.2754, min -10.57, max 10.41
+# AC3 measured constant Float64 K=0.5 tau=4: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.612e-06/0.0003189/0.002363; c median 0.2754, min -10.57, max 10.41
+# AC3 measured constant Float64 K=2.0 tau=1: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.972e-08/0.0002143/0.004156; c median 0.1725, min -13.87, max 63.8
+# AC3 measured constant Float64 K=2.0 tau=2: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.972e-08/0.0002143/0.004156; c median 0.1725, min -13.87, max 63.8
+# AC3 measured constant Float64 K=2.0 tau=4: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.972e-08/0.0002143/0.004156; c median 0.1725, min -13.87, max 63.8
+# AC3 measured constant Float64 K=5.0 tau=1: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.602e-06/0.000333/0.004454; c median 0.03678, min -28.49, max 85.98
+# AC3 measured constant Float64 K=5.0 tau=2: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.602e-06/0.000333/0.004454; c median 0.03678, min -28.49, max 85.98
+# AC3 measured constant Float64 K=5.0 tau=4: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.602e-06/0.000333/0.004454; c median 0.03678, min -28.49, max 85.98
+# AC3 measured constant Float64 K=twopi tau=1: (1/(2n)) ln(1 + c_n^2) min/median/max = 3.294e-07/0.0002249/0.003069; c median -0.07345, min -21.5, max 15.14
+# AC3 measured constant Float64 K=twopi tau=2: (1/(2n)) ln(1 + c_n^2) min/median/max = 3.294e-07/0.0002249/0.003069; c median -0.07345, min -21.5, max 15.14
+# AC3 measured constant Float64 K=twopi tau=4: (1/(2n)) ln(1 + c_n^2) min/median/max = 3.294e-07/0.0002249/0.003069; c median -0.07345, min -21.5, max 15.14
+AC3a | QR-family output (sum, comp, lambda_QR) not bitwise equal to QRSpectrum(RGS()): count of 600 orbits, Double64 | 0 | 0 | PASS
+AC3b | max ratio of the lower sandwich side -(lambda_1^SVD - lambda_1^QR - ln(1 + c^2)/(2n)) / theta_sum, 600 orbits, Double64 | 3.319e-05 | <= 1 | PASS
+AC3b | max ratio of the upper side (... - u/(2n)) / theta_sum, Double64 | 2.616e-05 | <= 1 | PASS
+AC3b | order/sandwich violations (lambda_1 >= lambda_2, lambda_1 + theta >= lambda_1^QR), Double64 | 0 | 0 | PASS
+# AC3(c) Double64: classes by S_1(500) over 600 orbits (K x tau x 50): S1(500)<0: 0 orbits, worst relative change 0; 0<=S1<2: 3 orbits, worst relative change 0.1374; 2<=S1<5: 72 orbits, worst relative change 0.04877; 5<=S1<25: 114 orbits, worst relative change 0.00753; S1>=25: 411 orbits, worst relative change 0
+AC3c | class S_1(500) >= 25: worst |c_1000 - c_500| / (8 eps_eff max(1, |c|)) over 411 orbits; failing orbits: 0; Double64 | 0 | <= 1 | PASS
+AC3c | class 5 <= S_1(500) < 25: worst |c_1000 - c_500| / (0.06 max(1, |c_500|)) over 114 orbits; failing: 0; Double64 | 0.1255 | <= 1 | PASS
+AC3c | class S_1(500) < 5: 75 orbits reported, worst relative change 0.1374, Double64 | 0.1374 | reported, not scored | INFO
+# AC3 measured constant Double64 K=0.5 tau=1: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.612e-06/0.0003189/0.002363; c median 0.2754, min -10.57, max 10.41
+# AC3 measured constant Double64 K=0.5 tau=2: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.612e-06/0.0003189/0.002363; c median 0.2754, min -10.57, max 10.41
+# AC3 measured constant Double64 K=0.5 tau=4: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.612e-06/0.0003189/0.002363; c median 0.2754, min -10.57, max 10.41
+# AC3 measured constant Double64 K=2.0 tau=1: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.972e-08/0.0002143/0.004156; c median 0.1725, min -13.87, max 63.8
+# AC3 measured constant Double64 K=2.0 tau=2: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.972e-08/0.0002143/0.004156; c median 0.1725, min -13.87, max 63.8
+# AC3 measured constant Double64 K=2.0 tau=4: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.972e-08/0.0002143/0.004156; c median 0.1725, min -13.87, max 63.8
+# AC3 measured constant Double64 K=5.0 tau=1: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.602e-06/0.000333/0.004454; c median 0.03678, min -28.49, max 85.98
+# AC3 measured constant Double64 K=5.0 tau=2: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.602e-06/0.000333/0.004454; c median 0.03678, min -28.49, max 85.98
+# AC3 measured constant Double64 K=5.0 tau=4: (1/(2n)) ln(1 + c_n^2) min/median/max = 1.602e-06/0.000333/0.004454; c median 0.03678, min -28.49, max 85.98
+# AC3 measured constant Double64 K=twopi tau=1: (1/(2n)) ln(1 + c_n^2) min/median/max = 3.294e-07/0.0002249/0.003069; c median -0.07345, min -21.5, max 15.14
+# AC3 measured constant Double64 K=twopi tau=2: (1/(2n)) ln(1 + c_n^2) min/median/max = 3.294e-07/0.0002249/0.003069; c median -0.07345, min -21.5, max 15.14
+# AC3 measured constant Double64 K=twopi tau=4: (1/(2n)) ln(1 + c_n^2) min/median/max = 3.294e-07/0.0002249/0.003069; c median -0.07345, min -21.5, max 15.14
+# section AC3 took 72.1 s
+AC4 | max ratio |lambda_i^SVD - lambda_i^ref| / theta_sum, 256-bit product at the run's own orbit, K 4 values, 20 orbits, tau 1,2,4, n 12,20,100,1000, Float64 (per K: 0.5: 0.03655, 2.0: 0.01685, 5.0: 0.01269, twopi: 0.008309) | 0.03655 | <= 1 | PASS
+AC4 | max absolute error in lambda / eps_eff (informational; scratch value 8 eps at n = 2000), Float64 | 1.35e+05 | - | INFO
+AC4 | max ratio |lambda_i^SVD - lambda_i^ref| / theta_sum, 256-bit product at the run's own orbit, K 4 values, 20 orbits, tau 1,2,4, n 12,20,100,1000, Double64 (per K: 0.5: 0.0008759, 2.0: 0.0005327, 5.0: 0.0002371, twopi: 0.0003325) | 0.0008759 | <= 1 | PASS
+AC4 | max absolute error in lambda / eps_eff (informational; scratch value 8 eps at n = 2000), Double64 | 3.354e+04 | - | INFO
+# section AC4 took 40.8 s
+# AC5 D35 table, Float64, 60 starts at K = 2 pi, n = 20: ln sigma_1(20) from 14.22 to 30.96, median 24.5; gap > 10 (or exact zero singular value) for 41 of 60; all orbits with ln sigma_1 >= 24.9 have gap > 10: true; smallest ln sigma_1 with gap > 10: 18.87; largest ln sigma_1 with finite gap <= 10: 24.44; starts with ln sigma_1 >= 25: 29; chosen start index 1 (ln sigma_1(20) = 25.13)
+AC5 | plain Float64 product + svdvals at n = 20: |ln sigma_2^naive - ln sigma_2^ref| (naive -13.88, ref -25.13; scratch 13.3) | 11.25 | > 10 | PASS
+AC5 | plain Float64 product has a non-finite entry first at n = 606 (derived 607, measured 618 in one orbit) | 606 | < 700 | PASS
+AC5 | estimator at n = 20 and 2000: finite = true; max ratio |lambda_i - 256-bit| / theta_sum, Float64 | 0.0001122 | <= 1 | PASS
+AC5 | plain Double64 product at n = 20: |ln sigma_2^naive - ln sigma_2^ref| from the naive determinant (informational: Double64 keeps ~32 digits, so no gap is required; Float64 control is the L10b statement) | 0 | - | INFO
+AC5 | plain Double64 product has a non-finite entry first at n = 589 (derived 607, measured 618 in one orbit) | 589 | < 700 | PASS
+AC5 | estimator at n = 20 and 2000: finite = true; max ratio |lambda_i - 256-bit| / theta_sum, Double64 | 0.0001935 | <= 1 | PASS
+# section AC5 took 9.1 s
+AC6 | rotation 0.7311, n = 1e4, tau = 1, 4 frames, Float64: finite = true; max ratio |lambda_i| / theta_sum | 0.002031 | <= 1 | PASS
+AC6 | rotation 0.7311, n = 1e4, tau = 10, 4 frames, Float64: finite = true; max ratio |lambda_i| / theta_sum | 0.005259 | <= 1 | PASS
+AC6 | rotation 0.7311, n = 1e4, tau = 1, 4 frames, Double64: finite = true; max ratio |lambda_i| / theta_sum | 0.0002967 | <= 1 | PASS
+AC6 | rotation 0.7311, n = 1e4, tau = 10, 4 frames, Double64: finite = true; max ratio |lambda_i| / theta_sum | 0.0006094 | <= 1 | PASS
+# section AC6 took 7.3 s
+AC7 | cat map n = 1e5, 4 frames, max |lambda_1 + lambda_2| / theta_sum, Float64 | 0 | <= 1 | PASS
+AC7 | cat map, max |lambda_1 + lambda_2 - (S_1 + S_2)/n| / 8 eps, Float64 | 0 | <= 1 | PASS
+AC7 | cat map, eps_pair != eps_sum or order violations, Float64 | 0 | 0 | PASS
+AC7 | standard map K = 0.5 n = 1e4, 10 orbits, Float64: max |sum|/theta_sum; max |sum - (S_1+S_2)/n|/8 eps; eps_pair/order violations 0 | 0.0001808 ; 3.379e-05 | <= 1 ; <= 1 ; 0 | PASS
+AC7 | standard map K = 2.0 n = 1e4, 10 orbits, Float64: max |sum|/theta_sum; max |sum - (S_1+S_2)/n|/8 eps; eps_pair/order violations 0 | 5.17e-05 ; 1.553e-05 | <= 1 ; <= 1 ; 0 | PASS
+AC7 | standard map K = 5.0 n = 1e4, 10 orbits, Float64: max |sum|/theta_sum; max |sum - (S_1+S_2)/n|/8 eps; eps_pair/order violations 0 | 0 ; 0 | <= 1 ; <= 1 ; 0 | PASS
+AC7 | standard map K = twopi n = 1e4, 10 orbits, Float64: max |sum|/theta_sum; max |sum - (S_1+S_2)/n|/8 eps; eps_pair/order violations 0 | 0.000614 ; 0.0226 | <= 1 ; <= 1 ; 0 | PASS
+AC7 | cat map n = 1e5, 4 frames, max |lambda_1 + lambda_2| / theta_sum, Double64 | 0.0001103 | <= 1 | PASS
+AC7 | cat map, max |lambda_1 + lambda_2 - (S_1 + S_2)/n| / 8 eps, Double64 | 3.312e-05 | <= 1 | PASS
+AC7 | cat map, eps_pair != eps_sum or order violations, Double64 | 0 | 0 | PASS
+AC7 | standard map K = 0.5 n = 1e4, 10 orbits, Double64: max |sum|/theta_sum; max |sum - (S_1+S_2)/n|/8 eps; eps_pair/order violations 0 | 0.0001059 ; 4.022e-06 | <= 1 ; <= 1 ; 0 | PASS
+AC7 | standard map K = 2.0 n = 1e4, 10 orbits, Double64: max |sum|/theta_sum; max |sum - (S_1+S_2)/n|/8 eps; eps_pair/order violations 0 | 3.727e-05 ; 0.0003117 | <= 1 ; <= 1 ; 0 | PASS
+AC7 | standard map K = 5.0 n = 1e4, 10 orbits, Double64: max |sum|/theta_sum; max |sum - (S_1+S_2)/n|/8 eps; eps_pair/order violations 0 | 1.15e-05 ; 0.0016 | <= 1 ; <= 1 ; 0 | PASS
+AC7 | standard map K = twopi n = 1e4, 10 orbits, Double64: max |sum|/theta_sum; max |sum - (S_1+S_2)/n|/8 eps; eps_pair/order violations 0 | 1.919e-05 ; 0.002306 | <= 1 ; <= 1 ; 0 | PASS
+# section AC7 took 40.7 s
+AC8 | wrapped standard map K {2,5} x tau {1,3}, n = 1200, 20 orbits: final record, x, W not bitwise equal to the plain per-orbit loop: 0 of 80, Float64 | 0 | 0 | PASS
+AC8 | 10^6 steps, K = 5, 8 orbits (15.19 s, loaded machine), Float64: finite = true, no health error; max |lambda_1 + lambda_2| / theta_sum (M_max = 6) | 5.021e-08 | <= 1 | PASS
+AC8 | bytes allocated by propagate_orbit (10^4 steps, SVDSpectrum, wrapped map) after warm-up, Float64 | 0 | 0 | PASS
+AC8 | wrapped standard map K {2,5} x tau {1,3}, n = 1200, 20 orbits: final record, x, W not bitwise equal to the plain per-orbit loop: 0 of 80, Double64 | 0 | 0 | PASS
+AC8 | 10^6 steps, K = 5, 8 orbits (203.5 s, loaded machine), Double64: finite = true, no health error; max |lambda_1 + lambda_2| / theta_sum (M_max = 6) | 2.524e-05 | <= 1 | PASS
+AC8 | bytes allocated by propagate_orbit (10^4 steps, SVDSpectrum, wrapped map) after warm-up, Double64 | 0 | 0 | PASS
+# section AC8 took 243.2 s
+AC9 | propagate (2 threads, chunk 64) vs serial propagate_orbit: x, W, finals (S_i, compensation, c) bitwise, Float64 | true | true (tolerance 0) | PASS
+AC9 | propagate (2 threads, chunk 1000) vs serial propagate_orbit: x, W, finals (S_i, compensation, c) bitwise, Float64 | true | true (tolerance 0) | PASS
+AC9 | propagate (2 threads, chunk default) vs serial propagate_orbit: x, W, finals (S_i, compensation, c) bitwise, Float64 | true | true (tolerance 0) | PASS
+AC9 | bytes allocated per orbit body after warm-up, Float64 | 0 | 0 | PASS
+AC9 | propagate (2 threads, chunk 64) vs serial propagate_orbit: x, W, finals (S_i, compensation, c) bitwise, Double64 | true | true (tolerance 0) | PASS
+AC9 | propagate (2 threads, chunk 1000) vs serial propagate_orbit: x, W, finals (S_i, compensation, c) bitwise, Double64 | true | true (tolerance 0) | PASS
+AC9 | propagate (2 threads, chunk default) vs serial propagate_orbit: x, W, finals (S_i, compensation, c) bitwise, Double64 | true | true (tolerance 0) | PASS
+AC9 | bytes allocated per orbit body after warm-up, Double64 | 0 | 0 | PASS
+# AC9 note: thread counts compared are serial (1 thread) against the 2-thread kernel; a 4-thread run was not made
+# section AC9 took 456.8 s
+AC12 | guard: exact message from propagate and reducer_init for (d,k) in {(4,4),(4,2),(4,1),(2,1)}; deviations from the exact string or not rejected before work (4-d map throws if stepped): 0 of 8, Float64 | 0 | 0 | PASS
+AC12 | provenance record (estimator, orthonormalizer, d, orthogonality_tol, k, tau, seed, precision = Float64, backend, device, fallback reason; chained ResidualMonitor): mismatches 0 of 4 cases, Float64 | 0 | 0 | PASS
+AC12 | guard: exact message from propagate and reducer_init for (d,k) in {(4,4),(4,2),(4,1),(2,1)}; deviations from the exact string or not rejected before work (4-d map throws if stepped): 0 of 8, Double64 | 0 | 0 | PASS
+AC12 | provenance record (estimator, orthonormalizer, d, orthogonality_tol, k, tau, seed, precision = Double64, backend, device, fallback reason; chained ResidualMonitor): mismatches 0 of 4 cases, Double64 | 0 | 0 | PASS
+# section AC12 took 15.0 s
+AC10 | CPU vs GPU lambda_i^SVD (tangent-core AC12 tolerances) and |c_cpu - c_gpu| <= 1e-12 at n = 1e4, K = 10, 1024 orbits with S_1(500) >= 25 | not run here; verify/gpu.jl has no SVDSpectrum section | AC12 tolerances; 1e-12 | STAGE04-GPU
+AC11 | FINDING: lyapunovspectrum overwrites the constructor Q0 with the identity (reinit! default): result with Q0 = identity vs Q0 = swap are equal | true | true (so W0 = identity on the Chaoslab side) | INFO
+# AC11 regular class: candidates screened 40 (first 20 regular accepted at candidate index 20; replaced = 0)
+AC11 | K = 0.5 regular, first orbit (n = 1e5): lambda_1^SVD 0.0001143, oracle 9.975e-05, c_n 4.163; |diff| / (1e-4 + ln(1 + c^2)/(2n)) | 0.127 | <= 1 | PASS
+AC11 | K = 0.5 regular, 20 orbits, n = 1e5: max |lambda_1^SVD - oracle| / (1e-4 + ln(1 + c_n^2)/(2n)) | 0.1432 | <= 1 | PASS
+AC11 | K = 0.5 regular, 20 orbits: max |lambda_1^SVD - oracle| and (informational) max |lambda_1^QR - oracle| (pathwise, same orbit and frame) | 1.671e-05 ; 2.365e-14 | - | INFO
+AC11 | K = 0.5 regular, lambda_2: max |lambda_2^SVD - lambda_2^oracle| and |lambda_2^QR - lambda_2^oracle| (informational) | 1.671e-05 ; 2.365e-14 | - | INFO
+AC11 | K = 2 pi chaotic, 1000 orbits, n = 1e4 (Chaoslab 8.656 s, ChaosTools 5.51 s): mean lambda_1^SVD 1.17, oracle 1.17, combined s.e. 0.002407; |difference of means| / (4 s.e.) | 0.001685 | <= 1 | PASS
+AC11 | K = 2 pi: pathwise max |lambda_1^SVD - oracle| and max |lambda_1^QR - oracle| over 1000 orbits (informational) | 0.0004065 ; 1.332e-14 | - | INFO
+AC11 | K = 2 pi: mean of (lambda_1^SVD - lambda_1^QR) over the ensemble, and max (the V7 offset; informational) | 1.622e-05 ; 0.0004065 | - | INFO
+# section AC11 took 35.5 s
+DEV | reducer_final field order equals the contract (n, sum, comp, lambda_qr, lambda, c, u, G_max, orth_max, count_max) | true | true | PASS
+DEV | lambda is zero at n = 0 on a fresh state | true | true | PASS
+DEV | failed QR step (rank-deficient window) after 2 good steps: code 1, c unchanged (0.6176470588235294 == 0.6176470588235294, nonzero: true), W returned unchanged | true | true | PASS
+DEV | step after a failure leaves state untouched (st.code != 0 shortcut) | true | true | PASS
+DEV | _qr_step still defined in qr_spectrum.jl (the shared step the SVD reducer calls) | true | true | PASS
+DEV | reducer_failed(SVDSpectrum, failed state) is true and a fresh state is not failed | true | true | PASS
+# section DEV took 0.0 s
+# figure data (a): n up to 2000, worst ratio per curve below
+# figure (a) K = 2 pi Float64: max over n <= 2000 of error / theta_sum: i=1 0.0007422, i=2 0.003291 (values below 1e-4 are drawn at 1e-4)
+# figure (b) K = 2 pi Float64: c_n at n = 1000, 10000: 2.461, 2.461; min over n of gap - lower (negative = rounding below the bound) -2.706e-16
+# figure (a) K = 2 pi Double64: max over n <= 2000 of error / theta_sum: i=1 0.0001, i=2 0.0002563 (values below 1e-4 are drawn at 1e-4)
+# figure (a) K = 0.5 Float64: max over n <= 2000 of error / theta_sum: i=1 0.02634, i=2 0.02583 (values below 1e-4 are drawn at 1e-4)
+# figure (b) K = 0.5 Float64: c_n at n = 1000, 10000: 0.2541, 0.2615; min over n of gap - lower (negative = rounding below the bound) -7.708e-20
+# figure saved: lyap-svd-stabilized-exponent-error.png
+# section figure took 185.2 s
+AC8 | recheck at end of run: bytes allocated by propagate_orbit (wrapped, 10^4 steps) after warm-up, Float64 | 0 | 0 | PASS
+AC8 | recheck at end of run: bytes allocated by propagate_orbit (wrapped, 10^4 steps) after warm-up, Double64 | 0 | 0 | PASS
+# section alloc-recheck took 2.1 s
+# H1 to H3 (general-d algorithm, held, D30/D32): not scored in M2
+# AC3(c) class table above reproduces Amendment D35 with fresh seeds; the per-orbit bound ratio of D35 (largest 0.104) is derivation only, not scored, and is not recomputed here
+# total wall time 1224.2 s

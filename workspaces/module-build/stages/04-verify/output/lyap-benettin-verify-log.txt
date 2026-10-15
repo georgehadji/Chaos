@@ -1,0 +1,148 @@
+# lyap-benettin verification, julia 1.13.1, threads 2, base seed 20261012, time 1.792062188e9 (unix), CUDA loaded: true
+# timings in this log were taken on a loaded machine (other agents were running concurrently)
+AC1 | (a) max |nX - ln(|A^n w0|/|w0|)_ref| / B_S, tau {1,5,10}, n {20,100,1e4}, 100 ids, Float64 | 0.017574 | <= 1 | PASS
+AC1 | (b) max |nX - closed form E10| / B_S, Float64 (excluded |c1| < 0.05: 4 of 100 ids, limit 10; final n wrong: 0) | 0.017574 | <= 1 | PASS
+AC1 | (a) max |nX - ln(|A^n w0|/|w0|)_ref| / B_S, tau {1,5,10}, n {20,100,1e4}, 100 ids, Double64 | 0.00086855 | <= 1 | PASS
+AC1 | (b) max |nX - closed form E10| / B_S, Double64 (excluded |c1| < 0.05: 4 of 100 ids, limit 10; final n wrong: 0) | 0.00086855 | <= 1 | PASS
+# section AC1 took 35.0 s
+AC2 | (a) rot4, w0 = (1,0), tau {1,3}, n up to 9996: cases with sum, comp or lambda != 0, Float64 | 0 | 0 | PASS
+AC2 | (b) K = -2 at (0,0), max |nX - ln(|M^n w0|/|w0|)_ref| / B_S, tau {1,2}, 100 ids, Float64 | 0.085061 | <= 1 | PASS
+AC2 | (b) even n: max |nX| / B_S, Float64 | 0.085061 | <= 1 | PASS
+AC2 | (b) odd n: max |nX| / (ln((3+sqrt5)/2) + B_S), Float64 | 0.99924 | <= 1 | PASS
+AC2 | (a) rot4, w0 = (1,0), tau {1,3}, n up to 9996: cases with sum, comp or lambda != 0, Double64 | 0 | 0 | PASS
+AC2 | (b) K = -2 at (0,0), max |nX - ln(|M^n w0|/|w0|)_ref| / B_S, tau {1,2}, 100 ids, Double64 | 0.0029054 | <= 1 | PASS
+AC2 | (b) even n: max |nX| / B_S, Double64 | 0.0029014 | <= 1 | PASS
+AC2 | (b) odd n: max |nX| / (ln((3+sqrt5)/2) + B_S), Double64 | 0.99924 | <= 1 | PASS
+# section AC2 took 23.3 s
+AC3 | max |nX - ln(|w_n|/|w0|)| / B_S, tau {1,10}, n {10,100,1e4} x 20 ids, Float64 | 0.019307 | <= 1 | PASS
+AC3 | same, n = 1e6, 3 ids, Float64  | 0.001012 | <= 1 | PASS
+AC3 | max nX / ln(n+1) (strict bound < 1), all n, Float64 | 0.9995 | <= 1 | PASS
+AC3 | w0 = (0,1), n = 1e4: |S_n - 0.5 ln(n^2+1)| / (8 n eps), Float64 | 0.00071829 | <= 1 | PASS
+AC3 | max |nX - ln(|w_n|/|w0|)| / B_S, tau {1,10}, n {10,100,1e4} x 20 ids, Double64 | 0.001296 | <= 1 | PASS
+AC3 | same, n = 1e6, 3 ids, Double64 (moved from the package suite) | 0.00065165 | <= 1 | PASS
+AC3 | max nX / ln(n+1) (strict bound < 1), all n, Double64 | 0.9995 | <= 1 | PASS
+AC3 | w0 = (0,1), n = 1e4: |S_n - 0.5 ln(n^2+1)| / (8 n eps), Double64 | 0.00063828 | <= 1 | PASS
+# section AC3 took 399.7 s
+AC4 | max |nX - closed form E12| / B_S, K = 1, tau {1,5}, n {20,100,1e3}, 100 ids, Float64 | 0.015797 | <= 1 | PASS
+AC4 | max |nX - closed form E12| / B_S, K = 2, tau {1,5}, n {20,100,1e3}, 100 ids, Float64 | 0.016046 | <= 1 | PASS
+AC4 | max |nX - closed form E12| / B_S, K = 6, tau {1,5}, n {20,100,1e3}, 100 ids, Float64 | 0.043307 | <= 1 | PASS
+AC4 | max |nX - closed form E12| / B_S, K = 1, tau {1,5}, n {20,100,1e3}, 100 ids, Double64 | 0.00088316 | <= 1 | PASS
+AC4 | max |nX - closed form E12| / B_S, K = 2, tau {1,5}, n {20,100,1e3}, 100 ids, Double64 | 0.0024734 | <= 1 | PASS
+AC4 | max |nX - closed form E12| / B_S, K = 6, tau {1,5}, n {20,100,1e3}, 100 ids, Double64 | 0.0026928 | <= 1 | PASS
+# section AC4 took 12.7 s
+AC5 | max |nX - ln(|Y_n w0|/|w0|)_ref| / B_S at every n multiple of 100, K = 0.5, n = 10000, Float64, 40 runs (20 starts x tau {1,4}); G_first > 1e4: 0; orbit == forward and all handoffs read: true | 0.0051052 | <= 1 | PASS
+AC5 | max |nX - ln(|Y_n w0|/|w0|)_ref| / B_S at every n multiple of 100, K = 2 pi, n = 10000, Float64, 40 runs (20 starts x tau {1,4}); G_first > 1e4: 15; orbit == forward and all handoffs read: true | 0.00031415 | <= 1 | PASS
+AC5 | max |nX - ln(|Y_n w0|/|w0|)_ref| / B_S at every n multiple of 100, K = 10, n = 1000, Float64, 40 runs (20 starts x tau {1,4}); G_first > 1e4: 17; orbit == forward and all handoffs read: true | 7.5572e-05 | <= 1 | PASS
+AC5 | max |nX - ln(|Y_n w0|/|w0|)_ref| / B_S at every n multiple of 100, K = 0.5, n = 10000, Double64, 40 runs (20 starts x tau {1,4}); G_first > 1e4: 0; orbit == forward and all handoffs read: true | 0.00021858 | <= 1 | PASS
+AC5 | max |nX - ln(|Y_n w0|/|w0|)_ref| / B_S at every n multiple of 100, K = 2 pi, n = 10000, Double64, 40 runs (20 starts x tau {1,4}); G_first > 1e4: 15; orbit == forward and all handoffs read: true | 1.8739e-05 | <= 1 | PASS
+AC5 | max |nX - ln(|Y_n w0|/|w0|)_ref| / B_S at every n multiple of 100, K = 10, n = 1000, Double64, 40 runs (20 starts x tau {1,4}); G_first > 1e4: 17; orbit == forward and all handoffs read: true | 4.7723e-06 | <= 1 | PASS
+AC18 | max alpha_j range violation ratio (E14), AC5 runs K = 0.5, n = 10000, Float64 | 0.99746 | <= 1 | PASS
+AC18 | max alpha_j range violation ratio (E14), AC5 runs K = 2 pi, n = 10000, Float64 | 0.99998 | <= 1 | PASS
+AC18 | max alpha_j range violation ratio (E14), AC5 runs K = 10, n = 1000, Float64 | 0.99783 | <= 1 | PASS
+AC18 | max alpha_j range violation ratio (E14), AC5 runs K = 0.5, n = 10000, Double64 | 0.99746 | <= 1 | PASS
+AC18 | max alpha_j range violation ratio (E14), AC5 runs K = 2 pi, n = 10000, Double64 | 0.99994 | <= 1 | PASS
+AC18 | max alpha_j range violation ratio (E14), AC5 runs K = 10, n = 1000, Double64 | 0.99951 | <= 1 | PASS
+AC6 | max |n X_tau - n X_1| / (B_S^tau + B_S^1), tau {2,5,10}, K {0.5, 2pi}, n {100,1e3}, 240 comparisons, Float64 | 0.0016936 | <= 1 | PASS
+AC18 | max alpha_j range violation ratio (E14), AC6 runs, Float64 | 0.99966 | <= 1 | PASS
+AC6 | max |n X_tau - n X_1| / (B_S^tau + B_S^1), tau {2,5,10}, K {0.5, 2pi}, n {100,1e3}, 240 comparisons, Double64 | 6.9505e-05 | <= 1 | PASS
+AC18 | max alpha_j range violation ratio (E14), AC6 runs, Double64 | 0.9999 | <= 1 | PASS
+# section AC5-6-18 took 268.0 s
+# S7 screening (fresh seed 20302362): first 100 regular starts, 2 candidates replaced
+AC7 | max |nX_T - nX_ref| / (32 K M_state n^2 eps rho_n), n = 10, 50 starts, Float64 (rho_n > 50 excluded: 0, limit 5) | 0.0010488 | <= 1 | PASS
+AC7 | same without the M_state factor (printed form before Amendment D35, informational), n = 10, Float64 | 0.051215 | <= 1 | INFO
+AC7 | max |nX_T - nX_ref| / (32 K M_state n^2 eps rho_n), n = 100, 50 starts, Float64 (rho_n > 50 excluded: 2, limit 5) | 0.0019383 | <= 1 | PASS
+AC7 | same without the M_state factor (printed form before Amendment D35, informational), n = 100, Float64 | 0.25407 | <= 1 | INFO
+AC7 | max |nX_T - nX_ref| / (32 K M_state n^2 eps rho_n), n = 10, 50 starts, Double64 (rho_n > 50 excluded: 0, limit 5) | 2.4487e-05 | <= 1 | PASS
+AC7 | same without the M_state factor (printed form before Amendment D35, informational), n = 10, Double64 | 0.0016315 | <= 1 | INFO
+AC7 | max |nX_T - nX_ref| / (32 K M_state n^2 eps rho_n), n = 100, 50 starts, Double64 (rho_n > 50 excluded: 2, limit 5) | 7.1666e-06 | <= 1 | PASS
+AC7 | same without the M_state factor (printed form before Amendment D35, informational), n = 100, Double64 | 0.0010156 | <= 1 | INFO
+# section AC7 took 23.6 s
+AC8 | max relative error of safe_norm / 2 eps, c (3,4) c in 2^{600,-600,0,1000,-1000} and 2000 random d {2,4} at scale 2^e, |e| <= 900, Float64 (non-finite results: 0) | 0.55722 | <= 1 | PASS
+AC8 | zero gives 0, NaN and Inf give a non-finite norm, Float64 | true | true | PASS
+AC8 | max relative error of safe_norm / 2 eps, c (3,4) c in 2^{600,-600,0,1000,-1000} and 2000 random d {2,4} at scale 2^e, |e| <= 900, Double64 (non-finite results: 0) | 0.020556 | <= 1 | PASS
+AC8 | zero gives 0, NaN and Inf give a non-finite norm, Double64 | true | true | PASS
+# section AC8 took 19.4 s
+AC9 | health: zero tangent (kind, orbit, step, backend, column, value, no result stored, lowest id first), NaN tangent (column 0, threshold Inf), Double64 per-orbit body, k != 1 ArgumentError: checks passed / total | 36/36 | all | PASS
+# section AC9 took 27.3 s
+AC10 | (a) orbit points at every handoff bitwise equal for chains {}, {L1}, {L1, det}: cases equal / total (5 starts x tau {1,4}) | 10/10 | all | PASS
+AC10 | (b) propagate (2 threads, chunks 64 and 1000) bitwise equal to the serial map of propagate_orbit (x, W, finals, provenance), 4096 orbits, K = 2 pi, n = 1e3, tau {1,4}, Float64 : equal / total | 4/4 | all | PASS
+AC10 | (b) propagate (2 threads, chunks 64 and 1000) bitwise equal to the serial map of propagate_orbit (x, W, finals, provenance), 1024 orbits, K = 2 pi, n = 1e3, tau {1,4}, Double64 (moved from the package suite): equal / total | 4/4 | all | PASS
+AC10 | (c) bytes allocated per orbit after warm-up, n = 1e4, chain {L1, det}, tau = 1, Float64 | 0 | 0 | PASS
+AC10 | (c) bytes allocated per orbit after warm-up, n = 1e4, chain {L1, det}, tau = 4, Float64 | 0 | 0 | PASS
+AC10 | (c) bytes allocated per orbit after warm-up, n = 1e4, chain {L1, det}, tau = 1, Double64 | 0 | 0 | PASS
+AC10 | (c) bytes allocated per orbit after warm-up, n = 1e4, chain {L1, det}, tau = 4, Double64 | 0 | 0 | PASS
+# section AC10 took 276.4 s
+AC11 | (a) K = 0, dyadic starts: wrapped and lifted finals bitwise identical, Float64: identical / total | 100/100 | all | PASS
+AC11 | (a) K = 0, dyadic starts: wrapped and lifted finals bitwise identical, Double64: identical / total | 100/100 | all | PASS
+AC11 | (b) max |nX_wrapped - nX_lifted| / (64 K M_state n^2 eps rho_n), K = 0.5 regular class, n = 10, 50 starts, Float64 (rho_n > 50 excluded: 0, limit 5) | 0.0012091 | <= 1 | PASS
+AC11 | (b) max |nX_wrapped - nX_lifted| / (64 K M_state n^2 eps rho_n), K = 0.5 regular class, n = 100, 50 starts, Float64 (rho_n > 50 excluded: 2, limit 5) | 0.00093431 | <= 1 | PASS
+AC11 | (b) max |nX_wrapped - nX_lifted| / (64 K M_state n^2 eps rho_n), K = 0.5 regular class, n = 10, 50 starts, Double64 (rho_n > 50 excluded: 0, limit 5) | 7.349e-06 | <= 1 | PASS
+AC11 | (b) max |nX_wrapped - nX_lifted| / (64 K M_state n^2 eps rho_n), K = 0.5 regular class, n = 100, 50 starts, Double64 (rho_n > 50 excluded: 2, limit 5) | 4.9524e-06 | <= 1 | PASS
+# section AC11 took 30.5 s
+AC17 | starts with slope of ln X vs ln n over n in [1e4,1e6] in [-1.1,-0.8] (of 20, K = 0.5 regular class, n up to 1e6); slope min / median / max = -0.91767 / -0.90386 / -0.86315 | 20 | >= 16 | PASS
+# section AC17 took 46.7 s
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 0.5, n = 10000, tau = 1, Float64 (nonzero: true) | 0.05 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 0.5, n = 10000, tau = 4, Float64 (nonzero: true) | 0.05 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 0.5, n = 10000, tau = 1, Double64 (nonzero: true) | 0.0015625 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 0.5, n = 10000, tau = 4, Double64 (nonzero: true) | 0.0015625 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 2 pi, n = 10000, tau = 1, Float64 (nonzero: true) | 0.060363 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 2 pi, n = 10000, tau = 4, Float64 (nonzero: true) | 0.060363 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 2 pi, n = 10000, tau = 1, Double64 (nonzero: true) | 0.0018864 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 2 pi, n = 10000, tau = 4, Double64 (nonzero: true) | 0.0018864 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 10, n = 1000, tau = 1, Float64 (nonzero: true) | 0.083333 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 10, n = 1000, tau = 4, Float64 (nonzero: true) | 0.083333 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 10, n = 1000, tau = 1, Double64 (nonzero: true) | 0.0026042 | <= 1 | PASS
+AC19 | (a) max det residual / threshold 4 eps (2 + K) over 20 starts, K = 10, n = 1000, tau = 4, Double64 (nonzero: true) | 0.0026042 | <= 1 | PASS
+AC19 | (b) injected det fault: raised for delta in [2 theta, 4 theta) (theta = 2.6645e-15) / quiet for delta in (theta/4, theta/2], Float64 | 1/1 ; 1/1 | all | PASS
+AC19 | (b) injected det fault: raised for delta in [2 theta, 4 theta) (theta = 9.4663e-30) / quiet for delta in (theta/4, theta/2], Double64 | 1/1 ; 1/1 | all | PASS
+# section AC19 took 50.8 s
+AC12 | (a) Float64 vs Double64 (lifted), K = 6.2832, 1000 starts, n = 1e4: mean X 1.1706 vs 1.1705, difference 0.00015919, 4 combined SE 0.0096029; value = |difference| / 4 SE | 0.016577 | <= 1 | PASS
+AC12 | (a) Float64 vs Double64 (lifted), K = 5, 1000 starts, n = 1e4: mean X 0.9505 vs 0.95031, difference 0.00019104, 4 combined SE 0.027431; value = |difference| / 4 SE | 0.0069643 | <= 1 | PASS
+AC12 | (b) Float64 vs BigFloat(256) (lifted), K = 2 pi, 100 starts, n = 1e3: mean X 1.169 vs 1.172, difference -0.0029461, 4 SE 0.020707; value = |difference| / 4 SE | 0.14227 | <= 1 | PASS
+AC12 | (b) Double64 vs BigFloat(256) (lifted), K = 2 pi, 100 starts, n = 1e3: mean X 1.1757 vs 1.172, difference 0.003731, 4 SE 0.018028; value = |difference| / 4 SE | 0.20696 | <= 1 | PASS
+AC12 | (c) regular class K = 0.5 (S7 screening, 2 candidates replaced), 100 starts, n = 1e5 (lifted): max |X_64 - X_D64| (X values 5.3715e-05 .. 0.00013047) | 4.6013e-08 | <= 1e-4 | PASS
+# section AC12 took 565.4 s
+AC13 | ChaosTools lifted orbit bitwise equal to Chaoslab forward, K = 0.5, 10 starts x 1000 steps: equal / total | 10000/10000 | all | INFO
+AC13 | ChaosTools lifted orbit bitwise equal to Chaoslab forward, K = 6.2832, 10 starts x 1000 steps: equal / total | 10000/10000 | all | INFO
+AC13 | ChaosTools lifted orbit bitwise equal to Chaoslab forward, K = 5, 10 starts x 1000 steps: equal / total | 10000/10000 | all | INFO
+AC13 | ChaosTools lifted orbit bitwise equal to Chaoslab forward, K = 10, 10 starts x 1000 steps: equal / total | 10000/10000 | all | INFO
+AC13 | regular class K = 0.5 (S7), 20 starts, n = 1e5: max |X Chaoslab (seeded w0) - lambda_1 ChaosTools| (X range 7.3308e-05 .. 0.00011662) | 4.0743e-05 | <= 1e-4 | PASS
+AC13 | same with the identical initial vector e1 on both sides: max |X - lambda_1 ChaosTools| | 1.1739e-14 | <= 1e-4 | PASS
+AC13 | pathwise, w0 = e1 on both sides, K = 0.5 (S7), n = 100, 50 starts, tau = 1: max |nX - n lambda_ChaosTools| / (64 K M_state n^2 eps rho_n) (rho_n > 50 excluded: 2, limit 5) | 3.3335e-05 | <= 1 | PASS
+AC13 | pathwise, w0 = e1, K = 2 pi, n = 1e3, 20 starts: max |nX - n lambda_ChaosTools| / (8 eps Psi_n) (two estimators, so up to 2 expected; informational) | 0.47147 | <= 2 | INFO
+AC14 | chaotic ensemble K = 6.2832, 1000 starts, n = 10000: mean X Chaoslab 1.1686 vs ChaosTools 1.1687, difference -5.0796e-05, 4 combined SE 0.01165; value = |difference| / 4 SE | 0.00436 | <= 1 | PASS
+AC14 | same starts, w0 = e1 on both sides: max per-start |X - lambda_ChaosTools| (chaotic orbits are bitwise equal; informational) | 1.5099e-14 | - | INFO
+AC15 | chaotic ensemble K = 5, 200 starts, n = 10000: mean X Chaoslab 0.95372 vs ChaosTools 0.95378, difference -5.4624e-05, 4 combined SE 0.055228; value = |difference| / 4 SE | 0.00098906 | <= 1 | PASS
+AC15 | same starts, w0 = e1 on both sides: max per-start |X - lambda_ChaosTools| (chaotic orbits are bitwise equal; informational) | 9.4369e-15 | - | INFO
+AC15 | chaotic ensemble K = 10, 200 starts, n = 10000: mean X Chaoslab 1.6186 vs ChaosTools 1.6186, difference -5.6857e-05, 4 combined SE 0.0043544; value = |difference| / 4 SE | 0.013057 | <= 1 | PASS
+AC15 | same starts, w0 = e1 on both sides: max per-start |X - lambda_ChaosTools| (chaotic orbits are bitwise equal; informational) | 9.5479e-15 | - | INFO
+# section AC13-15 took 35.8 s
+AC16 | chaotic class K = 10, 1024 orbits, n = 1e4, tau = 10, Float64: max per-orbit |X_cpu - X_gpu| / sigma (sigma 0.0094799); |difference of means| / SE | 4.1274; 1.0459 | 6; 4 | PASS
+AC16 | regular class K = 0.5, 1024 orbits, n = 4e4, tau = 10, Float64: orbits above 1e-6 vs the Double64 reference, CPU / GPU; max CPU-GPU gap over the 1007 orbits where both agree | 17 / 16; 3.6604e-07 | count diff <= 3; gap <= 2e-6 | PASS
+AC16 | chaotic class K = 10, 1024 orbits, n = 1e4, tau = 10, Double64 | - | 6 sigma; 4 SE | FALLBACK(kernel does not compile for the element type)
+# section AC16 took 1637.0 s
+Y1 | ensemble K = 1.5708, 100 uniform starts, n = 1e6: mean X 0.21608 +- 0.01355 (SE), median 0.29926, min 3.6254e-06, max 0.30921; ln(K/2) = -0.24156 (not asymptotic at this K); mean - ln(K/2) = 0.45764 | - | INFO
+Y1 | ensemble K = 6.2832, 100 uniform starts, n = 1e6: mean X 1.1723 +- 0.00012578 (SE), median 1.1723, min 1.169, max 1.1748; ln(K/2) = 1.1447, ln(K/2) + 1/K^2 = 1.1701; mean - ln(K/2) = 0.027579, mean - (ln(K/2) + 1/K^2) = 0.0022488 = 17.878 SE | - | INFO
+Y1 | ensemble K = 10, 100 uniform starts, n = 1e6: mean X 1.6201 +- 0.00010053 (SE), median 1.6201, min 1.6178, max 1.6222; ln(K/2) = 1.6094, ln(K/2) + 1/K^2 = 1.6194; mean - ln(K/2) = 0.010675, mean - (ln(K/2) + 1/K^2) = 0.00067491 = 6.7137 SE | - | INFO
+Y1 | ensemble K = 20, 100 uniform starts, n = 1e6: mean X 2.3052 +- 9.0976e-05 (SE), median 2.3052, min 2.303, max 2.3071; ln(K/2) = 2.3026, ln(K/2) + 1/K^2 = 2.3051; mean - ln(K/2) = 0.0025649, mean - (ln(K/2) + 1/K^2) = 6.4907e-05 = 0.71346 SE | - | INFO
+Y1 | single orbit K = 1.5708, start (x, p) = (1e-3, -1e-3) (E9 of (x,y) = (1,2) 1e-3), n = 1e7: X = 0.29642 vs SalaArtuso2015 0.298 (their n = 1e9); difference -0.0015807 | - | INFO
+Y1 | single orbit K = 6.2832, start (x, p) = (1e-3, -1e-3) (E9 of (x,y) = (1,2) 1e-3), n = 1e7: X = 1.1725 vs SalaArtuso2015 1.172 (their n = 1e9); difference 0.00049722 | - | INFO
+# section Y1 took 290.1 s
+PR-trig | Double64 sin, cos, |x| in [1e0, 1e1), 3000 evaluations: max abs error 0.030359 x eps_eff, max relative error 0.037337 x eps_eff, max abs error / (eps_eff |x|) = 0.020203 | eps_eff = 2^-100 | INFO
+PR-trig | Double64 sin, cos, |x| in [1e1, 1e2), 3000 evaluations: max abs error 0.003967 x eps_eff, max relative error 0.0072604 x eps_eff, max abs error / (eps_eff |x|) = 0.00039123 | eps_eff = 2^-100 | INFO
+PR-trig | Double64 sin, cos, |x| in [1e2, 1e3), 3000 evaluations: max abs error 0.0039616 x eps_eff, max relative error 0.0072667 x eps_eff, max abs error / (eps_eff |x|) = 3.5916e-05 | eps_eff = 2^-100 | INFO
+PR-trig | Double64 sin, cos, |x| in [1e3, 1e4), 3000 evaluations: max abs error 0.0039331 x eps_eff, max relative error 0.007339 x eps_eff, max abs error / (eps_eff |x|) = 3.6279e-06 | eps_eff = 2^-100 | INFO
+PR-trig | Double64 sin, cos, |x| in [1e4, 1e5), 3000 evaluations: max abs error 0.003958 x eps_eff, max relative error 0.0078038 x eps_eff, max abs error / (eps_eff |x|) = 3.5967e-07 | eps_eff = 2^-100 | INFO
+PR-trig | Double64 sin, cos, |x| in [1e5, 1e6), 3000 evaluations: max abs error 0.003946 x eps_eff, max relative error 0.0073692 x eps_eff, max abs error / (eps_eff |x|) = 3.8762e-08 | eps_eff = 2^-100 | INFO
+PR-trig | Double64 sin, cos, |x| in [1e6, 1e7), 3000 evaluations: max abs error 0.0039625 x eps_eff, max relative error 0.0073269 x eps_eff, max abs error / (eps_eff |x|) = 3.5545e-09 | eps_eff = 2^-100 | INFO
+PR-trig | Double64 sin, cos, |x| in [1e7, 1e8), 3000 evaluations: max abs error 0.0039627 x eps_eff, max relative error 0.0078889 x eps_eff, max abs error / (eps_eff |x|) = 3.9418e-10 | eps_eff = 2^-100 | INFO
+PR-trig | summary: Double64 trig floor over |x| in [1, 1e8): max abs error = 0.030359 eps_eff = 2.3949e-32 (2^-105.04); fit err <= c eps_eff |x| with c = 0.020203 | eps_eff = effective_eps(Double64) = 7.8886e-31 | INFO
+PR-trig | realized orbit arguments, K = 2 pi lifted Double64, 28580 points, max |x| = 6.8393e+06: max abs error of sin, cos in units of eps_eff by decade of |x| (count): 1e-2: 0.0035673 (1 points, 0 above 1); 1e-1: 0.00844 (4 points, 0 above 1); 1e0: 0.020566 (23 points, 0 above 1); 1e1: 0.0037095 (49 points, 0 above 1); 1e2: 0.00396 (246 points, 0 above 1); 1e3: 0.4455 (1246 points, 0 above 1); 1e4: 7.9963 (5274 points, 19 above 1); 1e5: 63.996 (13402 points, 62 above 1); 1e6: 484.43 (8335 points, 37 above 1); for |x| >= 1e3 max abs error / (eps_eff |x|) = 0.00012068 | eps_eff | INFO
+PR-trig | attribution, K = 2 pi lifted Double64, n = 1e4, 6 starts: max over starts of error / old linear bound 8 eps (n + G_first): vs 256-bit product at realized points 0.038904; vs product of the stored Double64 tangents 0.0068829; max |stored tangent entry - K cos x at 256 bits| = 1608.4 eps_eff; max |x| on the orbit 3.8393e+06 | - | INFO
+# section PR-trig took 56.8 s
+# figure K=2pi: |difference of means| / 4 SE at n = [10, 30, 100, 300, 1000, 3000, 10000]: 0.42723, 0.20761, 0.083861, 0.037132, 0.01372, 0.0048203, 0.0014504
+# figure K=0.5: max |X Chaoslab - X ChaosTools| over 20 starts at n = [100, 300, 1000, 3000, 10000, 30000, 100000]: 0.049717, 0.015636, 0.0042209, 0.0013732, 0.00040867, 0.00013592, 4.0743e-05
+# figure K=10: ensemble mean X(n) at n = [100, 300, 1000, 3000, 10000, 30000, 100000]: 1.6157, 1.6211, 1.623, 1.6192, 1.6209, 1.6205, 1.6202; ln(K/2) = 1.6094
+# figure saved: lyap-benettin-convergence.png
+# section figure took 722.3 s
+# total wall time 4731.1 s

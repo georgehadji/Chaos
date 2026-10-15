@@ -1,0 +1,100 @@
+# lyap-two-trajectory verification, julia 1.13.1, threads 2, base seed 20261012 (verify offset 45000), time 1.792054745e9 (unix)
+# timings in this log were taken on a loaded machine (other agents were running concurrently)
+SUITE | package suite at full size (L2_FULL_RUN), assertions passed (fail + error = 0); wall time 369.2 s | 568 | 568 pass, 0 fail, 0 error | PASS
+# section suite took 369.2 s
+AC1 | max |n X2 - ln||A^n u0|| | / B_S(n), tau in {1,5,10}, n in {20,100,1000}, d0 = 2^-20, Float64 | 0.02266 | <= 1 | PASS
+AC1 | max |n X2 - ln||A^n u0|| | / B_S(n), tau in {1,5,10}, n in {20,100,1000}, d0 = 2^-20, Double64 | 0.004841 | <= 1 | PASS
+AC2 | max |n X2 - ln sqrt((a+nb)^2+b^2)| / B_S(n), 20 seeded u0, d0 in {2^-20, 1e-9}, tau in {1,10}, n up to 1e4, Float64 | 0.06051 | <= 1 | PASS
+AC2 | max |n X2 - ln sqrt((a+nb)^2+b^2)| / B_S(n), 20 seeded u0, d0 in {2^-20, 1e-9}, tau in {1,10}, n up to 1e4, Double64 | 0.001159 | <= 1 | PASS
+AC3 | max |n X2 - [n ln mu+ + ln(|c1| ||vu||)]| / (B_S + 2 n E_nl), K in {1,2,6}, d0 in {1e-6,1e-9}, 100 u0, n in {20,100,1000} | 3.852e-08 | <= 1 | PASS
+AC4 | straddling pair and pair at x = 1: max |X2| / (2 E_ro(d0)), n in {1,10,100} (E_ro = 9.468e-09) | 0 | <= 1 | PASS
+AC4 | same two pairs: |X2(straddle) - X2(x=1)| / (2 E_ro(d0)) | 0 | <= 1 | PASS
+AC4 | plain wrapped difference of the straddling pair: ln(norm / d0), the artifact of T3 | 15.7 | >= 10 | PASS
+AC4 | separation(): max |entry| <= pi (9.537e-07) and ||sep|| = d0 within 4 E_ro d0, ratio | 0 | <= 1 | PASS
+AC4 | separation(displaced(sep)) - sep over 4 eps 2 pi | 0 | <= 1 | PASS
+AC4 | plain-difference double on the straddling pair: rejected before any work, kind/step/orbit/backend | separation/0/1/cpu | separation/0/1/cpu | PASS
+AC4 | double vs correct hook at x = 1: |difference| / (2 E_ro) | 0 | <= 1 | PASS
+AC4 | mirror case across p = 0, u0 = (0,1): max |n X2 - ln sqrt(n^2+1)| / (B_S + 2 n E_ro) | 0.04865 | <= 1 | PASS
+AC5 | cells where the reference orbit differs bitwise from the plain forward loop or the L1 stream orbit (40 cells: mode x K x tau x N, Float64) | 0 | 0 | PASS
+AC5 | cells where the reference orbit differs bitwise from the plain forward loop or the L1 stream orbit (40 cells: mode x K x tau x N, Double64) | 0 | 0 | PASS
+# section AC1-5 took 29.0 s
+AC6 | K = 0.5: max |X2 - X| / (Delta_2T Psi_n/n + B_S/n) (T5a), 50 starts, d0 = 10^-m m = 3..12, n up to 1e4; points outside validity (reported) = 0 | 0.006326 | <= 1 | PASS
+#   K = 0.5: old ratio max |X2 - X| / Delta_2T = 6.902; T5a ratio per decade m: 3:0.003805 4:0.004533 5:0.003786 6:0.003754 7:0.002866 8:0.006326 9:0.004964 10:0.005486 11:0.004374 12:0.004113
+AC6 | K = 2.0: max |X2 - X| / (Delta_2T Psi_n/n + B_S/n) (T5a), 50 starts, d0 = 10^-m m = 3..12, n up to 1e3; points outside validity (reported) = 0 | 0.02922 | <= 1 | PASS
+#   K = 2.0: old ratio max |X2 - X| / Delta_2T = 1.345; T5a ratio per decade m: 3:0.02272 4:0.02922 5:0.01631 6:0.01612 7:0.01021 8:0.004051 9:0.004322 10:0.005687 11:0.006291 12:0.01004
+AC6 | K = 5.0: max |X2 - X| / (Delta_2T Psi_n/n + B_S/n) (T5a), 50 starts, d0 = 10^-m m = 3..12, n up to 1e3; points outside validity (reported) = 0 | 0.03372 | <= 1 | PASS
+#   K = 5.0: old ratio max |X2 - X| / Delta_2T = 1.004; T5a ratio per decade m: 3:0.01012 4:0.03372 5:0.01356 6:0.01296 7:0.009313 8:0.00159 9:0.002119 10:0.001748 11:0.009692 12:0.002507
+AC6 | K = 6.283185307179586: max |X2 - X| / (Delta_2T Psi_n/n + B_S/n) (T5a), 50 starts, d0 = 10^-m m = 3..12, n up to 1e3; points outside validity (reported) = 0 | 0.0116 | <= 1 | PASS
+#   K = 6.283185307179586: old ratio max |X2 - X| / Delta_2T = 0.2157; T5a ratio per decade m: 3:0.0116 4:0.008359 5:0.006921 6:0.006471 7:0.004973 8:0.001512 9:0.001896 10:0.002043 11:0.002548 12:0.002055
+# section AC6 took 10.1 s
+AC7 | slope of log10 median|X2-X| against log10 d0, m in {2,3,4} (E_nl linear in d0), K = 5, 200 starts, n = 1e3 | 0.9001 | [0.8, 2.2] | PASS
+AC7 | same, m in {10,...,13} (E_ro proportional to 1/d0) | -0.9512 | [-1.3, -0.7] | PASS
+AC7 | grid minimum at m = 8: d0/d0* with d0* = 5.959e-08 (T8) | 0.1678 | [0.01, 100] | PASS
+AC7 | grid minimum of the median error 1.661e-08 over Delta_2T(d0*) = 6.689e-06 | 0.002484 | <= 1 | PASS
+#   AC7 median |X2 - X| per m: 2:0.001812 3:0.0003031 4:2.871e-05 5:2.853e-06 6:2.852e-07 7:2.881e-08 8:1.661e-08 9:1.736e-07 10:1.796e-06 11:1.568e-05 12:0.0001661 13:0.001212
+AC8 | Double64 K = 5: max |X2 - X| / (Delta_2T Psi_n/n + B_S/n) (T5a, eps 2^-100), 50 starts, n = 1e3, m = 3..28 | 0.01376 | <= 1 | PASS
+AC8 | Double64 K = 6.283: max |X2 - X| / (Delta_2T Psi_n/n + B_S/n) (T5a, eps 2^-100), 50 starts, n = 1e3, m = 3..28 | 0.01875 | <= 1 | PASS
+AC8 | Double64 K = 5 grid minimum of the median error | 1.287e-16 | <= 1e-9 | PASS
+AC8 | Float64 grid minimum / Double64 grid minimum (T8 predicts 1.7e7) | 1.291e+08 | >= 1e3 | PASS
+#   AC8 Double64 median |X2 - X| per m (K = 5): 3:0.0002168 4:2.197e-05 5:2.169e-06 6:2.166e-07 7:2.166e-08 8:2.166e-09 9:2.166e-10 10:2.166e-11 11:2.166e-12 12:2.166e-13 13:2.166e-14 14:2.166e-15 15:2.069e-16 16:1.287e-16 17:1.068e-15 18:1.096e-14 19:1.012e-13 20:9.881e-13 21:8.899e-12 22:1.197e-10 23:1.293e-09 24:1.222e-08 25:8.19e-08 26:1.193e-06 27:9.437e-06
+# section AC7-8 took 20.9 s
+AC9 | K = 0.5, tau = 1: max |X2 - X| / (sigma^(2(tau-1)) Delta_2T Psi_n/n + B_S/n), d0 = 1e-8, 50 starts, n = 1e3 (gated) | 0.002393 | <= 1 | PASS
+AC9 | K = 0.5, tau = 2: max |X2 - X| / (sigma^(2(tau-1)) Delta_2T Psi_n/n + B_S/n), d0 = 1e-8, 50 starts, n = 1e3 (gated) | 0.0001987 | <= 1 | PASS
+AC9 | K = 0.5, tau = 4: max |X2 - X| / (sigma^(2(tau-1)) Delta_2T Psi_n/n + B_S/n), d0 = 1e-8, 50 starts, n = 1e3 (gated) | 2.058e-05 | <= 1 | PASS
+AC9 | K = 5.0, tau = 1: max |X2 - X| / (sigma^(2(tau-1)) Delta_2T Psi_n/n + B_S/n), d0 = 1e-8, 50 starts, n = 1e3 (gated) | 0.0009609 | <= 1 | PASS
+AC9 | K = 5.0, tau = 2: max |X2 - X| / (sigma^(2(tau-1)) Delta_2T Psi_n/n + B_S/n), d0 = 1e-8, 50 starts, n = 1e3 (gated) | 2.778e-05 | <= 1 | PASS
+AC9 | K = 5.0, tau = 4: same ratio (reported, not gated) | 5.747e-08 | reported | INFO
+AC9 | K = 5.0, tau = 8: same ratio (reported, not gated) | 1.472e-12 | reported | INFO
+AC9 | negative control (T7), K = 10, d0 = 1e-3, tau = 16: max X2 against ln(pi sqrt 2/d0)/16 | 0.4884 | <= 0.5249 | PASS
+AC9 | negative control: min (X - X2) over the 50 of 50 starts with X >= 1.1 | 1.062 | >= 0.5 | PASS
+# section AC9 took 9.5 s
+AC10 | (a) d0 = 1e-20 at magnitude ~1: rejected before any work (the map throws if called), kind separation, step 0, backend cpu, both entry points | true | true | PASS
+AC10 | (b) map collapsing the pair at the second handoff, orbit 3: error with kind separation, orbit 3, step 2, nothing stored | true | true | PASS
+AC10 | (c) non-finite in reference, shadow or both: kind state, orbit 3, step 2, threshold Inf (6 calls) | true | true | PASS
+AC10 | (d) run record carries d0, tau, estimator, state_mode, seed, precision (3 type/mode cases) | true | true | PASS
+AC10 | contract checks: N not a multiple of tau, N = 0, d0 in {0, <0, NaN, Inf}, BigFloat d0 narrowing: ArgumentError | true | true | PASS
+AC11 | propagate_shadow equals the serial map of propagate_shadow_orbit bitwise, 4096 orbits, K = 2 pi, n = 1e3, chunk = 64 | true | true | PASS
+AC11 | propagate_shadow equals the serial map of propagate_shadow_orbit bitwise, 4096 orbits, K = 2 pi, n = 1e3, chunk = 1000 | true | true | PASS
+AC11 | propagate_shadow equals the serial map of propagate_shadow_orbit bitwise, 4096 orbits, K = 2 pi, n = 1e3, chunk = default | true | true | PASS
+AC11 | X2 series, sums, x and W bitwise identical for thread counts [1, 2, 4] (hashes of all outputs, separate processes) | true | true | PASS
+AC11 | bytes allocated by propagate_shadow_orbit after warm-up, n = 1e4, Float64, wrapped | 0 | 0 | PASS
+AC11 | bytes allocated by propagate_shadow_orbit after warm-up, n = 1e4, Float64, lifted | 0 | 0 | PASS
+AC11 | bytes allocated by propagate_shadow_orbit after warm-up, n = 1e4, Double64, wrapped | 0 | 0 | PASS
+AC11 | bytes allocated by propagate_shadow_orbit after warm-up, n = 1e4, Double64, lifted | 0 | 0 | PASS
+# section AC10-11 took 261.5 s
+AC12 | wrapped, n = 1000: max |X2 - X| / (Delta_2T Psi_n/n + B_S/n) over 100 tested starts of 100 (E_ro > 0.5, reported: 0; unexpected separation errors: 0), K = 5, d0 = 1e-8 | 0.001411 | <= 1 | PASS
+AC12 | lifted, n = 1000: max |X2 - X| / (Delta_2T Psi_n/n + B_S/n) over 100 tested starts of 100 (E_ro > 0.5, reported: 0; unexpected separation errors: 0), K = 5, d0 = 1e-8 | 0.001392 | <= 1 | PASS
+AC12 | lifted n = 1e3: all 100 starts valid and tested, no unexpected errors | (100, 0) | (100, 0) | PASS
+AC12 | wrapped, n = 1e+05: max |X2 - X| / (Delta_2T Psi_n/n + B_S/n) over 100 tested starts of 100 (E_ro > 0.5, reported: 0; unexpected separation errors: 0), K = 5, d0 = 1e-8 | 0.002036 | <= 1 | PASS
+AC12 | lifted, n = 1e+05: max |X2 - X| / (Delta_2T Psi_n/n + B_S/n) over 1 tested starts of 100 (E_ro > 0.5, reported: 99; unexpected separation errors: 0), K = 5, d0 = 1e-8 | 3.163e-05 | <= 1 | PASS
+AC12 | recorded (no threshold): max |X2 - X| at n = 1e5 over valid starts, lifted / wrapped = 1.104e-06 / 1.5e-06 | 0.736 | recorded | INFO
+# section AC12 took 58.9 s
+ORACLE | orbit of ChaosTools lifted rule vs Chaoslab forward, K = 5, 1000 steps: max |difference| (same arithmetic) | 0 | 0 (information) | INFO
+AC13 | K = 0.5 regular class, 20 starts, n = 1e5, d0 = 1e-6, lifted: max |X2 - lambda_oracle| (mean X2 0.0001472, mean oracle 0.0001075, Delta_2T(1e-6) = 1.486e-06) | 0.0003181 | <= 1e-4 | FAIL
+AC13 | info: max |X2 - X_L1| and max |oracle - X_L1| (same orbit and direction, lifted), default thresholds | 0.0003821 / 6.398e-05 | info | INFO
+AC13 | info: lifted-mode T5a ratio |X2 - X_L1| / (Delta_2T(M_state) Psi_n/n + B_S/n) with the measured M_state (max over starts 6.283e+05, max Psi_n/n 1.249e+05, E_ro(max M) = 0.001297) | 0.0005591 | info (vacuous bound) | INFO
+AC13 | info: same comparison at d0 = 1.0e-5 (default thresholds): max |X2 - oracle| / max |X2 - X_L1| | 0.0002261 / 0.0002784 | info | INFO
+AC13 | info: same comparison at d0 = 0.0001 (default thresholds): max |X2 - oracle| / max |X2 - X_L1| | 0.002265 / 0.0009403 | info | INFO
+AC13 | info: oracle thresholds [d0*0.5, d0*2]: max |X2 - oracle| / max |oracle - X_L1| | 0.0001294 / 0.0002572 | info (gate 1e-4 applies to the default) | INFO
+AC13 | info: oracle thresholds [d0*0.1, d0*10]: max |X2 - oracle| / max |oracle - X_L1| | 0.0001175 / 0.0002646 | info (gate 1e-4 applies to the default) | INFO
+AC13 | info: oracle thresholds [d0*0.01, d0*100]: max |X2 - oracle| / max |oracle - X_L1| | 0.0002955 / 8.663e-05 | info (gate 1e-4 applies to the default) | INFO
+AC14 | K = 2 pi, 1000 starts, n = 1e4, d0 = 1e-6: mean X2 1.167 (SE 0.002642), mean oracle 1.167 (SE 0.002642), |diff| = 1.66e-06; |diff| / combined SE | 0.0004443 | <= 4 | PASS
+#   pathwise |X2 - oracle|: median 4.086e-05, max 0.0005446
+AC14 | info: first 200 starts, oracle with tight thresholds [d0/2, 2 d0]: |diff of means| / combined SE (X2 mean 1.166, oracle 1.166) | 0.0004349 | info | INFO
+AC15 | K = 5, 200 starts, n = 1e4, d0 = 1e-6: mean X2 0.9521 (SE 0.01087), mean oracle 0.9521 (SE 0.01087), |diff| = 7.134e-06; |diff| / combined SE | 0.0004639 | <= 4 | PASS
+#   pathwise |X2 - oracle|: median 3.877e-05, max 0.0005637
+AC15 | K = 10, 200 starts, n = 1e4, d0 = 1e-6: mean X2 1.619 (SE 0.0007538), mean oracle 1.619 (SE 0.0007539), |diff| = 1e-05; |diff| / combined SE | 0.009381 | <= 4 | PASS
+#   pathwise |X2 - oracle|: median 3.903e-05, max 0.000606
+AC16 | K = 2 pi wrapped, 1000 starts, n = 1e4, d0 = d0* = 5.683e-08: X2 (first) against L1 X (second, in the 'oracle' slot): mean X2 1.169 (SE 0.001719), mean oracle 1.169 (SE 0.001719), |diff| = 3.671e-09; |diff| / combined SE | 1.51e-06 | <= 4 | PASS
+#   pathwise |X2 - oracle|: median 1.518e-08, max 1.011e-05
+#   AC16 pathwise |X2 - X| (same orbit and direction): median 1.518e-08, max 1.011e-05
+AC17 | CPU vs GPU on X2: needs a CUDA device and the shadow kernel; verify/gpu.jl has no L2 case | not run here | tangent-core AC12 tolerances | STAGE04-GPU
+R2 | oracle with wrapped rule vs lifted rule, K = 0.5, 40 starts, n = 1e5, d0 = 1e-6: mean wrapped 0.0002784 (SE 4.411e-05), mean lifted 0.0001048 (SE 3.318e-06), artifact = wrapped - lifted | 0.0001736 | recorded | INFO
+R2 | oracle with wrapped rule vs lifted rule, K = 5.0, 40 starts, n = 1e5, d0 = 1e-6: mean wrapped 0.9766 (SE 0.000825), mean lifted 0.9743 (SE 0.0007446), artifact = wrapped - lifted | 0.002288 | recorded | INFO
+# section oracle took 75.6 s
+# figure saved: lyap-two-trajectory-ushape.png
+# section figure took 384.7 s
+# figure saved: lyap-two-trajectory-oracle.png
+# section figure-oracle took 69.9 s
+# verdicts: 57 PASS, 1 FAIL, 15 other
+# total wall time 1401.1 s

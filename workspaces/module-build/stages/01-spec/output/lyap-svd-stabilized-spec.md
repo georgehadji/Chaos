@@ -101,3 +101,9 @@ The spec's "one seeded orbit" does not determine the control: the plain Float64 
 ### Coverage
 
 Package suite: the Double64 parts of criteria 3, 5, 8, 9 and 12 run at stage 04 (the stage 02 plan cut them for the 3 minute budget; the spec header says "Float64 and Double64" for every criterion); criteria 1, 2, 4, 6 and 7 run both types. Whether any returns to the package suite is decided by the stage 03 runtime measurement (owner question, see the table).
+
+## Amendment D41 (2026-10-15)
+
+Criterion 10, the c check, is replaced by an ensemble rounding bound. On the same orbits (n = 10^4, K = 10, 1024 seeded orbits with S_1(500) >= 25; the others reported), with r(a, b) = abs(a - b) / max(1, abs(a)): pass = max r(c_cpu, c_gpu) <= max r(c_cpu, c_cpu'), where c_cpu' is the CPU run from the same starts with x0[1] shifted by one ulp (`nextfloat`). The bound is measured in the same run, not a constant. The lambda tolerances of criterion 10 are unchanged.
+
+Why. The absolute 1e-12 ignored that c can be large (max abs(c) 167.9 at n = 10^4). The relative form with a fixed 1e-12 (first owner choice) also fails: c is fixed by the first windows (c(200) equals c(10^4) bitwise on every orbit) and ill-conditioned on some orbits, so a fixed bound measures the conditioning of the orbit, not the GPU. Measured at stage 04 (`verify/gpu.jl`, GTX 1050, Float64): CPU-GPU absolute max 6.1e-12; relative max 1.39e-12 (orbit 441, abs(c) 1.97), median 1.1e-16; 1-ulp sensitivity max 3.9e-11, median 3.3e-16, and 1.32e-12 on orbit 441. The bound accepts a GPU difference no larger than what one rounding of the start produces somewhere in the ensemble; it is loose on well-conditioned orbits (median sensitivity 3.3e-16), which the lambda tolerances cover.

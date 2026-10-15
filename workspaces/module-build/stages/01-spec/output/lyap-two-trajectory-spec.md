@@ -114,3 +114,9 @@ The negative control as written ("a test double that takes the plain wrapped dif
 ### Open points added
 
 (P5) The factor 2 of Delta_2T and the margin 34 of T5a are proposals; stage 04 reports the realized ratios. (P6) The validity statement of criterion 12 for the lifted mode at n = 1e5 (E_ro > 0.5 for 98 of the 100 seeded starts at K = 5; the other two are valid and tested) is unchanged by this amendment.
+
+## Amendment D42 (2026-10-15)
+
+Criterion 17, regular class: the tangent-core AC12(a) form (orbits above 1e-6 from a Double64 reference, counts within 3, gap within 2e-6) is replaced by a bound in L2 round-off units. Same S7-screened starts (K = 0.5, 1024 orbits), lifted mode, n = 4e4, tau = 1, d0 = 1e-8: pass = max over orbits of abs(X2_cpu - X2_gpu) / (4 E_ro(d0) Psi_n / n) <= 1, with E_ro of T5 at the orbit's measured M_state (lifted, as criterion 12) and Psi_n of T5a (the seeded direction). 4 E_ro Psi_n / n is the round-off part of T5a, 2 E_ro Psi_n / n, once per backend; E_nl is the same on both backends (same d0, same orbit start) and drops. Orbits with E_ro > 0.5 (outside the T5 validity) are reported, not gated. The chaotic part of criterion 17 keeps the tangent-core AC12 tolerances.
+
+Why. At stage 04 (`verify/gpu.jl`, GTX 1050, Float64, tau = 10) the count form failed, 882 / 876 orbits above 1e-6 (difference 6, bound 3), because the CPU itself departs from the Double64 reference by more than 1e-6 on 882 of 1024 orbits: at d0 = 1e-8 the round-off of the difference (E_ro, lifted M_state) is above the 1e-6 threshold, the AC13 mechanism. The tangent-core threshold measures the L2 round-off floor, not the GPU.

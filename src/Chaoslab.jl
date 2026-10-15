@@ -19,4 +19,5 @@ using .Foundation, .Systems, .Tangent, .Diagnostics, .Lyapunov
 for m in (Foundation, Systems, Tangent, Diagnostics, Lyapunov), n in names(m)
     n === nameof(m) || @eval export $n
 end
+include("precompile.jl")
 end

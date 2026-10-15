@@ -14,8 +14,14 @@ using KernelAbstractions: KernelAbstractions
 
 struct CUDADevice <: Foundation.AbstractDevice end
 
+# Per-thread stack of the orbit kernel (D40): CUDA's 1 KiB default overflows in the SVDSpectrum step (illegal address 700);
+# 2 KiB was the smallest size measured to run, this is twice that. Raised only, never lowered below a larger user setting.
+const GPU_STACK_BYTES = 4096
+
 function __init__()
-    CUDA.functional() && (Foundation.DEVICE[] = CUDADevice())
+    CUDA.functional() || return
+    CUDA.limit(CUDA.LIMIT_STACK_SIZE) < GPU_STACK_BYTES && CUDA.limit!(CUDA.LIMIT_STACK_SIZE, GPU_STACK_BYTES)
+    Foundation.DEVICE[] = CUDADevice()
 end
 
 Tangent.device_backend(::CUDADevice) = CUDABackend()

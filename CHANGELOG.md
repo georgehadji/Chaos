@@ -34,6 +34,7 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 - The `Manifest.toml` and `bench/` items of "Deferred" below are done (D13, D16).
 - Package test suites run in under 30 minutes on 2 threads: slow suites keep one representative case per criterion and run the full cross-product in `verify/` (D38); a PrecompileTools workload caches the hot paths at package precompile (D39).
+- The CUDA extension raises the device stack limit to at least 4 KiB at load, so `SVDSpectrum` runs on the GPU instead of failing with an illegal-address error at the 1 KiB default (D40).
 - Tangent-core spec Oracle corrected (D30): ChaosTools `lyapunov` is the two-trajectory method and `lyapunovspectrum` the tangent oracle; identical initial vectors are possible. Amendment D30 appended to the tangent-core and diagnostics specs.
 
 ### Deferred, with reason

@@ -9,7 +9,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 | File | Holds |
 |------|-------|
 | `Lyapunov.jl` | module, exports, include order |
-| `norm.jl` | `safe_norm`, the one norm every estimator uses |
+| `norm.jl` | `safe_norm`, the norm of every kernel-path estimator |
 | `benettin.jl` | `Benettin` reducer and its isbits state (`k = 1`) |
 | `orthonormalize.jl` | `Orthonormalizer` types `CGS`, `MGS`, `RGS`, status codes, `orthonormalize` for them, `window_Gw`, `window_G`, `orthogonality_threshold` |
 | `qr_spectrum.jl` | `QRSpectrum` reducer, its isbits state, the shared handoff step `_qr_step` |
@@ -43,13 +43,13 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 | Invariant | Guaranteed by |
 |-----------|---------------|
 | `orthonormalize` returns `Q'Q = I`, `R` upper triangular with exact zeros below and `R_ii > 0`; a zero or non-finite pivot gives `QR_PIVOT` with the pivot in `R[column, column]` | lyap-gram-schmidt spec G-items, lyap-householder-qr spec E5 |
-| Every estimator takes norms through `safe_norm` | lyap-benettin spec Algorithm 1, AC8 |
+| Every kernel-path estimator takes norms through `safe_norm` (LapackQR uses the norms inside LAPACK) | lyap-benettin spec Algorithm 1, AC8 |
 | Sums are compensated; `reducer_final` gives `lambda = (sum + comp) / n` | lyap-benettin spec E3 |
 | A zero or non-finite norm, pivot, state or separation is recorded in the state and raised as `NumericalHealthError` with orbit, step and backend, never thrown inside a kernel | D30, `Tangent` failure path |
 | `SVDSpectrum` reuses the RGS step unchanged: its `lambda_qr` equals that of `QRSpectrum(RGS())` bitwise | lyap-svd-stabilized spec AC3a |
 | `SVDSpectrum` refuses any `d` or `k` other than 2 at `reducer_init`; general `d` is held | D32, `SVD_GUARD_MESSAGE` |
 | CPU outputs are bitwise identical for 1 and 4 threads | `verify/threads.jl` |
-| `propagate_shadow` on the CPU equals a serial `map` of `propagate_shadow_orbit` bitwise, for any chunk size and thread count | lyap-two-trajectory spec, stage 04 report |
+| `propagate_shadow` on the CPU equals a serial `map` of `propagate_shadow_orbit` bitwise, at the tested chunk sizes (64, 1000, default) and thread counts (1, 2, 4) | lyap-two-trajectory spec, stage 04 report |
 | `d0` must widen exactly into the element type; a realized start separation outside `[d0/2, 2 d0]` raises before any chunk | lyap-two-trajectory spec Algorithm 1 |
 | Kernel-path estimators (Benettin, MGS, RGS, the three Householder variants, SVDSpectrum, `propagate_shadow`) run on the CUDA GPU in Float64; CGS shares the kernel but was not run on the GPU | `verify/gpu.jl` |
 | Double64 on the GPU falls back to the CPU with reason "kernel does not compile for the element type" | `verify/gpu.jl` |

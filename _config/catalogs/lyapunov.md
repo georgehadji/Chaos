@@ -9,7 +9,7 @@ Every variational method below consumes the same tangent stream from `Tangent.pr
 | ID | Method | Gives | Vectors | Main numerical issue | Source | Phase | Status |
 |----|--------|-------|---------|----------------------|--------|-------|--------|
 | L1 | Benettin single-vector renormalization (finite-time mLCE lambda_1(n)) | lambda_1(n) | 1 | slow O(ln n / n) convergence for regular orbits; threshold ambiguity in weak chaos | Benettin1980a, Skokos2010 | M2 | verified |
-| L2 | Two-trajectory (shadow orbit) separation with periodic renormalization | approx. lambda_1 | 0 (second orbit) | perturbation too large: nonlinear saturation; too small: round-off; wrapped vs lifted coordinates | Benettin1976, Wolf1985 | M2 | verified |
+| L2 | Two-trajectory (shadow orbit) separation with periodic renormalization | approx. lambda_1 | 0 (second orbit) | perturbation too large: nonlinear saturation; too small: round-off; wrapped vs lifted coordinates | Benettin1976, Wolf1985 | M2 | verified (criterion 13 open, D43) |
 
 ## B. Variational, full spectrum by reorthonormalization (discrete QR family)
 

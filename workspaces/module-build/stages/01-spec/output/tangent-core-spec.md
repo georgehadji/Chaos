@@ -197,3 +197,7 @@ Owner-approved at the Batch B spec checkpoint (decision D30, owner question O7; 
 - T4, Algorithm: new paragraph "Scaled norms" (effect on the overflow bound of tau).
 - T5, "Numerical health": reducers may add a named health kind; first is "orthonormalisation breakdown".
 - T6 (whether a reducer may own extra state components) is not applied here: D30 gave lyap-two-trajectory its own per-orbit loop, so the contract is unchanged.
+
+## Amendment D43 (2026-10-16)
+
+Amendment D30, item T2: the clause "accepts identical initial deviation vectors" is withdrawn. ChaosTools `lyapunovspectrum` does not accept a prescribed initial frame: `reinit!` resets the deviation vectors to the identity, so a seeded Q0 passed to it is ignored. Found in the installed source (ChaosTools 3.5.4) and confirmed by the stage 04 runs of lyap-benettin, lyap-gram-schmidt and lyap-svd-stabilized; every comparison with it runs with the identity frame on both sides. The rest of T2 stands.

@@ -6,7 +6,7 @@ Layer 3, canonical. `Status` is `planned` or `verified`; only module-build/05 wr
 
 | ID | System | Dim | Role | Known-answer tests | Source | Phase | Status |
 |----|--------|-----|------|--------------------|--------|-------|--------|
-| Y1 | Chirikov-Taylor standard map (lifted + wrapped coordinates) | 2 | P1/P2 workhorse | det DT = 1; K = 0 gives lambda = 0; large-K lambda_1 vs Chirikov estimate ln(K/2) | Chirikov1979, Greene1979 | M2 | planned |
+| Y1 | Chirikov-Taylor standard map (lifted + wrapped coordinates) | 2 | P1/P2 workhorse | det DT = 1; K = 0 gives lambda = 0; large-K lambda_1 vs Chirikov estimate ln(K/2) | Chirikov1979, Greene1979 | M2 | verified |
 | Y2 | Henon area-preserving quadratic map | 2 | second 2D benchmark, escaping orbits | det = 1 | Henon1969 | M4 | planned |
 | Y3 | Coupled standard maps / Froeschle 4D map | 4 | GALI_k, full spectra, Arnold diffusion | pairing lambda_1 = -lambda_4, lambda_2 = -lambda_3 | Froeschle1972 | M5 | planned |
 | Y4 | N coupled standard maps (chain) | 2N | spectrum scaling, k-vector cost | pairing for all i | Skokos2004, Skokos2007 | M5 | planned |

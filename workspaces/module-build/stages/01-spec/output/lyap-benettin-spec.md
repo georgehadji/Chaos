@@ -140,3 +140,7 @@ The printed bounds 32 K n^2 eps rho_n (criterion 7) and 64 K n^2 eps rho_n (crit
 ### Open points added
 
 (P5) The constants 16 (n^2 term) and 8 (Psi form) are proposals; stage 04 reports the realized ratios. (P6) G_first of S3 does not bound the amplification of a start whose direction is almost the contracting one (c_1 near 0); the closed form keeps it (criterion 1 excludes abs(c_1) < 0.05), and Psi_n includes it (its first term is norm(Y_n) norm(w_0)/norm(w_n)).
+
+## Amendment D43 (2026-10-16)
+
+Open point P4 is withdrawn. ChaosTools `lyapunovspectrum` does not accept a prescribed initial frame: `reinit!` resets the deviation vectors to the identity, so a seeded Q0 passed to it is ignored. Found in the installed source (ChaosTools 3.5.4) and confirmed by the stage 04 runs of lyap-benettin, lyap-gram-schmidt and lyap-svd-stabilized; every comparison with it runs with the identity frame on both sides. The tangent-core Oracle correction of D30 (T2) is amended to match (tangent-core spec, Amendment D43).

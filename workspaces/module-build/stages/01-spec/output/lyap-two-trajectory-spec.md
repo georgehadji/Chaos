@@ -122,3 +122,7 @@ Criterion 17, regular class: the tangent-core AC12(a) form (orbits above 1e-6 fr
 Why. At stage 04 (`verify/gpu.jl`, GTX 1050, Float64, tau = 10) the count form failed, 882 / 876 orbits above 1e-6 (difference 6, bound 3), because the CPU itself departs from the Double64 reference by more than 1e-6 on 882 of 1024 orbits: at d0 = 1e-8 the round-off of the difference (E_ro, lifted M_state) is above the 1e-6 threshold, the AC13 mechanism. The tangent-core threshold measures the L2 round-off floor, not the GPU.
 
 Measured (stage 04, after this amendment): ratio 1.1e-4, all 1024 orbits valid. In this configuration the bound exceeds |X2| on every orbit (bound median 563, |X2| median 7.8e-4), so the criterion does not discriminate; whether to keep it or to move to a configuration where 4 E_ro Psi_n / n < |X2| is an open owner question.
+
+## Amendment D43 (2026-10-16)
+
+Criterion 13 is sent back to stage 01 (owner's choice at the stage 04 checkpoint): its 1e-4 was derived from the per-step terms, and Amendment D35 replaced the pathwise bounds of criteria 6, 8, 9 and 12 but not this one. Measured at stage 04: max abs(X2 - oracle) 3.18e-4 (20 regular K = 0.5 starts, n = 1e5, d0 = 1e-6, lifted), the departure on the Chaoslab side in lifted-mode round-off (lyap-two-trajectory-verification.md, "AC13 FAIL and its diagnosis"). Until the re-specified criterion is verified, criterion 13 is open; the rest of the module is integrated (D43).

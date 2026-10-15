@@ -30,6 +30,12 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 - `bench/` timing scripts per module; `Manifest.toml` (Julia LTS) and `Manifest-v1.13.toml` committed (D13).
 - Float32 is dropped from M2 (D24); two fallback reasons added (D25, D33).
 
+### Added (M2 Batch B)
+
+- `Lyapunov` (lyap-benettin, lyap-gram-schmidt, lyap-householder-qr, lyap-svd-stabilized, lyap-two-trajectory): Benettin `lambda_1(n)` with compensated sums; `QRSpectrum` with CGS, MGS, RGS, Householder, Givens and augmented QR in the kernel and `LapackQR` on the CPU library path; `SVDSpectrum` singular-value exponents for d = k = 2; two-trajectory `propagate_shadow` (lifted and wrapped). Catalog L1 to L6, L9 (d = 2) and Y1 verified (D43).
+- Verification scripts per slug, `verify/threads.jl` (1 vs 4 threads, bitwise) and the Batch B sections of `verify/gpu.jl` (CPU vs GPU on every kernel-path estimator, K15 timing record: GPU 6.3 times the 4-thread CPU).
+- Spec amendments D35, D41 (SVD c check against the ensemble 1-ulp sensitivity), D42 (two-trajectory GPU check in round-off units), D43 (CGS/MGS bitwise claim withdrawn; ChaosTools initial-frame statements corrected).
+
 ### Changed
 
 - The `Manifest.toml` and `bench/` items of "Deferred" below are done (D13, D16).
@@ -42,5 +48,6 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 - `bin/chaoslab.jl`, `python/nbody/`: no caller before M3 (D16).
 - Coverage reporting: not yet set up; module tests exist, the report is not wired into CI.
 - Step-chunked GPU relaunch (state carried between launches): a named run before M2 exit (D33).
-- ChaosTools exponent comparisons: lyap-benettin stage 04 (D27).
+- lyap-two-trajectory criterion 13 (external two-trajectory oracle): sent back to stage 01, open before M2 exit (D43).
+- Fallback reason for a lost device (error 700 is reported as "launch exceeds the display watchdog"): with the step-chunked relaunch (D33, D43).
 - `CITATION.cff` and Zenodo: after `setup` fills the author data, before the first tag `v0.1.0` (M3).

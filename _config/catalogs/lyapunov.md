@@ -8,8 +8,8 @@ Every variational method below consumes the same tangent stream from `Tangent.pr
 
 | ID | Method | Gives | Vectors | Main numerical issue | Source | Phase | Status |
 |----|--------|-------|---------|----------------------|--------|-------|--------|
-| L1 | Benettin single-vector renormalization (finite-time mLCE lambda_1(n)) | lambda_1(n) | 1 | slow O(ln n / n) convergence for regular orbits; threshold ambiguity in weak chaos | Benettin1980a, Skokos2010 | M2 | planned |
-| L2 | Two-trajectory (shadow orbit) separation with periodic renormalization | approx. lambda_1 | 0 (second orbit) | perturbation too large: nonlinear saturation; too small: round-off; wrapped vs lifted coordinates | Benettin1976, Wolf1985 | M2 | planned |
+| L1 | Benettin single-vector renormalization (finite-time mLCE lambda_1(n)) | lambda_1(n) | 1 | slow O(ln n / n) convergence for regular orbits; threshold ambiguity in weak chaos | Benettin1980a, Skokos2010 | M2 | verified |
+| L2 | Two-trajectory (shadow orbit) separation with periodic renormalization | approx. lambda_1 | 0 (second orbit) | perturbation too large: nonlinear saturation; too small: round-off; wrapped vs lifted coordinates | Benettin1976, Wolf1985 | M2 | verified |
 
 ## B. Variational, full spectrum by reorthonormalization (discrete QR family)
 
@@ -17,12 +17,12 @@ Shared step: propagate k tangent vectors, every `tau` steps factor W = Q R, accu
 
 | ID | Orthonormalizer | Cost (dim d, k vectors) | Stability notes | Source | Phase | Status |
 |----|-----------------|-------------------------|-----------------|--------|-------|--------|
-| L3 | Classical Gram-Schmidt (CGS) | O(d k^2) | loses orthogonality when vectors nearly align; kept as historical baseline | ShimadaNagashima1979, Benettin1980b | M2 | planned |
-| L4 | Modified Gram-Schmidt (MGS) | O(d k^2) | orthogonality loss ~ eps * cond(W) | Skokos2010 | M2 | planned |
-| L5 | Householder QR (LAPACK geqrf) | O(d k^2) | backward stable (assumption); default reference | Geist1990, Dieci1997 | M2 | planned |
-| L6 | Givens rotations QR | O(d k^2) | stable; cheap for d = 2, 4 and banded tangent maps (assumption, counts derived in the lyap-householder-qr spec) | Householder1958, DanielGragg1976 | M2 | planned |
-| L4b | Repeated (re-orthogonalized) Gram-Schmidt, RGS | O(d k^2), ~2x GS | restores orthogonality for nearly parallel columns | DanielGragg1976, Geist1990 | M2 | planned |
-| L5b | Householder variants H1 (treppen iteration path) / H2 (diagonal iteration path); the augmented block [W, I] is bookkeeping that returns Q explicitly | O(d k^2) | as L5; H1 deferred, H2 built in M2 (D30) | Householder1958, Geist1990 | M2 | planned |
+| L3 | Classical Gram-Schmidt (CGS) | O(d k^2) | loses orthogonality when vectors nearly align; kept as historical baseline | ShimadaNagashima1979, Benettin1980b | M2 | verified |
+| L4 | Modified Gram-Schmidt (MGS) | O(d k^2) | orthogonality loss ~ eps * cond(W) | Skokos2010 | M2 | verified |
+| L5 | Householder QR (LAPACK geqrf) | O(d k^2) | backward stable (assumption); default reference | Geist1990, Dieci1997 | M2 | verified |
+| L6 | Givens rotations QR | O(d k^2) | stable; cheap for d = 2, 4 and banded tangent maps (assumption, counts derived in the lyap-householder-qr spec) | Householder1958, DanielGragg1976 | M2 | verified |
+| L4b | Repeated (re-orthogonalized) Gram-Schmidt, RGS | O(d k^2), ~2x GS | restores orthogonality for nearly parallel columns | DanielGragg1976, Geist1990 | M2 | verified |
+| L5b | Householder variants H1 (treppen iteration path) / H2 (diagonal iteration path); the augmented block [W, I] is bookkeeping that returns Q explicitly | O(d k^2) | as L5; H1 deferred, H2 built in M2 (D30) | Householder1958, Geist1990 | M2 | verified (H2; H1 deferred) |
 | L7 | Reorthonormalization interval study, fixed `tau` | n/a | `tau` too long: overflow / alignment; too short: cost | Skokos2010 | M2 (parameter, not module) | verified |
 | L7b | Adaptive reorthonormalization (trigger on measured orthogonality loss or local stretching) | n/a | research line R3; must not bias estimates | open | M5 | planned |
 | L7c | Block / sparse QR exploiting banded tangent maps of coupled maps and lattices | O(d k b) for bandwidth b | research line R3 | open | M5 | planned |
@@ -32,7 +32,7 @@ Shared step: propagate k tangent vectors, every `tau` steps factor W = Q R, accu
 | ID | Method | Gives | Main issue | Source | Phase | Status |
 |----|--------|-------|-----------|--------|-------|--------|
 | L8 | Continuous QR (ODE for Q on the orthogonal group, flows only): dQ/dt = Q S, d(ln R_ii)/dt = (Q^T J Q)_ii | full spectrum | orthogonality drift (needs projection, Cayley or a nu (Q^T Q - I) correction); reported ~40x slower than discrete QR on a 29-dim Toda chain (Geist1990, Table III p.886) | Goldhirsch1987, Dieci1997, ChristiansenRugh1997 | M5 | planned |
-| L9 | Discrete SVD of the finite-time product, stabilized (product SVD / QR-accumulated SVD, no naive multiplication) | finite-time singular values sigma_i(n); spectrum as n grows | finite-time singular values are not term-by-term equal to QR diagonals | GreeneKim1987, Dieci1997, Stewart1997, OliveiraStewart2000 | M2 (d = 2); general d M3 (D32) | planned |
+| L9 | Discrete SVD of the finite-time product, stabilized (product SVD / QR-accumulated SVD, no naive multiplication) | finite-time singular values sigma_i(n); spectrum as n grows | finite-time singular values are not term-by-term equal to QR diagonals | GreeneKim1987, Dieci1997, Stewart1997, OliveiraStewart2000 | M2 (d = 2); general d M3 (D32) | verified (d = 2) |
 | L10 | Continuous SVD (Greene-Kim): ODEs for U and ln sigma_i | spectrum + singular vectors | singular when exponents are (nearly) degenerate, i.e. on tori and periodic orbits, which Hamiltonian systems always have (lambda_i = 0 pairs); costliest | GreeneKim1987, Dieci1997, DieciVanVleck2007 | catalog only (degeneracy makes it unsuitable for symplectic systems) | planned |
 | L10b | Single large-time SVD of the full product | spectrum | overflow / loss of small singular values; kept only as a negative control | Geist1990 | catalog only | planned |
 | L11 | Rangarajan-Habib-Ryne parametrization (no rescaling, no reorthonormalization) | full spectrum | parametrization singularities; derived ODEs per dimension | Rangarajan1998 | M5 (catalog only) | planned |
@@ -57,6 +57,8 @@ Delay embedding (Takens, false nearest neighbours) is a supporting module for L1
 Analytic Jacobian (default, ground truth); automatic differentiation (forward mode, ForwardDiff.jl) for maps without hand-written Jacobians, validated against the analytic one; complex-step derivative for tests. AD tangents are part of research line R3. Oracles: ChaosTools `lyapunov` / `lyapunovspectrum` (no SALI, MEGNO, FLI there), TaylorIntegration `lyap_taylorinteg` at BigFloat.
 
 Status: verified (M2 Batch A, tangent-core: analytic Jacobians checked against ForwardDiff and complex step; integration commit abef540, decision D22).
+
+Status of rows L1 to L6 and L9: M2 Batch B (lyap-benettin, lyap-gram-schmidt, lyap-householder-qr, lyap-svd-stabilized, lyap-two-trajectory), decision D43; L2 criterion 13 is open (sent back to stage 01).
 
 ## D3. Benchmark values (pointer)
 

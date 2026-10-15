@@ -61,7 +61,7 @@ Sample sizes: the measurement functions reuse `hh_helpers.jl` and the definition
 | 14a | max over orbits of \|lambda_1 + lambda_2\| / theta_sum, CPU; GPU: K = 0.5 H 4.9e-4; 5.8e-4, G 3.0e-4; 2.3e-4, A as H; K = 10 H 2.4e-4; 2.2e-4, G 1.3e-4; 8.6e-5, A as H | max 5.8e-4 | 1 | PASS | `verify/gpu.jl` |
 | 14a | Double64 kernel | does not compile for the device | compile or reason | FALLBACK(kernel does not compile for the element type) | `verify/gpu.jl` |
 | 14b | library path QRSpectrum(LapackQR), gpu and auto request on the GTX 1050 machine: backend; device; reason | cpu; cpu; "reducer is CPU-only" (both) | exact | PASS | `verify/gpu.jl` |
-| 14c | K15 record, kernel path QRSpectrum(HouseholderQR), 10^6 orbits, d = k = 2, N = 1e4, tau = 2, K = 2 pi: wall s GPU (GTX 1050, CUDA runtime 12.9.0, 202 chunks); CPU 4 threads; CPU 1 thread (skylake); gate GPU <= CPU | 311.3; 1971; 8109; true (GPU 6.3x the 4-thread CPU) | recorded | INFO (gate met) | `verify/gpu.jl` (`gpu-hh-perf-verify-log.txt`) |
+| 14c | K15 record, kernel path QRSpectrum(HouseholderQR), 10^6 orbits, d = k = 2, N = 1e4, tau = 2, K = 2 pi: wall s GPU (GTX 1050, CUDA runtime 12.9.0, 202 chunks); CPU 4 threads (of 12 hardware threads, `Sys.CPU_THREADS`); CPU 1 thread (skylake); gate GPU <= CPU | 311.3; 1971; 8109; true (GPU 6.3x the 4-thread CPU) | recorded | INFO (gate met) | `verify/gpu.jl` (`gpu-hh-perf-verify-log.txt`) |
 | 15 | failed exact-string and provenance checks (of 34) | 0 | 0 | PASS | T, X, V |
 | 16 | H1 versus H2 | - | - | EXCLUDED (D30) | |
 | 17a | regular K = 0.5, n = 1e5, \|lambda_i - ChaosTools\|, i = 1, 2, four variants (lambda = +-8.826e-05; ln n / n = 1.151e-04) | 7.5e-15 (V-H, V-A), 3.1e-15, 2.7e-15 | 1e-4 | PASS | V |

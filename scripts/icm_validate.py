@@ -12,6 +12,8 @@ WORKSPACES = ["literature-review", "module-build", "study", "paper"]
 CONTRACT_SECTIONS = {"Inputs", "Process", "Checkpoints", "Audit", "Outputs"}
 ICM_DIRS = ("workspaces", "_config", "setup", "schema")  # lowercase-hyphen rule applies here
 SKIP = {".git", "_core", "data", ".ruff_cache", "__pycache__", "workspace-builder"}
+# git-ignored N-body environments and build outputs (.gitignore): third-party code, not ICM content
+SKIP_DIRS = tuple(f"python/nbody/windows-build/{d}/" for d in ("venv", "_work", "wheels"))
 LATER = ("/scripts", "/bin", "/test", "/src", "/bench", "/CHANGELOG", "/python")
 CREATIVE = {("literature-review", "01-scope"), ("literature-review", "02-search"),
             ("literature-review", "04-synthesize"), ("module-build", "01-spec"),
@@ -37,9 +39,14 @@ def load_stages(root):
     return stages
 
 
+def skipped(rel):
+    return (bool(set(rel.parts) & SKIP) or any(part.startswith(".venv") for part in rel.parts)
+            or rel.as_posix().startswith(SKIP_DIRS))
+
+
 def text_files(root):
     for p in root.rglob("*"):
-        if p.is_file() and not set(p.relative_to(root).parts) & SKIP and p.name != "LICENSE":
+        if p.is_file() and not skipped(p.relative_to(root)) and p.name != "LICENSE":
             if p.suffix in {".md", ".toml", ".jl", ".py", ".yml", ".cff", ".bib"}:
                 yield p
 

@@ -146,6 +146,12 @@ class ValidateTests(unittest.TestCase):
         fails, _ = icm_validate.validate(ROOT)
         self.assertEqual(fails, [])
 
+    def test_git_ignored_nbody_folders_are_skipped(self):
+        for rel in ("python/nbody/.venv-nbody/Lib/site-packages/x.py", "python/nbody/windows-build/_work/src/x.py",
+                    "python/nbody/windows-build/venv/x.py", "python/nbody/windows-build/wheels/x.py"):
+            self.assertTrue(icm_validate.skipped(Path(rel)), rel)
+        self.assertFalse(icm_validate.skipped(Path("python/nbody/windows-build/build_windows.py")))
+
 
 if __name__ == "__main__":
     unittest.main()

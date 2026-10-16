@@ -7,3 +7,5 @@ include(joinpath(@__DIR__, "l2_helpers.jl"))
 include(joinpath(@__DIR__, "l2_analytic.jl"))
 include(joinpath(@__DIR__, "l2_sweeps.jl"))
 include(joinpath(@__DIR__, "l2_runtime.jl"))
+# Amendment D44 (step-chunked relaunch, item 15, D44k): output/tangent-core-d44-test-plan.md
+include(joinpath(@__DIR__, "l2_d44.jl"))

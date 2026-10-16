@@ -9,3 +9,6 @@ include(joinpath(@__DIR__, "tc_device.jl"))
 
 # Amendment D34 (reducer_provenance, NumericalHealthError.column): workspaces/module-build/stages/02-tests/output/tangent-core-test-plan.md
 include(joinpath(@__DIR__, "tc_d34.jl"))
+
+# Amendment D44 (step-chunked relaunch; _LAUNCH_STEPS, _before_launch, _budget_steps, launch provenance, ninth reason): output/tangent-core-d44-test-plan.md
+include(joinpath(@__DIR__, "tc_d44.jl"))

@@ -706,7 +706,7 @@ let
     checks = Pair{String,Bool}[]
     chk(name, b) = push!(checks, name => b)
     chk("reasons list", FALLBACK_REASONS == ["CUDA.jl not loadable", "no functional device", "kernel does not compile for the element type",
-        "device out of memory", "NumericalHealthError raised only on the GPU", "reducer is CPU-only", "GPU not faster for the element type", "launch exceeds the display watchdog"])
+        "device out of memory", "NumericalHealthError raised only on the GPU", "reducer is CPU-only", "GPU not faster for the element type", "launch exceeds the display watchdog", "device lost"])
     c = resolve_backend(:auto, Float64)
     chk("(a) auto, no CUDA", c.backend === :cpu && c.device == "cpu" && c.reason in ("CUDA.jl not loadable", "no functional device"))
     default_reason = c.reason

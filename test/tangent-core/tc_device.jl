@@ -90,7 +90,7 @@ Chaoslab.reducer_final(::tc_HeapSum, st) = (sum = st[1],)
         @test tc_F.free_memory(tc_F.NoDevice()) > 0
         @test !tc_F.is_oom(ErrorException("x")) && !tc_F.is_compile_error(ErrorException("x")) && !tc_F.is_device_lost(ErrorException("x"))
         @test tc_F.gpu_step_ns(tc_F.NoDevice(), Float64) === nothing
-        @test length(FALLBACK_REASONS) == 8 && FALLBACK_REASONS[8] == "launch exceeds the display watchdog"
+        @test length(FALLBACK_REASONS) == 9 && FALLBACK_REASONS[8] == "launch exceeds the display watchdog" && FALLBACK_REASONS[9] == "device lost"   # D44: nine reasons
         p = tc_F.probe(tc_F.NoDevice(), Float64)
         @test keys(p) == (:loadable, :functional, :device, :compiles, :gpu_faster) && !p.functional && !p.gpu_faster
         for name in (:AbstractDevice, :NoDevice, :DEVICE, :probe, :free_memory, :is_oom, :is_compile_error, :is_device_lost, :gpu_step_ns)
@@ -165,22 +165,32 @@ Chaoslab.reducer_final(::tc_HeapSum, st) = (sum = st[1],)
         tc_with_device(tc_FakeDevice(true, budget_ns(1100.5), 2^28)) do
             r = propagate(sys, x0, N; k = 2, tau = tau, seed = seed, reducers = red, backend = :gpu)
             @test same(r, ref0) && r.provenance.backend === :gpu && r.provenance.chunk_size == 1100
+            @test r.provenance.launch_steps == N && r.provenance.launches_per_chunk == 1   # D44: one launch fits, so no split
             r = run(backend = :gpu)   # an explicit chunk below the budget is kept
             @test r.provenance.backend === :gpu && r.provenance.chunk_size == chunk
         end
-        # N alone exceeds the budget: even one wave of 1024 orbits does not fit
+        # D44: N beyond the budget is split into launches (no CPU fallback); L is the largest multiple of tau within the budget at one wave
         tc_with_device(tc_FakeDevice(true, budget_ns(500), 2^28)) do
             r = run(backend = :gpu)
-            @test same(r, ref) && r.provenance.backend === :cpu && r.provenance.device == "cpu"
-            @test r.provenance.backend_fallback_reason == "launch exceeds the display watchdog" && r.provenance.gpu_chunks == 0
+            L = tc44_budget_L(budget_ns(500), tau)
+            @test 0 < L < N
+            @test same(r, ref) && r.provenance.backend === :gpu && r.provenance.device == "FakeGPU"
+            @test r.provenance.backend_fallback_reason == "" && r.provenance.gpu_chunks == 3
+            @test r.provenance.launch_steps == L && r.provenance.launches_per_chunk == cld(N, L)
             @test run(backend = :cpu).provenance.backend_fallback_reason == ""
         end
         # no record: the documented default of 100 ns per orbit-step applies
         @test tc_Tg.DEFAULT_GPU_NS == 100.0
         tc_with_device(tc_FakeDevice(true)) do
-            @test propagate(sys, x0, N; k = 2, tau = tau, seed = seed, reducers = red, backend = :gpu).provenance.backend === :gpu
-            r = propagate(sys, x0, 10_000; k = 2, tau = 10, seed = seed, reducers = red, backend = :gpu)   # 1 s / (100 ns x 1e4) = 1000 orbits < 1024
-            @test r.provenance.backend === :cpu && r.provenance.backend_fallback_reason == "launch exceeds the display watchdog"
+            p = propagate(sys, x0, N; k = 2, tau = tau, seed = seed, reducers = red, backend = :gpu).provenance
+            @test p.backend === :gpu && p.launch_steps == N && p.launches_per_chunk == 1
+            # D44: 1 s / (100 ns x 1024) = 9765 steps per launch, 9760 for tau = 10: N = 10_000 is split into two launches on the device
+            cpu10 = propagate(sys, x0, 10_000; k = 2, tau = 10, seed = seed, reducers = red, backend = :cpu)
+            r = propagate(sys, x0, 10_000; k = 2, tau = 10, seed = seed, reducers = red, backend = :gpu)
+            L = min(10_000, tc44_budget_L(100.0, 10))
+            @test L == 9760 && same(r, cpu10)
+            @test r.provenance.backend === :gpu && r.provenance.backend_fallback_reason == ""
+            @test r.provenance.launch_steps == L && r.provenance.launches_per_chunk == cld(10_000, L)
         end
     end
 
@@ -188,7 +198,7 @@ Chaoslab.reducer_final(::tc_HeapSum, st) = (sum = st[1],)
         tc_with_device(tc_FakeDevice(true)) do
             r = run(backend = :gpu, W0 = failing(tc_FakeLost(), 2chunk + 3))
             @test same(r, ref) && r.provenance.backend === :cpu && r.provenance.gpu_chunks == 1
-            @test r.provenance.backend_fallback_reason == "launch exceeds the display watchdog"
+            @test r.provenance.backend_fallback_reason == "device lost"   # D44: the ninth reason, not the budget string
             @test tc_F.DEVICE[] isa tc_F.NoDevice   # later calls do not touch the dead context
             @test run(backend = :gpu).provenance.backend_fallback_reason in ("CUDA.jl not loadable", "no functional device")
         end

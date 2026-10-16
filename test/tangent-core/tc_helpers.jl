@@ -230,3 +230,17 @@ Chaoslab.reducer_final(::tc_ProvAB, st) = (;)
     Chaoslab.reducer_provenance(::tc_ProvA) = (alpha = 1, shared = "a")
     Chaoslab.reducer_provenance(::tc_ProvB) = (beta = 2.5, shared = "b")
 end
+
+# D44: Independent form of the D44d budget rule: largest multiple of tau whose one-wave estimate is within the budget (0 if none).
+function tc44_budget_L(ns, tau)
+    fits(m) = ns * 1e-9 * (m * tau) * 1024 <= 1.0
+    m = floor(Int, 1.0 / (ns * 1e-9 * 1024 * tau))
+    while m > 0 && !fits(m)
+        m -= 1
+    end
+    while fits(m + 1)
+        m += 1
+    end
+    return m * tau
+end
+

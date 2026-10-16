@@ -39,7 +39,7 @@
         @test p.estimator == "two-trajectory" && p.state_mode == string(mode) && p.k == 0
         @test p.d0 isa Float64 && p.d0 == Float64(dT) && p.tau == 2 && p.seed == seed && p.precision == string(T)
         @test p.backend in (:cpu, :gpu)
-        @test all(k -> haskey(p, k), (:device, :backend_fallback_reason, :threads, :cpu, :chunk_size, :headroom, :gpu_chunks, :gpu_chunk_size))
+        @test all(k -> haskey(p, k), (:device, :backend_fallback_reason, :threads, :cpu, :chunk_size, :headroom, :gpu_chunks, :gpu_chunk_size, :launch_steps, :launches_per_chunk))   # D44: two new keys
     end
     @testset "AC10 contract checks" begin
         sys = StandardMap(2.0)

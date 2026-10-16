@@ -31,7 +31,7 @@ end
     @test FALLBACK_REASONS == [
         "CUDA.jl not loadable", "no functional device", "kernel does not compile for the element type",
         "device out of memory", "NumericalHealthError raised only on the GPU", "reducer is CPU-only",
-        "GPU not faster for the element type", "launch exceeds the display watchdog",
+        "GPU not faster for the element type", "launch exceeds the display watchdog", "device lost",
     ]
     # (a) CI without CUDA: default probe
     c = tc_with_device(() -> resolve_backend(:auto, Float64), tc_F.NoDevice())

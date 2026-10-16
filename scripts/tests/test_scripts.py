@@ -47,6 +47,11 @@ class BibcheckTests(unittest.TestCase):
         text = "- arXiv:2304.08340\n- arXiv:acc-phys/9411001\n- arXiv:chao-dyn/9406010\n"
         self.assertEqual(bibcheck.ARXIV_RE.findall(text), ["2304.08340", "acc-phys/9411001", "chao-dyn/9406010"])
 
+    def test_doi_punctuation_is_dropped_but_inner_parens_kept(self):
+        dois = [bibcheck.clean_doi(d) for d in bibcheck.DOI_RE.findall(
+            "see (10.1103/PhysRevLett.1.1). Also 10.1016/0370-1573(79)90023-1.")]
+        self.assertEqual(dois, ["10.1103/PhysRevLett.1.1", "10.1016/0370-1573(79)90023-1"])
+
     def test_bibtex_round_trip(self):
         entry = bibcheck.parse_bib(bibcheck.to_bibtex("Chirikov1979", RECORD))[0]
         self.assertEqual(entry["key"], "Chirikov1979")

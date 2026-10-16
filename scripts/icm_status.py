@@ -66,7 +66,7 @@ def main(argv):
     args = [a for a in argv[1:] if not a.startswith("--")]
     root = Path(argv[argv.index("--root") + 1]) if "--root" in argv else Path(".")
     if "--root" in argv:
-        args.remove(str(root))
+        args.remove(argv[argv.index("--root") + 1])  # the raw value: Path() rewrites "./x" to "x"
     slug = args[0] if args else None
     for ws in WORKSPACES:
         stages, table = workspace_status(root, ws)

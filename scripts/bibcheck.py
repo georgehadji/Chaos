@@ -15,6 +15,7 @@ import sys
 import time
 import unicodedata
 import urllib.error
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 
@@ -106,8 +107,14 @@ def http_get(url):
             time.sleep(float(ex.headers.get("Retry-After") or 2 ** attempt))
 
 
+def clean_doi(d):
+    """Drop sentence punctuation caught by DOI_RE: a trailing '.' and an unmatched ')' as in '(10.1/x)'."""
+    d = d.rstrip(".")
+    return d[:-1] if d.endswith(")") and d.count(")") > d.count("(") else d
+
+
 def fetch_crossref(doi):
-    return json.loads(http_get("https://api.crossref.org/works/" + doi))["message"]
+    return json.loads(http_get("https://api.crossref.org/works/" + urllib.parse.quote(doi, safe="/")))["message"]
 
 
 def datacite_to_record(a):
@@ -127,7 +134,7 @@ def fetch_doi(doi):
     except urllib.error.HTTPError as ex:
         if ex.code != 404:
             raise
-        return datacite_to_record(json.loads(http_get("https://api.datacite.org/dois/" + doi))["data"]["attributes"])
+        return datacite_to_record(json.loads(http_get("https://api.datacite.org/dois/" + urllib.parse.quote(doi, safe="/")))["data"]["attributes"])
 
 
 def fetch_arxiv(aid):
@@ -183,7 +190,7 @@ def check_bib(path):
 
 def fetch_candidates(path, out):
     text = open(path, encoding="utf-8").read()
-    ids = [("doi", d.rstrip(".")) for d in dict.fromkeys(DOI_RE.findall(text))]
+    ids = [("doi", d) for d in dict.fromkeys(map(clean_doi, DOI_RE.findall(text)))]
     ids += [("arxiv", a) for a in dict.fromkeys(ARXIV_RE.findall(text))]
     recs, titles, failed = [], {}, 0
     for kind, ident in ids:

@@ -17,7 +17,8 @@ function layering_violations(srcdir)
         rank = layer(owner)
         rank === nothing && continue
         for line in eachline(joinpath(dir, f))
-            for m in eachmatch(r"^\s*(?:using|import)\s+.*?(?:\.\.|Chaoslab\.)(\w+)", line)
+            occursin(r"^\s*(?:using|import)\s", line) || continue
+            for m in eachmatch(r"(?:\.\.|Chaoslab\.)(\w+)", line)  # every module on the line, not just the first
                 dep = m.captures[1]
                 dr = layer(dep)
                 if dr !== nothing && dep != owner && dr >= rank
@@ -34,6 +35,6 @@ end
 # The checker itself must catch an upward import.
 mktempdir() do tmp
     mkpath(joinpath(tmp, "Systems"))
-    write(joinpath(tmp, "Systems", "bad.jl"), "using ..Lyapunov\n")
+    write(joinpath(tmp, "Systems", "bad.jl"), "using ..Foundation, ..Lyapunov\n")
     @test layering_violations(tmp) == ["Systems/bad.jl: Systems imports Lyapunov"]
 end

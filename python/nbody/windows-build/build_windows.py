@@ -13,7 +13,7 @@ Requirements: Windows x64, `uv` on PATH, `git` on PATH (only for `git apply`), M
 (found automatically by setuptools). Nothing is installed outside the venv and the work directory.
 Rerunnable: the source trees are re-extracted and re-patched on every run.
 
-    python build_windows.py [--venv DIR] [--work DIR] [--wheels DIR] [--python 3.12]
+    python build_windows.py [--venv DIR] [--work DIR] [--wheels DIR]
 """
 import argparse
 import hashlib
@@ -63,7 +63,6 @@ def main():
     ap.add_argument('--venv', default=os.path.join(HERE, 'venv'))
     ap.add_argument('--work', default=os.path.join(HERE, '_work'))
     ap.add_argument('--wheels', default=os.path.join(HERE, 'wheels'))
-    ap.add_argument('--python', default='3.12', help='interpreter request used when the venv must be created')
     ap.add_argument('--no-compat', action='store_true',
                     help='skip celmech-1.5.8-modern-deps-compat.diff (REBOUND 5 / SciPy / Python 3 fixes unrelated '
                          'to Windows)')
@@ -77,7 +76,7 @@ def main():
     os.makedirs(wheels, exist_ok=True)
 
     if not os.path.exists(os.path.join(venv, 'Scripts', 'python.exe')):
-        run([uv, 'venv', '-p', args.python, venv])
+        run([uv, 'venv', '-p', '3.12', venv])  # the wheel names below are cp312
     py = os.path.join(venv, 'Scripts', 'python.exe')
     run([uv, 'pip', 'install', '-p', py] + BUILD_REQS)
 

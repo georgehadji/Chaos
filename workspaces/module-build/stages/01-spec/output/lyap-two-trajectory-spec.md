@@ -126,3 +126,7 @@ Measured (stage 04, after this amendment): ratio 1.1e-4, all 1024 orbits valid. 
 ## Amendment D43 (2026-10-16)
 
 Criterion 13 is sent back to stage 01 (owner's choice at the stage 04 checkpoint): its 1e-4 was derived from the per-step terms, and Amendment D35 replaced the pathwise bounds of criteria 6, 8, 9 and 12 but not this one. Measured at stage 04: max abs(X2 - oracle) 3.18e-4 (20 regular K = 0.5 starts, n = 1e5, d0 = 1e-6, lifted), the departure on the Chaoslab side in lifted-mode round-off (lyap-two-trajectory-verification.md, "AC13 FAIL and its diagnosis"). Until the re-specified criterion is verified, criterion 13 is open; the rest of the module is integrated (D43).
+
+## Amendment D44 (2026-10-16)
+
+The device run of this estimator gets the step-chunked relaunch of tangent-core spec Amendment D44: carried state, budget, lost-device rule, the ninth fallback reason and the two provenance fields are defined there (items 6 to 15), and its criteria are D44k there. Criterion 17 stays at n = 4e4 (owner).

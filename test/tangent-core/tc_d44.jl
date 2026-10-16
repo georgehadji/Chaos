@@ -8,7 +8,7 @@
 # RED: UndefVarError for _LAUNCH_STEPS / _budget_steps, missing provenance keys, 8 reasons, :cpu where a relaunch is now expected.
 
 const TC44_SEED = TC_SEED + 4400
-const TC44_ORBITS = 256   # D44a orbits (spec: 1024, reduced for the package suite runtime; the test plan records it)
+const TC44_ORBITS = 512   # D44a orbits (spec correction: 512; at 256 the RGS/SVD tau = 10 cases kept 64 on Julia 1.13 and 62 on 1.10)
 
 # Set the forced launch length for the duration of f, restore it afterwards.
 function tc_with_launch_steps(f, L)
@@ -109,7 +109,7 @@ end
 end
 
 @testset "D44a CPU bitwise, carried state" begin
-    # 256 seeded orbits (spec 1024; orbits whose single-launch run raises a health error are dropped, see tc44_clean), K = 2 pi, N = 2000; k = 1 Benettin, k = 2 QRSpectrum(RGS()), k = 2 SVDSpectrum;
+    # 512 seeded orbits (spec correction; orbits whose single-launch run raises a health error are dropped, see tc44_clean), K = 2 pi, N = 2000; k = 1 Benettin, k = 2 QRSpectrum(RGS()), k = 2 SVDSpectrum;
     # tau in {1, 2, 10}, forced L in {tau, 20 tau, 130 tau}: x, W and finals equal the single-launch run bitwise (tolerance 0).
     seed = TC44_SEED + 1
     N = 2000

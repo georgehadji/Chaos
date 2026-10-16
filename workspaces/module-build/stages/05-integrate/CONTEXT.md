@@ -15,13 +15,13 @@ Flip the catalog status, update docs, and commit.
 1. Flip the catalog `Status` of this module's rows to `verified` (promotion write into `/_config/`).
 2. Update the folder `CONTEXT.md` and `CHANGELOG.md`.
 3. **[Checkpoint]** Present the commit.
-4. Commit on a branch. Push or PR only with explicit approval.
+4. Commit on a branch and push it. PR only with explicit approval.
 
 ## Checkpoints
 
 | After Step | Agent Presents | Human Decides |
 |------------|---------------|---------------|
-| 2 | Diff and commit message | Approve the commit; push yes or no |
+| 2 | Diff and commit message | Approve the commit; PR yes or no |
 
 ## Outputs
 

@@ -17,4 +17,4 @@ Python runs the ICM scripts in `scripts/` (standard library only) and the N-body
 
 - `python scripts/<name>.py` for ICM mechanics (no third-party packages).
 - `uv venv` plus `uv pip install` for the N-body environments (`rebound.md`).
-- Every push, pull request or submission needs explicit human approval.
+- Pushes need no approval, but never force-push (decision D45); every pull request or submission needs explicit human approval.

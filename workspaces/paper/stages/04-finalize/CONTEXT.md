@@ -16,7 +16,7 @@ Format for the journal, add disclosures, build the PDF.
 1. Convert to the journal LaTeX template (ARS `/ars-format-convert`); build the PDF if LaTeX is installed.
 2. Write the AI-use disclosure (ARS `/ars-disclosure`) and the code and data availability statement (repo URL, commit SHA, manifests).
 3. **[Checkpoint]** Present the PDF.
-4. Commit. Submission and any push only with explicit approval.
+4. Commit and push. Submission only with explicit approval.
 
 ## Checkpoints
 

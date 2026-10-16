@@ -22,12 +22,13 @@ end
 
 # The single per-orbit body (spec I1, I2): tangent at the OLD point, then advance x; handoff every tau steps.
 # The state has s >= d components (D28 winding counts ride along), W is d x k with d the system dimension.
-# Non-throwing so the same code runs in the kernel: returns (x, W, states, status, step of the bad handoff).
-@inline function _orbit_body(sys, x0::SVector{s, T}, W0::SMatrix{d, k}, N::Int, tau::Int, reducers::Tuple) where {s, d, k, T}
-    x, W = x0, W0
-    states = _init_states(reducers, T, Val(d), Val(k))
-    n = 0
-    for _ in 1:(N ÷ tau)
+# One launch (D44): `steps` steps (a multiple of tau) from the carried point, matrix, reducer states and global step n0;
+# a run of N steps is the call with n0 = 0, steps = N and fresh states. The final status check runs only at step N.
+# Non-throwing so the same code runs in the kernel: returns (x, W, states, status, global step of the bad handoff).
+@inline function _orbit_body(sys, x0::SVector, W0::SMatrix, states0::Tuple, n0::Int, steps::Int, N::Int, tau::Int, reducers::Tuple)
+    x, W, states = x0, W0, states0
+    n = n0
+    for _ in 1:(steps ÷ tau)
         for _ in 1:tau
             W = tangent(sys, x) * W
             x = forward(sys, x)
@@ -38,7 +39,7 @@ end
         states, W = _apply(reducers, states, n, x, W)
         _any_failed(reducers, states) && return (x, W, states, STATUS_REDUCER, n)
     end
-    return (x, W, states, _status(x, W), N)
+    return (x, W, states, n == N ? _status(x, W) : STATUS_OK, n)
 end
 
 # First non-finite entry as Float64 (NaN or Inf), for the error record.
@@ -61,10 +62,11 @@ end
 Per-orbit body shared with the kernel: `N` steps of `sys` from `x0` with deviation matrix `W0`, the reducer chain
 applied at steps tau, 2 tau, ...; throws `NumericalHealthError` when `x` or `W` is non-finite at a handoff.
 """
-function propagate_orbit(sys, x0::SVector, W0::SMatrix, N::Integer, tau::Integer, reducers::Tuple;
-                         orbit::Integer = 1, backend::Symbol = :cpu)
+function propagate_orbit(sys, x0::SVector{s, T}, W0::SMatrix{d, k}, N::Integer, tau::Integer, reducers::Tuple;
+                         orbit::Integer = 1, backend::Symbol = :cpu) where {s, T, d, k}
     _check_steps(N, tau)
-    x, W, states, code, step = _orbit_body(sys, x0, W0, Int(N), Int(tau), reducers)
+    s0 = _init_states(reducers, T, Val(d), Val(k))
+    x, W, states, code, step = _orbit_body(sys, x0, W0, s0, 0, Int(N), Int(N), Int(tau), reducers)
     code == STATUS_REDUCER && throw(_reducer_error(reducers, states, orbit, backend))
     code == STATUS_OK || throw(_health_error(code, x, W, step, orbit, backend))
     return (x, W, states)

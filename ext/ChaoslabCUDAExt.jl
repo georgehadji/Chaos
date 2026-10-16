@@ -37,7 +37,7 @@ const LOST_CODES = (CUDA.ERROR_LAUNCH_TIMEOUT, CUDA.ERROR_LAUNCH_FAILED, CUDA.ER
                     CUDA.ERROR_UNKNOWN)
 Foundation.is_device_lost(e::CUDA.CuError) = e.code in LOST_CODES
 
-"Path of the per-machine record (git-ignored): `[<device name>.\"<precision label>\"]` with `gpu_faster`, `cpu_ns_per_step`, ..."
+"Path of the per-machine record (git-ignored): `[<device name>.\"<precision label>\"]` with `gpu_faster`, `cpu_ns_per_step`, `gpu_ns_per_step`, `gpu_ns_per_step_wave` (the launch budget's one-wave value, D44), ..."
 record_path() = joinpath(pkgdir(Chaoslab), "data", "gpu-benchmark.toml")
 
 # The record entry of (device, T); any read, parse or shape problem gives an empty entry (gpu_faster false, no ns value).
@@ -53,8 +53,9 @@ end
 
 gpu_faster(device, T) = get(record_entry(record_path(), device, T), "gpu_faster", false) === true
 
+# The launch budget reads only the one-wave value (D44 item 9); a record without it gives the default.
 function Foundation.gpu_step_ns(::CUDADevice, ::Type{T}) where {T}
-    v = get(record_entry(record_path(), CUDA.name(CUDA.device()), T), "gpu_ns_per_step", nothing)
+    v = get(record_entry(record_path(), CUDA.name(CUDA.device()), T), "gpu_ns_per_step_wave", nothing)
     return v isa Real && isfinite(v) && v > 0 ? Float64(v) : nothing
 end
 
@@ -68,8 +69,8 @@ function compiles(::Type{T}) where {T}
                 b = CUDABackend()
                 A(x) = KernelAbstractions.allocate(b, typeof(x), 1)
                 x0, W0 = [SVector(T(1) / 3, T(0))], [SMatrix{2, 1, T}(1, 0)]
-                xo, Wo, so, code, h = A(x0[1]), A(W0[1]), A(()), A(Int8(0)), A(0)
-                _orbit_kernel!(b, 1)(xo, Wo, so, code, h, StandardMap(T(1)), CuArray(x0), CuArray(W0), 1, 1, (); ndrange = 1)
+                x, W, so, code, h = CuArray(x0), CuArray(W0), A(()), A(Int8(0)), A(0)
+                _orbit_kernel!(b, 1)(x, W, so, code, h, StandardMap(T(1)), 0, 1, 1, 1, (); ndrange = 1)
                 KernelAbstractions.synchronize(b)
                 true
             catch e

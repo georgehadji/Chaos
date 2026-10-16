@@ -130,3 +130,35 @@ Code: `src/Foundation/Foundation.jl` (A1a: `NumericalHealthError` gets the seven
 
 ### Known limits
 - `reducer_provenance` is evaluated on the host after the run; it must not depend on the reducer state.
+
+## Amendment D44 (2026-10-16)
+
+Code:
+- `src/Tangent/orbit.jl`: `_orbit_body` takes the carried state `(x, W, states, n0, steps, N)`. It is still the only stepping body; `propagate_orbit` calls it with fresh states, `n0 = 0` and `steps = N`. The final status check runs only when the launch ends at step N.
+- `src/Tangent/propagate.jl`:
+  - `_orbit_kernel!` works in place on five carried buffers (point, matrix, reducer states, status, failing step). The first launch draws fresh reducer states inside the kernel; an orbit that failed in an earlier launch keeps its status and step and is not advanced.
+  - `_run_chunk!` loops over launches; `_before_launch` (test hook, no-op by default) runs on the host before every device launch.
+  - New: `_budget_steps`, `_LAUNCH_STEPS`, `_forced_launch`, `_device_plan`, `_launches`. `_fallback_reason` returns 9 for a lost device.
+  - Provenance gains `launch_steps` and `launches_per_chunk`.
+- `src/Foundation/Foundation.jl`: ninth reason "device lost"; docstrings for `is_device_lost` and `gpu_step_ns`.
+- `ext/ChaoslabCUDAExt.jl`:
+  - `gpu_step_ns` reads only the one-wave key `gpu_ns_per_step_wave`.
+  - `compiles()` calls the new kernel signature.
+- `verify/gpu.jl`: the record gains `gpu_ns_per_step_wave` (1024 orbits x 1e4 steps, forced to one launch, the slower of two runs).
+
+### Result
+- `test/tangent-core/`: 783 pass; `test/lyap-two-trajectory/`: 477 pass; `test/precision/`: 150 pass.
+- Full `Pkg.test()`: 50197 pass, 0 fail (Julia 1.13.1, 4 threads, 14 min 42 s).
+- `verify/threads.jl`: every hash equal to the committed log, so the unforced CPU path is bitwise unchanged for all Batch B estimators.
+- AC14 counts unchanged: one `forward(sys` site, one `tangent(sys` site, two callers of `_orbit_body`.
+
+### Deviations and notes
+- **Status codes are carried with the state.** Spec item 2 says "nothing else is carried". The status code and failing step are carried too, so an orbit that failed stops, and the chunk reports the lowest failing orbit id after the last launch, exactly as one launch does. A per-launch throw would report the earliest launch instead.
+- **Provenance after setup.** The two fields take the device values once device setup succeeds, even if the first chunk then fails. This matches D44k: after a lost device in chunk 1 the fields keep L. A forced CPU split records its own L.
+- **Orbit cap.** With a budget L the orbit cap is floored at one wave (item 6); with a forced L it is only kept at least 1.
+- **Unexplained failure in the first full run.** It had 72 failures in the lyap-gram-schmidt CGS-vs-MGS bitwise checks (AC3 lines 57, 58 and 64; AC7 line 53). The rerun passed. The suite alone, with `--check-bounds=yes`, passes both on HEAD and on this change. Line 64 compares `orthonormalize(CGS(), W)` with `orthonormalize(MGS(), W)` directly, without propagate, so the failure does not come from this change. It is the fragility that D43 recorded: I6 was restated without the bitwise claim, but the tests still gate on it. Owner decision: turn those lines into reported lines, as D43 says.
+- **Pre-existing function size.** `_propagate` (67 lines) and `_shadow_run` (63) were already over 50 lines before D44 and gained about 5 lines each.
+
+### Known limits
+- **Forced CPU split.** It runs every launch even after all orbits failed: the failed orbits are skipped, but the launch still happens.
+- **Not yet run on the GTX 1050.** D44c hardware, D44h codes, D44i, D44j and D44k(c) are stage 04. The `compiles()` probe on the new signature is exercised there first.

@@ -2,8 +2,9 @@
 # chunk, kernel and fallback pattern (decision D34), without a tangent map.
 
 using KernelAbstractions
-using ..Foundation: DEVICE, NoDevice, free_memory, gpu_step_ns
-using ..Tangent: device_backend, workgroup, _fallback_reason, CHUNK_HEADROOM, LAUNCH_WAVE, _budget_orbits, _check_steps, _host
+using ..Foundation: DEVICE, NoDevice, free_memory
+using ..Tangent: device_backend, workgroup, _fallback_reason, CHUNK_HEADROOM, _check_steps, _host, _before_launch, _forced_launch,
+                 _device_plan, _launches
 
 # Per-orbit end record. code: 0 ok, 1 non-finite state, 2 separation zero or non-finite, 3 realized separation outside
 # [d0/2, 2 d0]; `value` is the offending number and `step` its handoff.
@@ -44,14 +45,21 @@ end
     return zero(eltype(x))
 end
 
-# The per-orbit body (Algorithm 1 to 3), non-throwing so the same code runs in the kernel.
-@inline function _shadow_body(sys, x0::SVector{s, T}, u0::SVector, N::Int, tau::Int, d0::T) where {s, T}
-    x = x0
-    y, dprev, code = _shadow_start(sys, x, u0, d0)
-    acc = CompensatedSum{T}()
-    code == 0 || return ShadowEnd(x, y, acc, dprev, code, 0, dprev)
-    n = 0
-    for _ in 1:(N ÷ tau)
+# The per-orbit body (Algorithm 1 to 3), non-throwing so the same code runs in the kernel. One launch (D44): `steps` steps
+# (a multiple of tau) from global step n0; at n0 = 0 the shadow starts at x0 + d0 u0, later launches continue from the
+# carried end record `e` (reference, shadow, sum, previous separation). A run of N steps is the call with n0 = 0, steps = N.
+@inline function _shadow_body(sys, x0::SVector{s, T}, u0::SVector, e::ShadowEnd{s, T}, n0::Int, steps::Int, N::Int, tau::Int,
+                              d0::T) where {s, T}
+    if n0 == 0
+        x = x0
+        y, dprev, code = _shadow_start(sys, x, u0, d0)
+        acc = CompensatedSum{T}()
+        code == 0 || return ShadowEnd(x, y, acc, dprev, code, 0, dprev)
+    else
+        x, y, acc, dprev = e.x, e.y, e.sum, e.dprev
+    end
+    n = n0
+    for _ in 1:(steps ÷ tau)
         for _ in 1:tau
             x = forward(sys, x)
             y = forward(sys, y)
@@ -67,7 +75,7 @@ end
         (dprev >= d0 / 2 && dprev <= 2 * d0) ||
             return ShadowEnd(x, y, acc, dprev, isfinite(dprev) && dprev > 0 ? Int8(3) : Int8(2), n, dprev)
     end
-    return ShadowEnd(x, y, acc, dprev, Int8(0), N, dprev)
+    return ShadowEnd(x, y, acc, dprev, Int8(0), n, dprev)
 end
 
 _final(e::ShadowEnd, N::Int) = (n = N, sum = e.sum.s, comp = e.sum.c, X2 = total(e.sum) / N, d_prev = e.dprev)
@@ -90,24 +98,42 @@ function propagate_shadow_orbit(sys, x0::SVector{s, T}, u0::SVector, N::Integer,
                                 orbit::Integer = 1, backend::Symbol = :cpu) where {s, T}
     _check_steps(N, tau)
     dT = _check_d0(T, d0)
-    e = _shadow_body(sys, x0, u0, Int(N), Int(tau), dT)
+    e = _shadow_body(sys, x0, u0, _blank_end(x0, dT), 0, Int(N), Int(N), Int(tau), dT)
     e.code == 0 || throw(_shadow_error(e, dT, orbit, backend))
     return (e.x, e.y, _final(e, Int(N)))
 end
 
-@kernel function _shadow_kernel!(so, x0, u0, sys, N, tau, d0)
+# One work item per orbit and one launch (D44), in place on the carried end records `so`; an orbit that failed in an
+# earlier launch keeps its record and is not advanced.
+@kernel function _shadow_kernel!(so, x0, u0, sys, n0, steps, N, tau, d0)
     i = @index(Global)
-    so[i] = _shadow_body(sys, x0[i], u0[i], N, tau, d0)
+    if n0 == 0
+        so[i] = _shadow_body(sys, x0[i], u0[i], _blank_end(x0[i], d0), n0, steps, N, tau, d0)
+    elseif so[i].code == 0
+        so[i] = _shadow_body(sys, x0[i], u0[i], so[i], n0, steps, N, tau, d0)
+    end
 end
 
-# One chunk on `backend`; stores nothing in `ends` when an orbit failed (lowest orbit id reported first).
-function _shadow_chunk!(ends, bufs, r, args, who::Symbol, backend)
+# Placeholder end record for the first launch (never read: the body starts the shadow from x0 when n0 = 0).
+@inline _blank_end(x::SVector{s, T}, d0::T) where {s, T} = ShadowEnd(x, x, CompensatedSum{T}(), d0, Int8(0), 0, d0)
+
+# One chunk on `backend` in launches of `args.L` steps; stores nothing in `ends` when an orbit failed (lowest orbit id
+# reported first). `ci` is the device chunk index for the hook.
+function _shadow_chunk!(ends, bufs, r, args, who::Symbol, backend, ci::Int = 0)
     xin, uin, so = bufs
     len = length(r)
     copyto!(xin, 1, args.x0, first(r), len)
     copyto!(uin, 1, args.u, first(r), len)
-    _shadow_kernel!(backend, workgroup(backend))(so, xin, uin, args.sys, args.N, args.tau, args.d0; ndrange = len)
-    KernelAbstractions.synchronize(backend)
+    kernel = _shadow_kernel!(backend, workgroup(backend))
+    n0, launch = 0, 0
+    while n0 < args.N
+        steps = min(args.L, args.N - n0)
+        launch += 1
+        who === :gpu && _before_launch(DEVICE[], ci, launch, (ends = so,))
+        kernel(so, xin, uin, args.sys, n0, steps, args.N, args.tau, args.d0; ndrange = len)
+        KernelAbstractions.synchronize(backend)
+        n0 += steps
+    end
     h = _host(so)
     i = findfirst(e -> e.code != 0, view(h, 1:len))
     i === nothing || throw(_shadow_error(h[i], args.d0, first(r) + i - 1, who))
@@ -115,9 +141,9 @@ function _shadow_chunk!(ends, bufs, r, args, who::Symbol, backend)
 end
 
 # A chunk on the device: 0 when it ran, else the fallback reason index (as Tangent._device_chunk!).
-function _shadow_device_chunk!(ends, bufs, r, args, backend)
+function _shadow_device_chunk!(ends, bufs, r, args, backend, ci::Int)
     try
-        _shadow_chunk!(ends, bufs, r, args, :gpu, backend)
+        _shadow_chunk!(ends, bufs, r, args, :gpu, backend, ci)
         return 0
     catch e
         why = _fallback_reason(e)
@@ -147,7 +173,8 @@ Two-trajectory estimate X2 of the largest exponent for every orbit of `x0` (spec
 at distance `d0` from the reference orbit along the seeded direction (`U0` overrides it) and is brought back to `d0` every
 `tau` steps. `x[i]` is the final reference state, `W[i]` the final shadow state, `finals[i] = (final,)` with
 `final = (n, sum, comp, X2, d_prev)`. `d0` must widen exactly into the element type. On the CPU backend the result equals a
-serial `map` of [`propagate_shadow_orbit`](@ref) bitwise for any chunk size and thread count.
+serial `map` of [`propagate_shadow_orbit`](@ref) bitwise for any chunk size and thread count. On the device a long run is split
+into launches that carry the state, with the launch budget, fallback reasons and provenance fields of [`propagate`](@ref) (D44).
 """
 function propagate_shadow(sys, x0::AbstractVector{SVector{s, T}}, N::Integer; d0, tau::Integer = 1, seed::Integer,
                           backend::Symbol = :cpu, chunk::Union{Int, Nothing} = nothing, U0 = nothing) where {s, T}
@@ -157,11 +184,12 @@ function propagate_shadow(sys, x0::AbstractVector{SVector{s, T}}, N::Integer; d0
     chunk === nothing || chunk >= 1 || throw(ArgumentError("chunk must be positive, got $chunk"))
     dT = _check_d0(T, d0)
     u = _shadow_directions(seed, U0, length(x0), Val(d), T)
+    forced = _forced_launch(tau)
     _check_starts(sys, x0, u, dT, T)
-    return _shadow_run(sys, x0, u, Val(d), Int(N), Int(tau), dT, seed, backend, chunk)
+    return _shadow_run(sys, x0, u, Val(d), Int(N), Int(tau), dT, seed, backend, chunk, forced)
 end
 
-function _shadow_run(sys, x0::AbstractVector{SVector{s, T}}, u, ::Val{d}, N, tau, d0, seed, backend, chunk) where {s, T, d}
+function _shadow_run(sys, x0::AbstractVector{SVector{s, T}}, u, ::Val{d}, N, tau, d0, seed, backend, chunk, forced) where {s, T, d}
     n = length(x0)
     csize_for(free) = chunk !== nothing ? chunk :
                       chunk_size(free, Val(d), Val(0), T; f = CHUNK_HEADROOM, reducer_bytes = 3 * sizeof(T), s = 2s)
@@ -170,9 +198,12 @@ function _shadow_run(sys, x0::AbstractVector{SVector{s, T}}, u, ::Val{d}, N, tau
                                      KernelAbstractions.allocate(b, ShadowEnd{s, T}, m)))
     choice = resolve_backend(backend, T)
     dev, csize, gpu_csize, gpu_chunks, bufs = CPU(), 0, 0, 0, nothing
+    Lcpu = forced === nothing ? N : min(forced, N)   # the CPU is split only by the test hook (D44 item 5)
+    L, launches = forced === nothing ? (0, 0) : (Lcpu, _launches(N, Lcpu))
+    Ldev = 0
     if choice.backend === :gpu
-        cap = _budget_orbits(something(gpu_step_ns(DEVICE[], T), 100.0), N)
-        if cap < LAUNCH_WAVE   # N alone exceeds the launch budget (D33)
+        Ldev, cap = _device_plan(forced, T, N, tau)   # the tangent stream's budget and default ns value (D44 item 15)
+        if Ldev == 0   # even L = tau exceeds the budget for one wave
             choice = BackendChoice(:cpu, "cpu", FALLBACK_REASONS[8])
         else
             try
@@ -180,10 +211,11 @@ function _shadow_run(sys, x0::AbstractVector{SVector{s, T}}, u, ::Val{d}, N, tau
                 dev = device_backend(DEVICE[])
                 bufs = alloc(dev, csize)
                 gpu_csize = csize
+                L, launches = Ldev, _launches(N, Ldev)
             catch e
                 why = _fallback_reason(e)
                 why == 0 && rethrow()
-                why == 8 && (DEVICE[] = NoDevice())
+                why == 9 && (DEVICE[] = NoDevice())
                 choice = BackendChoice(:cpu, "cpu", FALLBACK_REASONS[why])
             end
         end
@@ -193,21 +225,22 @@ function _shadow_run(sys, x0::AbstractVector{SVector{s, T}}, u, ::Val{d}, N, tau
         bufs = alloc(dev, csize)
     end
     ends = Vector{ShadowEnd{s, T}}(undef, n)
-    args = (; sys, x0, u, N, tau, d0)
+    args = (; sys, x0, u, N, tau, d0, L = choice.backend === :gpu ? Ldev : Lcpu)
     lo = 1
     while lo <= n
         r = lo:min(lo + csize - 1, n)
         if choice.backend === :gpu
-            why = _shadow_device_chunk!(ends, bufs, r, args, dev)
+            why = _shadow_device_chunk!(ends, bufs, r, args, dev, gpu_chunks + 1)
             if why == 0
                 gpu_chunks += 1
                 lo = last(r) + 1
                 continue
             end
-            why == 8 && (DEVICE[] = NoDevice())
+            why == 9 && (DEVICE[] = NoDevice())
             choice = BackendChoice(:cpu, "cpu", FALLBACK_REASONS[why])
             dev, csize = CPU(), csize_for(Sys.free_memory())
             bufs = alloc(dev, csize)
+            args = merge(args, (L = Lcpu,))
             continue
         end
         _shadow_chunk!(ends, bufs, r, args, :cpu, dev)
@@ -216,7 +249,7 @@ function _shadow_run(sys, x0::AbstractVector{SVector{s, T}}, u, ::Val{d}, N, tau
     prov = (backend = choice.backend, device = choice.device, backend_fallback_reason = choice.reason,
             precision = precision_label(T), threads = Threads.nthreads(), cpu = Sys.CPU_NAME,
             seed = seed, tau = tau, k = 0, chunk_size = csize, headroom = CHUNK_HEADROOM,
-            gpu_chunks = gpu_chunks, gpu_chunk_size = gpu_csize,
+            gpu_chunks = gpu_chunks, gpu_chunk_size = gpu_csize, launch_steps = L, launches_per_chunk = launches,
             estimator = "two-trajectory", d0 = Float64(d0), state_mode = state_mode(sys))
     return PropagationResult([e.x for e in ends], [e.y for e in ends], [(_final(e, N),) for e in ends], prov)
 end

@@ -169,6 +169,21 @@ want("record") && let
             prov.backend === :gpu ? (gpu_ns[T] = tg / steps * 1e9) : (reason = prov.backend_fallback_reason)
         end
         if isempty(reason)
+            # D44 item 9: the launch budget's value at one wave (1024 orbits x 1e4 steps, one launch), the slower of two runs
+            tw = 0.0
+            old = Chaoslab.Tangent._LAUNCH_STEPS[]
+            Chaoslab.Tangent._LAUNCH_STEPS[] = 10^4
+            try
+                for _ in 1:2
+                    t, pw = ac13_run(T, 1024, 10^4, :gpu)
+                    pw.backend === :gpu || error("one-wave record run fell back: $(pw.backend_fallback_reason)")
+                    tw = max(tw, t)
+                end
+            finally
+                Chaoslab.Tangent._LAUNCH_STEPS[] = old
+            end
+            entry["gpu_ns_per_step_wave"] = tw / (1024 * 10^4) * 1e9
+            row("D44", "record: GPU ns/orbit-step at one wave, T=$T (1024 orbits x 1e4 steps, one launch, slower of 2)", fmt(entry["gpu_ns_per_step_wave"]), "recorded", "INFO")
             entry["gpu_ns_per_step"] = gpu_ns[T]
             entry["gpu_faster"] = gpu_ns[T] <= cpu_ns[T]
             for (nt, base) in ((1, cpu1_ns[T]), (Threads.nthreads(), cpu_ns[T]))

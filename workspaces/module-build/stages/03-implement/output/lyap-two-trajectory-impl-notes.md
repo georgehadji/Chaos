@@ -43,3 +43,19 @@ All pass on both versions: quality.jl (Aqua + JET, 12/12), layering.jl (2/2), ly
 - `separation`/`displaced` exist for `WrappedStandardMap` and the plain default only; a new system with extra state components must define both methods.
 - The start check and the body both compute `_shadow_start` (one extra separation per orbit, negligible).
 - Series values X2(n) at several n come from re-running with different N (prefix invariance, Q9); there is no emission channel.
+
+## Amendment D44 (2026-10-16)
+
+Code (`src/Lyapunov/two_trajectory.jl`):
+- `_shadow_body` takes the carried end record and `(n0, steps, N)`. At `n0 = 0` it starts the shadow inside the body, as before; later launches continue from the carried reference, shadow, sum and previous separation.
+- `_shadow_kernel!` works in place on the `ShadowEnd` buffer and skips orbits that failed earlier.
+- `_shadow_chunk!` loops over launches and calls `Tangent._before_launch(device, chunk, launch, (ends = buf,))`.
+- The budget, the default ns value, the forced launch length, lost device (reason 9) and the provenance fields come from Tangent (`_device_plan`, `_forced_launch`, `_launches`). The literal 100.0 is gone.
+
+### Result
+- `test/lyap-two-trajectory/`: 477 pass (D44k a, b, d and the device path on the CPU backend).
+- Full suite green, as noted in tangent-core-impl-notes.md, Amendment D44.
+
+### Notes
+- `propagate_shadow_orbit` passes a placeholder end record (`_blank_end`), which the body never reads at `n0 = 0`.
+- D44k(c) on the GTX 1050 is stage 04.

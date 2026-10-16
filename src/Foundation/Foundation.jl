@@ -67,11 +67,11 @@ end
 "Value of a [`CompensatedSum`](@ref): `s + c`."
 total(acc::CompensatedSum) = acc.s + acc.c
 
-"The eight recorded reasons for a CPU fallback, in `_config/architecture.md` \"Compute\" order."
+"The nine recorded reasons for a CPU fallback, in `_config/architecture.md` \"Compute\" order (the ninth, \"device lost\", D44)."
 const FALLBACK_REASONS = [
     "CUDA.jl not loadable", "no functional device", "kernel does not compile for the element type",
     "device out of memory", "NumericalHealthError raised only on the GPU", "reducer is CPU-only",
-    "GPU not faster for the element type", "launch exceeds the display watchdog",
+    "GPU not faster for the element type", "launch exceeds the display watchdog", "device lost",
 ]
 
 "Resolved compute backend: `backend` is `:cpu` or `:gpu`, `reason` is empty unless a GPU was passed over."
@@ -98,9 +98,9 @@ free_memory(::NoDevice) = Sys.free_memory()
 is_oom(::Exception) = false
 "Whether an exception thrown by a device chunk is the kernel failing to compile for the element type."
 is_compile_error(::Exception) = false
-"Whether an exception thrown by a device call means the device or its context is lost (e.g. a launch timeout of the display watchdog)."
+"Whether an exception thrown by a device call means the device or its context is lost (a launch timeout, an illegal address, ...); recorded as \"device lost\" (D44)."
 is_device_lost(::Exception) = false
-"Measured GPU time per orbit-step in nanoseconds for `T` on `device` (the per-machine record), or `nothing` when unknown."
+"Measured GPU time per orbit-step in nanoseconds for `T` on `device` at one wave of 1024 orbits (the per-machine record, D44 item 9), read by the launch budget; `nothing` when unknown."
 gpu_step_ns(::AbstractDevice, ::Type) = nothing
 
 cpu_choice(reason) = BackendChoice(:cpu, "cpu", reason)

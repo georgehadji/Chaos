@@ -50,7 +50,8 @@ end
     end
     let syso = LinearSymplecticMap(gs_Apow(Float64, 16)), x0s = [gs_zero(Float64, 2) for _ in 1:10]
         rc, rm = (gs_run(syso, x0s, 200; k = 2, tau = 1, seed, alg) for alg in (CGS(), MGS()))
-        @test isequal(rc.finals, rm.finals) && isequal(rc.W, rm.W)       # I6 at k = 2
+        same = isequal(rc.finals, rm.finals) && isequal(rc.W, rm.W)       # I6 at k = 2: reported, not gated (D43)
+        @info "lyap-gram-schmidt AC7, I6 reported (D43): CGS and MGS bitwise equal at A^16: $same"
     end
     # Injected: a window with a zero column raises with the right column index; through propagate and through reducer_update
     for T in (Float64,), alg in gs_algsT(T)

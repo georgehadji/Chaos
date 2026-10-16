@@ -79,3 +79,7 @@ Command (repo root, 4 threads, test env with `Chaoslab` developed): `julia -t 4 
 
 Testset count: 15 (3 API units, 12 criteria: AC1 to AC11 and AC14). Deferred to stage 04: AC12, AC13, the G8 sandwich of AC11, the scratch reproductions listed above.
 
+
+## Change after D43 (owner, 2026-10-16)
+
+AC3(a) and the I6 line of AC7: the CGS=MGS bitwise checks are reported (`@info` with the counts of differing orbits and matrices), not gated, as Amendment D43 of the spec states. Cause: an intermittent failure of these lines in a full `Pkg.test()` during the D44 stage 03 run.

@@ -48,21 +48,25 @@ end
 
 @testset "AC3 bitwise structure" begin
     seed = gs_seed(3)
-    # (a) k = 2: CGS and MGS perform identical operations, so S_i, the final Q (and every window's Q, R) agree bitwise
+    # (a) k = 2: CGS and MGS perform the same operations in exact arithmetic. Amendment D43: not claimed bitwise equal
+    # (the compiled code may differ in the last bits); the bitwise agreement is reported, not gated.
+    orbit_diff = 0
     for K in (0.5, 2.0, 5.0, 10.0), tau in (1, 3)
         sys = gs_stdmap(Float64, K)
         x0s = gs_starts(Float64, seed + 1, 100)
         rc = gs_run(sys, x0s, 1200; k = 2, tau, seed, alg = CGS())
         rm = gs_run(sys, x0s, 1200; k = 2, tau, seed, alg = MGS())
-        @test all(j -> isequal(gs_fin(rc, j).sum, gs_fin(rm, j).sum) && isequal(gs_fin(rc, j).comp, gs_fin(rm, j).comp), 1:100)
-        @test isequal(rc.W, rm.W)
+        orbit_diff += count(j -> !(isequal(gs_fin(rc, j).sum, gs_fin(rm, j).sum) && isequal(gs_fin(rc, j).comp, gs_fin(rm, j).comp) &&
+                                   isequal(rc.W[j], rm.W[j])), 1:100)
     end
     rng = StableRNG(seed + 2)
+    matrix_diff = 0
     for (T, d) in ((Float64, 2), (Float64, 4), (Double64, 2)), _ in 1:200
         W = SMatrix{d,2,T}(ntuple(_ -> T(randn(rng)), Val(2d)))
         fc, fm = orthonormalize(CGS(), W), orthonormalize(MGS(), W)
-        @test isequal(fc[1], fm[1]) && isequal(fc[2], fm[2])
+        matrix_diff += !(isequal(fc[1], fm[1]) && isequal(fc[2], fm[2]))
     end
+    @info "lyap-gram-schmidt AC3(a), I6 reported (D43): CGS and MGS not bitwise equal on $orbit_diff of 800 orbits and $matrix_diff of 600 matrices"
     # (b) A_S, k = 4, tau = 3, 200 windows (window map A_S^3): CGS and MGS differ in Q for k >= 3; tolerance 0
     A3 = gs_AS(Float64)^3
     Qc = Qm = initial_deviations(seed + 4, 1, Val(4), Val(4), Float64)

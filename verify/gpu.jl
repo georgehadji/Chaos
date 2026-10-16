@@ -13,7 +13,7 @@ CHILD || @eval using CUDA
 
 const SEED = 20261012
 const ROOT = normpath(joinpath(@__DIR__, ".."))
-# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2) runs only those sections; the
+# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c) runs only those sections; the
 # default runs everything. Skipping "record" needs an existing data/gpu-benchmark.toml for the launch budget.
 const ONLY = get(ENV, "GPU_ONLY", "")
 want(tag) = isempty(ONLY) || tag in strip.(split(ONLY, ','))
@@ -571,12 +571,154 @@ want("l2") && let
     end
 end
 
+# ------------------------------------------------------------------------------------- D44 (tangent-core Amendment D44, local)
+# Step-chunked relaunch on the GTX 1050, after the record (the budget reads its one-wave value). Tag "d44".
+MODTAG[] = "tangent-core: "
+const Tg = Chaoslab.Tangent
+function with_L(f, L)
+    old = Tg._LAUNCH_STEPS[]
+    Tg._LAUNCH_STEPS[] = L
+    try
+        return f()
+    finally
+        Tg._LAUNCH_STEPS[] = old
+    end
+end
+same_run(a, b) = isequal(a.x, b.x) && isequal(a.W, b.W) && isequal(a.finals, b.finals)
+on_dev(p, L, N) = p.backend === :gpu && p.backend_fallback_reason == "" && p.gpu_chunks > 0 && p.launch_steps == L && p.launches_per_chunk == cld(N, L)
+
+# D44c [local]: N = 2e3 (one launch fits); forced L < N equals forced L = N bitwise on the device. Orbits whose single-launch run
+# raises a health error are dropped (as the package test D44a; RGS breaks down on a few K = 2 pi, tau = 10 orbits): first on the CPU,
+# then on the device (a device-only breakdown would send the whole run to the CPU with reason 5, making the comparison CPU vs CPU).
+(want("d44") || want("d44c")) && let
+    N = 2000
+    rng = StableRNG(SEED + 4403)
+    x0 = [SVector(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:1024]
+    sys = StandardMap(2pi)
+    for (name, k, red) in (("Benettin", 1, (Benettin(),)), ("QRSpectrum(RGS)", 2, (QRSpectrum(RGS()),)), ("SVDSpectrum", 2, (SVDSpectrum(),))), tau in (2, 10)
+        w(j) = initial_deviations(SEED, j, Val(2), Val(k), Float64)
+        keep = [j for j in eachindex(x0) if catchhe(() -> propagate_orbit(sys, x0[j], w(j), N, tau, red; orbit = j)) === nothing]
+        ncpu = length(keep)
+        filter!(j -> propagate(sys, [x0[j]], N; k = k, tau = tau, seed = SEED, reducers = red, W0 = [w(j)], backend = :gpu).provenance.backend === :gpu, keep)
+        xs, W0 = x0[keep], [w(j) for j in keep]
+        println("# D44c $name tau=$tau: kept $(length(keep)) of 1024 orbits ($(1024 - ncpu) fail on the CPU, $(ncpu - length(keep)) more only on the device)")
+        run() = propagate(sys, xs, N; k = k, tau = tau, seed = SEED, reducers = red, W0 = W0, backend = :gpu)
+        full = with_L(run, N)
+        ok = on_dev(full.provenance, N, N) && same_run(run(), full)
+        for L in (tau, 20tau, 130tau)
+            r = with_L(run, L)
+            ok &= on_dev(r.provenance, L, N) && same_run(r, full)
+        end
+        row("D44c", "device bitwise, $name, K=2pi, $(length(xs)) orbits, N=2e3, tau=$tau: forced L in (tau, 20 tau, 130 tau) equals L = N (and the unforced run), all on the device",
+            ok ? "equal" : "differs", "bitwise", pf(ok))
+    end
+end
+
+# D44k(c) [local]: the same for propagate_shadow, lifted and wrapped, K = 0.5 and 2 pi, d0 = 1e-8, 256 orbits.
+want("d44") && let
+    N = 2000
+    rng = StableRNG(SEED + 4411)
+    z0 = [SVector(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:256]
+    for mode in (:lifted, :wrapped), K in (0.5, 2pi), tau in (2, 10)
+        sys = mode === :wrapped ? WrappedStandardMap(K) : StandardMap(K)
+        x0 = mode === :wrapped ? [torus_state(z) for z in z0] : z0
+        run() = propagate_shadow(sys, x0, N; d0 = 1e-8, tau = tau, seed = SEED, backend = :gpu)
+        full = with_L(run, N)
+        ok = on_dev(full.provenance, N, N) && same_run(run(), full)
+        for L in (tau, 20tau, 130tau)
+            r = with_L(run, L)
+            ok &= on_dev(r.provenance, L, N) && same_run(r, full)
+        end
+        row("D44k", "(c) device bitwise, propagate_shadow, $mode, K=$(K == 2pi ? "2pi" : K), 256 orbits, N=2e3, tau=$tau: forced L in (tau, 20 tau, 130 tau) equals L = N, all on the device",
+            ok ? "equal" : "differs", "bitwise", pf(ok))
+    end
+end
+
+# D44h [local part]: every lost-device code of the extension's table yields "device lost" and never the budget string; codes that
+# leave the context usable (out of memory, invalid value) are not lost-device errors.
+want("d44") && let
+    ext = Base.get_extension(Chaoslab, :ChaoslabCUDAExt)
+    lost = ext.LOST_CODES
+    got = [FALLBACK_REASONS[Tg._fallback_reason(CUDA.CuError(c))] for c in lost]
+    other = [CUDA.ERROR_OUT_OF_MEMORY, CUDA.ERROR_INVALID_VALUE]
+    ok = all(==("device lost"), got) && CUDA.ERROR_LAUNCH_TIMEOUT in lost && CUDA.ERROR_ILLEGAL_ADDRESS in lost &&
+         all(c -> !F.is_device_lost(CUDA.CuError(c)), other)
+    row("D44h", "lost-device codes $(join(Int.(lost), ", ")): reason of each; codes $(join(Int.(other), ", ")) not lost",
+        join(unique(got), "; "), "\"device lost\" for all, 700 and 702 included", pf(ok))
+end
+
+# D44i: one stepping body (inspection; the counts of the tangent-core AC14 check).
+want("d44") && let
+    tdir = joinpath(ROOT, "src", "Tangent")
+    code(l) = first(split(l, '#'))
+    hits(pat) = [(basename(f), i) for f in filter(f -> endswith(f, ".jl"), readdir(tdir; join = true)) for (i, l) in enumerate(eachline(f)) if occursin(pat, code(l))]
+    fwd, tan = hits("forward(sys"), hits("tangent(sys")
+    calls = filter(h -> !occursin("@inline function _orbit_body", code(readlines(joinpath(tdir, h[1]))[h[2]])), hits("_orbit_body("))
+    ok = length(fwd) == 1 && length(tan) == 1 && length(calls) == 2
+    row("D44i", "single stepping body: forward(sys / tangent(sys sites in src/Tangent; callers of _orbit_body (kernel, propagate_orbit), $(join(("$(c[1]):$(c[2])" for c in calls), ", "))",
+        "$(length(fwd)) / $(length(tan)); $(length(calls))", "1 / 1; 2", pf(ok))
+end
+
+# D44j [local]: the rows cut down or fallen back for the launch budget, rerun at n = 1e5 on the device, original tolerances. Per row:
+# provenance on the device with more than one launch per chunk, the per-launch estimate from provenance (<= 1 s), and the measured
+# time of one full launch (the same row at N = L with one chunk of the run's device chunk size, <= 4 s).
+function d44j(ac, name, est, lam, nl, x0; extra = nothing, N = 10^5, tau = 10)
+    sys = StandardMap(0.5)
+    gpu = est(sys, x0, N, tau, :gpu)
+    p = gpu.provenance
+    launched = p.backend === :gpu && p.backend_fallback_reason == "" && p.gpu_chunks > 0 && p.launches_per_chunk > 1
+    launched || return row(ac, "D44j $name, n=$(fmt(N)): on the device in launches", "backend $(p.backend), reason \"$(p.backend_fallback_reason)\", launches $(p.launches_per_chunk)", "gpu, more than 1 launch", "FAIL")
+    ns = something(F.gpu_step_ns(DEV, Float64), Tg.DEFAULT_GPU_NS)
+    estm = ns * 1e-9 * p.launch_steps * max(p.chunk_size, 1024)
+    xs = x0[1:min(length(x0), p.gpu_chunk_size)]
+    t1 = @elapsed g1 = with_L(() -> est(sys, xs, p.launch_steps, tau, :gpu), p.launch_steps)
+    one = g1.provenance.backend === :gpu && g1.provenance.gpu_chunks == 1 && g1.provenance.launches_per_chunk == 1
+    cpu = est(sys, x0, N, tau, :cpu)
+    ref = est(StandardMap(Double64(0.5)), [SVector{2,Double64}(z) for z in x0], N, tau, :cpu)
+    for i in 1:nl
+        lc, lg, lr = [Float64(l[i]) for l in lams(cpu, lam)], [Float64(l[i]) for l in lams(gpu, lam)], [Float64(l[i]) for l in lams(ref, lam)]
+        dcr, dgr, dcg = abs.(lc .- lr), abs.(lg .- lr), abs.(lc .- lg)
+        nc, ng = count(>(1e-6), dcr), count(>(1e-6), dgr)
+        both = (dcr .<= 1e-6) .& (dgr .<= 1e-6)
+        gap = any(both) ? maximum(dcg[both]) : Inf
+        ok = abs(nc - ng) <= 3 && gap <= 2e-6 && estm <= 1 && one && t1 <= 4
+        row(ac, "D44j $name lambda_$i, K=0.5, $(length(x0)) orbits, n=$(fmt(N)), tau=$tau, L=$(p.launch_steps), $(p.launches_per_chunk) launches per chunk, $(p.gpu_chunks) device chunk(s) of $(p.gpu_chunk_size): orbits above 1e-6 vs the Double64 reference CPU / GPU; gap over the $(count(both)) agreeing orbits; per-launch estimate s; measured full launch s ($(length(xs)) orbits x L, one launch: $one); ratio measured/estimate (max |cpu-gpu| $(fmt(maximum(dcg))), max |gpu-ref| $(fmt(maximum(dgr))))",
+            "$nc / $ng (diff $(abs(nc - ng))); $(fmt(gap)); $(fmt(estm)); $(fmt(t1)); $(fmt(t1 / estm))", "count diff <= 3; gap <= 2e-6; <= 1; <= 4", pf(ok))
+    end
+    extra === nothing || extra(sys, x0, N, tau, cpu, gpu)
+end
+if want("d44")
+    let rng = StableRNG(SEED + 1201), N = 10^5   # tangent-core AC12a starts and reducer
+        x0 = [SVector(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:1024]
+        est = (sys, x, n, tau, b) -> propagate(sys, x, n; k = 1, tau = tau, seed = SEED, reducers = (LogNorm(),), backend = b)
+        d44j("AC12a", "tangent-core LogNorm (S/n)", est, f -> f.logs ./ N, 1, x0)
+    end
+    let rng = StableRNG(SEED + 41000 + 50 * 16 + 1)   # lyap-benettin AC16 starts (vs(16, 1)) and seed (vs(16))
+        x0 = [SVector(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:1024]
+        est = (sys, x, n, tau, b) -> propagate(sys, x, n; k = 1, tau = tau, seed = SEED + 41800, reducers = (Benettin(),), backend = b)
+        MODTAG[] = "lyap-benettin: "
+        d44j("AC16", "Benettin", est, lam_of, 1, x0)
+    end
+    xr = first(regular_starts(1024))
+    MODTAG[] = "lyap-gram-schmidt: "
+    for (nm, alg) in (("RGS", RGS()), ("MGS", MGS()))
+        d44j("AC12", "QRSpectrum($nm)", qr_run(QRSpectrum(alg)), lam_of, 2, xr)
+    end
+    MODTAG[] = "lyap-householder-qr: "
+    isdefined(Main, :hh_theta) || include(joinpath(ROOT, "test", "lyap-householder-qr", "hh_helpers.jl"))
+    for (nm, alg) in (("HouseholderQR", HouseholderQR()), ("GivensQR", GivensQR()), ("AugmentedQR", AugmentedQR()))
+        d44j("AC14", "QRSpectrum($nm)", qr_run(QRSpectrum(alg)), lam_of, 2, xr; extra = (a...) -> hh_sum_check("(a) D44j $nm, K=0.5, n=1e5", a...))
+    end
+    MODTAG[] = "lyap-svd-stabilized: "
+    d44j("AC10", "SVDSpectrum", qr_run(SVDSpectrum()), lam_of, 2, xr)
+    MODTAG[] = "tangent-core: "
+end
+
 # ------------------------------------------------------------------------------------------------ AC12a (tangent-core), last
 # D33: symmetric form. Each backend is compared with a Double64 CPU reference on all 1024 seeded orbits; the numbers of orbits above
 # 1e-6 may differ by at most 3, and on the orbits where both backends agree with the reference the CPU-GPU gap is within 2e-6.
-# The spec's n = 1e5 is one launch of about 2 s, over the 1 s launch budget of D33, so propagate runs it on the CPU with the
-# reason "launch exceeds the display watchdog" (FALLBACK line); the same criterion is then evaluated at the largest n whose
-# launch fits the budget with one wave of 1024 orbits (n = 4e4). It runs last, after the record is written.
+# Before D44 the spec's n = 1e5 (one launch of about 2 s) fell back to the CPU for the 1 s launch budget and the criterion was
+# evaluated at n = 4e4; since D44 n = 1e5 runs on the device in launches (the D44j rows above add the launch checks).
 MODTAG[] = "tangent-core: "
 function ac12a(N)
     K, no, tau = 0.5, 1024, 10
@@ -595,7 +737,7 @@ function ac12a(N)
     both = (dcr .<= 1e-6) .& (dgr .<= 1e-6)
     gap = maximum(dcg[both])
     ok = abs(ncpu - ngpu) <= 3 && gap <= 2e-6
-    row("AC12a", "K=0.5, $no orbits, n=$(fmt(N)), tau=$tau, one launch ($(fmt(tg)) s): orbits above 1e-6 against the Double64 reference, CPU / GPU; max CPU-GPU gap over the $(count(both)) orbits where both agree with the reference",
+    row("AC12a", "K=0.5, $no orbits, n=$(fmt(N)), tau=$tau, GPU run $(fmt(tg)) s ($(gpu.provenance.launches_per_chunk) launch(es) of $(gpu.provenance.launch_steps) steps): orbits above 1e-6 against the Double64 reference, CPU / GPU; max CPU-GPU gap over the $(count(both)) orbits where both agree with the reference",
         "$ncpu / $ngpu (diff $(abs(ncpu - ngpu))); $(fmt(gap))", "count diff <= 3; gap <= 2e-6", pf(ok))
     row("AC12a", "same, maxima over all $no orbits (chaotic layer included): |S_cpu - S_ref| $(fmt(maximum(dcr))), |S_gpu - S_ref| $(fmt(maximum(dgr))), |S_cpu - S_gpu| $(fmt(maximum(dcg)))",
         maximum(dcg), "-", "INFO")

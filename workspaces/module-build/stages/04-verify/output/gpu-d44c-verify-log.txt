@@ -1,0 +1,23 @@
+# gpu verification, julia 1.13.1, threads 4, cpu skylake, base seed 20261012
+# device type ChaoslabCUDAExt.CUDADevice, name 'NVIDIA GeForce GTX 1050'
+# CUDA.jl 6.4.2, runtime 12.9.0, driver 13.0.0, capability 6.1.0, free memory 2452.0 MiB, stack limit 4096 B (extension minimum D40)
+# Windows TDR registry values (GraphicsDrivers): TdrDelay    REG_DWORD    0x8; TdrLevel    REG_DWORD    0x3
+# record file: E:\Documents\Vibe-Coding\Chaos Research Orchestrator\data\gpu-benchmark.toml (exists at start)
+# probe Float64: (loadable = true, functional = true, device = "NVIDIA GeForce GTX 1050", compiles = true, gpu_faster = true)
+└ @ LLVM C:\Users\tesse\.julia\packages\LLVM\tiRVR\src\core\context.jl:209
+# probe Double64: (loadable = true, functional = true, device = "NVIDIA GeForce GTX 1050", compiles = false, gpu_faster = false)
+# format: AC<n> | quantity | value | bound | verdict
+# after the record: resolve_backend(:auto, Float64) = BackendChoice(:gpu, "NVIDIA GeForce GTX 1050", ""); (:auto, Double64) = BackendChoice(:cpu, "cpu", "kernel does not compile for the element type")
+# D44c Benettin tau=2: kept 1024 of 1024 orbits (0 fail on the CPU, 0 more only on the device)
+D44c | tangent-core: device bitwise, Benettin, K=2pi, 1024 orbits, N=2e3, tau=2: forced L in (tau, 20 tau, 130 tau) equals L = N (and the unforced run), all on the device | equal | bitwise | PASS
+# D44c Benettin tau=10: kept 1024 of 1024 orbits (0 fail on the CPU, 0 more only on the device)
+D44c | tangent-core: device bitwise, Benettin, K=2pi, 1024 orbits, N=2e3, tau=10: forced L in (tau, 20 tau, 130 tau) equals L = N (and the unforced run), all on the device | equal | bitwise | PASS
+# D44c QRSpectrum(RGS) tau=2: kept 1024 of 1024 orbits (0 fail on the CPU, 0 more only on the device)
+D44c | tangent-core: device bitwise, QRSpectrum(RGS), K=2pi, 1024 orbits, N=2e3, tau=2: forced L in (tau, 20 tau, 130 tau) equals L = N (and the unforced run), all on the device | equal | bitwise | PASS
+# D44c QRSpectrum(RGS) tau=10: kept 58 of 1024 orbits (780 fail on the CPU, 186 more only on the device)
+D44c | tangent-core: device bitwise, QRSpectrum(RGS), K=2pi, 58 orbits, N=2e3, tau=10: forced L in (tau, 20 tau, 130 tau) equals L = N (and the unforced run), all on the device | equal | bitwise | PASS
+# D44c SVDSpectrum tau=2: kept 1024 of 1024 orbits (0 fail on the CPU, 0 more only on the device)
+D44c | tangent-core: device bitwise, SVDSpectrum, K=2pi, 1024 orbits, N=2e3, tau=2: forced L in (tau, 20 tau, 130 tau) equals L = N (and the unforced run), all on the device | equal | bitwise | PASS
+# D44c SVDSpectrum tau=10: kept 58 of 1024 orbits (780 fail on the CPU, 186 more only on the device)
+D44c | tangent-core: device bitwise, SVDSpectrum, K=2pi, 58 orbits, N=2e3, tau=10: forced L in (tau, 20 tau, 130 tau) equals L = N (and the unforced run), all on the device | equal | bitwise | PASS
+# SUMMARY PASS=6 (6 lines)

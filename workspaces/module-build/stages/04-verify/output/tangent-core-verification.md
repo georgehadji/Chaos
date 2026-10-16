@@ -134,3 +134,62 @@ Findings.
 - AC13. On an idle machine the GPU is faster than 4 CPU threads for Float64 (5.1x in this run, 4.3x in the earlier one), so the record has `gpu_faster = true` for Float64 and `auto` resolves to the GPU for Float64 on this machine once CUDA is loaded. The CPU times in the CPU section of this report (185.6 and 851.1 ns/orbit-step) were taken while other jobs ran. The record (`data/gpu-benchmark.toml`, git-ignored) holds the numbers of the last run.
 - Double64 does not compile for the GPU: the kernel reaches a lazily initialised `__subtf3` call from Quadmath (reached through DoubleFloats) and allocations of objects with references (`Vector{Base.Padding}`). The probe returns `compiles = false`; `resolve_backend` gives CPU with reason 3 for `:gpu` and `:auto`, and an explicit `:gpu` run completes on the CPU with that reason in its provenance.
 - Launch time. A launch is bounded by the number of steps per orbit, not by the number of orbits: 256 and 1024 orbits x 1e4 steps took 0.38 s and 0.30 s, 1024 x 1e5 steps 1.5 to 2.9 s. The launch budget of D33 therefore refuses such a run instead of relying on the watchdog delay.
+
+## Amendment D44 (2026-10-16)
+
+### Evidence
+
+- **Package criteria:**
+  - D44a, b, d, e, f, g, the package part of h, and the CPU-backend part of c: `test/tangent-core/tc_d44.jl` and `tc_device.jl`, 783 pass.
+  - Two-trajectory D44k(a, b, d): `test/lyap-two-trajectory/l2_d44.jl`, 477 pass.
+  - Full `Pkg.test()`: 50197 pass (stage 03 notes).
+- **Hardware criteria:** `verify/gpu.jl`, raw output `gpu-d44-verify-log.txt` (all sections except hh-perf) and `gpu-d44c-verify-log.txt` (the D44c rerun).
+- **Machine:** as in the GPU section above (GTX 1050, TdrDelay 8 s).
+- **Record:** one-wave value 28.06 ns per orbit-step (item 9: 1024 orbits x 1e4 steps, one launch, slower of two runs). AC13 value 23.08 ns; GPU faster than the CPU for Float64. The budget then gives L = 34800 for tau = 10.
+
+| Criterion | Quantity | Value | Bound | Verdict |
+|---|---|---|---|---|
+| D44c [local] | Device bitwise, K = 2 pi, N = 2e3, forced L in {tau, 20 tau, 130 tau} against L = N and the unforced run: Benettin, QRSpectrum(RGS), SVDSpectrum at tau = 2 (1024 orbits each) and tau = 10 (Benettin 1024 orbits; RGS and SVD 58 orbits, see findings) | equal (6 rows) | bitwise | PASS |
+| D44h [local] | The extension's lost-device codes 702, 719, 700, 709, 4, 100, 214, 714, 715, 716, 201, 710, 999: reason of each; codes 2 (out of memory) and 1 (invalid value) are not lost-device codes | "device lost" for every code | "device lost", 700 and 702 included | PASS |
+| D44i | One stepping body: sites of `forward(sys` and `tangent(sys` in `src/Tangent`; callers of `_orbit_body` (`propagate.jl:36` kernel, `orbit.jl:69` `propagate_orbit`) | 1 / 1; 2 | 1 / 1; 2 | PASS |
+| D44j [local] AC12a | tangent-core LogNorm S/n, 1024 orbits, n = 1e5, tau = 10: orbits above 1e-6 vs the Double64 reference, CPU / GPU; gap; per-launch estimate; measured full launch (ratio) | 20 / 20; 9.444e-08; 1.0 s; 1.508 s (1.51) | diff <= 3; <= 2e-6; <= 1 s; <= 4 s | PASS |
+| D44j [local] lyap-benettin AC16 | Benettin, same form | 18 / 17; 1.754e-07; 1.0 s; 1.334 s (1.33) | same | PASS |
+| D44j [local] lyap-gram-schmidt AC12 | QRSpectrum(RGS), lambda_1 and lambda_2 (S7 regular class) | 1 / 1; 5.434e-07; 1.0 s; 1.341 s (1.34) | same | PASS |
+| D44j [local] lyap-gram-schmidt AC12 | QRSpectrum(MGS) | 1 / 1; 5.434e-07; 1.0 s; 1.265 s (1.27) | same | PASS |
+| D44j [local] lyap-householder-qr AC14a | HouseholderQR; \|lambda_1 + lambda_2\| / theta_sum, CPU and GPU | 1 / 1; 5.434e-07; 1.0 s; 1.415 s (1.42); 3.1e-4 and 2.6e-4 | same; <= 1 | PASS |
+| D44j [local] lyap-householder-qr AC14a | GivensQR; theta_sum ratio | 1 / 1; 5.434e-07; 1.0 s; 2.009 s (2.01); 2.1e-4 and 2.2e-4 | same; <= 1 | PASS |
+| D44j [local] lyap-householder-qr AC14a | AugmentedQR; theta_sum ratio | 1 / 1; 5.434e-07; 1.0 s; 2.983 s (2.98); 3.1e-4 and 2.6e-4 | same; <= 1 | PASS |
+| D44j [local] lyap-svd-stabilized AC10a | SVDSpectrum, lambda_1 and lambda_2 | 1 / 1; 5.434e-07; 1.0 s; 2.679 s (2.68) | same | PASS |
+| D44k(c) [local] | propagate_shadow device bitwise, lifted and wrapped, K = 0.5 and 2 pi, tau = 2 and 10, 256 orbits, N = 2e3, forced L in {tau, 20 tau, 130 tau} against L = N | equal (8 rows) | bitwise | PASS |
+| AC12a (rerun) | n = 1e5, the original criterion, now on the device in 3 launches of 34800 steps (GPU run 2.46 s in all) | 20 / 20 (diff 0); 9.444e-08 | count diff <= 3; gap <= 2e-6 | PASS (was FALLBACK) |
+
+Every D44j row ran on the device: backend gpu, empty reason, 1 device chunk of 1024 orbits, L = 34800, 3 launches per chunk. Each full launch was measured in one chunk of one launch, as the provenance confirms.
+
+The Batch B rows at n = 4e4, the AC12b and c rows and the chaotic K = 10 rows all pass again with the relaunch code, at the same values as `gpu-batchb-verify-log.txt`. The 13 FALLBACK lines are all Double64, "kernel does not compile for the element type", unchanged.
+
+### Findings
+
+- **D44c at tau = 10.**
+  - The first run failed for RGS and SVD. Every run of those two rows, the single launch included, ended on the CPU with reason 5: on some orbits only the device raised "orthonormalisation breakdown". The comparison was therefore CPU against CPU (`d44c_diag.jl`: all equal, all CPU).
+  - The procedure now also drops orbits whose single-launch device run raises; this extends the D44a correction to the device side. After that, 58 of 1024 orbits remain: 780 break down on the CPU and 186 more only on the device. All rows pass.
+  - K = 2 pi with tau = 10 is far outside the usable RGS window, so the bitwise check at tau = 10 rests on 58 orbits. The tau = 2 rows keep all 1024.
+  - Owner decision: accept 58 orbits, or move the tau = 10 rows to a smaller K.
+- **The launch estimate is low for reducers heavier than the record's.**
+  - The one-wave record uses the LogNorm reducer. Measured full launches at L = 34800 take 1.27 to 2.98 s against the 1 s estimate (AugmentedQR is the slowest).
+  - All are within the 4 s gate and the 8 s TdrDelay, but the margin to the watchdog is 2.7x, not 8x.
+  - Candidate for `_config/risks.md`: a per-reducer record, or a cost factor, if heavier reducers or slower cards follow.
+- **CPU timing.** The 4-thread CPU value of this run (218 ns per orbit-step) is twice the earlier 102.6. Other jobs ran during part of the run. `gpu_faster` stays true either way.
+
+### Review findings (independent Sonnet review: spec and code only)
+
+None CRITICAL or HIGH.
+
+| # | Severity | Finding | Disposition |
+|---|---|---|---|
+| 1 | MEDIUM | The provenance fields take the device L as soon as device setup succeeds. A first chunk that fails in launch 1 still reports L, although item 13 says 0 when "the device was never used". | Kept. The owner-approved test D44k expects L after a lost device in launch 3 of chunk 1. Read with item 13: the device was used once launches ran. The only case left open is a failure in launch 1 of chunk 1. Owner decision. |
+| 2 | LOW | `_budget_steps` upward loop unbounded for a tiny, corrupt record value | Fixed: m capped at `typemax(Int) / (4 tau)` |
+| 3 | LOW | A forced L with a setup fallback records the forced L on the CPU | As specified: item 13 says a forced CPU step chunk records its L (test hook only) |
+| 4 | LOW | `Val(size(Wi, 1))` in the kernel may not constant-fold on the GPU | Refuted on hardware: the probe compiles and every Float64 row ran on the device |
+| 5 | LOW | The shadow start is computed again on the device at launch 1, besides the host check | Kept: it keeps the single-launch path unchanged (item 4), and the device needs the start code |
+| 6 | LOW | An OOM or lost device inside `compiles()` escapes the probe | Pre-existing (D29), unchanged by D44 |
+| 7 | LOW | The record run aborts the script on a fallback | Intended |

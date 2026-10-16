@@ -134,3 +134,10 @@ Independent review: fresh Sonnet subagent given the spec and the code, not the i
 | LOW | default `separation` and `displaced` assume s == d | `src/Lyapunov/separation.jl:9, 17` | record |
 | LOW | host-side seeding over all orbits before chunking | `src/Lyapunov/two_trajectory.jl:137-141` | record (memory only) |
 | untested | thread count; post-reset window failure code 3; I3 over a run | `test/lyap-two-trajectory` | thread count closed by AC11 (1, 2, 4 threads, child processes, bitwise); the other two: fix, test cases |
+
+## Amendment D44 (2026-10-16)
+
+Step-chunked relaunch (tangent-core spec, Amendment D44, item 15). Evidence:
+- D44k(a), (b) and (d): `test/lyap-two-trajectory/l2_d44.jl`, 477 pass.
+- D44k(c) [local]: device bitwise on the GTX 1050 for lifted and wrapped, K = 0.5 and 2 pi, tau = 2 and 10, 256 orbits, N = 2e3, forced L in {tau, 20 tau, 130 tau} against L = N. Eight rows equal; see `tangent-core-verification.md`, "Amendment D44", and `gpu-d44-verify-log.txt`.
+- Criterion 17 stays at n = 4e4 (owner, D44). AC17(a) and (c) pass again with the relaunch code.

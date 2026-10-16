@@ -149,11 +149,12 @@ Steps per launch (D44 item 6): the largest multiple of `tau` whose estimate for 
 """
 function _budget_steps(ns, tau::Integer)
     fits(m) = ns * 1e-9 * (m * tau) * LAUNCH_WAVE <= LAUNCH_BUDGET_S
-    m = floor(Int, min(LAUNCH_BUDGET_S / (ns * 1e-9 * LAUNCH_WAVE * tau), 2.0^52))
+    cap = typemax(Int) ÷ (4 * tau)   # a tiny ns value (corrupt record) gives a huge L, never an unbounded loop
+    m = floor(Int, min(LAUNCH_BUDGET_S / (ns * 1e-9 * LAUNCH_WAVE * tau), cap))
     while m > 0 && !fits(m)
         m -= 1
     end
-    while fits(m + 1)
+    while m < cap && fits(m + 1)
         m += 1
     end
     return m * tau

@@ -177,6 +177,8 @@ want("record") && let
                 for _ in 1:2
                     t, pw = ac13_run(T, 1024, 10^4, :gpu)
                     pw.backend === :gpu || error("one-wave record run fell back: $(pw.backend_fallback_reason)")
+                    (pw.gpu_chunks == 1 && pw.gpu_chunk_size >= 1024 && pw.launches_per_chunk == 1) ||
+                        error("one-wave record run is not one chunk of one launch: $pw")
                     tw = max(tw, t)
                 end
             finally

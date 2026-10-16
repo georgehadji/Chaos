@@ -171,14 +171,11 @@ function _forced_launch(tau::Integer)
 end
 
 # Device launch plan (D44): steps per launch L (0 when even L = tau exceeds the budget for one wave) and the orbit cap
-# at L. A budget L keeps the cap at least one wave (item 6); a forced L only keeps it positive.
+# at L, never below one wave (item 6). A forced L (tests, the one-wave record run) keeps the wave floor, so the record
+# run of 1024 orbits stays one chunk whatever value is on disk.
 function _device_plan(forced, ::Type{T}, N::Int, tau::Int) where {T}
     ns = something(gpu_step_ns(DEVICE[], T), DEFAULT_GPU_NS)
-    if forced !== nothing
-        L = min(forced, N)
-        return (L, max(1, _budget_orbits(ns, L)))
-    end
-    L = min(_budget_steps(ns, tau), N)
+    L = forced === nothing ? min(_budget_steps(ns, tau), N) : min(forced, N)
     return L == 0 ? (0, 0) : (L, max(LAUNCH_WAVE, _budget_orbits(ns, L)))
 end
 

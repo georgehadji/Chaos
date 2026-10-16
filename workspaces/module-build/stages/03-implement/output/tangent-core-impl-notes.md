@@ -155,8 +155,13 @@ Code:
 ### Deviations and notes
 - **Status codes are carried with the state.** Spec item 2 says "nothing else is carried". The status code and failing step are carried too, so an orbit that failed stops, and the chunk reports the lowest failing orbit id after the last launch, exactly as one launch does. A per-launch throw would report the earliest launch instead.
 - **Provenance after setup.** The two fields take the device values once device setup succeeds, even if the first chunk then fails. This matches D44k: after a lost device in chunk 1 the fields keep L. A forced CPU split records its own L.
-- **Orbit cap.** With a budget L the orbit cap is floored at one wave (item 6); with a forced L it is only kept at least 1.
-- **Unexplained failure in the first full run.** It had 72 failures in the lyap-gram-schmidt CGS-vs-MGS bitwise checks (AC3 lines 57, 58 and 64; AC7 line 53). The rerun passed. The suite alone, with `--check-bounds=yes`, passes both on HEAD and on this change. Line 64 compares `orthonormalize(CGS(), W)` with `orthonormalize(MGS(), W)` directly, without propagate, so the failure does not come from this change. It is the fragility that D43 recorded: I6 was restated without the bitwise claim, but the tests still gate on it. Owner decision: turn those lines into reported lines, as D43 says.
+- **Orbit cap.** The orbit cap is floored at one wave (item 6), for the budget L and for a forced L alike. With a forced L the record run of 1024 orbits stays one chunk, whatever ns value is already on disk. `verify/gpu.jl` asserts one chunk of one launch for that run.
+- **Audit items not run:** coverage and the `bench/` budget, for this amendment.
+- **Intermittent failure, cause not established, first seen on this change.**
+  - The first full run had 72 failures in the lyap-gram-schmidt CGS-vs-MGS bitwise checks: AC3 lines 57, 58 and 64, and AC7 line 53. The rerun passed.
+  - Run alone with `--check-bounds=yes`, the suite passes both on HEAD and on this change. Five earlier full runs on HEAD passed.
+  - Line 64 compares `orthonormalize(CGS(), W)` with `orthonormalize(MGS(), W)` directly. The precompile workload, however, runs CGS and MGS through the changed kernel, so an effect through compiled specializations is not excluded.
+  - The gated CGS=MGS bitwise lines contradict D43, which restated I6 without the bitwise claim and made those lines reported. Owner decision: change the tests (stage 02) to report those lines.
 - **Pre-existing function size.** `_propagate` (67 lines) and `_shadow_run` (63) were already over 50 lines before D44 and gained about 5 lines each.
 
 ### Known limits

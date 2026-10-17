@@ -10,7 +10,7 @@ Build and inspect the orbit panel. Skip for grid scans.
 
 ## Process
 
-1. Run `julia --project bin/chaoslab.jl panel` with the preregistration (no AI): picks initial conditions per class, writes the panel file and phase portraits.
+1. Run `julia --project bin/chaoslab.jl panel` with the preregistration (no AI): picks initial conditions per class, writes the panel file and phase portraits; run the audit.
 2. **[Checkpoint]** Present the portraits.
 3. If a class is wrong, the human amends `[study]-preregistration.md` in 01's output (logged amendment, allowed only before 03-run), then this stage reruns.
 
@@ -19,6 +19,13 @@ Build and inspect the orbit panel. Skip for grid scans.
 | After Step | Agent Presents | Human Decides |
 |------------|---------------|---------------|
 | 1 | Phase portraits with the chosen orbits marked | Orbits match their classes, or amend |
+
+## Audit
+
+| Check | Pass Condition |
+|-------|---------------|
+| Classes | Every orbit class of the preregistration has at least one orbit in the panel |
+| Seeds | Every initial condition carries its recorded seed |
 
 ## Outputs
 

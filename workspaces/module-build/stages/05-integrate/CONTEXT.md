@@ -13,7 +13,7 @@ Flip the catalog status, update docs, and commit.
 ## Process
 
 1. Flip the catalog `Status` of this module's rows to `verified` (promotion write into `/_config/`).
-2. Update the folder `CONTEXT.md` and `CHANGELOG.md`.
+2. Update the folder `CONTEXT.md` and `CHANGELOG.md`; run the audit.
 3. **[Checkpoint]** Present the commit.
 4. Commit on a branch and push it. PR only with explicit approval.
 
@@ -22,6 +22,14 @@ Flip the catalog status, update docs, and commit.
 | After Step | Agent Presents | Human Decides |
 |------------|---------------|---------------|
 | 2 | Diff and commit message | Approve the commit; PR yes or no |
+
+## Audit
+
+| Check | Pass Condition |
+|-------|---------------|
+| Status matches evidence | A row is `verified` only if its verification report has no open criterion; a qualifier in parentheses names any deferred part |
+| Log | The integration log names the commit SHA and every file changed |
+| Changelog | `CHANGELOG.md` has an entry for the module or amendment |
 
 ## Outputs
 

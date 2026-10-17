@@ -14,7 +14,7 @@ Format for the journal, add disclosures, build the PDF.
 ## Process
 
 1. Convert to the journal LaTeX template (ARS `/ars-format-convert`); build the PDF if LaTeX is installed.
-2. Write the AI-use disclosure (ARS `/ars-disclosure`) and the code and data availability statement (repo URL, commit SHA, manifests).
+2. Write the AI-use disclosure (ARS `/ars-disclosure`) and the code and data availability statement (repo URL, commit SHA, manifests); run the audit.
 3. **[Checkpoint]** Present the PDF.
 4. Commit and push. Submission only with explicit approval.
 
@@ -23,6 +23,14 @@ Format for the journal, add disclosures, build the PDF.
 | After Step | Agent Presents | Human Decides |
 |------------|---------------|---------------|
 | 2 | PDF, disclosure, availability statement | Ready to submit, or revise |
+
+## Audit
+
+| Check | Pass Condition |
+|-------|---------------|
+| Citations | Every cited key is in `references.bib`; none is in `unverified.md` |
+| Availability | The statement names the repo URL, the commit SHA and the study manifests |
+| Disclosure | The AI-use disclosure is present |
 
 ## Outputs
 

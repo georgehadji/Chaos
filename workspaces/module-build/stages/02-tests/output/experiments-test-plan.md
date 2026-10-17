@@ -101,3 +101,23 @@ Full suite: `julia --project -t 2 -e 'using Pkg; Pkg.test()'`: 49731 results: 49
 ## Checkpoint (2026-10-17)
 
 Owner approved the tests and the gap choices above. The manifest records the preregistration path relative to the repository root, so the same file gives the same panel wherever the checkout lives (spec I8).
+
+## Correction after stage 03 (2026-10-17)
+
+`ex_panel.jl` I3 check: control starts are now keyed by K index before the uniqueness test. Unkeyed, it contradicted AC18, which requires the fixed point (0, 0) as a control at every K > 0 (and the Y5 control starts at (0, 0) too), so no conforming build could pass both.
+
+## Amendment D51 (2026-10-17)
+
+Spec Amendment D51 (decision D51) supersedes D50; preregistration Amendment A3 removes `sn_trace` from the panel block. The D50 tests are removed.
+
+| Criterion | Test | Change |
+|-----------|------|--------|
+| D51b | ex_periodic.jl "D51 conditioning test" | new. `error_bound(J, F)` equals `||F||_2 ||J - I||_2 / |2 - t|` within 1e-12 relative on 200 seeded random 2 x 2 matrices of determinant 1; `tr J = 2` gives an infinite bound |
+| D51a | same testset | new. Same residual 1e-12: `J` with `2 - t = -1e-6` has a bound above delta_dup / 10 and is not `well_conditioned`; `2 - t = -1` is; at 256 bits `_newton_seed` at K = 2 pi (binary64) from (pi/2 + 1e-7, 0) returns code 4 (ill-conditioned, small `|2 - t|`) and at K = 5, period 2, near the family A orbit returns code 0 |
+| D51c | ex_panel.jl "D51 build at K = 2 pi (binary64)" | new small-grid proxy (K = ["2pi"], q_max 1, 16 x 16 grid, rho 1e-10): the build completes, `manifest.ill_conditioned` has a period-1 row with count > 0 and smallest `|2 - t|` < 1e-5, `newton.ill_conditioned` covers it, no accepted period-1 point lies within 1e-5 of (pi/2, 0) or (3 pi/2, 0), `min_separation` >= 10 delta_dup. Full study inputs: stage 04 |
+| D51d | same testset | new. No `merged` table, no `sn_trace` input, periodic and control classes are elliptic, parabolic or hyperbolic only, no `SN_CLASS` or `MergedPair` in the module; the base build lists only ill-conditioned rows with count > 0 |
+| input validation | ex_inputs.jl AC1 | the four D50 `sn_trace` cases are replaced by one: `sn_trace` is now an unknown key |
+| fixtures | ex_helpers.jl `ex_block_default` | `sn_trace` removed again (net change against the stage 02 commit: none) |
+| D50 tests | ex_periodic.jl, ex_panel.jl | the D50 merge testset and the D50 build proxy are deleted |
+
+New API: `error_bound(J, F)`, `well_conditioned(J, F, delta_dup)` (exported); `_newton_seed(K, x, p, q, rho, nmax, delta_dup)` returns `(code, x, p, den)`; manifest `ill_conditioned` (`k_index, q, count, min_abs_2_minus_t`) and `newton.ill_conditioned`. The I3 correction of the earlier section stays.

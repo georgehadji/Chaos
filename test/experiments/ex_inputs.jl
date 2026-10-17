@@ -56,6 +56,7 @@ end
         ("s_L above s_D", mk(d -> d["s_L"] = 3), ["s_L", "s_D"]),
         ("cap_D below the number of controls", mk(d -> d["cap_D"] = 1), ["cap_D"]),
         ("alpha nan", mk(d -> d["alpha"] = "NaN"), ["alpha"]),
+        ("sn_trace is no longer an input (D51)", mk(d -> d["sn_trace"] = 1e-6), ["sn_trace"]),
     ]
     @test length(cases) >= 24
     for (name, d, keys) in cases

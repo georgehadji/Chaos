@@ -213,3 +213,34 @@ end
                                                  rho = rho, delta_dup = dup), ["delta_dup"])
     end
 end
+
+@testset "D51 conditioning test" begin
+    rho, dup = 1e-10, 1e-8
+    # D51b: bound = ||F||_2 ||J - I||_2 / |2 - t| on seeded random 2x2 matrices with det 1
+    rng = StableRNG(ex_seed(51))
+    for _ in 1:200
+        a, b, c = 4 * randn(rng, 3)
+        a == 0 && continue
+        J = [a b; c (1 + b * c) / a]                                   # det = 1
+        F = randn(rng, 2) * 1e-12
+        t = J[1, 1] + J[2, 2]
+        want = sqrt(F[1]^2 + F[2]^2) * opnorm(J - I) / abs(2 - t)
+        @test abs(EX.error_bound(J, F) - want) <= 1e-12 * want
+    end
+    @test EX.error_bound([1.0 1.0; 0.0 1.0], [1e-12, 0.0]) == Inf      # tr J = 2: infinite bound
+    # D51a: same residual, |2 - t| tiny is rejected, |2 - t| of order 1 is accepted
+    F = [1e-12, 0.0]
+    Jbad = [1+1e-6 1.0; 1e-6 1.0]                                      # det 1, 2 - t = -1e-6
+    Jgood = [2.0 1.0; 1.0 1.0]                                         # det 1, 2 - t = -1
+    @test EX.error_bound(Jbad, F) > dup / 10 && !EX.well_conditioned(Jbad, F, dup)
+    @test EX.error_bound(Jgood, F) <= dup / 10 && EX.well_conditioned(Jgood, F, dup)
+    setprecision(BigFloat, 256) do
+        x, p = BigFloat(pi) / 2 + 1e-7, zero(BigFloat)
+        # K = 2 pi in binary64 (2.4e-16 below 2 pi): residual-accepted ghost near (pi/2, 0) is rejected as ill-conditioned (code 4)
+        code, _, _, den = EX._newton_seed(BigFloat(2pi), x, p, 1, rho, 50, dup)
+        @test code == 4 && 0 <= den < 1e-5
+        # K = 5, period 2, seed near the family A orbit {(0, pi), (pi, pi)}: accepted
+        code, _, _, den = EX._newton_seed(BigFloat(5), BigFloat(1e-3), BigFloat(pi), 2, rho, 50, dup)
+        @test code == 0 && den > 1
+    end
+end

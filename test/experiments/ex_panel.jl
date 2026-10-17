@@ -52,7 +52,8 @@ ex_wrapf(x) = (y = x - EX_TWO_PI * floor(x / EX_TWO_PI); y)
     @test isempty([o for o in orbs if get(o, "k_index", 0) == 1 && o["class"] in ("C", "S", "X")])
     @test all(i -> all(k -> ex_cell(b, i, k)["status"] != "undefined", ("T", "R", "C", "S", "X")), 2:3)
     # I3: controls are disjoint from drawn starts after wrapping and appear once
-    w(o) = (ex_wrapf(o["x0"]), ex_wrapf(o["p0"]))
+    # keyed by K index: the same fixed point at two K values is two controls (AC18)
+    w(o) = (get(o, "k_index", 0), ex_wrapf(o["x0"]), ex_wrapf(o["p0"]))
     cs = w.(ex_ctrls(b))
     @test allunique(cs) && isdisjoint(cs, w.(dr))
     # I6 and the number of controls
@@ -350,4 +351,26 @@ end
     @test ex_man(b)["git_dirty"] == tracked_dirty
     proj = TOML.parsefile(joinpath(root, "Project.toml"))["version"]
     @test ex_man(b)["package_version"] == proj == string(EX.package_version())
+end
+
+@testset "D51 build at K = 2 pi (binary64)" begin
+    # binary64 2 pi lies 2.4e-16 below the accelerator-mode saddle-node: residual-accepted ghosts near (pi/2, 0) exist
+    b = ex_build("sn2pi", Dict{String, Any}("K" => ["2pi"], "q_max" => 1, "grid_side" => 16))   # D51c proxy: completes
+    man = ex_man(b)
+    ill = [r for r in man["ill_conditioned"] if r["k_index"] == 1 && r["q"] == 1]
+    @test !isempty(ill) && ill[1]["count"] > 0 && 0 <= ill[1]["min_abs_2_minus_t"] < 1e-5
+    @test man["newton"]["ill_conditioned"] >= ill[1]["count"]
+    # no accepted period-1 point within 1e-5 of (pi/2, 0) or its mirror (3 pi/2, 0)
+    for q in man["periodic"], pt in q["points"]
+        z = setprecision(() -> (Float64(ex_bigdec(pt[1])), Float64(ex_bigdec(pt[2]))), BigFloat, 256)
+        q["q"] == 1 && @test min(ex_tdist(z, (pi / 2, 0.0)), ex_tdist(z, (3pi / 2, 0.0))) > 1e-5
+    end
+    @test man["min_separation"] >= 10 * EX_DUP
+    # D51d: the D50 outputs are gone
+    @test !haskey(man, "merged") && !haskey(man["inputs"], "sn_trace")
+    @test all(q -> q["class"] in ("elliptic", "parabolic", "hyperbolic"), man["periodic"])
+    @test all(c -> c in ("elliptic", "parabolic", "hyperbolic"), (o["stability"] for o in ex_ctrls(b) if haskey(o, "stability")))
+    @test !isdefined(Chaoslab.Experiments, :SN_CLASS) && !isdefined(Chaoslab.Experiments, :MergedPair)
+    base = ex_man(ex_build("base"))
+    @test haskey(base, "ill_conditioned") && all(r -> r["count"] > 0, base["ill_conditioned"])
 end

@@ -212,4 +212,29 @@ Not sourced, reported to the owner: (a) the preregistration gives no Newton seed
 
 ## Amendments
 
-None. The runner and run store are added here by a later amendment (D49), before study/03.
+The runner and run store are added here by a later amendment (D49), before study/03.
+
+## Amendment D50 (2026-10-17)
+
+E9 refusal is narrowed. After deduplication, let two distinct accepted orbits have the same primitive period q and a smallest torus distance d between their points with d < 10 delta_dup. If both traces satisfy ||t| - 2| <= sn_trace (a new input, read from the panel block; preregistration Amendment A2), the pair is a near saddle-node: near a tangent bifurcation an elliptic and a hyperbolic orbit of the same period approach each other with t - 2 proportional to d, and a binary64 parameter next to the bifurcation value leaves a pair (or a ghost) that no residual test can split. The pair becomes one orbit: the member from the smaller grid id is kept as representative (E10), its class is parabolic (near saddle-node), its exponent 0 (E4), and the manifest lists the pair (K index, period, both representatives, d, both traces). Parabolic counts as elliptic for the C exclusion (E11, unchanged). Any other pair with d < 10 delta_dup still refuses, as before. Observed case: K = 2pi in binary64 (2.4e-16 below 2pi, where the period-1 accelerator mode at x = pi/2 is born), d = 1.0e-8 with delta_dup = 1e-8.
+
+### Acceptance criteria (amendment)
+
+- D50a A synthetic near saddle-node pair (same period, d = 5 delta_dup, both ||t| - 2| <= sn_trace) is merged into one orbit of class parabolic (near saddle-node), representative from the smaller grid id, exponent 0, and listed in the manifest with d and both traces.
+- D50b A synthetic pair with d = 5 delta_dup and one trace outside sn_trace still refuses (replaces AC9 (e) for that case; AC9 (c) at 10 delta_dup is unchanged).
+- D50c The build with the study inputs at K = 2pi (binary64) completes and records exactly the merged pairs it found; every recorded pair satisfies both conditions of D50a. Checked in stage 04 on the full study inputs.
+
+## Amendment D51 (2026-10-17)
+
+Supersedes Amendment D50 (its merge rule, its input sn_trace and criteria D50a to D50c are withdrawn). E3 acceptance gains a conditioning test. A Newton solution z with residual ||F(z)||_inf <= rho is accepted only if its position error bound
+
+    e(z) = ||F(z)||_2 / sigma_min(J_q - I) <= delta_dup / 10,
+
+with J_q evaluated at z. For the 2D map det(J_q - I) = 2 - t (det J_q = 1, E3), so sigma_min(J_q - I) = |2 - t| / ||J_q - I||_2 (derived; analytic). If |2 - t| is zero in the working precision, e(z) is infinite. Reason: near a tangent bifurcation (t -> 2) the residual no longer bounds the distance to a true periodic point (linearization of F at z), so a binary64 parameter next to the bifurcation value, such as K = 2pi, yields a cloud of residual-accepted ghost points. A solution that passes the residual test but fails the bound is rejected as ill-conditioned; the manifest counts these per K index and period, with the smallest |2 - t| among them. They never enter the periodic set, R placement, the C exclusion or the controls. The E9 refusal (smallest separation below 10 delta_dup) is unchanged. The exact fixed points are exempt only where their trace is analytically away from 2 (E5); at K values where an exact fixed point is parabolic it is kept as parabolic with its analytic class.
+
+### Acceptance criteria (amendment)
+
+- D51a A synthetic solution with residual <= rho and |2 - t| such that e > delta_dup / 10 is rejected and counted as ill-conditioned; the same residual with |2 - t| of order 1 is accepted.
+- D51b The bound equals ||F||_2 ||J_q - I||_2 / |2 - t| within 1e-12 relative on random 2x2 matrices of determinant 1 (seeded).
+- D51c At K = 2pi in binary64 with the study inputs the build completes, no accepted periodic point lies within 1e-5 of (pi/2, 0) (torus distance, period 1) unless its error bound passes, and the ill-conditioned count at K = 2pi is positive. Checked on the full study inputs in stage 04; a small-grid proxy runs in the package suite.
+- D51d No orbit of class parabolic-near-saddle-node and no merged-pair table remain (the D50 outputs are removed).

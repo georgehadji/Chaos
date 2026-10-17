@@ -12,11 +12,12 @@ include("Systems/Systems.jl")
 include("Tangent/Tangent.jl")
 include("Diagnostics/Diagnostics.jl")
 include("Lyapunov/Lyapunov.jl")
+include("Experiments/Experiments.jl")
 
-using .Foundation, .Systems, .Tangent, .Diagnostics, .Lyapunov
+using .Foundation, .Systems, .Tangent, .Diagnostics, .Lyapunov, .Experiments
 
 # Re-export every name a submodule exports, so users and tests need only `using Chaoslab`.
-for m in (Foundation, Systems, Tangent, Diagnostics, Lyapunov), n in names(m)
+for m in (Foundation, Systems, Tangent, Diagnostics, Lyapunov, Experiments), n in names(m)
     n === nameof(m) || @eval export $n
 end
 include("precompile.jl")

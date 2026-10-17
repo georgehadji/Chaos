@@ -11,8 +11,8 @@ FROZEN 2026-10-17. Every value marked "proposed" was approved by the owner at th
 | Claims tested | C1, C2. C3 is out of scope (P2). |
 | Value types | FALSIFIES (C1, C2), REPRODUCES (SalaArtuso2015), TOOL (Chaoslab v0.1.0 at M3 exit), NEGATIVE allowed (`/_config/value-types.md`) |
 | Git SHA at freeze | 1e760e229eabf9d8323ad4d8097cc1dbd017f845 (parent commit of the freeze commit) |
-| SHA-256 of this file (current version) | c9ad3c2cf3ba1220990d118c81e55da2104a7130b0f49e7dcd83cf75461fdcef (rule: Amendment A1, item 1) |
-| Amendment log | A1 (2026-10-17, section "Amendment A1"; parent commit 963345d86570366f5f0ea3ee6950288e20edcfa7; replaces freeze hash fa84e883405a7acbdb4774be2527bbecb8399a4c369fa79fbfc4d563d98bea87) |
+| SHA-256 of this file (current version) | 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46 (rule: Amendment A1, item 1) |
+| Amendment log | A1 (2026-10-17, section "Amendment A1"; parent commit 963345d86570366f5f0ea3ee6950288e20edcfa7; replaces freeze hash fa84e883405a7acbdb4774be2527bbecb8399a4c369fa79fbfc4d563d98bea87); A2 (2026-10-17, section "Amendment A2"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash c9ad3c2cf3ba1220990d118c81e55da2104a7130b0f49e7dcd83cf75461fdcef); A3 (2026-10-17, section "Amendment A3"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash d89d2bf99e4eaa5740be88da436ec28b2d92f7859a278c50fe734ff4a02ae69c) |
 
 Value types, in the words of `value-types.md`:
 - FALSIFIES: H1 to H3 each have a decision rule below, fixed before any data exists.
@@ -350,3 +350,11 @@ cap_L = 110
 ```
 
 K and mu entries are decimal or closed-form strings; the module evaluates them in BigFloat and rounds once to each working type.
+
+## Amendment A2 (2026-10-17)
+
+Approved by the owner before stage 03-run produced any data (decision D50). The first build of this panel refused at K = 2pi: the binary64 value of 2pi lies 2.4e-16 below the K at which the period-1 accelerator mode is born, and the periodic-point search accepted a ghost pair near x = pi/2 only 1.0e-8 apart, below 10 delta_dup. Two accepted orbits of the same period closer than 10 delta_dup whose traces both lie within sn_trace of +-2 are now one orbit of class parabolic (near saddle-node), listed in the panel manifest; any other close pair still stops the build. sn_trace = 1e-6 (proposed: for the observed pair t - 2 is about 2e-8, and a genuine pair of distinct orbits that close with traces far from 2 is still refused) is added to the panel block of Amendment A1, item 7, marked there. K stays at 2pi, so H4 is unchanged.
+
+## Amendment A3 (2026-10-17)
+
+Approved by the owner before stage 03-run produced any data (decision D51). Supersedes Amendment A2: with sn_trace = 1e-6 the K = 2pi build still refused, and with 1e-5 it completed but kept about 1000 ghost periodic rows near x = pi/2 and two ghost controls. The periodic-point search now accepts a Newton solution only if its position error bound (residual divided by the smallest singular value of J_q - I) is at most delta_dup / 10; residual-accepted points that fail it are rejected as ill-conditioned and counted in the panel manifest. This uses only rho and delta_dup, so the key sn_trace is removed from the panel block of Amendment A1, item 7. K stays at 2pi; H4 is unchanged.

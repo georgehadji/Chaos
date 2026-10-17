@@ -1,0 +1,180 @@
+# experiments verification, julia 1.13.2, threads 23, ChaosTools 3.5.4 / DynamicalSystemsBase 3.19.3 (verify/Manifest.toml)
+# prereg workspaces\study\stages\01-design\output\p1-le-benchmark-preregistration.md, scratch C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\verify-panel
+D51c | build_panel on the real preregistration completes, threads 23, wall seconds (compile included) | 401.3 | completes | PASS
+BUILD | orbits (drawn, controls) | 883 (870, 13) | - | INFO
+BUILD | panel file bytes and SHA-256 | 6353491 fa2fc6498ac9721f8f4ec09e298178894c17c1683cb5898c339b68def7708365 | - | INFO
+BUILD | manifest git sha / dirty flag / package version | 3991155f7a / true / 0.0.1 | - | INFO
+BUILD | Newton statistics (tried, accepted, singular, diverged, cap, ill_conditioned) | 1966080, 1359242, 0, 499944, 32931, 73963 | - | INFO
+# section BUILD took 401.4 s
+AC2a | frozen file: header SHA-256 equals module value | true | true | PASS
+AC2a/e | module value equals the independent value (sha256sum, own SELF rule) | true | true | PASS
+AC2 | INFO | header 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46, amendments logged 3, panel block parsed: K = [0.0, 0.5, 0.971635406, 1.5707963267948966, 6.283185307179586, 10.0], grid_side 256, N_scr 100000
+AC2 | panel manifest records the same header and computed hash | true | true | PASS
+AC2d | CRLF copy of the real file passes with the same hash | true | true | PASS
+# section AC2 took 0.0 s
+D51c | K index 5 is K = 2pi in binary64 | 6.283 | == 2pi (Float64) | PASS
+D51c | ill-conditioned count at K = 2pi (all periods) | 73963 | > 0 | PASS
+D51c | INFO |   period 1: 44032 rejected, smallest |2 - t| 3.381e-08
+D51c | INFO |   period 2: 21693 rejected, smallest |2 - t| 1.539e-15
+D51c | INFO |   period 3: 3475 rejected, smallest |2 - t| 6.15e-08
+D51c | INFO |   period 4: 3475 rejected, smallest |2 - t| 6.156e-15
+D51c | INFO |   period 5: 724 rejected, smallest |2 - t| 8.043e-07
+D51c | INFO |   period 6: 564 rejected, smallest |2 - t| 1.385e-14
+D51c | ill-conditioned rows at the other K values (reported) | 0 | reported | INFO
+D51c | accepted period-1 rows at K = 2pi / nearest accepted period-1 point to (pi/2, 0) (torus distance) | 2 / 1.571 | >= 1e-5 unless bound passes | PASS
+D51c | smallest separation of distinct orbit points (all K) against 10 delta_dup | 0.0003146 | >= 1.0e-7 | PASS
+D51d | no D50 output remains (merged table, sn_trace input, near-saddle-node class) | true | true | PASS
+# section D51c took 0.3 s
+AC12 | K = 0: 65536 grid cells screened in 9.1 s; closed-form lambda_scr (256 bit) 0.0001117; max |lambda_scr - closed form| | 4.472e-19 | <= 1.776e-15 | PASS
+AC12 | same, relative to the closed form | 4.005e-15 | reported | INFO
+AC12 | spread of lambda_scr over the grid (max - min) | 0 | reported | INFO
+AC12 | K = 0 T cell: qualifying count recomputed here / in the panel manifest | 53248 / 53248 | equal | PASS
+AC12 | INFO | K = 0 T cell in the panel: status populated, drawn 40, reason ""; lambda_scr 0.0001117 <= theta_T 0.0005, growth ratio 1.26 < g_T 5.0
+AC12 | K = 0 other classes recorded undefined (C, S, X) | true | true | PASS
+# section AC12 took 9.1 s
+AC21 | S_L within S_D within P | true | true | PASS
+AC21 | |S_D| / cap_D, |S_L| / cap_L | 172 / 210, 92 / 110 | <= caps | PASS
+AC21 | |S_D| = sum over cells of min(drawn, s_D) plus controls, before caps (expected 172) | 172 | == 172 (or caps) | PASS
+AC21 | |S_L| = sum over cells of min(drawn, s_L) (expected 92) | 92 | == 92 (or cap) | PASS
+AC21 | no cap applied: every drawn orbit of rank <= s_D is in S_D, of rank <= s_L in S_L | true | true | PASS
+AC21 | controls all in S_D, none in S_L, count | true / 13 | true | PASS
+AC21 | recomputed subsets and removed ids equal the file (removed D / L: 0 / 0) | true | true | PASS
+# section AC21 took 0.3 s
+# cell table (drawn / qualifying, status):
+#   K index, K | T | R | C | S | X
+#   1, 0.0 | 40 / 53248 populated | 40 / 0 populated | 0 / 0 undefined [class undefined at K = 0] | 0 / 0 undefined [class undefined at K = 0] | 0 / 0 undefined [class undefined at K = 0]
+#   2, 0.5 | 40 / 63165 populated | 40 / 49 populated | 40 / 794 populated | 25 / 25 short [fewer qualifying grid cells than n_c] | 40 / 0 populated
+#   3, 0.971635406 | 40 / 34295 populated | 40 / 37 populated | 40 / 22669 populated | 40 / 618 populated | 40 / 0 populated
+#   4, 1.5707963267948966 | 40 / 16462 populated | 40 / 31 populated | 40 / 41707 populated | 40 / 333 populated | 40 / 0 populated
+#   5, 6.283185307179586 | 40 / 138 populated | 0 / 0 empty [no elliptic periodic point] | 40 / 64596 populated | 5 / 5 short [fewer qualifying grid cells than n_c] | 40 / 0 populated
+#   6, 10.0 | 0 / 0 empty [no qualifying grid cell] | 0 / 0 empty [no elliptic periodic point] | 40 / 65536 populated | 0 / 0 empty [no qualifying grid cell] | 40 / 0 populated
+CELLS | every cell populated (n_c), short or empty with a reason, or undefined at K = 0 (C, S, X); counts in the file equal the orbits present | true | true | PASS
+AC23 | class T: orbits in the panel (over all K) | 200 | >= 1 | PASS
+AC23 | class R: orbits in the panel (over all K) | 160 | >= 1 | PASS
+AC23 | class C: orbits in the panel (over all K) | 200 | >= 1 | PASS
+AC23 | class S: orbits in the panel (over all K) | 110 | >= 1 | PASS
+AC23 | class X: orbits in the panel (over all K) | 200 | >= 1 | PASS
+CELLS | K = 2pi, class R: status empty, drawn 0, reason "no elliptic periodic point" (ACCEPTED by the owner: the four elliptic points of the D50 build were ghosts) | empty | empty accepted | INFO
+AC22 | orbit ids run 1..N in file order | true | true | PASS
+AC22 | totals: orbits = drawn + controls = sum of cell counts + controls | true | true | PASS
+AC23 | orbits missing a required field / drawn orbits missing cell seed or draw index | 0 / 0 | 0 / 0 | PASS
+AC17 | cell stream seed of every drawn orbit re-derived from E15 (SHA-256 of the text) | 0 | 0 mismatches | PASS
+AC17 | orbit seed of every orbit equals tangent-core rule (EX.orbit_seed) | 0 | 0 mismatches | PASS
+# section CELLS took 0.2 s
+O7 | decimal text rebuilt at 256 bits rounds to the stored binary64 start, orbits 883 | 0 | 0 mismatches | PASS
+O7 | starts formed in binary64 (T, C, S, X, R at K = 0): decimal text equals the binary64 value exactly | 0 | 0 mismatches | PASS
+O7 | periodic rows 5283: max return residual at 1024 bits (windings of the stored representative) | 1.7366434125204372e-20 | <= rho = 1.0e-12 | PASS
+O7 | windings (m, j) recomputed equal the stored ones, mismatches | 0 | 0 | PASS
+O7 | trace recomputed at 1024 bits against the stored trace, max relative | 1.0905048577940507e-16 | <= 1e-12 | PASS
+O7 | max |det J_q - 1| at 1024 bits | 1.5290591125556738e-297 | <= 1e-200 | PASS
+O7 | class re-derived from the trace (parabolic band rho), mismatches | 0 | 0 | PASS
+O7 | stored exponent against ln|mu_+| / q at 1024 bits, max error | 0.0 | <= 1e-12 | PASS
+O7 | every listed orbit point is an iterate of the representative (tolerance 1e-8: points are polished to residual ~rho^2, not 256 bits), mismatches | 0 | 0 | PASS
+O7 | primitive period: a divisor of q passes the return test, rows | 0 | 0 | PASS
+O7 | smallest distance between points of distinct periodic orbits (all K, recomputed); stored value 0.0003145893354215511 | 0.00031458933542220286 | >= 10 delta_dup = 1.0e-7 | PASS
+O7 | recomputed separation equals the stored one (relative) | 2.071806201301417e-12 | <= 1e-6 | PASS
+O7 | T, C, S starts are screening grid centres of the N_g grid (1024-bit nearest binary64), mismatches | 0 | 0 | PASS
+O7 | X starts (200): torus distance from (0, 0) equals stored r, max relative error | 1.9941208970498926e-16 | <= 1e-12 | PASS
+O7 | X starts: log10 r in [-4.0, -2.0], violations | 0 | 0 | PASS
+O7 | R starts at K > 0: torus distance from the recorded periodic point equals delta_R, max relative error | 0.0 | <= 1e-12 | PASS
+O7 | R starts at K = 0 (40): gcd(a, b) = 1, b <= q_max, p0 = nearest binary64 of 2 pi a / b, violations | 0 | 0 | PASS
+O7 | fixed-point control id 871 (K index 2, x0 = 0): class and exponent against the closed form | hyperbolic 0.6931471805599453 | hyperbolic 0.6931471805599453 | PASS
+O7 | fixed-point control id 872 (K index 2, x0 = pi): class and exponent against the closed form | elliptic 0.0 | elliptic 0.0 | PASS
+O7 | fixed-point control id 873 (K index 3, x0 = 0): class and exponent against the closed form | hyperbolic 0.949629152896806 | hyperbolic 0.949629152896806 | PASS
+O7 | fixed-point control id 874 (K index 3, x0 = pi): class and exponent against the closed form | elliptic 0.0 | elliptic 0.0 | PASS
+O7 | fixed-point control id 875 (K index 4, x0 = 0): class and exponent against the closed form | hyperbolic 1.1830967077257937 | hyperbolic 1.1830967077257937 | PASS
+O7 | fixed-point control id 876 (K index 4, x0 = pi): class and exponent against the closed form | elliptic 0.0 | elliptic 0.0 | PASS
+O7 | fixed-point control id 877 (K index 5, x0 = 0): class and exponent against the closed form | hyperbolic 2.0993233310910635 | hyperbolic 2.0993233310910635 | PASS
+O7 | fixed-point control id 878 (K index 5, x0 = pi): class and exponent against the closed form | hyperbolic 1.3950997261071487 | hyperbolic 1.3950997261071487 | PASS
+O7 | fixed-point control id 879 (K index 6, x0 = 0): class and exponent against the closed form | hyperbolic 2.477888730288475 | hyperbolic 2.477888730288475 | PASS
+O7 | fixed-point control id 880 (K index 6, x0 = pi): class and exponent against the closed form | hyperbolic 2.0634370688955603 | hyperbolic 2.0634370688955603 | PASS
+O7 | Y5 control id 883: exponent against ln mu at 1024 bits | 0.9624236501192069 | 0.9624236501192069 | PASS
+O7 | INFO | separate process (julia --startup-file=no, TOML and Base only, no Chaoslab), 8.3 s
+# section O7 took 8.3 s
+# ChaosTools settings: periodicorbits, orders 1..3, ICs = centres of the 64 x 64 sub-grid (4096), lambda in [0.001, 0.01, 0.1], all 2 index permutations x 4 sign patterns, maxiters 1e5, disttol 1e-10, inftol 10.0, abstol 1e-8; davidchacklai n = 3, m = 2, package defaults
+AC27 | INFO | periodicorbits: 5760 tasks in 134.7 s
+AC27 | INFO | davidchacklai: 5 K values in 1.4 s
+AC27 | K index 2 (K = 0.5), o = 1: ChaosTools points (union) 7 [dl=3 pc_0.001=4 pc_0.01=3 pc_0.1=3]; matched 7, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 7/7 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 3.257e-15; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 1 found by ChaosTools) 2 / 2; analytic E6 families A, B found -
+AC27 | K index 2 (K = 0.5), o = 2: ChaosTools points (union) 23 [dl=8 pc_0.001=12 pc_0.01=10 pc_0.1=7]; matched 21, unmatched near wrap boundary 2, ghost (D51) 0, unmatched other 0, class mismatches 0 | 21/23 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 1.331e-08; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 2 found by ChaosTools) 6 / 6; analytic E6 families A, B found 2 / 2
+AC27 | INFO |     unmatched: boundary (3.142, 3.142) nearest module point 1.062e-06, AD t 1.75
+AC27 | INFO |     unmatched: boundary (3.142, 3.142) nearest module point 1.062e-06, AD t 1.75
+AC27 | K index 2 (K = 0.5), o = 3: ChaosTools points (union) 54 [dl=13 pc_0.001=10 pc_0.01=34 pc_0.1=16]; matched 54, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 54/54 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 3.079e-08; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 3 found by ChaosTools) 13 / 14; analytic E6 families A, B found -
+AC27 | K index 3 (K = 0.9716), o = 1: ChaosTools points (union) 11 [dl=3 pc_0.001=12 pc_0.01=3 pc_0.1=3]; matched 11, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 11/11 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 4.75e-15; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 1 found by ChaosTools) 2 / 2; analytic E6 families A, B found -
+AC27 | K index 3 (K = 0.9716), o = 2: ChaosTools points (union) 27 [dl=8 pc_0.001=20 pc_0.01=7 pc_0.1=7]; matched 27, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 27/27 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 3.753e-08; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 2 found by ChaosTools) 6 / 6; analytic E6 families A, B found 2 / 2
+AC27 | K index 3 (K = 0.9716), o = 3: ChaosTools points (union) 78 [dl=15 pc_0.001=70 pc_0.01=18 pc_0.1=16]; matched 78, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 78/78 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 1.069e-07; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 3 found by ChaosTools) 13 / 14; analytic E6 families A, B found -
+AC27 | K index 4 (K = 1.571), o = 1: ChaosTools points (union) 4 [dl=3 pc_0.001=4 pc_0.01=3 pc_0.1=3]; matched 4, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 4/4 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 4.441e-16; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 1 found by ChaosTools) 2 / 2; analytic E6 families A, B found -
+AC27 | K index 4 (K = 1.571), o = 2: ChaosTools points (union) 16 [dl=8 pc_0.001=13 pc_0.01=5 pc_0.1=5]; matched 16, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 16/16 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 4.006e-08; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 2 found by ChaosTools) 6 / 6; analytic E6 families A, B found 2 / 2
+AC27 | K index 4 (K = 1.571), o = 3: ChaosTools points (union) 36 [dl=13 pc_0.001=36 pc_0.01=16 pc_0.1=14]; matched 36, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 36/36 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 1.008e-07; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 3 found by ChaosTools) 13 / 14; analytic E6 families A, B found -
+AC27 | K index 5 (K = 6.283), o = 1: ChaosTools points (union) 102 [dl=69 pc_0.001=30 pc_0.01=10 pc_0.1=3]; matched 3, unmatched near wrap boundary 0, ghost (D51) 99, unmatched other 0, class mismatches 0 | 3/102 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 0; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 1 found by ChaosTools) 2 / 2; analytic E6 families A, B found -
+AC27 | INFO |     unmatched: ghost (1.571, 1.001e-07) nearest module point 1.571, AD t - 2 = 0.001121
+AC27 | INFO |     unmatched: ghost (1.571, 1.388e-07) nearest module point 1.571, AD t - 2 = 0.00102
+AC27 | INFO |     unmatched: ghost (1.571, 1.413e-07) nearest module point 1.571, AD t - 2 = 0.0009445
+AC27 | INFO |     unmatched: ghost (1.571, 1.407e-07) nearest module point 1.571, AD t - 2 = 0.0008955
+AC27 | INFO |     unmatched: ghost (1.571, 1.399e-07) nearest module point 1.571, AD t - 2 = 0.0008709
+AC27 | INFO |     unmatched: ghost (1.571, 1.369e-07) nearest module point 1.571, AD t - 2 = 0.0008018
+AC27 | K index 5 (K = 6.283), o = 2: ChaosTools points (union) 800 [dl=662 pc_0.001=140 pc_0.01=25 pc_0.1=2]; matched 38, unmatched near wrap boundary 0, ghost (D51) 762, unmatched other 0, class mismatches 0 | 38/800 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 1.411e-08; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 2 found by ChaosTools) 16 / 16; analytic E6 families A, B found 2 / 2
+AC27 | INFO |     unmatched: ghost (1.57, 3.142) nearest module point 0.0009, AD t - 2 = -4.743e-05
+AC27 | INFO |     unmatched: ghost (1.57, 3.142) nearest module point 0.0006683, AD t - 2 = -2.643e-05
+AC27 | INFO |     unmatched: ghost (1.57, 3.142) nearest module point 0.0005415, AD t - 2 = -1.675e-05
+AC27 | INFO |     unmatched: ghost (1.571, 3.142) nearest module point 0.0001912, AD t - 2 = -2.166e-06
+AC27 | INFO |     unmatched: ghost (1.571, 3.142) nearest module point 0.0001674, AD t - 2 = -1.661e-06
+AC27 | INFO |     unmatched: ghost (1.571, 3.142) nearest module point 0.0001667, AD t - 2 = -1.647e-06
+AC27 | K index 5 (K = 6.283), o = 3: ChaosTools points (union) 227 [dl=124 pc_0.001=176 pc_0.01=63 pc_0.1=2]; matched 181, unmatched near wrap boundary 0, ghost (D51) 46, unmatched other 0, class mismatches 0 | 181/227 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 2.224e-07; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 3 found by ChaosTools) 86 / 86; analytic E6 families A, B found -
+AC27 | INFO |     unmatched: ghost (1.571, 6.283) nearest module point 0.5108, AD t - 2 = 7.83e-05
+AC27 | INFO |     unmatched: ghost (1.571, 6.283) nearest module point 0.5108, AD t - 2 = 6.646e-05
+AC27 | INFO |     unmatched: ghost (1.571, 6.283) nearest module point 0.5108, AD t - 2 = 6.015e-05
+AC27 | INFO |     unmatched: ghost (1.571, 6.283) nearest module point 0.5108, AD t - 2 = 5.404e-05
+AC27 | INFO |     unmatched: ghost (1.571, 6.283) nearest module point 0.5108, AD t - 2 = 4.546e-05
+AC27 | INFO |     unmatched: ghost (1.571, 6.283) nearest module point 0.5108, AD t - 2 = 3.852e-05
+AC27 | K index 6 (K = 10), o = 1: ChaosTools points (union) 9 [dl=7 pc_0.001=12 pc_0.01=7 pc_0.1=7]; matched 9, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 9/9 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 4.983e-12; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 1 found by ChaosTools) 6 / 6; analytic E6 families A, B found -
+AC27 | K index 6 (K = 10), o = 2: ChaosTools points (union) 124 [dl=54 pc_0.001=106 pc_0.01=50 pc_0.1=12]; matched 124, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 124/124 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 8.257e-07; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 2 found by ChaosTools) 52 / 52; analytic E6 families A, B found 6 / 6
+AC27 | K index 6 (K = 10), o = 3: ChaosTools points (union) 577 [dl=283 pc_0.001=534 pc_0.01=30 pc_0.1=0]; matched 577, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 577/577 | 100% matched, 0 mismatches | PASS
+AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 1.542e-07; 0 | <= 1e-5 | PASS
+AC27 | INFO |   reverse coverage (module points with period | 3 found by ChaosTools) 282 / 282; analytic E6 families A, B found -
+AC27 | totals over K and o: unmatched other / class mismatches / trace outliers | 0 / 0 / 0 | 0 / 0 / 0 | PASS
+# section AC27 took 136.8 s
+AC19 | reduced preregistration (grid_side 64) passes the hash rule; module hash equals independent (sha256sum) | true | true | PASS
+AC19 | INFO | julia -t 1: BUILD_SECONDS 143.3475083 threads 1, SHA-256 f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652, 1986040 bytes
+AC19 | INFO | julia -t 4: BUILD_SECONDS 42.7681918 threads 4, SHA-256 f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652, 1986040 bytes
+AC19 | INFO | julia -t 23: BUILD_SECONDS 28.893137 threads 23, SHA-256 f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652, 1986040 bytes
+AC19 | panel files from julia -t 1, 4, 23 byte-identical (SHA-256) | true | true | PASS
+#   AC19 SHA-256 -t 1: f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652
+#   AC19 SHA-256 -t 4: f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652
+#   AC19 SHA-256 -t 23: f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652
+AC19 | forbidden key names in the reduced panel file (lambda, block, screen, wall, host, thread, device, backend) |  | none | PASS
+AC19 | INFO | full-input panel (this process, 23 threads) SHA-256 fa2fc6498ac9721f8f4ec09e298178894c17c1683cb5898c339b68def7708365
+# section AC19 took 220.1 s
+PORTRAITS | figure written | workspaces\module-build\stages\04-verify\output\experiments-portraits.png | - | INFO
+PORTRAITS | INFO | copied to workspaces\study\stages\02-panel\output\p1-le-benchmark-portraits.png; portrait content: 6 K values, starts per K 80, 187, 202, 202, 127, 84, periodic markers per K 49, 98, 98, 142, 5794, 21545
+# section PORTRAITS took 13.8 s
+# summary: PASS 93, FAIL 0, INFO 60, total 795.2 s
+FINAL | all checks passed: study panel written | workspaces\study\stages\02-panel\output\p1-le-benchmark-panel.toml | - | INFO
+# section FINAL took 0.0 s

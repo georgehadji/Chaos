@@ -25,3 +25,6 @@ Numbered, each with a measurable pass condition and a tolerance.
 
 ## Sources
 Verified keys used, with locations.
+
+## Amendments
+A change after the spec checkpoint is appended, never edited into the base sections: one section `## Amendment Dnn (date)` per decision, holding what changed and, when criteria change, a subsection `### Acceptance criteria (amendment)` with the new or replaced criteria by number; small owner corrections to an amendment are appended to it as "Corrections ..." paragraphs. Stage 04 reads the base "Acceptance criteria" and "Oracle" plus every amendment's criteria and corrections, not the whole file. Sub-criteria of an amendment are named by its decision ID and a letter (D44a, D44b); the letter IDs live in the spec only, not in the decision log.

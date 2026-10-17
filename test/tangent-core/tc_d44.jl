@@ -368,3 +368,34 @@ end
     end
     # ChaoslabCUDAExt table (codes 700, 702, ...): stage 04, verify/gpu.jl
 end
+
+@testset "D46 provenance when no launch completed on the device" begin
+    seed = TC44_SEED + 9
+    sys = tc_Std(5.0)
+    N, L = TC44_N, TC44_L
+    ref = propagate(sys, tc44_x0(), N; k = 2, tau = TC44_TAU, seed = seed, reducers = tc44_red(), chunk = TC44_CHUNK, backend = :cpu)
+    faults = ((tc_FakeLost(), "device lost"), (tc_FakeOOM(), "device out of memory"),
+              (tc_FakeCompileError(), "kernel does not compile for the element type"))
+    run_fail(at, err, forced) = tc_with_device(tc44_HookDevice(nothing, tc44_hook(Tuple{Int, Int}[]; fail = (at, err)))) do
+        tc44_run(sys, seed; L = forced)
+    end
+    for (err, reason) in faults
+        # (a), (b): launch 1 of chunk 1, no forced L: the device was never used, 0 and 0
+        r = run_fail((1, 1), err, nothing)
+        @test tc44_same(r, ref) && r.provenance.backend === :cpu && r.provenance.backend_fallback_reason == reason
+        @test r.provenance.gpu_chunks == 0 && r.provenance.launch_steps == 0 && r.provenance.launches_per_chunk == 0
+        # (c): forced L, the CPU step chunk values
+        r = run_fail((1, 1), err, L)
+        @test tc44_same(r, ref) && r.provenance.backend === :cpu && r.provenance.gpu_chunks == 0
+        @test r.provenance.launch_steps == L && r.provenance.launches_per_chunk == cld(N, L)
+        # (d): launch 3 of chunk 1, and launch 1 of chunk 2: the device was used, its values stay
+        for at in ((1, 3), (2, 1))
+            r = run_fail(at, err, L)
+            @test tc44_same(r, ref) && r.provenance.backend === :cpu && r.provenance.backend_fallback_reason == reason
+            @test r.provenance.launch_steps == L && r.provenance.launches_per_chunk == cld(N, L)
+        end
+    end
+    # (c) again with L not dividing N (the forced L is the device L too, so these already held before D46: regression)
+    r = run_fail((1, 1), tc_FakeLost(), 36)
+    @test r.provenance.launch_steps == 36 && r.provenance.launches_per_chunk == cld(N, 36)
+end

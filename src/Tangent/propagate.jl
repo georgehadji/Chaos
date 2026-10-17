@@ -90,12 +90,14 @@ function _run_chunk!(out, bufs, Wh, r, args, who::Symbol, backend, ci::Int = 0)
     copyto!(W, 1, Wh, 1, len)
     kernel = _orbit_kernel!(backend, workgroup(backend))
     n0, launch = 0, 0
+    args.done[] = 0
     while n0 < args.N
         steps = min(args.L, args.N - n0)
         launch += 1
         who === :gpu && _before_launch(DEVICE[], ci, launch, (x = x, W = W, states = so))
         kernel(x, W, so, code, hstep, args.sys, n0, steps, args.N, args.tau, args.reducers; ndrange = len)
         KernelAbstractions.synchronize(backend)
+        args.done[] = launch   # launches completed in this chunk, for the provenance after a failed first chunk
         n0 += steps
     end
     code, so, xo, Wo, hstep = _host(code), _host(so), _host(x), _host(W), _host(hstep)
@@ -223,7 +225,7 @@ function _propagate(sys, x0::AbstractVector{SVector{s, T}}, N, tau, ::Val{d}, ::
     f0 = map(reducer_final, reducers, s0)
     out = (x = Vector{SVector{s, T}}(undef, n), W = Vector{SMatrix{d, k, T, d * k}}(undef, n),
            finals = Vector{typeof(f0)}(undef, n))
-    args = (; sys, x0, seed, W0, N, tau, reducers, T, dims = (Val(d), Val(k)), L = choice.backend === :gpu ? Ldev : Lcpu)
+    args = (; sys, x0, seed, W0, N, tau, reducers, T, dims = (Val(d), Val(k)), L = choice.backend === :gpu ? Ldev : Lcpu, done = Ref(0))
     lo = 1
     while lo <= n
         r = lo:min(lo + csize - 1, n)
@@ -240,6 +242,8 @@ function _propagate(sys, x0::AbstractVector{SVector{s, T}}, N, tau, ::Val{d}, ::
             dev, csize = CPU(), csize_for(Sys.free_memory())
             bufs, Wh = alloc(dev, csize)
             args = merge(args, (L = Lcpu,))
+            # no launch ever completed on the device: it was never used, so the fields take the CPU values (D46)
+            gpu_chunks == 0 && args.done[] == 0 && ((L, launches) = forced === nothing ? (0, 0) : (Lcpu, _launches(N, Lcpu)))
             continue
         end
         _run_chunk!(out, bufs, Wh, r, args, :cpu, dev)

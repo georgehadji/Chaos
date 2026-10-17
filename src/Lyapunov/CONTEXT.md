@@ -69,5 +69,5 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 |------|-------|
 | H1 (Householder, second iteration path) | lyap-householder-qr spec, held; only H2 (diagonal iteration) exists |
 | General-`d` singular-value exponents | held for M3, D32 |
-| lyap-two-trajectory criterion 13 (external two-trajectory oracle), sent back to stage 01 | D43 |
+| lyap-two-trajectory criterion 13 (external two-trajectory oracle): re-specified in wrapped mode, verified | D43, D46 |
 | Float32 | D24 |

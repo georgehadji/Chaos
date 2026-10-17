@@ -572,7 +572,7 @@ want("l2") && let
 end
 
 # ------------------------------------------------------------------------------------- D44 (tangent-core Amendment D44, local)
-# Step-chunked relaunch on the GTX 1050, after the record (the budget reads its one-wave value). Tag "d44".
+# Step-chunked relaunch on the local device (GTX 1050 at D44, RTX 5060 from D46), after the record (the budget reads its one-wave value). Tag "d44".
 MODTAG[] = "tangent-core: "
 const Tg = Chaoslab.Tangent
 function with_L(f, L)
@@ -594,8 +594,9 @@ on_dev(p, L, N) = p.backend === :gpu && p.backend_fallback_reason == "" && p.gpu
     N = 2000
     rng = StableRNG(SEED + 4403)
     x0 = [SVector(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:1024]
-    sys = StandardMap(2pi)
     for (name, k, red) in (("Benettin", 1, (Benettin(),)), ("QRSpectrum(RGS)", 2, (QRSpectrum(RGS()),)), ("SVDSpectrum", 2, (SVDSpectrum(),))), tau in (2, 10)
+        Kc = tau == 10 ? 0.5 : 2pi   # D46: K = 2 pi with tau = 10 is outside the RGS window (58 of 1024 orbits survived)
+        sys = StandardMap(Kc)
         w(j) = initial_deviations(SEED, j, Val(2), Val(k), Float64)
         keep = [j for j in eachindex(x0) if catchhe(() -> propagate_orbit(sys, x0[j], w(j), N, tau, red; orbit = j)) === nothing]
         ncpu = length(keep)
@@ -609,7 +610,7 @@ on_dev(p, L, N) = p.backend === :gpu && p.backend_fallback_reason == "" && p.gpu
             r = with_L(run, L)
             ok &= on_dev(r.provenance, L, N) && same_run(r, full)
         end
-        row("D44c", "device bitwise, $name, K=2pi, $(length(xs)) orbits, N=2e3, tau=$tau: forced L in (tau, 20 tau, 130 tau) equals L = N (and the unforced run), all on the device",
+        row("D44c", "device bitwise, $name, K=$(tau == 10 ? "0.5" : "2pi"), $(length(xs)) orbits, N=2e3, tau=$tau: forced L in (tau, 20 tau, 130 tau) equals L = N (and the unforced run), all on the device",
             ok ? "equal" : "differs", "bitwise", pf(ok))
     end
 end
@@ -660,14 +661,15 @@ want("d44") && let
 end
 
 # D44j [local]: the rows cut down or fallen back for the launch budget, rerun at n = 1e5 on the device, original tolerances. Per row:
-# provenance on the device with more than one launch per chunk, the per-launch estimate from provenance (<= 1 s), and the measured
+# provenance on the device with at least one launch per chunk (D46: one launch when the device's budget fits N, as on the RTX 5060;
+# the relaunch path is then covered by D44c and D44k), the per-launch estimate from provenance (<= 1 s), and the measured
 # time of one full launch (the same row at N = L with one chunk of the run's device chunk size, <= 4 s).
 function d44j(ac, name, est, lam, nl, x0; extra = nothing, N = 10^5, tau = 10)
     sys = StandardMap(0.5)
     gpu = est(sys, x0, N, tau, :gpu)
     p = gpu.provenance
-    launched = p.backend === :gpu && p.backend_fallback_reason == "" && p.gpu_chunks > 0 && p.launches_per_chunk > 1
-    launched || return row(ac, "D44j $name, n=$(fmt(N)): on the device in launches", "backend $(p.backend), reason \"$(p.backend_fallback_reason)\", launches $(p.launches_per_chunk)", "gpu, more than 1 launch", "FAIL")
+    launched = p.backend === :gpu && p.backend_fallback_reason == "" && p.gpu_chunks > 0 && p.launches_per_chunk >= 1
+    launched || return row(ac, "D44j $name, n=$(fmt(N)): on the device in launches", "backend $(p.backend), reason \"$(p.backend_fallback_reason)\", launches $(p.launches_per_chunk)", "gpu, at least 1 launch", "FAIL")
     ns = something(F.gpu_step_ns(DEV, Float64), Tg.DEFAULT_GPU_NS)
     estm = ns * 1e-9 * p.launch_steps * max(p.chunk_size, 1024)
     xs = x0[1:min(length(x0), p.gpu_chunk_size)]

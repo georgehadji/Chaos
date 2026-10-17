@@ -130,3 +130,9 @@ Criterion 13 is sent back to stage 01 (owner's choice at the stage 04 checkpoint
 ## Amendment D44 (2026-10-16)
 
 The device run of this estimator gets the step-chunked relaunch of tangent-core spec Amendment D44: carried state, budget, lost-device rule, the ninth fallback reason and the two provenance fields are defined there (items 6 to 15), and its criteria are D44k there. Criterion 17 stays at n = 4e4 (owner).
+
+## Amendment D46 (2026-10-17)
+
+Criterion 13 as re-specified (owner's choice at the stage 01 checkpoint after D43): the Chaoslab side runs in wrapped mode (wrapped state plus winding counts, D28, T3), the oracle keeps its lifted rule, and the bound stays 1e-4.
+
+13. (V) External two-trajectory oracle, regular class K = 0.5 (S7 screening), 20 starts, n = 1e5, d0 = 1e-6 on both sides, Chaoslab side in wrapped mode, oracle with the lifted rule, oracle start placed along the seeded direction (Oracle): |X2(n) - lambda^oracle(n)| <= 1e-4. Why the bound holds in wrapped mode: M_state = max(1, abs(K), 2 pi) (Acceptance criteria, preamble), so the per-step round-off E_ro does not grow with the lifted coordinate magnitude (about 6e5 at n = 1e5 on these orbits), which caused the 3.18e-4 of the lifted run (D43). Recorded line (no threshold): the same comparison with the Chaoslab side lifted, the pre-D46 form.

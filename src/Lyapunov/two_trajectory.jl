@@ -126,12 +126,14 @@ function _shadow_chunk!(ends, bufs, r, args, who::Symbol, backend, ci::Int = 0)
     copyto!(uin, 1, args.u, first(r), len)
     kernel = _shadow_kernel!(backend, workgroup(backend))
     n0, launch = 0, 0
+    args.done[] = 0
     while n0 < args.N
         steps = min(args.L, args.N - n0)
         launch += 1
         who === :gpu && _before_launch(DEVICE[], ci, launch, (ends = so,))
         kernel(so, xin, uin, args.sys, n0, steps, args.N, args.tau, args.d0; ndrange = len)
         KernelAbstractions.synchronize(backend)
+        args.done[] = launch   # launches completed in this chunk, for the provenance after a failed first chunk
         n0 += steps
     end
     h = _host(so)
@@ -225,7 +227,7 @@ function _shadow_run(sys, x0::AbstractVector{SVector{s, T}}, u, ::Val{d}, N, tau
         bufs = alloc(dev, csize)
     end
     ends = Vector{ShadowEnd{s, T}}(undef, n)
-    args = (; sys, x0, u, N, tau, d0, L = choice.backend === :gpu ? Ldev : Lcpu)
+    args = (; sys, x0, u, N, tau, d0, L = choice.backend === :gpu ? Ldev : Lcpu, done = Ref(0))
     lo = 1
     while lo <= n
         r = lo:min(lo + csize - 1, n)
@@ -241,6 +243,8 @@ function _shadow_run(sys, x0::AbstractVector{SVector{s, T}}, u, ::Val{d}, N, tau
             dev, csize = CPU(), csize_for(Sys.free_memory())
             bufs = alloc(dev, csize)
             args = merge(args, (L = Lcpu,))
+            # no launch ever completed on the device: it was never used, so the fields take the CPU values (D46)
+            gpu_chunks == 0 && args.done[] == 0 && ((L, launches) = forced === nothing ? (0, 0) : (Lcpu, _launches(N, Lcpu)))
             continue
         end
         _shadow_chunk!(ends, bufs, r, args, :cpu, dev)

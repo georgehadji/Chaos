@@ -1,0 +1,30 @@
+# lyap-two-trajectory verification, julia 1.13.2, threads 2, base seed 20261012 (verify offset 45000), time 1.792231127e9 (unix)
+# timings in this log were taken on a loaded machine (other agents were running concurrently)
+ORACLE | orbit of ChaosTools lifted rule vs Chaoslab forward, K = 5, 1000 steps: max |difference| (same arithmetic) | 0 | 0 (information) | INFO
+AC13 | K = 0.5 regular class, 20 starts, n = 1e5, d0 = 1e-6, wrapped (oracle lifted rule): max |X2 - lambda_oracle| (mean X2 0.0001009, mean oracle 0.0001075, Delta_2T(1e-6) = 1.486e-06) | 7.717e-05 | <= 1e-4 | PASS
+AC13 | info: same, Chaoslab side lifted (the pre-D46 form): max |X2 - lambda_oracle| | 0.0003181 | info | INFO
+AC13 | info: max |X2 - X_L1| and max |oracle - X_L1| (same orbit and direction, lifted), default thresholds | 0.0003821 / 6.398e-05 | info | INFO
+AC13 | info: lifted-mode T5a ratio |X2 - X_L1| / (Delta_2T(M_state) Psi_n/n + B_S/n) with the measured M_state (max over starts 6.283e+05, max Psi_n/n 1.249e+05, E_ro(max M) = 0.001297) | 0.0005591 | info (vacuous bound) | INFO
+AC13 | info: same comparison at d0 = 1.0e-5 (default thresholds): max |X2 - oracle| / max |X2 - X_L1| | 0.0002261 / 0.0002784 | info | INFO
+AC13 | info: same comparison at d0 = 0.0001 (default thresholds): max |X2 - oracle| / max |X2 - X_L1| | 0.002265 / 0.0009403 | info | INFO
+AC13 | info: oracle thresholds [d0*0.5, d0*2]: max |X2 - oracle| / max |oracle - X_L1| | 0.0001294 / 0.0002572 | info (gate 1e-4 applies to the default) | INFO
+AC13 | info: oracle thresholds [d0*0.1, d0*10]: max |X2 - oracle| / max |oracle - X_L1| | 0.0001175 / 0.0002646 | info (gate 1e-4 applies to the default) | INFO
+AC13 | info: oracle thresholds [d0*0.01, d0*100]: max |X2 - oracle| / max |oracle - X_L1| | 0.0002955 / 8.663e-05 | info (gate 1e-4 applies to the default) | INFO
+AC14 | K = 2 pi, 1000 starts, n = 1e4, d0 = 1e-6: mean X2 1.167 (SE 0.002642), mean oracle 1.167 (SE 0.002642), |diff| = 1.66e-06; |diff| / combined SE | 0.0004443 | <= 4 | PASS
+#   pathwise |X2 - oracle|: median 4.086e-05, max 0.0005446
+AC14 | info: first 200 starts, oracle with tight thresholds [d0/2, 2 d0]: |diff of means| / combined SE (X2 mean 1.166, oracle 1.166) | 0.0004349 | info | INFO
+AC15 | K = 5, 200 starts, n = 1e4, d0 = 1e-6: mean X2 0.9521 (SE 0.01087), mean oracle 0.9521 (SE 0.01087), |diff| = 7.134e-06; |diff| / combined SE | 0.0004639 | <= 4 | PASS
+#   pathwise |X2 - oracle|: median 3.877e-05, max 0.0005637
+AC15 | K = 10, 200 starts, n = 1e4, d0 = 1e-6: mean X2 1.619 (SE 0.0007538), mean oracle 1.619 (SE 0.0007539), |diff| = 1e-05; |diff| / combined SE | 0.009381 | <= 4 | PASS
+#   pathwise |X2 - oracle|: median 3.903e-05, max 0.000606
+AC16 | K = 2 pi wrapped, 1000 starts, n = 1e4, d0 = d0* = 5.683e-08: X2 (first) against L1 X (second, in the 'oracle' slot): mean X2 1.169 (SE 0.001719), mean oracle 1.169 (SE 0.001719), |diff| = 3.671e-09; |diff| / combined SE | 1.51e-06 | <= 4 | PASS
+#   pathwise |X2 - oracle|: median 1.518e-08, max 1.011e-05
+#   AC16 pathwise |X2 - X| (same orbit and direction): median 1.518e-08, max 1.011e-05
+AC17 | CPU vs GPU on X2: needs a CUDA device and the shadow kernel; verify/gpu.jl has no L2 case | not run here | tangent-core AC12 tolerances | STAGE04-GPU
+R2 | oracle with wrapped rule vs lifted rule, K = 0.5, 40 starts, n = 1e5, d0 = 1e-6: mean wrapped 0.0002784 (SE 4.411e-05), mean lifted 0.0001048 (SE 3.318e-06), artifact = wrapped - lifted | 0.0001736 | recorded | INFO
+R2 | oracle with wrapped rule vs lifted rule, K = 5.0, 40 starts, n = 1e5, d0 = 1e-6: mean wrapped 0.9766 (SE 0.000825), mean lifted 0.9743 (SE 0.0007446), artifact = wrapped - lifted | 0.002288 | recorded | INFO
+# section oracle took 4.6 s
+# figure saved: lyap-two-trajectory-oracle.png
+# section figure-oracle took 14.1 s
+# verdicts: 5 PASS, 0 FAIL, 13 other
+# total wall time 24.9 s

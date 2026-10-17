@@ -193,3 +193,32 @@ None CRITICAL or HIGH.
 | 5 | LOW | The shadow start is computed again on the device at launch 1, besides the host check | Kept: it keeps the single-launch path unchanged (item 4), and the device needs the start code |
 | 6 | LOW | An OOM or lost device inside `compiles()` escapes the probe | Pre-existing (D29), unchanged by D44 |
 | 7 | LOW | The record run aborts the script on a fallback | Intended |
+
+## Amendment D46: stage 04 on the RTX 5060 (2026-10-17)
+
+### Evidence
+
+- **Machine:** NVIDIA GeForce RTX 5060 Laptop GPU (compute capability 12.0, 7.96 GiB), Intel Core Ultra 9 275HX, TdrDelay 8 s, CUDA.jl 6.4.2 (verify Manifest), Julia 1.13.2, 4 threads. From D46 on, this is the machine of every [local] criterion; the GTX 1050 sections above stay on record.
+- **Record (`data/gpu-benchmark.toml`, per machine, git-ignored):** Float64 GPU 2.468 ns per orbit-step (AC13 ensemble), one-wave value 9.137 ns (item 9; GTX 1050: 28.06), CPU 8.255 ns with 4 threads and 33.09 ns with 1 thread; GPU faster (speedup 3.3 against 4 threads, 13.4 against 1). Double64 falls back, "kernel does not compile for the element type", as on the GTX 1050.
+- **Full run before D46:** `gpu-rtx5060-verify-log.txt` (893 s): PASS 64, FAIL 8, FALLBACK 13 (all Double64), INFO 5. The 8 FAIL lines are the D44j rows, which failed only their precondition "more than 1 launch": the budget fits n = 1e5 in one launch on this card (L = 100000). Everything else of Batch A, Batch B and D44 passed.
+- **D46 rerun (tag d44):** `gpu-rtx5060-d46-verify-log.txt`: PASS 33 of 33, after the D46 corrections (spec Amendment D44, corrections at stage 04 on the RTX 5060) and the item 13 code change.
+- **Package suite:** 49621 pass, 0 fail (D46 tests: 25 in `test/tangent-core/tc_d44.jl`, 16 in `test/lyap-two-trajectory/l2_d44.jl`), Aqua and JET clean.
+
+| Criterion | Quantity | Value | Bound | Verdict |
+|---|---|---|---|---|
+| D44c [local] | Device bitwise, N = 2e3, forced L in {tau, 20 tau, 130 tau} against L = N and the unforced run: Benettin, QRSpectrum(RGS), SVDSpectrum; tau = 2 at K = 2 pi, tau = 10 at K = 0.5 (D46) | equal (6 rows), 1024 of 1024 orbits kept in every row | bitwise | PASS |
+| D44h [local] | Lost-device codes of the extension table | "device lost" for every code | as D44 | PASS |
+| D44i | One stepping body | 1 / 1; 2 | 1 / 1; 2 | PASS |
+| D44j [local] AC12a | tangent-core LogNorm, n = 1e5, tau = 10, L = 1e5, 1 launch per chunk: orbits above 1e-6 CPU / GPU; gap; estimate; measured full launch | 20 / 20; 9.444e-08; 1.0 s; 0.345 s | diff <= 3; <= 2e-6; <= 1 s; <= 4 s | PASS |
+| D44j [local] lyap-benettin AC16 | Benettin, same form | 18 / 17; 1.754e-07; 1.0 s; 0.370 s | same | PASS |
+| D44j [local] lyap-gram-schmidt AC12 | QRSpectrum(RGS) and (MGS), lambda_1 and lambda_2 | 1 / 1; 5.434e-07; 1.0 s; 0.582 s and 0.500 s | same | PASS |
+| D44j [local] lyap-householder-qr AC14a | Householder, Givens, Augmented; theta_sum ratio CPU and GPU | 1 / 1; 5.434e-07; 0.497 s, 0.473 s, 0.492 s; at most 3.1e-4 | same; <= 1 | PASS |
+| D44j [local] lyap-svd-stabilized AC10a | SVDSpectrum | 1 / 1; 5.434e-07; 1.0 s; 0.617 s | same | PASS |
+| D44k(c) [local] | propagate_shadow device bitwise, lifted and wrapped, K = 0.5 and 2 pi, tau = 2 and 10 | equal (8 rows) | bitwise | PASS |
+| Item 13 (D46) | Provenance after a fault in launch 1 of chunk 1 (lost device, out of memory, compile error): 0 and 0 unforced, the CPU values forced; device values kept after launch 3 or chunk 2 | as specified | exact | PASS (package suite) |
+
+### Findings
+
+- The D44j values equal the GTX 1050 values to every printed digit (same seeds, same Float64 kernel), so the relaunch at three launches and the single launch here agree with the same Double64 reference.
+- With one launch per chunk at n = 1e5, the relaunch path on this card is exercised by D44c and D44k at N = 2e3 with forced L (owner, D46).
+- The measured full launches (0.34 to 0.62 s) are below the 1 s estimate, so the launch estimate is conservative on this card; the GTX 1050 finding about heavier reducers (1.3 to 3.0 s against 1 s) does not reproduce here.

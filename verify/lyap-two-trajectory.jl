@@ -480,10 +480,12 @@ seeded_dirs(seed, m) = [SVector{2, Float64}(initial_deviations(seed, j, Val(2), 
 mean_se(v) = (mean(v), std(v) / sqrt(length(v)))
 
 # Oracle and Chaoslab estimates on the same starts, lifted mode, same d0, oracle test orbit placed along the seeded direction of Chaoslab
-function oracle_pair(K, starts, n, d0, seed; kw...)
-    sys = StandardMap(K)
+# mode = :wrapped runs the Chaoslab side on the wrapped system with winding counts (D28; criterion 13 as amended, D46);
+# the oracle keeps its lifted rule either way.
+function oracle_pair(K, starts, n, d0, seed; mode = :lifted, kw...)
     x0s = [SVector{2, Float64}(z) for z in starts]
-    X2 = l2_X2(sys, x0s, n, seed, d0)
+    X2 = mode === :wrapped ? l2_X2(WrappedStandardMap(K), [l2_state(:wrapped, Float64, z) for z in starts], n, seed, d0) :
+                             l2_X2(StandardMap(K), x0s, n, seed, d0)
     dirs = seeded_dirs(seed, length(x0s))
     CTv = [ct_lyap(ct_lifted, K, x0s[j], dirs[j], n, d0; kw...) for j in eachindex(x0s)]
     return X2, CTv
@@ -509,11 +511,14 @@ section("oracle") do
     end
     emit("ORACLE", "orbit of ChaosTools lifted rule vs Chaoslab forward, K = 5, 1000 steps: max |difference| (same arithmetic)", maximum(abs, SVector{2, Float64}(CT.current_state(ds)) - zo), "0 (information)", "INFO")
 
-    # AC13: regular class, pathwise
+    # AC13 (amended, D46): regular class, pathwise, Chaoslab side in wrapped mode; the lifted run stays as an information line
     starts = l2_regular_starts(0.5, 20, StableRNG(vseed(13)))
-    X2, CTv = oracle_pair(0.5, starts, 100_000, d0, vseed(13))
+    X2w, CTv = oracle_pair(0.5, starts, 100_000, d0, vseed(13); mode = :wrapped)
+    difw = maximum(abs.(X2w .- CTv))
+    emit("AC13", "K = 0.5 regular class, 20 starts, n = 1e5, d0 = 1e-6, wrapped (oracle lifted rule): max |X2 - lambda_oracle| (mean X2 $(fmt(mean(X2w))), mean oracle $(fmt(mean(CTv))), Delta_2T(1e-6) = $(fmt(l2_D2T(0.5, 1e-6, L2_TWO_PI, EPS64))))", difw, "<= 1e-4", pf(difw <= 1e-4))
+    X2, _ = oracle_pair(0.5, starts, 100_000, d0, vseed(13))
     dif = maximum(abs.(X2 .- CTv))
-    emit("AC13", "K = 0.5 regular class, 20 starts, n = 1e5, d0 = 1e-6, lifted: max |X2 - lambda_oracle| (mean X2 $(fmt(mean(X2))), mean oracle $(fmt(mean(CTv))), Delta_2T(1e-6) = $(fmt(l2_D2T(0.5, 1e-6, L2_TWO_PI, EPS64))))", dif, "<= 1e-4", pf(dif <= 1e-4))
+    emit("AC13", "info: same, Chaoslab side lifted (the pre-D46 form): max |X2 - lambda_oracle|", dif, "info", "INFO")
     # AC13 diagnostics (not gated): which side departs from the L1 tangent value X, and the oracle with narrower rescaling thresholds
     X13 = l2_X(StandardMap(0.5), [SVector{2, Float64}(z) for z in starts], 100_000, vseed(13))
     emit("AC13", "info: max |X2 - X_L1| and max |oracle - X_L1| (same orbit and direction, lifted), default thresholds", string(fmt(maximum(abs.(X2 .- X13))), " / ", fmt(maximum(abs.(CTv .- X13)))), "info", "INFO")
@@ -600,9 +605,9 @@ end
 section("figure-oracle") do
     d0 = 1e-6
     fig = CM.Figure(size = (1200, 480))
-    ax = CM.Axis(fig[1, 1]; xlabel = "oracle lambda (ChaosTools, lifted)", ylabel = "Chaoslab X2", title = "AC13: K = 0.5 regular, 20 starts, n = 1e5, d0 = 1e-6")
+    ax = CM.Axis(fig[1, 1]; xlabel = "oracle lambda (ChaosTools, lifted)", ylabel = "Chaoslab X2 (wrapped)", title = "AC13: K = 0.5 regular, 20 starts, n = 1e5, d0 = 1e-6")
     starts = l2_regular_starts(0.5, 20, StableRNG(vseed(13)))
-    X2, CTv = oracle_pair(0.5, starts, 100_000, d0, vseed(13))
+    X2, CTv = oracle_pair(0.5, starts, 100_000, d0, vseed(13); mode = :wrapped)
     CM.scatter!(ax, CTv, X2; color = :crimson)
     lim = extrema(vcat(CTv, X2))
     CM.lines!(ax, [lim...], [lim...]; color = :black)

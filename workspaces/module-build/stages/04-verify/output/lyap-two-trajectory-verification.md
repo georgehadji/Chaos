@@ -141,3 +141,15 @@ Step-chunked relaunch (tangent-core spec, Amendment D44, item 15). Evidence:
 - D44k(a), (b) and (d): `test/lyap-two-trajectory/l2_d44.jl`, 477 pass.
 - D44k(c) [local]: device bitwise on the GTX 1050 for lifted and wrapped, K = 0.5 and 2 pi, tau = 2 and 10, 256 orbits, N = 2e3, forced L in {tau, 20 tau, 130 tau} against L = N. Eight rows equal; see `tangent-core-verification.md`, "Amendment D44", and `gpu-d44-verify-log.txt`.
 - Criterion 17 stays at n = 4e4 (owner, D44). AC17(a) and (c) pass again with the relaunch code.
+
+## Amendment D46: criterion 13 in wrapped mode (2026-10-17)
+
+Criterion 13 as re-specified (spec Amendment D46): the Chaoslab side in wrapped mode (wrapped state plus winding counts), the oracle with its lifted rule, bound 1e-4. Script `verify/lyap-two-trajectory.jl`, sections oracle and figure-oracle; log `lyap-two-trajectory-d46-verify-log.txt` (5 PASS, 0 FAIL); figure `lyap-two-trajectory-oracle.png` (left panel now wrapped).
+
+| Criterion | Quantity | Value | Bound | Verdict |
+|---|---|---|---|---|
+| 13 (V) | K = 0.5 regular class, 20 starts, n = 1e5, d0 = 1e-6, wrapped (oracle lifted rule): max abs(X2 - oracle); mean X2 1.009e-4, mean oracle 1.075e-4 | 7.717e-05 | <= 1e-4 | PASS |
+| 13 info | Same with the Chaoslab side lifted (the pre-D46 form) | 3.181e-04 | info | INFO |
+| 14, 15, 16 (V) | Ensemble means (rerun in the same section) | as before | as before | PASS |
+
+The lifted run reproduces the D43 value exactly; the wrapped run removes the lifted-mode round-off (coordinate magnitude about 6.3e5) and passes with margin 1.3. Criterion 13 is closed.

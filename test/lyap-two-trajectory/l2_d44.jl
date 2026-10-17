@@ -234,3 +234,23 @@ end
     end
     @test FALLBACK_REASONS[9] == "device lost" && length(FALLBACK_REASONS) == 9
 end
+
+@testset "D46 provenance when no launch completed on the device" begin
+    seed = l2_seed(18, 6)
+    ref = l2_44_run(seed; backend = :cpu, L = nothing)
+    for (err, reason) in ((l2_FakeLost(), "device lost"), (l2_FakeOOM(), "device out of memory"))
+        run_fail(at, L) = l2_with_device(l2_HookDevice(nothing, l2_hook(Tuple{Int, Int}[]; fail = (at, err)))) do
+            l2_44_run(seed; L = L)
+        end
+        # launch 1 of chunk 1, no forced L: the device was never used, 0 and 0
+        p = run_fail((1, 1), nothing).provenance
+        @test p.backend === :cpu && p.backend_fallback_reason == reason && p.gpu_chunks == 0
+        @test p.launch_steps == 0 && p.launches_per_chunk == 0
+        # forced L: the CPU step chunk values; launch 3 of chunk 1 or launch 1 of chunk 2: the device values stay
+        for at in ((1, 1), (1, 3), (2, 1))
+            r = run_fail(at, L2_44_L)
+            @test l2_same(r, ref) && r.provenance.backend === :cpu
+            @test r.provenance.launch_steps == L2_44_L && r.provenance.launches_per_chunk == cld(L2_44_N, L2_44_L)
+        end
+    end
+end

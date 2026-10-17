@@ -43,6 +43,12 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 - The CUDA extension raises the device stack limit to at least 4 KiB at load, so `SVDSpectrum` runs on the GPU instead of failing with an illegal-address error at the 1 KiB default (D40).
 - Tangent-core spec Oracle corrected (D30): ChaosTools `lyapunov` is the two-trajectory method and `lyapunovspectrum` the tangent oracle; identical initial vectors are possible. Amendment D30 appended to the tangent-core and diagnostics specs.
 
+### Changed (D46)
+
+- GPU stage 04 moves to the GeForce RTX 5060 Laptop GPU (compute capability 12.0): full `verify/gpu.jl` run and the D44 rerun pass there (D46); D44j accepts one launch per chunk when the budget fits n = 1e5, the D44c rows at tau = 10 run at K = 0.5.
+- `propagate` and `propagate_shadow`: the provenance fields `launch_steps` and `launches_per_chunk` are 0 when the first device chunk fails before any launch completed (review finding 1 of D44, D46).
+- lyap-two-trajectory criterion 13 runs the Chaoslab side in wrapped mode and passes at 1e-4; catalog L2 is verified without open criteria (D46).
+
 ### Deferred, with reason
 
 - `bin/chaoslab.jl`, `python/nbody/`: no caller before M3 (D16).

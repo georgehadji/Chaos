@@ -39,7 +39,7 @@ The per-machine record is `data/gpu-benchmark.toml` (git-ignored), written by `v
 ## Tests and verification
 
 - Package (no GPU in CI): `test/tangent-core/tc_device.jl` drives the device path with a fake device on the CPU backend, including the fake lost-device case.
-- Local GPU run: `verify/gpu.jl` (every GPU criterion of Batch A), on the GeForce GTX 1050 recorded in the report. A real launch timeout cannot be provoked on purpose.
+- Local GPU run: `verify/gpu.jl` (every GPU criterion of Batch A), on the GeForce RTX 5060 Laptop GPU from D46 (`tangent-core-verification.md`, section "Amendment D46"); the GTX 1050 runs of Batch A, Batch B and D44 stay in the reports. A real launch timeout cannot be provoked on purpose.
 
 ## Deferred
 

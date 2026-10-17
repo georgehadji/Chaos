@@ -305,12 +305,16 @@ bad1 = 0; bad_exact = 0
 for o in orbs
     x, p = d256(o["x0_dec"]), d256(o["p0_dec"])
     (Float64(x) == o["x0"] && Float64(p) == o["p0"]) || (global bad1 += 1)
-    if o["class"] in ("T", "C", "S", "X") || (o["class"] == "R" && o["k_index"] >= 1 && haskey(o, "a"))
+    if o["class"] in ("T", "C", "S", "X")
         (x == BigFloat(o["x0"]) && p == BigFloat(o["p0"])) || (global bad_exact += 1)
+    elseif o["class"] == "R" && haskey(o, "a")
+        # K = 0 R (D52, L1): x0 formed in binary64, p0 text is the 256-bit value of 2 pi a / b
+        pr = setprecision(() -> 2 * BigFloat(pi) * o["a"] / o["b"], BigFloat, 256)
+        (x == BigFloat(o["x0"]) && p == pr) || (global bad_exact += 1)
     end
 end
 line("O7", "decimal text rebuilt at 256 bits rounds to the stored binary64 start, orbits $(length(orbs))", bad1, "0 mismatches", bad1 == 0)
-line("O7", "starts formed in binary64 (T, C, S, X, R at K = 0): decimal text equals the binary64 value exactly", bad_exact, "0 mismatches", bad_exact == 0)
+line("O7", "T, C, S, X starts: decimal text equals the binary64 value; K = 0 R: x0 binary64, p0 equals 2 pi a / b at 256 bits", bad_exact, "0 mismatches", bad_exact == 0)
 # 2. periodic orbits at 1024 bits
 prows = man["periodic"]
 maxres = 0.0; nbad = 0; maxtr = 0.0; maxex = 0.0; bad_prim = 0; bad_pts = 0; bad_class = 0; bad_wind = 0; maxdet = 0.0

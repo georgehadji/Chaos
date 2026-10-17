@@ -34,13 +34,7 @@ Shared references live in `/_config/`; onboarding is the repo-level `/setup/`.
 
 ## Routing
 
-| Task | Go To |
-|------|-------|
-| Preregister | `stages/01-design/CONTEXT.md` |
-| Build the orbit panel | `stages/02-panel/CONTEXT.md` |
-| Run | `stages/03-run/CONTEXT.md` |
-| Analyze | `stages/04-analyze/CONTEXT.md` |
-| Report results | `stages/05-report/CONTEXT.md` |
+The task table is `CONTEXT.md`, section "Task Routing" (one home; this file adds only what to load per task).
 
 ## What to Load
 

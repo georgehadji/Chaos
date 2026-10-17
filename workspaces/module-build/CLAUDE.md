@@ -34,13 +34,7 @@ Shared references live in `/_config/`; onboarding is the repo-level `/setup/`.
 
 ## Routing
 
-| Task | Go To |
-|------|-------|
-| Write the math spec | `stages/01-spec/CONTEXT.md` |
-| Write failing tests | `stages/02-tests/CONTEXT.md` |
-| Write the code | `stages/03-implement/CONTEXT.md` |
-| Verify against oracles | `stages/04-verify/CONTEXT.md` |
-| Flip status and commit | `stages/05-integrate/CONTEXT.md` |
+The task table is `CONTEXT.md`, section "Task Routing" (one home; this file adds only what to load per task).
 
 ## What to Load
 

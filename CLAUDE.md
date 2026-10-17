@@ -39,7 +39,7 @@ Chaos/
 | Keyword | Action |
 |---------|--------|
 | `setup` | Run `setup/questionnaire.md` |
-| `status` | One line per workspace (slugs, stages complete) plus catalog `Status` counts |
+| `status` | `python scripts/icm_status.py`: one line per workspace (slugs, stages complete) plus catalog `Status` counts |
 | `status <slug>` | Pipeline diagram for one topic, module, study or paper |
 
 ## Routing

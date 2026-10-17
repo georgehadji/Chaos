@@ -34,13 +34,7 @@ Shared references live in `/_config/`; onboarding is the repo-level `/setup/`.
 
 ## Routing
 
-| Task | Go To |
-|------|-------|
-| Plan a search | `stages/01-scope/CONTEXT.md` |
-| Run and screen the search | `stages/02-search/CONTEXT.md` |
-| Verify candidates | `stages/03-verify/CONTEXT.md` |
-| Annotate papers (optional) | `stages/04-synthesize/CONTEXT.md` |
-| Merge into the bibliography | `stages/05-promote/CONTEXT.md` |
+The task table is `CONTEXT.md`, section "Task Routing" (one home; this file adds only what to load per task).
 
 ## What to Load
 

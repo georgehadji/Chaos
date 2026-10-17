@@ -42,13 +42,7 @@ Pipeline Status: workspace-builder
 
 ## Routing
 
-| Task | Go To |
-|------|-------|
-| Start building a new workspace | `stages/01-discovery/CONTEXT.md` |
-| Formalize stage contracts | `stages/02-mapping/CONTEXT.md` |
-| Generate the workspace files | `stages/03-scaffolding/CONTEXT.md` |
-| Design the onboarding questionnaire | `stages/04-questionnaire-design/CONTEXT.md` |
-| Validate the workspace | `stages/05-validation/CONTEXT.md` |
+The task table is `CONTEXT.md`, section "Task Routing" (one home; this file adds only what to load per task).
 
 ## What to Load
 

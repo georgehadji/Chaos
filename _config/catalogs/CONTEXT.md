@@ -1,6 +1,6 @@
 # Catalogs
 
-One row per method or system, with sources, build milestone (`Phase`, see `../build-order.md`) and `Status` (`planned` or `verified`). Load only the rows a stage names.
+One row per method or system, with sources, build milestone (`Phase`, see `../build-order.md`) and `Status` (`planned` or `verified`; a qualifier in parentheses names a deferred part, for example `verified (d = 2)`; a row with an open criterion stays `planned`). Load only the rows a stage names.
 
 | File | Rows |
 |------|------|

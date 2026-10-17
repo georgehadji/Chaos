@@ -33,12 +33,7 @@ Shared references live in `/_config/`; onboarding is the repo-level `/setup/`.
 
 ## Routing
 
-| Task | Go To |
-|------|-------|
-| Outline | `stages/01-outline/CONTEXT.md` |
-| Draft | `stages/02-draft/CONTEXT.md` |
-| Review and revise | `stages/03-review/CONTEXT.md` |
-| Finalize | `stages/04-finalize/CONTEXT.md` |
+The task table is `CONTEXT.md`, section "Task Routing" (one home; this file adds only what to load per task).
 
 ## What to Load
 

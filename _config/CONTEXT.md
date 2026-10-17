@@ -13,7 +13,7 @@ Canonical facts. Workspaces read these; nothing here points to a workspace. Stag
 | `coding-conventions.md` | Code and test rules |
 | `value-types.md` | What a study or paper can deliver |
 | `publication.md` | Author, journals, citation style |
-| `environment.md` | Compute target, cores, data root, precision backend |
+| `environment.md` | Compute target, cores, local GPU, data root, precision backend |
 | `decision-log.md` | Structural decisions, why, when to revisit |
 | `risks.md` | Risk list, reviewed at every milestone exit |
 | `catalogs/CONTEXT.md` | Methods, indicators, integrators, systems, module `Status` |

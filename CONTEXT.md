@@ -18,3 +18,4 @@ Pick the workspace for the task, then read only that workspace's CONTEXT.md.
 | Run-store schema | `schema/run-store.md` | HDF5 layout used by Julia and Python |
 | ICM rules | `_core/CONVENTIONS.md` | Workspace conventions |
 | What is built when | `_config/build-order.md` | Milestones M0-M8 |
+| Machine and local GPU | `_config/environment.md` | Compute target, the GPU of the [local] criteria |

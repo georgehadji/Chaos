@@ -36,7 +36,7 @@ Layer 3, canonical. `Status` is `planned` or `verified`; only module-build/05 wr
 | B5 | Resonant / secular reduced models (Poincare variables, disturbing-function expansions, secular theory) | analytic skeleton of chaos: resonance overlap, secular resonances; compare reduced-model indicators with full N-body | HaddenTamayo2022 (celmech) | M7 |
 | B6 | Ephemeris-quality test particles (asteroids, NEOs) in the DE440/441 field with variational equations | high-precision reference orbits; tangent vectors for MEGNO/LE of small bodies | Holman2023 (ASSIST) | M7 (optional) |
 
-Initial conditions for B1-B2 come from JPL Horizons (DE440/DE441 ephemerides, Park2021) via `scripts/fetch_horizons.py`, cached with query date in the manifest. ASSIST needs the DE440/441 planet file plus the `sb441-n16` asteroid kernel (about 1 GB, downloaded once by `scripts/fetch_ephemerides.py` into `{{DATA_ROOT}}`, never committed).
+Initial conditions for B1-B2 come from JPL Horizons (DE440/DE441 ephemerides, Park2021) via `scripts/fetch_horizons.py`, cached with query date in the manifest. ASSIST needs the DE440/441 planet file plus the `sb441-n16` asteroid kernel (about 1 GB, downloaded once by `scripts/fetch_ephemerides.py` into the data root (`_config/environment.md`), never committed).
 
 Ecosystem packages (all GPL-3.0, adapters only, no re-implementation): REBOUND (integrators, MEGNO), REBOUNDx (extra forces), celmech (analytic and semi-analytic celestial mechanics), ASSIST (ephemeris-quality test particles).
 

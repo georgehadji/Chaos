@@ -4,17 +4,17 @@ Layer 3, canonical. Filled once by `setup`.
 
 ## Author
 
-- Name: {{AUTHOR_NAME}}
-- Affiliation: {{AFFILIATION}}
-- ORCID: {{ORCID}}
+- Name: georgehadji
+- Affiliation: Independent researcher
+- ORCID: none yet
 
 ## Journals
 
-{{TARGET_JOURNALS}}
+Decided per paper at paper/01-outline.
 
 ## Citation style
 
-{{CITATION_STYLE}}
+The target journal's own style.
 
 ## Code and data availability
 

@@ -4,8 +4,8 @@ Layer 3, canonical. Filled once by `setup`.
 
 ## Compute
 
-- Target: {{COMPUTE_TARGET}}
-- Max cores: {{MAX_CORES}}
+- Target: this computer (host in "Local GPU" below)
+- Max cores: 23
 
 ## Local GPU
 
@@ -16,7 +16,7 @@ Layer 3, canonical. Filled once by `setup`.
 
 ## Storage
 
-- Data root: {{DATA_ROOT}} (run stores and literature full texts; never committed)
+- Data root: `data/` in this repo (git-ignored) (run stores and literature full texts; never committed)
 
 ## High precision
 

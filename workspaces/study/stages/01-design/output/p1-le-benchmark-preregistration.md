@@ -11,8 +11,8 @@ FROZEN 2026-10-17. Every value marked "proposed" was approved by the owner at th
 | Claims tested | C1, C2. C3 is out of scope (P2). |
 | Value types | FALSIFIES (C1, C2), REPRODUCES (SalaArtuso2015), TOOL (Chaoslab v0.1.0 at M3 exit), NEGATIVE allowed (`/_config/value-types.md`) |
 | Git SHA at freeze | 1e760e229eabf9d8323ad4d8097cc1dbd017f845 (parent commit of the freeze commit) |
-| SHA-256 of this file at freeze | fa84e883405a7acbdb4774be2527bbecb8399a4c369fa79fbfc4d563d98bea87 (over this file with this value written as SELF) |
-| Amendment log | empty (see "Amendment rule" at the end) |
+| SHA-256 of this file (current version) | c9ad3c2cf3ba1220990d118c81e55da2104a7130b0f49e7dcd83cf75461fdcef (rule: Amendment A1, item 1) |
+| Amendment log | A1 (2026-10-17, section "Amendment A1"; parent commit 963345d86570366f5f0ea3ee6950288e20edcfa7; replaces freeze hash fa84e883405a7acbdb4774be2527bbecb8399a4c369fa79fbfc4d563d98bea87) |
 
 Value types, in the words of `value-types.md`:
 - FALSIFIES: H1 to H3 each have a decision rule below, fixed before any data exists.
@@ -306,3 +306,47 @@ Frozen after study/01. A change after freeze is an amendment: one numbered entry
 - Confirm the proposed values marked "proposed" above, in particular H1 tolerances, n_H2 = 1e4, the 0.10 and 10x thresholds of H2 and H3, and the label rules (these thresholds make D36 and D37 decidable; D37 itself flags the structure axis as the risk).
 - Confirm K = 0.5 and K = 10 as additions to the K values named in the scope, and the 12 h wall cap.
 - The mapping from the D37 phrase "stated canonical norm" to the Euclidean 2-norm on lifted (x, p) is proposed here.
+
+## Amendment A1 (2026-10-17)
+
+Approved by the owner at the module-build/01 checkpoint of `experiments` (decision D49), before stage 03-run produced any data. Base sections above are left as frozen; where they differ, this section wins.
+
+1. Hash rule. The header cell "SHA-256 of this file (current version)" holds the SHA-256 of this file with the whole cell (hash and note) replaced by the word SELF. Rule in full: the whole cell is replaced by the word SELF before hashing (UTF-8, LF line ends); each amendment updates this cell and logs the hash it replaces. The freeze hash fa84e883... was computed under the same rule with the freeze-time cell text.
+2. T predicate (Selection rule, item 2). Under the frozen threshold class T is empty: at K = 0 every screening point has lambda_scr = ln(sqrt((cos a + N sin a)^2 + sin^2 a)) / N, about 1.12e-4 for a = pi/4 and N = N_scr = 1e5, above 1e-4, and regular orbits at K > 0 sit on the same ln n / n floor (Skokos2010, see `benchmarks.md`). New rule: T requires lambda_scr <= theta_T, the growth ratio g = S(N_scr) / S(N_scr / 10) < g_T with S(N_scr / 10) > 0 (S is the cumulative log stretching, so g = r(N_scr) of "Label rules"), and the frozen distance condition. g tends to about 1.25 for regular decay and to 10 for constant positive lambda. theta_T = 5e-4 (the owner approved 1e-3 at the checkpoint; it is set to 5e-4 so that theta_T stays strictly below the S threshold 1e-3 and T is disjoint from S, as the module requires; the growth ratio carries the separation).
+3. Screening deviation direction: the primary direction of Methods (angle pi/4), one vector (k = 1).
+4. Windowed estimate (S predicate): the exponent over disjoint blocks of w = 1e3 steps, e_i = (S((i + 1) w) - S(i w)) / w; the median over blocks is the "median windowed value"; a stuck stretch is a run of consecutive blocks with e_i < 0.2 times that median, its length the block count times w.
+5. Newton periodic-point search: at most 50 iterations per seed; two accepted points are the same orbit when their torus distance (after reduction to the primitive period) is below delta_dup = 1e-8.
+6. Subset caps: S_D cap 210 and S_L cap 110, so that full population is not cut (7 x 27 + 13 = 202, 4 x 27 = 108). The two control slots left after the 10 fixed points go to the Newton orbits of lowest period, ties broken by K index (module rule).
+7. Machine-readable panel inputs. The block below is the single home of the panel inputs the module reads; its values equal the frozen prose except where items 2 to 6 change them.
+
+```toml
+[panel]
+K = ["0", "0.5", "0.971635406", "pi/2", "2pi", "10"]
+n_c = 40
+grid_side = 256
+N_scr = 100000
+alpha = "pi/4"
+theta_T = 5e-4
+g_T = 5.0
+r_T = 0.05
+theta_C = 0.01
+r_C = 0.3
+theta_S = 1e-3
+w = 1000
+f_S = 0.2
+L_S = 20000
+log10_r = [-4.0, -2.0]
+q_max = 6
+rho = 1e-12
+delta_R = 1e-3
+newton_max = 50
+delta_dup = 1e-8
+n_ctrl_max = 12
+mu = "(3 + sqrt(5))/2"
+s_D = 7
+cap_D = 210
+s_L = 4
+cap_L = 110
+```
+
+K and mu entries are decimal or closed-form strings; the module evaluates them in BigFloat and rounds once to each working type.

@@ -1,11 +1,11 @@
 # experiments verification, julia 1.13.2, threads 23, ChaosTools 3.5.4 / DynamicalSystemsBase 3.19.3 (verify/Manifest.toml)
 # prereg workspaces\study\stages\01-design\output\p1-le-benchmark-preregistration.md, scratch C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\verify-panel
-D51c | build_panel on the real preregistration completes, threads 23, wall seconds (compile included) | 401.3 | completes | PASS
+D51c | build_panel on the real preregistration completes, threads 23, wall seconds (compile included) | 404.7 | completes | PASS
 BUILD | orbits (drawn, controls) | 883 (870, 13) | - | INFO
-BUILD | panel file bytes and SHA-256 | 6353491 fa2fc6498ac9721f8f4ec09e298178894c17c1683cb5898c339b68def7708365 | - | INFO
-BUILD | manifest git sha / dirty flag / package version | 3991155f7a / true / 0.0.1 | - | INFO
+BUILD | panel file bytes and SHA-256 | 6332442 ebf277e6ad5c4bddde183708b80fc39564a5f2788c7de7f5658798676e464cc3 | - | INFO
+BUILD | manifest git sha / dirty flag / package version | 9ef8bd7487 / true / 0.0.1 | - | INFO
 BUILD | Newton statistics (tried, accepted, singular, diverged, cap, ill_conditioned) | 1966080, 1359242, 0, 499944, 32931, 73963 | - | INFO
-# section BUILD took 401.4 s
+# section BUILD took 404.8 s
 AC2a | frozen file: header SHA-256 equals module value | true | true | PASS
 AC2a/e | module value equals the independent value (sha256sum, own SELF rule) | true | true | PASS
 AC2 | INFO | header 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46, amendments logged 3, panel block parsed: K = [0.0, 0.5, 0.971635406, 1.5707963267948966, 6.283185307179586, 10.0], grid_side 256, N_scr 100000
@@ -25,13 +25,13 @@ D51c | accepted period-1 rows at K = 2pi / nearest accepted period-1 point to (p
 D51c | smallest separation of distinct orbit points (all K) against 10 delta_dup | 0.0003146 | >= 1.0e-7 | PASS
 D51d | no D50 output remains (merged table, sn_trace input, near-saddle-node class) | true | true | PASS
 # section D51c took 0.3 s
-AC12 | K = 0: 65536 grid cells screened in 9.1 s; closed-form lambda_scr (256 bit) 0.0001117; max |lambda_scr - closed form| | 4.472e-19 | <= 1.776e-15 | PASS
+AC12 | K = 0: 65536 grid cells screened in 9.2 s; closed-form lambda_scr (256 bit) 0.0001117; max |lambda_scr - closed form| | 4.472e-19 | <= 1.776e-15 | PASS
 AC12 | same, relative to the closed form | 4.005e-15 | reported | INFO
 AC12 | spread of lambda_scr over the grid (max - min) | 0 | reported | INFO
 AC12 | K = 0 T cell: qualifying count recomputed here / in the panel manifest | 53248 / 53248 | equal | PASS
 AC12 | INFO | K = 0 T cell in the panel: status populated, drawn 40, reason ""; lambda_scr 0.0001117 <= theta_T 0.0005, growth ratio 1.26 < g_T 5.0
 AC12 | K = 0 other classes recorded undefined (C, S, X) | true | true | PASS
-# section AC12 took 9.1 s
+# section AC12 took 9.3 s
 AC21 | S_L within S_D within P | true | true | PASS
 AC21 | |S_D| / cap_D, |S_L| / cap_L | 172 / 210, 92 / 110 | <= caps | PASS
 AC21 | |S_D| = sum over cells of min(drawn, s_D) plus controls, before caps (expected 172) | 172 | == 172 (or caps) | PASS
@@ -39,7 +39,7 @@ AC21 | |S_L| = sum over cells of min(drawn, s_L) (expected 92) | 92 | == 92 (or 
 AC21 | no cap applied: every drawn orbit of rank <= s_D is in S_D, of rank <= s_L in S_L | true | true | PASS
 AC21 | controls all in S_D, none in S_L, count | true / 13 | true | PASS
 AC21 | recomputed subsets and removed ids equal the file (removed D / L: 0 / 0) | true | true | PASS
-# section AC21 took 0.3 s
+# section AC21 took 0.2 s
 # cell table (drawn / qualifying, status):
 #   K index, K | T | R | C | S | X
 #   1, 0.0 | 40 / 53248 populated | 40 / 0 populated | 0 / 0 undefined [class undefined at K = 0] | 0 / 0 undefined [class undefined at K = 0] | 0 / 0 undefined [class undefined at K = 0]
@@ -62,7 +62,7 @@ AC17 | cell stream seed of every drawn orbit re-derived from E15 (SHA-256 of the
 AC17 | orbit seed of every orbit equals tangent-core rule (EX.orbit_seed) | 0 | 0 mismatches | PASS
 # section CELLS took 0.2 s
 O7 | decimal text rebuilt at 256 bits rounds to the stored binary64 start, orbits 883 | 0 | 0 mismatches | PASS
-O7 | starts formed in binary64 (T, C, S, X, R at K = 0): decimal text equals the binary64 value exactly | 0 | 0 mismatches | PASS
+O7 | T, C, S, X starts: decimal text equals the binary64 value; K = 0 R: x0 binary64, p0 equals 2 pi a / b at 256 bits | 0 | 0 mismatches | PASS
 O7 | periodic rows 5283: max return residual at 1024 bits (windings of the stored representative) | 1.7366434125204372e-20 | <= rho = 1.0e-12 | PASS
 O7 | windings (m, j) recomputed equal the stored ones, mismatches | 0 | 0 | PASS
 O7 | trace recomputed at 1024 bits against the stored trace, max relative | 1.0905048577940507e-16 | <= 1e-12 | PASS
@@ -89,10 +89,10 @@ O7 | fixed-point control id 878 (K index 5, x0 = pi): class and exponent against
 O7 | fixed-point control id 879 (K index 6, x0 = 0): class and exponent against the closed form | hyperbolic 2.477888730288475 | hyperbolic 2.477888730288475 | PASS
 O7 | fixed-point control id 880 (K index 6, x0 = pi): class and exponent against the closed form | hyperbolic 2.0634370688955603 | hyperbolic 2.0634370688955603 | PASS
 O7 | Y5 control id 883: exponent against ln mu at 1024 bits | 0.9624236501192069 | 0.9624236501192069 | PASS
-O7 | INFO | separate process (julia --startup-file=no, TOML and Base only, no Chaoslab), 8.3 s
-# section O7 took 8.3 s
+O7 | INFO | separate process (julia --startup-file=no, TOML and Base only, no Chaoslab), 6.7 s
+# section O7 took 6.8 s
 # ChaosTools settings: periodicorbits, orders 1..3, ICs = centres of the 64 x 64 sub-grid (4096), lambda in [0.001, 0.01, 0.1], all 2 index permutations x 4 sign patterns, maxiters 1e5, disttol 1e-10, inftol 10.0, abstol 1e-8; davidchacklai n = 3, m = 2, package defaults
-AC27 | INFO | periodicorbits: 5760 tasks in 134.7 s
+AC27 | INFO | periodicorbits: 5760 tasks in 133.2 s
 AC27 | INFO | davidchacklai: 5 K values in 1.4 s
 AC27 | K index 2 (K = 0.5), o = 1: ChaosTools points (union) 7 [dl=3 pc_0.001=4 pc_0.01=3 pc_0.1=3]; matched 7, unmatched near wrap boundary 0, ghost (D51) 0, unmatched other 0, class mismatches 0 | 7/7 | 100% matched, 0 mismatches | PASS
 AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 3.257e-15; 0 | <= 1e-5 | PASS
@@ -160,21 +160,21 @@ AC27 | K index 6 (K = 10), o = 3: ChaosTools points (union) 577 [dl=283 pc_0.001
 AC27 |   trace agreement of the matched points (AD of the wrapped rule vs module trace power), max relative; points above 1e-5 | 1.542e-07; 0 | <= 1e-5 | PASS
 AC27 | INFO |   reverse coverage (module points with period | 3 found by ChaosTools) 282 / 282; analytic E6 families A, B found -
 AC27 | totals over K and o: unmatched other / class mismatches / trace outliers | 0 / 0 / 0 | 0 / 0 / 0 | PASS
-# section AC27 took 136.8 s
+# section AC27 took 135.2 s
 AC19 | reduced preregistration (grid_side 64) passes the hash rule; module hash equals independent (sha256sum) | true | true | PASS
-AC19 | INFO | julia -t 1: BUILD_SECONDS 143.3475083 threads 1, SHA-256 f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652, 1986040 bytes
-AC19 | INFO | julia -t 4: BUILD_SECONDS 42.7681918 threads 4, SHA-256 f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652, 1986040 bytes
-AC19 | INFO | julia -t 23: BUILD_SECONDS 28.893137 threads 23, SHA-256 f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652, 1986040 bytes
+AC19 | INFO | julia -t 1: BUILD_SECONDS 114.0336311 threads 1, SHA-256 67f5836afa308be53155b57cbbd7c1ecac1babd6ffff490d4df115daa10fe97f, 1977387 bytes
+AC19 | INFO | julia -t 4: BUILD_SECONDS 35.6048708 threads 4, SHA-256 67f5836afa308be53155b57cbbd7c1ecac1babd6ffff490d4df115daa10fe97f, 1977387 bytes
+AC19 | INFO | julia -t 23: BUILD_SECONDS 27.033567 threads 23, SHA-256 67f5836afa308be53155b57cbbd7c1ecac1babd6ffff490d4df115daa10fe97f, 1977387 bytes
 AC19 | panel files from julia -t 1, 4, 23 byte-identical (SHA-256) | true | true | PASS
-#   AC19 SHA-256 -t 1: f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652
-#   AC19 SHA-256 -t 4: f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652
-#   AC19 SHA-256 -t 23: f1b168e18805a7f93a5e248620b091714f5ddcefef159078224633fcea805652
+#   AC19 SHA-256 -t 1: 67f5836afa308be53155b57cbbd7c1ecac1babd6ffff490d4df115daa10fe97f
+#   AC19 SHA-256 -t 4: 67f5836afa308be53155b57cbbd7c1ecac1babd6ffff490d4df115daa10fe97f
+#   AC19 SHA-256 -t 23: 67f5836afa308be53155b57cbbd7c1ecac1babd6ffff490d4df115daa10fe97f
 AC19 | forbidden key names in the reduced panel file (lambda, block, screen, wall, host, thread, device, backend) |  | none | PASS
-AC19 | INFO | full-input panel (this process, 23 threads) SHA-256 fa2fc6498ac9721f8f4ec09e298178894c17c1683cb5898c339b68def7708365
-# section AC19 took 220.1 s
+AC19 | INFO | full-input panel (this process, 23 threads) SHA-256 ebf277e6ad5c4bddde183708b80fc39564a5f2788c7de7f5658798676e464cc3
+# section AC19 took 181.6 s
 PORTRAITS | figure written | workspaces\module-build\stages\04-verify\output\experiments-portraits.png | - | INFO
 PORTRAITS | INFO | copied to workspaces\study\stages\02-panel\output\p1-le-benchmark-portraits.png; portrait content: 6 K values, starts per K 80, 187, 202, 202, 127, 84, periodic markers per K 49, 98, 98, 142, 5794, 21545
-# section PORTRAITS took 13.8 s
-# summary: PASS 93, FAIL 0, INFO 60, total 795.2 s
+# section PORTRAITS took 11.9 s
+# summary: PASS 93, FAIL 0, INFO 60, total 754.3 s
 FINAL | all checks passed: study panel written | workspaces\study\stages\02-panel\output\p1-le-benchmark-panel.toml | - | INFO
 # section FINAL took 0.0 s

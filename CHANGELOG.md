@@ -53,6 +53,12 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 - All nine M2 modules verified (stages 01 to 05); catalog I1 verified on the lyap-benettin evidence; risks K19 to K21 added, K15 closed, K6 moved to M4 and M5.
 
+### Added (M3 experiments, D49)
+
+- `Experiments` module (panel scope): screening grid with L5 at Float64, periodic orbits up to the preregistered period by 256-bit Newton with a conditioning test (D51), the preregistered class predicates, seeded draws keyed by cell and orbit id, controls, nested subsets, and a panel file whose manifest checks the preregistration hash. CPU only; byte-identical at any thread count on one machine and Julia version (D52). Package dependency `SHA` added.
+- `verify/experiments.jl`: ChaosTools periodic-orbit oracle, independent 1024-bit re-evaluation, thread-count runs, full study inputs, portraits.
+- Study `p1-le-benchmark`: preregistration frozen with amendments A1 (T predicate, panel block, caps, hash rule), A2 (superseded) and A3 (conditioning test); panel of 883 orbits built from a clean commit.
+
 ### Deferred, with reason
 
 - `bin/chaoslab.jl`, `python/nbody/`: no caller before M3 (D16).

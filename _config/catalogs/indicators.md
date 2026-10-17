@@ -6,7 +6,7 @@ Layer 3, canonical. `Status` is `planned` or `verified`; only module-build/05 wr
 
 | ID | Indicator | Vectors | Regular orbit | Chaotic orbit | Main issue | Source | Phase | Status |
 |----|-----------|---------|---------------|---------------|-----------|--------|-------|--------|
-| I1 | Finite-time mLCE lambda_1(n) | 1 | -> 0 like ln n / n | -> lambda_1 > 0 | slow; threshold choice | Benettin1980a, Skokos2010 | M2 | planned |
+| I1 | Finite-time mLCE lambda_1(n) | 1 | -> 0 like ln n / n | -> lambda_1 > 0 | slow; threshold choice | Benettin1980a, Skokos2010 | M2 | verified |
 | I2 | SALI (min of norm of sum / difference of two unit deviation vectors) | 2 | fluctuates around positive value | -> 0 like exp(-(lambda_1 - lambda_2) n) | in 2D maps: exp(-2 lambda_1 n), cross-check vs I1 | Skokos2001, Skokos2004 | M4 | planned |
 | I3 | GALI_k (volume of k unit deviation vectors, product of singular values) | k = 2..2N | constant or power-law decay (torus dimension) | exponential decay with sum of exponent gaps | k > 2 needs dim >= 4 | Skokos2007, Skokos2008 | M4 (k=2), M5 (k>2) | planned |
 | I4 | LGALI / GALI for local dynamics | k | see I3 | see I3 | | Skokos2008? (LGALI source not confirmed, resolve at 01-spec) | M5 | planned |

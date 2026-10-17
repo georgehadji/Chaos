@@ -40,3 +40,11 @@ Short hashes are the commits on `main..m2-p1-modules` that touched the file (`gi
 - `src/Lyapunov/CONTEXT.md` (all five Batch B slugs); `CHANGELOG.md` section "Added (M2 Batch B)" and "Deferred"; spec Amendments D43; this log.
 
 Commit SHA: 6ad3423
+
+## M2 exit (2026-10-17, D48)
+
+| File | Row or section | Change |
+|------|----------------|--------|
+| `_config/catalogs/indicators.md` | I1 (finite-time mLCE lambda_1(n)) | planned -> verified |
+
+Evidence: the L1 criteria of `stages/04-verify/output/lyap-benettin-verification.md` (the same quantity; regular-orbit decay E5). The classification threshold of I1 stays a per-study preregistration.

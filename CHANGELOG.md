@@ -49,6 +49,10 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 - `propagate` and `propagate_shadow`: the provenance fields `launch_steps` and `launches_per_chunk` are 0 when the first device chunk fails before any launch completed (review finding 1 of D44, D46).
 - lyap-two-trajectory criterion 13 runs the Chaoslab side in wrapped mode and passes at 1e-4; catalog L2 is verified without open criteria (D46).
 
+### M2 exit (D48)
+
+- All nine M2 modules verified (stages 01 to 05); catalog I1 verified on the lyap-benettin evidence; risks K19 to K21 added, K15 closed, K6 moved to M4 and M5.
+
 ### Deferred, with reason
 
 - `bin/chaoslab.jl`, `python/nbody/`: no caller before M3 (D16).

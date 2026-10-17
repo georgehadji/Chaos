@@ -40,3 +40,16 @@ Short hashes are the commits on `main..m2-p1-modules` that touched the file (`gi
 - `src/Lyapunov/CONTEXT.md` (all five Batch B slugs); `CHANGELOG.md` section "Added (M2 Batch B)" and "Deferred"; spec Amendments D43; this log.
 
 Commit SHA: 6ad3423
+
+## D46 (2026-10-17)
+
+Branch `m2-d46`, commit db8be05. GPU stage 04 on the RTX 5060 Laptop GPU; evidence in `stages/04-verify/output/tangent-core-verification.md`, section "Amendment D46", logs `gpu-rtx5060-verify-log.txt` and `gpu-rtx5060-d46-verify-log.txt`.
+
+## Catalog rows flipped (D46)
+
+| File | Row or section | Change |
+|------|----------------|--------|
+| `_config/catalogs/lyapunov.md` | L2 (two-trajectory) | verified (criterion 13 open, D43) -> verified |
+
+- Criterion 13 closed: wrapped mode, 7.717e-05 against 1e-4 (`lyap-two-trajectory-verification.md`, section "Amendment D46"; log `lyap-two-trajectory-d46-verify-log.txt`).
+- Files: `src/Lyapunov/two_trajectory.jl` (item 13 provenance), `test/lyap-two-trajectory/l2_d44.jl`, `verify/lyap-two-trajectory.jl`, `stages/01-spec/output/lyap-two-trajectory-spec.md`, `stages/04-verify/output/lyap-two-trajectory-oracle.png`, `stages/04-verify/output/lyap-two-trajectory-verification.md`; `src/Lyapunov/CONTEXT.md`.

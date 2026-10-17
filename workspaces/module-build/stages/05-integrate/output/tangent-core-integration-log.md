@@ -49,3 +49,10 @@ Short hashes are the commits on `main..m2-p1-modules` that touched the file (`gi
 - Folder `CONTEXT.md` files for Foundation, Systems, Tangent, Diagnostics and `ext/`; `CHANGELOG.md` section "Added (M2 Batch A)", "Changed", "Deferred"; this log.
 
 Commit SHA: abef540
+
+## D46 (2026-10-17)
+
+Branch `m2-d46`, commit db8be05. GPU stage 04 on the RTX 5060 Laptop GPU; evidence in `stages/04-verify/output/tangent-core-verification.md`, section "Amendment D46", logs `gpu-rtx5060-verify-log.txt` and `gpu-rtx5060-d46-verify-log.txt`.
+
+- Spec: Amendment D44 corrections (D44j one launch, D44c tau = 10 at K = 0.5, item 13 launch-1 failure).
+- Files: `src/Tangent/propagate.jl`, `test/tangent-core/tc_d44.jl`, `verify/gpu.jl`, `stages/01-spec/output/tangent-core-spec.md`, `stages/04-verify/output/tangent-core-verification.md`, the two GPU logs; shared: `ext/CONTEXT.md`, `CHANGELOG.md`, `_config/decision-log.md` (D46).

@@ -44,13 +44,16 @@ def workspace_status(root, ws):
         pats = stage_patterns((d / "CONTEXT.md").read_text(encoding="utf-8"))
         for slug in slugs_in(d / "output", pats):
             table.setdefault(slug, set()).add(d.name)
-    return [d.name for d in stages], table
+    # A run starts in the first stage: a later-stage name without a first-stage artifact (a figure such as
+    # lyap-benettin-convergence.png cut at its first hyphen, an amendment plan such as tangent-core-d44) is no slug.
+    first = stages[0].name if stages else None
+    return [d.name for d in stages], {s: done for s, done in table.items() if first in done}
 
 
 def catalog_counts(root):
     counts = {}
     for p in sorted((root / "_config" / "catalogs").glob("*.md")):
-        for status in re.findall(r"\| (planned|verified) \|$", p.read_text(encoding="utf-8"), re.M):
+        for status in re.findall(r"\| (planned|verified)(?: \([^|]*\))? \|$", p.read_text(encoding="utf-8"), re.M):
             counts[status] = counts.get(status, 0) + 1
     return counts
 

@@ -78,6 +78,27 @@ class StatusTests(unittest.TestCase):
                                              "| b | `output/[study]-fig-*.pdf` | f |\n")
             self.assertEqual(icm_status.slugs_in(out, pats), {"p1-le-benchmark"})
 
+    def test_later_stage_names_without_a_first_stage_artifact_are_not_slugs(self):
+        with tempfile.TemporaryDirectory() as d:
+            st = Path(d) / "workspaces" / "module-build" / "stages"
+            for name, outs in (("01-spec", "`output/[module]-spec.md`"), ("02-tests", "`output/[module]-test-plan.md`"),
+                               ("04-verify", "`output/[module]-verification.md`, `output/[module]-*.png`")):
+                (st / name / "output").mkdir(parents=True)
+                (st / name / "CONTEXT.md").write_text(f"## Outputs\n| a | {outs} | f |\n")
+            (st / "01-spec" / "output" / "lyap-benettin-spec.md").write_text("x")
+            (st / "02-tests" / "output" / "tangent-core-d44-test-plan.md").write_text("x")   # amendment plan
+            (st / "04-verify" / "output" / "lyap-benettin-verification.md").write_text("x")
+            (st / "04-verify" / "output" / "lyap-benettin-convergence.png").write_text("x")  # cut at the first hyphen: "lyap"
+            _, table = icm_status.workspace_status(Path(d), "module-build")
+            self.assertEqual(table, {"lyap-benettin": {"01-spec", "04-verify"}})
+
+    def test_catalog_status_with_a_qualifier_counts(self):
+        with tempfile.TemporaryDirectory() as d:
+            cat = Path(d) / "_config" / "catalogs"
+            cat.mkdir(parents=True)
+            (cat / "x.md").write_text("| L1 | a | verified |\n| L5b | b | verified (H2; H1 deferred) |\n| L7 | c | planned |\n")
+            self.assertEqual(icm_status.catalog_counts(Path(d)), {"verified": 2, "planned": 1})
+
 
 class PromoteTests(unittest.TestCase):
     def make_repo(self, d, new_key):

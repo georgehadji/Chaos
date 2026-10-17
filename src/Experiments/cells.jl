@@ -87,7 +87,7 @@ function _draw_R(inp, i, ps, pids)
     if inp.K[i] == 0
         for t in 1:inp.n_c
             r = place_R0(rng, inp.q_max)
-            d = _with_start!(_drawn_base(inp, i, "R", t), r.x, r.p)
+            d = _with_start!(_drawn_base(inp, i, "R", t), BigFloat(r.x), r.pb)
             d["a"], d["b"] = r.a, r.b
             push!(orbs, d)
         end

@@ -1,17 +1,17 @@
 # Preregistration hash (E18) and the machine-readable panel block (Amendment A1, item 7).
 
 const _HASH_ROW = r"(?m)^\| SHA-256 of this file[^\n]*$"
-const _HASH_CELL = r"(?m)^(\| SHA-256 of this file[^|\n]*\|)[^|\n]*\|"
+const _HASH_CELL = r"(?m)^(\| SHA-256 of this file[^|\n]*\|)([ \t]*)[^|\n]*?([ \t]*)\|"
 
 _lf(text::AbstractString) = replace(text, "\r\n" => "\n")
 
 """
     prereg_hash(text) -> String
 
-SHA-256 (64 hexadecimal digits) of `text` after replacing CRLF by LF and the value cell of the header row
-"SHA-256 of this file" by `SELF` (E18).
+SHA-256 (64 hexadecimal digits) of `text` after replacing CRLF by LF and the trimmed text of the value cell of the header
+row "SHA-256 of this file" by `SELF`, its padding kept (E18, D52).
 """
-prereg_hash(text::AbstractString) = bytes2hex(sha256(codeunits(replace(_lf(text), _HASH_CELL => s"\1 SELF |"))))
+prereg_hash(text::AbstractString) = bytes2hex(sha256(codeunits(replace(_lf(text), _HASH_CELL => s"\1\2SELF\3|"))))
 
 """
     check_prereg(path) -> (header_sha256, computed_sha256, amendments)

@@ -127,3 +127,27 @@ Results: experiments suite 2597/2597 (27 s); full `Pkg.test` 52218 pass, 0 fail,
 | Functions under 50 lines, files under 400 | pass (checked below) |
 | Tests | changed on purpose, see the test diff above |
 | `@fastmath`, dashes, compensated sums | pass |
+
+## Amendment D52 (stage 04 review findings, 2026-10-17)
+
+Tests first (test plan, section "Amendment D52"; new testsets in `ex_inputs.jl`, `ex_periodic.jl`, `ex_panel.jl`, no existing assertion changed), then code. Not run here by instruction: the study panel and `verify/experiments.jl`.
+
+| Finding | Fix |
+|---------|-----|
+| M1 | `_snap` in `orbits.jl`: a stored orbit point coordinate whose binary64 value is not below 2 pi becomes 0 (identity key rule of E20); iteration of the orbit uses the unsnapped values. Controls are ordered by the 256-bit key `_key` of the orbit, not by stored binary64 values (`_controls` sorts orbit records first) |
+| M2 | `collect_orbits`: a duplicate farther than `delta_dup / 5` from a kept point refuses (ArgumentError naming delta_dup, K and the period); closer ones merge as before (also when `check = false`) |
+| M3 | manifest keys `julia_version` and `stablerngs_version` (the sidecar kept its `julia_version`); identity is promised for one machine and one Julia version (spec D52) |
+| M4 | `_make_orbit` checks the return residual at every point of the orbit and returns `nothing` (orbit not accepted) above rho; the stored residual is the maximum over the points |
+| L1 | `place_R0` returns the 256-bit `pb`; the decimal text of a K = 0 R start is `2 pi a / b` at 256 bits |
+| L2, L3 | `K >= 0`; `N_scr` a multiple of 10 and `N_scr / 10` a multiple of `tau` (messages name the keys) |
+| L4 | `_HASH_CELL` keeps the padding of the cell (trimmed text replaced by SELF); the real preregistration has single blanks, so its hash is unchanged |
+| L5 | a solution reduced to a smaller primitive period is re-tested against the D51 bound at that period; rejected ones are counted in `ill_conditioned` (per period) |
+| L6 | StableRNGs version in the manifest (`stablerngs_version`) |
+| L7 | `_repo_path`: relative with `/` inside the repository, else `<outside repository>/<file name>` |
+| L8 | `_search_k`: a refusal is rethrown with the prefix "K index i (K = ...)" |
+
+Portraits (`verify/experiments.jl`): hyperbolic periodic points are no longer drawn (only elliptic circles and parabolic diamonds, plus controls by their start marker); each panel subtitle states the number of hyperbolic periodic points not drawn; the legend lost the hyperbolic entry. The file parses; it was not run.
+
+Results: experiments suite 2632/2632 (29 s); full `Pkg.test` 52253 pass, 0 fail, 0 error, 5 min 09 s; Aqua, JET and layering clean; coverage of `src/Experiments` 98.2 percent (694/707). Longest function 27 lines, longest file 163 lines (`orbits.jl`); no `@fastmath`; no dashes.
+
+Not fixed / caveats: the `delta_dup / 5` duplicate rule is untested on the full study inputs (the panel was not rebuilt); if a legitimate duplicate sits slightly farther than the linearized bound the build refuses with a message naming K index and period. M2's coordinate snap moves a point by at most about 4e-16 (its binary64 distance to 2 pi), well inside rho. `Manifest.toml` for Julia 1.10 still needs `Pkg.resolve()`.

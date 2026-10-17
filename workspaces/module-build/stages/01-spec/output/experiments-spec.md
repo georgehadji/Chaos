@@ -238,3 +238,21 @@ with J_q evaluated at z. For the 2D map det(J_q - I) = 2 - t (det J_q = 1, E3), 
 - D51b The bound equals ||F||_2 ||J_q - I||_2 / |2 - t| within 1e-12 relative on random 2x2 matrices of determinant 1 (seeded).
 - D51c At K = 2pi in binary64 with the study inputs the build completes, no accepted periodic point lies within 1e-5 of (pi/2, 0) (torus distance, period 1) unless its error bound passes, and the ill-conditioned count at K = 2pi is positive. Checked on the full study inputs in stage 04; a small-grid proxy runs in the package suite.
 - D51d No orbit of class parabolic-near-saddle-node and no merged-pair table remain (the D50 outputs are removed).
+
+## Amendment D52 (2026-10-17)
+
+Stage 04 review findings, fixed in stage 03 before integration.
+
+- Coordinates: every stored coordinate is reduced by the identity key rule of E20 (a value that rounds to 2pi in binary64 is stored as 0), so I1 holds for stored starts and periodic points; controls are ordered by the 256-bit key, never by stored binary64 values.
+- Deduplication: dropping a candidate as a duplicate of a kept orbit records the distance; since every accepted solution lies within delta_dup / 10 of a true orbit point (D51), a duplicate distance above delta_dup / 5 proves two distinct orbits closer than 10 delta_dup and the build refuses with the E9 message, naming the K index and period.
+- Residual: an orbit is accepted only if every one of its q points meets the residual rho (I7, AC8), and the conditioning bound of D51 is evaluated at the primitive period.
+- Scope of determinism (I8): the panel file is byte-identical for the same inputs on one machine and one Julia version; across hosts or Julia versions Float64 elementary functions may differ and a cell near a threshold may change. The manifest records the Julia version and the host-independent inputs; cross-host identity is not promised.
+- Inputs: K >= 0; N_scr a multiple of 10 and N_scr / 10 a multiple of tau; the decimal text of a K = 0 R start is the exact 256-bit value of 2 pi a / b; the SELF rule replaces the trimmed cell text and keeps its padding; the manifest records the random generator's package version; a preregistration path outside the repository is stored without any host part.
+
+### Acceptance criteria (amendment)
+
+- D52a No stored coordinate equals or exceeds 2pi in binary64 (all panel orbits and periodic rows), including a fixture whose 256-bit coordinate is 2pi minus 1e-78; control order is unchanged under a sign flip of that noise.
+- D52b A synthetic duplicate at distance 0.5 delta_dup refuses with the E9 message; at delta_dup / 20 it is merged silently.
+- D52c An orbit with a point above rho (synthetic) is not accepted.
+- D52d Each new input check of the last item rejects its malformed case with a message naming the key.
+- D52e The decimal text of a K = 0 R start rebuilds 2 pi a / b at 256 bits exactly; the manifest holds the StableRNGs version; a path outside the repository leaves no drive letter or user directory in the panel file.

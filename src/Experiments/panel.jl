@@ -1,13 +1,24 @@
 # build_panel: preregistration in, panel file and provenance sidecar out (spec Algorithm 0 to 11).
 
+"""
+Path of the preregistration as stored in the manifest: relative to the repository root (with `/`), or, when the file lies outside it,
+the marker `<outside repository>/` and the file name only, so no drive letter, host or user directory is recorded (D52).
+"""
+function _repo_path(path, root)
+    rel = relpath(abspath(path), root)
+    inside = !isabspath(rel) && !startswith(rel, "..")
+    return inside ? replace(rel, '\\' => '/') : "<outside repository>/" * basename(path)
+end
+
 function _manifest(path, pr, psets, rows, cells, orbs, sub, controls, root)
     inp = pr.inputs
     g = git_state(root)
-    prereg_path = replace(relpath(abspath(path), root), '\\' => '/')
+    prereg_path = _repo_path(path, root)
     drawn = sum(length(c.orbits) for cs in cells for c in cs)
     return Dict{String, Any}(
         "format_version" => FORMAT_VERSION, "package_version" => string(package_version()), "git_sha" => g.sha, "git_dirty" => g.dirty,
-        "stream_rule" => STREAM_RULE, "draw_order" => collect(DRAW_ORDER), "K_binary64" => inp.K,
+        "stream_rule" => STREAM_RULE, "stablerngs_version" => string(pkgversion(StableRNGs)),
+        "julia_version" => string(VERSION), "draw_order" => collect(DRAW_ORDER), "K_binary64" => inp.K,
         "min_separation" => minimum(ps.min_separation for ps in psets),
         "prereg" => Dict{String, Any}("path" => prereg_path, "header_sha256" => pr.header_sha256,
                                        "computed_sha256" => pr.computed_sha256, "amendments" => pr.amendments),
@@ -18,13 +29,24 @@ function _manifest(path, pr, psets, rows, cells, orbs, sub, controls, root)
         "totals" => Dict{String, Any}("orbits" => length(orbs), "drawn" => drawn, "controls" => length(controls)))
 end
 
+# Periodic set of K index i; a refusal (E9) names the K index.
+function _search_k(inp, i, nt)
+    try
+        ps = periodic_set(inp.K[i]; q_max = inp.q_max, N_g = inp.grid_side, rho = inp.rho, newton_max = inp.newton_max,
+                          delta_dup = inp.delta_dup, bits = inp.bigfloat_bits, ntasks = nt)
+        _check_separation(ps.min_separation, inp.delta_dup)
+        return ps
+    catch e
+        e isa ArgumentError && throw(ArgumentError("K index $i (K = $(inp.K[i])): " * e.msg))
+        rethrow()
+    end
+end
+
 # Everything computed at the working precision; nothing is written here.
 function _assemble(path, pr, nt, chunk)
     inp = pr.inputs
     centres = grid_centres(inp.grid_side)
-    psets = [periodic_set(K; q_max = inp.q_max, N_g = inp.grid_side, rho = inp.rho, newton_max = inp.newton_max,
-                          delta_dup = inp.delta_dup, bits = inp.bigfloat_bits, ntasks = nt) for K in inp.K]
-    foreach(ps -> _check_separation(ps.min_separation, inp.delta_dup), psets)
+    psets = [_search_k(inp, i, nt) for i in eachindex(inp.K)]
     rows, pids = _periodic_rows(psets)
     cells = map(eachindex(inp.K)) do i
         flags = _screen_flags(inp.K[i], inp, psets[i], centres, chunk, nt)

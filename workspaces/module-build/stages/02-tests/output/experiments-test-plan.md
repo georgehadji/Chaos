@@ -121,3 +121,19 @@ Spec Amendment D51 (decision D51) supersedes D50; preregistration Amendment A3 r
 | D50 tests | ex_periodic.jl, ex_panel.jl | the D50 merge testset and the D50 build proxy are deleted |
 
 New API: `error_bound(J, F)`, `well_conditioned(J, F, delta_dup)` (exported); `_newton_seed(K, x, p, q, rho, nmax, delta_dup)` returns `(code, x, p, den)`; manifest `ill_conditioned` (`k_index, q, count, min_abs_2_minus_t`) and `newton.ill_conditioned`. The I3 correction of the earlier section stays.
+
+## Amendment D52 (2026-10-17)
+
+Stage 04 review findings (decision D52). Tests added, none of the existing assertions changed:
+
+| Criterion | Test | Content |
+|-----------|------|---------|
+| D52a | ex_periodic.jl "D52 coordinates, duplicates, every point" | a 256-bit coordinate 2 pi - 1e-78 (and +1e-78) in a solution: stored coordinates all below the binary64 2 pi, the first one exactly 0 for the minus sign, the same orbit order for both signs |
+| D52a | ex_panel.jl "D52 panel: ..." | in the base build no control or T, C, S start and no periodic point reaches the binary64 2 pi; no orbit coordinate equals it |
+| D52b | ex_periodic.jl (same testset) | duplicate at 0.5 delta_dup refuses naming delta_dup and "period 1"; at delta_dup / 20 it is merged silently |
+| D52c | same | period-2 orbit at K = 10 (found by a scan) whose first point meets rho and the second does not: not accepted; a genuine orbit still is |
+| D52d | ex_inputs.jl "D52 input checks" | K negative, N_scr not a multiple of 10, N_scr / 10 not a multiple of tau: each rejected naming the key; K = 0 stays valid |
+| D52d | ex_inputs.jl "D52 SELF rule keeps the padding..." | a header cell with extra blanks: the independent hash keeps them, the module agrees, differs from the fixed-padding hash, and a padding change refuses |
+| D52e | ex_panel.jl "D52 panel: ..." | K = 0 R decimal text equals 2 pi a / b at 256 bits; manifest `stablerngs_version` and `julia_version`; a path outside the repository is stored as `<outside repository>/name` (no drive letter, no `\`), one inside as a relative path (`_repo_path`); a refusal names the K index (delta_dup = 0.5 gives "K index 2") |
+
+L5 (conditioning at the primitive period) is covered by construction in `collect_orbits` (only reduced solutions are re-tested; the D51 tests are unchanged). Internal names used by the tests: `_repo_path`.

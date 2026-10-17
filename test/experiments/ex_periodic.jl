@@ -244,3 +244,40 @@ end
         @test code == 0 && den > 1
     end
 end
+
+@testset "D52 coordinates, duplicates, every point" begin
+    rho, dup = 1e-6, 1e-8
+    SMALL = BigFloat("1e-78")
+    # D52a: a 256-bit coordinate 2 pi - 1e-78 is stored as 0, not as the binary64 2 pi; the order does not depend on the sign of the noise
+    for sgn in (-1, 1)
+        setprecision(BigFloat, 256) do
+            z0 = (sgn < 0 ? 2 * BigFloat(pi) - SMALL : SMALL, zero(BigFloat))
+            zpi = (BigFloat(pi), zero(BigFloat))
+            os = EX.collect_orbits(0.5, [(q = 1, z = zpi, id = 2), (q = 1, z = z0, id = 1)]; rho = rho, delta_dup = dup)
+            @test length(os) == 2
+            @test all(o -> all(pt -> Float64(pt[1]) < EX_TWO_PI && Float64(pt[2]) < EX_TWO_PI, o.points), os)
+            @test Float64(os[1].points[1][1]) < 1e-70 && Float64(os[2].points[1][1]) == Float64(pi)       # same order for both signs
+            sgn < 0 && @test Float64(os[1].points[1][1]) == 0.0
+        end
+    end
+    setprecision(BigFloat, 256) do
+        sol(id, x) = (q = 1, z = (BigFloat(x), zero(BigFloat)), id = id)
+        # D52b: a duplicate at 0.5 delta_dup proves two distinct orbits closer than 10 delta_dup: refusal naming delta_dup and the period
+        @test ex_rejects(() -> EX.collect_orbits(0.5, [sol(1, 0.0), sol(2, 0.5dup)]; rho = rho, delta_dup = dup), ["delta_dup"])
+        @test ex_rejects(() -> EX.collect_orbits(0.5, [sol(1, 0.0), sol(2, 0.5dup)]; rho = rho, delta_dup = dup), ["period 1"])
+        @test length(EX.collect_orbits(0.5, [sol(1, 0.0), sol(2, dup / 20)]; rho = rho, delta_dup = dup)) == 1   # merged silently
+        # D52c: a period-2 orbit at K = 10 (|mu| = 58) whose first point meets rho while the second one does not is not accepted
+        K, h = BigFloat(10), BigFloat(pi) / 2
+        found = nothing
+        for e in 10.0 .^ range(-9, -3; length = 61)
+            z = (BigFloat(0) + e, BigFloat(pi))                             # near family A, hyperbolic at K = 10
+            z1 = ex_T(K, z)
+            r0, r1 = ex_residual(K, z, 2), ex_residual(K, (z1[1], z1[2]), 2)
+            r0 <= 0.5rho && r1 > 1.5rho && (found = z; break)
+        end
+        @test found !== nothing
+        found !== nothing && @test isempty(EX.collect_orbits(10.0, [(q = 2, z = found, id = 1)]; rho = rho, delta_dup = dup))
+        # a genuine orbit (all points within rho) is still accepted
+        @test length(EX.collect_orbits(10.0, [(q = 2, z = (zero(BigFloat), BigFloat(pi)), id = 1)]; rho = rho, delta_dup = dup)) == 1
+    end
+end

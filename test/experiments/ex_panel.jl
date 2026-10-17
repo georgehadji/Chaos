@@ -374,3 +374,32 @@ end
     base = ex_man(ex_build("base"))
     @test haskey(base, "ill_conditioned") && all(r -> r["count"] > 0, base["ill_conditioned"])
 end
+
+@testset "D52 panel: coordinates, K = 0 decimal, provenance, messages" begin
+    b = ex_build("base")
+    man, orbs = ex_man(b), b.panel["orbit"]
+    # D52a: no stored coordinate of a controls or screening start, and no periodic point, equals or exceeds the binary64 2 pi
+    wrapped_starts = [o for o in orbs if o["control"] || o["class"] in ("T", "C", "S")]
+    @test all(o -> 0 <= o["x0"] < EX_TWO_PI && 0 <= o["p0"] < EX_TWO_PI, wrapped_starts)
+    @test all(q -> all(pt -> all(s -> 0 <= Float64(ex_bigdec(s)) < EX_TWO_PI, pt), q["points"]), man["periodic"])
+    @test all(o -> o["x0"] != EX_TWO_PI && o["p0"] != EX_TWO_PI, orbs)
+    # D52e: the decimal text of a K = 0 R start is the exact 256-bit value of 2 pi a / b
+    k0 = ex_build("k0-full", Dict{String, Any}("K" => ["0"]))
+    for o in ex_of(k0, 1, "R")
+        want = setprecision(() -> 2 * BigFloat(pi) * o["a"] / o["b"], BigFloat, 256)
+        @test ex_bigdec(o["p0_dec"]) == want && Float64(want) == o["p0"]
+    end
+    @test man["stablerngs_version"] == string(pkgversion(StableRNGs))
+    @test man["julia_version"] == string(VERSION)
+    # D52e: a path outside the repository leaves no drive letter or user directory; one inside is stored relative
+    p = man["prereg"]["path"]
+    @test !occursin(':', p) && !occursin(basename(homedir()), p) && !occursin('\\', p) && endswith(p, basename(b.prereg))
+    root = normpath(joinpath(@__DIR__, "..", ".."))
+    @test EX._repo_path(joinpath(root, "workspaces", "study", "x.md"), root) == "workspaces/study/x.md"
+    @test EX._repo_path(b.prereg, root) == p
+    @test !occursin(':', EX._repo_path("C:\\Users\\someone\\secret\\prereg.md", root))
+    # D52 (L8): a refusal names the K index
+    pre = ex_prereg_for(Dict{String, Any}("delta_dup" => 0.5))
+    @test ex_rejects(() -> EX.build_panel(pre; out = ex_path("refuse-panel.toml")), ["K index 2"])
+    @test !isfile(ex_path("refuse-panel.toml"))
+end

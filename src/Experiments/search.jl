@@ -26,6 +26,16 @@ end
 const _NO_ILL = NamedTuple{(:q, :count, :min_den), Tuple{Int, Int, Float64}}[]
 const _NO_STATS = (tried = 0, accepted = 0, singular = 0, diverged = 0, cap = 0, ill_conditioned = 0)
 
+# Ill-conditioned rejections per period: the Newton ones and those found at the primitive period.
+function _merge_ill(ill, rej)
+    d = Dict{Int, Tuple{Int, Float64}}(r.q => (r.count, r.min_den) for r in ill)
+    for (q, den) in rej
+        c, m = get(d, q, (0, Inf))
+        d[q] = (c + 1, min(m, den))
+    end
+    return [(q = q, count = d[q][1], min_den = d[q][2]) for q in sort!(collect(keys(d)))]
+end
+
 # Newton solves of period q from every centre, in parallel; results by cell id.
 function _search_period(Kb, centres, q::Integer, rho, nmax::Integer, delta_dup, nt::Integer)
     res = Vector{Tuple{Int, BigFloat, BigFloat, Float64}}(undef, length(centres))
@@ -71,8 +81,10 @@ function periodic_set(K::Real; q_max::Integer, N_g::Integer, rho, newton_max::In
             isempty(bad) || push!(ill, (q = q, count = length(bad), min_den = minimum(bad)))
             append!(sols, (q = q, z = (r[2], r[3]), id = i - 1) for (i, r) in enumerate(res) if r[1] == 0)
         end
-        orbits = collect_orbits(K, sols; rho = rho, delta_dup = delta_dup, bits = bits, check = false)
-        PeriodicSet(orbits, Tuple{Int, Int}[], stats, ill, _min_separation(orbits))
+        rej = Tuple{Int, Float64}[]
+        orbits = collect_orbits(K, sols; rho = rho, delta_dup = delta_dup, bits = bits, check = false, rejected = rej)
+        stats = merge(stats, (ill_conditioned = stats.ill_conditioned + length(rej),))
+        PeriodicSet(orbits, Tuple{Int, Int}[], stats, _merge_ill(ill, rej), _min_separation(orbits))
     end
 end
 

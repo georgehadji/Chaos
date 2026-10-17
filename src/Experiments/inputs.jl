@@ -80,6 +80,8 @@ function _check_integers(d, tau)
     nm = _int("newton_max", d["newton_max"])
     w % tau == 0 || _bad(("w", "tau"), "w = $w is not a multiple of tau = $tau")
     N % w == 0 || _bad(("N_scr", "w"), "N_scr = $N is not a multiple of w = $w")
+    N % 10 == 0 || _bad(("N_scr",), "N_scr = $N is not a multiple of 10 (S(N_scr / 10) is read at a handoff)")
+    (N ÷ 10) % tau == 0 || _bad(("N_scr", "tau"), "N_scr / 10 = $(N ÷ 10) is not a multiple of tau = $tau")
     LS = _int("L_S", d["L_S"])
     (LS >= w && LS <= N) || _bad(("L_S",), "must lie in [w, N_scr] = [$w, $N], got $LS")
     return (n_c = n_c, grid_side = ng, N_scr = N, w = w, q_max = qm, newton_max = nm, L_S = LS)
@@ -118,6 +120,7 @@ function _check_special(d, bits)
     Ks = d["K"]
     (Ks isa AbstractVector && !isempty(Ks)) || _bad(("K",), "must be a non-empty list")
     K = [_finite("K", k, bits) for k in Ks]
+    all(>=(0), K) || _bad(("K",), "must be non-negative, got $K")
     allunique(K) || _bad(("K",), "has a repeated value (compared as binary64)")
     return (K = K, log10_r = [lo, hi], mu = mu, alpha = alpha)
 end

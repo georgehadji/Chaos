@@ -636,7 +636,7 @@ section("PORTRAITS") do
     fig = CM.Figure(size = (2100, 1500), fontsize = 15)
     for (n, c) in enumerate(pc)
         r, col = fldmod1(n, 3)
-        ax = CM.Axis(fig[r, col]; title = "k index $(c.k_index), K = $(fmt(c.K))", subtitle = isempty(c.notes) ? "all cells populated" : join(c.notes, "; "),
+        ax = CM.Axis(fig[r, col]; title = "k index $(c.k_index), K = $(fmt(c.K))", subtitle = (isempty(c.notes) ? "all cells populated" : join(c.notes, "; ")) * "; " * string(count(q -> q.symbol == :cross, c.periodic)) * " hyperbolic periodic points not drawn",
                      subtitlesize = 11, aspect = CM.DataAspect(), limits = (0, TWO_PI, 0, TWO_PI), xlabel = "x", ylabel = "p",
                      xticks = ([0, pi, TWO_PI], ["0", "π", "2π"]), yticks = ([0, pi, TWO_PI], ["0", "π", "2π"]))
         for cls in vcat(CLASS_ORDER, ["control"])
@@ -651,7 +651,7 @@ section("PORTRAITS") do
         end
         ct = [s for s in c.starts if s.class == "control"]
         isempty(ct) || CM.scatter!(ax, [s.x for s in ct], [s.p for s in ct]; marker = :rect, markersize = 11, color = :transparent, strokecolor = :black, strokewidth = 1.6)
-        for (sym, mk) in ((:cross, :xcross), (:circle, :circle), (:diamond, :diamond))
+        for (sym, mk) in ((:circle, :circle), (:diamond, :diamond))      # hyperbolic periodic points are counted in the subtitle, not drawn (controls are marked by their start)
             pp = [q for q in c.periodic if q.symbol == sym]
             isempty(pp) && continue
             CM.scatter!(ax, [q.x for q in pp], [q.p for q in pp]; marker = mk, markersize = sym == :circle ? 6 : 7, color = :transparent, strokecolor = (:black, 0.8), strokewidth = 0.8)
@@ -661,8 +661,7 @@ section("PORTRAITS") do
     labs = ["T torus", "R resonant", "C chaotic sea", "S sticky", "X near separatrix"]
     push!(els, CM.MarkerElement(color = :transparent, strokecolor = :black, strokewidth = 1.6, marker = :rect, markersize = 11)); push!(labs, "control start")
     push!(els, CM.MarkerElement(color = :black, marker = :star5, markersize = 11)); push!(labs, "orbit start (star)")
-    push!(els, CM.MarkerElement(color = :transparent, strokecolor = :black, strokewidth = 1, marker = :xcross, markersize = 10)); push!(labs, "periodic point, hyperbolic")
-    push!(els, CM.MarkerElement(color = :transparent, strokecolor = :black, strokewidth = 1, marker = :circle, markersize = 10)); push!(labs, "elliptic")
+    push!(els, CM.MarkerElement(color = :transparent, strokecolor = :black, strokewidth = 1, marker = :circle, markersize = 10)); push!(labs, "periodic point, elliptic")
     push!(els, CM.MarkerElement(color = :transparent, strokecolor = :black, strokewidth = 1, marker = :diamond, markersize = 10)); push!(labs, "parabolic")
     CM.Legend(fig[3, 1:3], els, labs; orientation = :horizontal, nbanks = 2, tellheight = true, framevisible = false)
     CM.Label(fig[0, 1:3], "p1-le-benchmark panel: first 1000 iterates (wrapped) of every panel orbit, 870 drawn + 13 controls", fontsize = 18)

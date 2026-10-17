@@ -1,7 +1,7 @@
 # Tables of the panel file: periodic orbits, controls, orbit list with ids, subsets and the cell records (spec Algorithm 3, 7, 8, 11).
 
 const FORMAT_VERSION = 1
-const STREAM_RULE = "first 8 bytes, big-endian, of SHA-256 over the UTF-8 text \"chaoslab-panel-1|<seed>|<K index>|<class>\"; StableRNGs.StableRNG"
+const STREAM_RULE = "first 8 bytes, big-endian, of SHA-256 over the UTF-8 text \"chaoslab-panel-1|<seed>|<K index>|<class>\"; StableRNGs.StableRNG (package version in stablerngs_version)"
 
 _dec(x) = string(BigFloat(x))
 
@@ -35,21 +35,19 @@ function _control_dict(inp, i, o, kind)
     return _with_start!(d, pt[1], pt[2])
 end
 
-_startkey(d) = (d["x0"], d["p0"])
-
 """
 Controls (E19): the exact fixed points by K index (0, 0) before (pi, 0), then the Newton orbits by (period, K index,
 representative); the first `n_ctrl_max` of that list, then the Y5 control.
 """
 function _controls(inp, psets)
-    fixed, newton = Dict{String, Any}[], Dict{String, Any}[]
+    fixed, newton = Tuple{Int, PeriodicOrbit}[], Tuple{Int, PeriodicOrbit}[]
     for (i, ps) in enumerate(psets), o in ps.orbits
-        isfix = o.grid_id == -1 && o.q == 1
-        push!(isfix ? fixed : newton, _control_dict(inp, i, o, isfix ? "fixed" : "newton"))
+        push!(o.grid_id == -1 && o.q == 1 ? fixed : newton, (i, o))
     end
-    sort!(fixed; by = d -> (d["k_index"], _startkey(d)))
-    sort!(newton; by = d -> (d["period"], d["k_index"], _startkey(d)))
-    list = first(vcat(fixed, newton), inp.n_ctrl_max)
+    sort!(fixed; by = ((i, o),) -> (i, _key(o.points[1])))            # the 256-bit key, never the stored binary64 values
+    sort!(newton; by = ((i, o),) -> (o.q, i, _key(o.points[1])))
+    ctrl = vcat([(f, "fixed") for f in fixed], [(n, "newton") for n in newton])
+    list = [_control_dict(inp, i, o, kind) for ((i, o), kind) in first(ctrl, inp.n_ctrl_max)]
     y = y5_control(inp.mu)
     push!(list, Dict{String, Any}("class" => "control", "control" => true, "control_kind" => "y5", "system" => "linear", "k_index" => 0,
                                   "run_seed" => string(inp.seed), "in_SD" => true, "in_SL" => false, "exponent" => y.exponent,

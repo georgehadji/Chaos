@@ -176,3 +176,37 @@ end
     end
     @test isdir(dir) && isempty(upward)
 end
+
+@testset "D52 input checks" begin
+    base = ex_block()
+    mk(f) = (d = deepcopy(base); f(d); d)
+    cases = [
+        ("K negative", mk(d -> d["K"] = ["0", "-0.5"]), ["K"]),
+        ("N_scr not a multiple of 10", mk(d -> (d["N_scr"] = 2005; d["w"] = 5; d["L_S"] = 500)), ["N_scr"]),
+        ("N_scr / 10 not a multiple of tau", mk(d -> (d["tau"] = 400; d["w"] = 400)), ["N_scr", "tau"]),
+    ]
+    for (name, d, keys) in cases
+        @testset "$name" begin
+            @test ex_rejects(() -> EX.panel_inputs(d), keys)
+        end
+    end
+    @test EX.panel_inputs(mk(d -> d["K"] = ["0", "0.5"])).K == [0.0, 0.5]       # K = 0 stays valid
+end
+
+@testset "D52 SELF rule keeps the padding of the cell" begin
+    # the cell text is trimmed and replaced by SELF, its padding stays (D52): an independent preparation keeps the blanks
+    keep(text) = replace(replace(text, "\r\n" => "\n"),
+                         r"(?m)^(\| SHA-256 of this file \(current version\) \|)( *)[^|\n]*?( *)\|" => s"\1\2SELF\3|")
+    text0 = ex_prereg_text(ex_block())
+    text1 = replace(text0, "0"^64 * " (rule: fixture) |" => "0"^64 * " (rule: fixture)    |"; count = 1)
+    text1 = replace(text1, "(current version) | " => "(current version) |    "; count = 1)
+    h = ex_sha256(keep(text1))
+    f = ex_path("hash-padded.md")
+    write(f, replace(text1, "0"^64 => h; count = 1))
+    r = EX.check_prereg(f)
+    @test r.header_sha256 == r.computed_sha256 == h
+    @test EX.prereg_hash(read(f, String)) == h
+    @test h != ex_sha256(ex_prepare(text1))                                   # the fixed-padding rule would give another value
+    write(ex_path("hash-padded2.md"), replace(read(f, String), "(rule: fixture)    |" => "(rule: fixture)  |"))
+    @test_throws ArgumentError EX.check_prereg(ex_path("hash-padded2.md"))     # changing the padding changes the hash
+end

@@ -57,13 +57,13 @@ function place_R(rng, pts, delta_R)
     return (index = index, phi = phi, x = Float64(xb), p = Float64(pb), xb = xb, pb = pb)
 end
 
-"R start at K = 0 (E13): a reduced fraction `a / b`, `b <= q_max`, in the order `(b, a)`; `p = 2 pi a / b`, `x = 2 pi u`. Returns `(a, b, x, p)`."
+"R start at K = 0 (E13): a reduced fraction `a / b`, `b <= q_max`, in the order `(b, a)`; `p = 2 pi a / b`, `x = 2 pi u`. Returns `(a, b, x, p, pb)`, `pb` the 256-bit value of `p`."
 function place_R0(rng, q_max::Integer)
     fr = [(a, b) for b in 1:q_max for a in 0:(b - 1) if gcd(a, b) == 1]
     u1, u2 = rand(rng), rand(rng)
     a, b = fr[1 + floor(Int, u1 * length(fr))]
-    p = setprecision(() -> Float64(2 * BigFloat(pi) * a / b), BigFloat, 256)
-    return (a = a, b = b, x = 2pi * u2, p = p)
+    pb = setprecision(() -> 2 * BigFloat(pi) * a / b, BigFloat, 256)
+    return (a = a, b = b, x = 2pi * u2, p = Float64(pb), pb = pb)
 end
 
 """

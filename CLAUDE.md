@@ -27,7 +27,7 @@ Chaos/
 
 ## Rules
 
-- Subagents run on Sonnet; mechanical subagent tasks (listing, formatting, status) on Haiku. Never Opus for subagents.
+- Subagents run on Sonnet 5.5; the easiest mechanical subagent tasks (listing, formatting, status) on Haiku 5.5. Never Opus for subagents.
 - Never cite from memory. Only keys in `_config/bibliography/references.bib`; never anything in `unverified.md`.
 - Commits are fine at the stage that says so; push whenever needed, never force-push (D45); every PR or submission needs explicit human approval.
 - No em dashes. Names in `workspaces/`, `_config/`, `setup/`, `schema/` are lowercase-with-hyphens; code and tooling files follow their ecosystem (`Project.toml`, `src/Chaoslab.jl`, `scripts/icm_validate.py`).

@@ -11,8 +11,8 @@ FROZEN 2026-10-17. Every value marked "proposed" was approved by the owner at th
 | Claims tested | C1, C2. C3 is out of scope (P2). |
 | Value types | FALSIFIES (C1, C2), REPRODUCES (SalaArtuso2015), TOOL (Chaoslab v0.1.0 at M3 exit), NEGATIVE allowed (`/_config/value-types.md`) |
 | Git SHA at freeze | 1e760e229eabf9d8323ad4d8097cc1dbd017f845 (parent commit of the freeze commit) |
-| SHA-256 of this file (current version) | 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46 (rule: Amendment A1, item 1) |
-| Amendment log | A1 (2026-10-17, section "Amendment A1"; parent commit 963345d86570366f5f0ea3ee6950288e20edcfa7; replaces freeze hash fa84e883405a7acbdb4774be2527bbecb8399a4c369fa79fbfc4d563d98bea87); A2 (2026-10-17, section "Amendment A2"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash c9ad3c2cf3ba1220990d118c81e55da2104a7130b0f49e7dcd83cf75461fdcef); A3 (2026-10-17, section "Amendment A3"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash d89d2bf99e4eaa5740be88da436ec28b2d92f7859a278c50fe734ff4a02ae69c) |
+| SHA-256 of this file (current version) | 3a1c042c8f8f5f288f690e9d2e564ddaea823bf9b0e4eb033873d3e256a1fa33 (rule: Amendment A1, item 1) |
+| Amendment log | A1 (2026-10-17, section "Amendment A1"; parent commit 963345d86570366f5f0ea3ee6950288e20edcfa7; replaces freeze hash fa84e883405a7acbdb4774be2527bbecb8399a4c369fa79fbfc4d563d98bea87); A2 (2026-10-17, section "Amendment A2"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash c9ad3c2cf3ba1220990d118c81e55da2104a7130b0f49e7dcd83cf75461fdcef); A3 (2026-10-17, section "Amendment A3"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash d89d2bf99e4eaa5740be88da436ec28b2d92f7859a278c50fe734ff4a02ae69c); A4 (2026-10-18, section "Amendment A4"; parent commit e020bef1aea6148ba39257d5d279ae647421fd05; replaces hash 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46) |
 
 Value types, in the words of `value-types.md`:
 - FALSIFIES: H1 to H3 each have a decision rule below, fixed before any data exists.
@@ -358,3 +358,167 @@ Approved by the owner before stage 03-run produced any data (decision D50). The 
 ## Amendment A3 (2026-10-17)
 
 Approved by the owner before stage 03-run produced any data (decision D51). Supersedes Amendment A2: with sn_trace = 1e-6 the K = 2pi build still refused, and with 1e-5 it completed but kept about 1000 ghost periodic rows near x = pi/2 and two ghost controls. The periodic-point search now accepts a Newton solution only if its position error bound (residual divided by the smallest singular value of J_q - I) is at most delta_dup / 10; residual-accepted points that fail it are rejected as ill-conditioned and counted in the panel manifest. This uses only rho and delta_dup, so the key sn_trace is removed from the panel block of Amendment A1, item 7. K stays at 2pi; H4 is unchanged.
+
+## Amendment A4 (2026-10-18)
+
+Approved by the owner at the D53 checkpoint of `experiments` (decision D53), before stage 03-run produced any data. Base sections and Amendments A1 to A3 are left as written; where they differ, this section wins. A4 adds the machine-readable run block below next to the panel block of Amendment A1 and changes no hypothesis, threshold, subset or horizon. Every value in the block equals the frozen prose (Methods, Metrics, Budget, Stopping rules, H1 to H4, A1 to A3) or a resolution below; a value that the prose does not give carries a trailing comment.
+
+1. Setup check (Stopping rules, last bullet). The check that a Double64 or BigFloat run agrees with the Float64 run on the orbit coordinates within 1e-10 applies over the first 100 steps to the design classes T and R and to the elliptic and parabolic controls, and over the first 5 steps to the design classes C, S and X, to the hyperbolic controls (positive analytic exponent, including Y5) and to the H4 starts (chaotic or near a hyperbolic point, where a difference of 1e-16 reaches 1e-10 within about 10 steps). The tolerance 1e-10 is unchanged. Block keys: `setup_check_steps` by class, `setup_check_tol`.
+2. Cost cap and pilot (Stopping rules, fourth bullet; Amendment rule). A pilot validates the budget of every arm before any study chunk runs; a pilot that uses no panel orbit and writes outside the study store is not data in the sense of the Amendment rule. After study data exist, an arm paused by the first-chunk cost cap resumes only by a recorded cap override that changes no threshold, horizon or subset; the words "re-estimated by amendment" in the frozen bullet no longer apply.
+3. Backend agreement. The tolerance for GPU against CPU values of lambda_1(n) at grid points takes the form and the numbers of `tangent-core-spec.md`, acceptance criterion 12(c): per orbit |S_cpu/n - S_gpu/n| at most 6 sigma_FT, sigma_FT the standard deviation of S/n on the CPU ensemble, and the difference of ensemble means at most 4 combined standard errors. It is a check of the run, not a hypothesis.
+4. Exact-exponent controls (H1, last sentence; Stopping rules, third bullet). The bound 1e-8 is checked only in the arm marked h1_check (primary direction, tau = 1, lifted coordinates, horizon N_1), for the methods of V. The sweep arms (directions, tau, wrapped coordinates, eps, long horizon, precision ladder, H4) are not under the stop rule: the bias ln(c) / n of a start direction away from the unstable direction of the Y5 map can exceed 1e-8 at N_1 without a code defect.
+5. Panel validity. The panel file was built under the preregistration hash recorded below as `panel_prereg_sha256_accepted`; it stays valid under the hash that A4 gives this file, because A4 changes no panel input.
+
+```toml
+[run]
+panel_prereg_sha256_accepted = ["650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46"]
+
+[run.primary]
+tau = 1
+eps = 1e-8
+direction = "pi/4"
+coordinate_mode = "lifted"
+
+[[run.arm]]
+name = "main"
+orbits = "P"
+methods = ["L1", "L2", "L3", "L4", "L4b", "L5", "L5b", "L6", "L9"]
+precisions = ["Float64"]
+horizons = [10000000]
+h1_check = true
+
+[[run.arm]]
+name = "long"
+orbits = "S_D"
+methods = ["L1", "L2", "L3", "L4", "L4b", "L5", "L5b", "L6", "L9"]
+precisions = ["Float64"]
+horizons = [100000000]
+
+[[run.arm]]
+name = "tau_sweep"
+orbits = "S_D"
+methods = ["L4", "L5"]
+precisions = ["Float64"]
+horizons = [10000000]
+tau = [1, 2, 4, 8, 16]
+
+[[run.arm]]
+name = "wrapped"
+orbits = "S_D"
+methods = ["L1", "L2", "L3", "L4", "L4b", "L5", "L5b", "L6", "L9"]
+precisions = ["Float64"]
+horizons = [10000000]
+coordinate_mode = ["wrapped"]
+
+[[run.arm]]
+name = "directions"
+orbits = "S_D"
+methods = ["L1", "L5", "L9"]
+precisions = ["Float64"]
+horizons = [10000000]
+direction = ["pi/4", "0.3", "0.3 + pi/5", "0.3 + 2pi/5", "0.3 + 3pi/5"]
+
+[[run.arm]]
+name = "eps_sweep"
+orbits = "S_D"
+methods = ["L2"]
+precisions = ["Float64"]
+horizons = [10000000]
+eps = [1e-6, 1e-8, 1e-10, 1e-12]
+
+[[run.arm]]
+name = "h4_float64"
+orbits = "h4"
+methods = ["L1", "L5"]
+precisions = ["Float64"]
+horizons = [1000000000]
+
+[[run.arm]]
+name = "h4_double64"
+orbits = "h4"
+methods = ["L5"]
+precisions = ["Double64"]
+horizons = [100000000]
+
+[[run.arm]]
+name = "ladder_double64_short"
+orbits = "S_L"
+methods = ["L1", "L3", "L5", "L9"]
+precisions = ["Double64"]
+horizons = [10000000]
+
+[[run.arm]]
+name = "ladder_double64_long"
+orbits = "S_L"
+methods = ["L5"]
+precisions = ["Double64"]
+horizons = [100000000]
+
+[[run.arm]]
+name = "ladder_bigfloat"
+orbits = "S_L"
+methods = ["L1", "L5", "L9"]
+precisions = ["BigFloat"]
+horizons = [1000000]
+
+[run.grid]
+points_per_decade = 20
+first_steps = 100
+extra_fractions = [0.1, 0.5]   # A4: proposed in D53
+
+[run.backend]
+Float64 = "auto"
+Double64 = "cpu"
+BigFloat = "cpu"
+
+[run.health]
+fail_fraction = 0.05
+control_bound = 1e-8
+control_methods = ["L1", "L3", "L4", "L4b", "L5", "L5b", "L6", "L9"]
+setup_check_steps = { T = 100, R = 100, control_elliptic = 100, control_hyperbolic = 5, C = 5, S = 5, X = 5, h4 = 5 }
+setup_check_tol = 1e-10
+drift_bound = 1e6
+rerun_attempts = 1
+stop_failed_fraction = 0.05
+first_chunk_cost_factor = 2.0
+wall_cap_hours = 12
+
+[run.budget.Float64]
+ns_cpu_thread = 33.09
+ns_gpu = 2.468
+safety = 2
+
+[run.budget.Double64]
+ns_cpu_thread = 1553.8
+safety = 3
+
+[run.budget.BigFloat]
+ns_cpu_thread = 18200
+safety = 3
+
+[run.k19]
+threads = 23
+
+[run.verify]
+backend_agreement = { per_orbit_sigma = 6.0, mean_standard_errors = 4.0 }
+rerun_sample = 20   # A4: proposed at the A4 checkpoint
+
+[run.pilot]
+orbits_per_k = 4              # A4: proposed at the A4 checkpoint
+horizon = 100000              # A4: proposed at the A4 checkpoint
+seed_label = "p1-le-benchmark-pilot"   # A4: proposed at the A4 checkpoint
+
+[[run.h4]]
+K = "pi/2"
+x0 = "1e-3"
+p0 = "-1e-3"
+label = "SalaArtuso2015_Khalfpi"   # A4: proposed in D53
+
+[[run.h4]]
+K = "2pi"
+x0 = "1e-3"
+p0 = "-1e-3"
+label = "SalaArtuso2015_K2pi"   # A4: proposed in D53
+```
+
+Notes on the block. Arms that list a sweep key give its values; a key absent from an arm means the primary value of `[run.primary]`. Identical items of different arms are one item (the primary values of a sweep coincide with the main arm). `ns_gpu` is absent for Double64 and BigFloat because they run on CPU only (Methods). `setup_check_steps` is by class: `control` is every control, `h4` the two H4 starts.

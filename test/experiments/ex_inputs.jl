@@ -80,7 +80,7 @@ end
 @testset "AC2 preregistration hash" begin
     # (a) the frozen study file: header hash equals the recomputed one and the independent one
     @testset "frozen p1-le-benchmark" begin
-        text = read(EX_REAL_PREREG, String)
+        text = replace(read(EX_REAL_PREREG, String), "\r\n" => "\n")   # a Windows checkout with autocrlf has CRLF; the hash rule normalises too
         r = EX.check_prereg(EX_REAL_PREREG)
         @test r.header_sha256 == r.computed_sha256 == ex_header_hash(text) == ex_sha256(ex_prepare(text))
         @test r.amendments == length(collect(eachmatch(r"\bA\d+ \(", match(r"(?m)^\| Amendment log \|.*$", text).match)))

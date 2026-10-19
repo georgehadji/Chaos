@@ -39,8 +39,12 @@ Base.@kwdef mutable struct Session
 end
 
 _record_dict(r::Nothing) = "absent"
-_record_dict(r) = Dict{String, Any}("threads" => r.threads, "cpu_ns_per_step" => r.cpu_ns_per_step, "gpu_ns_per_step" => r.gpu_ns_per_step,
-                                    "gpu_faster" => r.gpu_faster, "date" => r.date)
+function _record_dict(r)
+    d = Dict{String, Any}("threads" => r.threads, "cpu_ns_per_step" => r.cpu_ns_per_step, "gpu_ns_per_step" => r.gpu_ns_per_step,
+                          "gpu_faster" => r.gpu_faster, "date" => r.date)
+    hasproperty(r, :recorder) && (d["recorder"] = Dict{String, Any}(m => _record_dict(x) for (m, x) in r.recorder))
+    return d
+end
 
 function _backend_rows(s::Session)
     return [Dict{String, Any}("precision" => p, "method" => m, "request" => String(r.request), "backend" => String(r.backend),

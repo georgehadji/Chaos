@@ -33,6 +33,51 @@ for ((p, m), r) in sort!(collect(tbl); by = first)
 end
 get(ENV, "EXD_ONLY", "") == "table" && exit(0)
 
+# EXD_ONLY=record (amendment D54): the per-method record on the recording chain, written to data/gpu-benchmark.toml as
+# [<device>."Float64".recorder.<method>]. Same ensemble as the cost lines below: ENS_ORB orbits x ENS_N steps (main-arm items repeated),
+# lifted, tau 1, the tangent-core launch plan on the device (end to end), the CPU threads of the run (end to end).
+const ENS_ORB = parse(Int, get(ENV, "EXD_ENS_ORB", "2048"))
+const ENS_N = parse(Int, get(ENV, "EXD_ENS_N", "200000"))
+function measure_recorder(m)
+    base = [it for c in plan.chunks for i in c.items for it in (plan.items[i],) if c.run_type.method == m && c.run_type.precision == "Float64" &&
+            c.run_type.coordinate_mode == "lifted" && c.run_type.tau == 1 && "main" in c.arms]
+    items = NamedTuple[merge(base[mod1(i, length(base))], (horizon = ENS_N,)) for i in 1:ENS_ORB]
+    ctx = EX.make_ctx(plan, items)
+    steps = ENS_ORB * ENS_N
+    EX.device_records(ctx, items; hook = false)
+    tg, g = Inf, nothing
+    for _ in 1:2
+        t = @elapsed r = EX.device_records(ctx, items)
+        t < tg && ((tg, g) = (t, r))
+    end
+    g.recs === nothing && return Dict{String, Any}("threads" => NT, "gpu_faster" => false, "reason" => g.prov.reason, "date" => Libc.strftime("%Y-%m-%d", time()))
+    EX.compute_records(ctx, items, NT)
+    tc = minimum(@elapsed(EX.compute_records(ctx, items, NT)) for _ in 1:2)
+    cpu, gpu = tc / steps * 1e9, tg / steps * 1e9
+    return Dict{String, Any}("threads" => NT, "cpu_ns_per_step" => cpu, "gpu_ns_per_step" => gpu, "gpu_faster" => gpu <= cpu,
+        "date" => Libc.strftime("%Y-%m-%d", time()), "launch_steps" => g.prov.launch_steps, "orbits" => ENS_ORB, "steps" => ENS_N)
+end
+if get(ENV, "EXD_ONLY", "") == "record"
+    path = joinpath(pkgdir(Chaoslab), "data", "gpu-benchmark.toml")
+    recs = Dict{String, Any}()
+    for m in ["L1", "L2", "L3", "L4", "L4b", "L5", "L5b", "L9"]
+        recs[m] = measure_recorder(m)
+        say("RECORD | $m | ", recs[m])
+    end
+    all = isfile(path) ? TOML.parsefile(path) : Dict{String, Any}()
+    get!(get!(all, CUDA.name(CUDA.device()), Dict{String, Any}()), "Float64", Dict{String, Any}())["recorder"] = recs
+    tmp = path * ".tmp"
+    open(io -> TOML.print(io, all), tmp, "w")
+    mv(tmp, path; force = true)
+    say("# recorder records written to ", path)
+    rec2 = EX.gpu_record()
+    tbl2 = EX.backend_table(plan; threads = NT, record = rec2)
+    for ((p, m), r) in sort!(collect(tbl2); by = first)
+        say("TABLE-AFTER | ", p, " | ", m, " | ", r.request, " | ", r.backend, " | ", r.device, " | ", r.reason, " | ", r.note)
+    end
+    exit(0)
+end
+
 const AGREE = plan.block.raw["verify"]["backend_agreement"]
 const METHODS = ["L1", "L2", "L3", "L4", "L4b", "L5", "L5b", "L9"]
 
@@ -112,8 +157,6 @@ end
 # Cost at the ensemble size of the campaign: ENS_ORB orbits (the main-arm items repeated) x ENS_N steps, lifted, tau 1, ns per orbit-step end to end.
 # (a) the launch plan of tangent-core (L from the one-wave value of the record, batches capped by the same budget), (b) launches of 10^4 steps
 # (the batch then holds the whole ensemble), (c) the CPU threads on the same items; against [run.budget].Float64 (ns_cpu_thread, ns_gpu).
-const ENS_ORB = parse(Int, get(ENV, "EXD_ENS_ORB", "2048"))
-const ENS_N = parse(Int, get(ENV, "EXD_ENS_N", "200000"))
 bg = plan.block.raw["budget"]["Float64"]
 say("# ensemble cost, $ENS_ORB orbits x $ENS_N steps; [run.budget].Float64 = $bg")
 for m in METHODS

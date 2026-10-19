@@ -365,3 +365,18 @@ Choices: (1) bit equality on the KA CPU backend, the form the tangent-core tests
 ### RED log (before the code)
 
 Command: `julia --project -t 4 -e 'using Test, Chaoslab; @testset "experiments" begin include("test/experiments/runtests.jl") end'` (Julia 1.13.2, 4 threads, 2 min 36 s). Result: `experiments | Pass 4349 | Fail 240 | Error 6 | Total 4595`. Existing suites: 4300 of 4300 pass. New part: 12 testsets, 49 passes (the isbits testset, which needs no new code, and the campaign assertions that hold on the CPU path), 240 fails (every chunk recorded as `cpu` where `gpu` is required, launch counts and reasons absent) and 6 errors: `UndefVarError: device_records not defined in Chaoslab.Experiments` in 5 testsets, and one test defect (a two-argument anonymous function over dictionary pairs in the backend-table check) fixed before the code was written. After the code: 4615 of 4615 (315 new assertions).
+
+## Amendment D54 (per-method record on the recording chain, 2026-10-19)
+
+New file `test/experiments/ex_record.jl` (registered in `runtests.jl`, last include); no existing assertion changed. Interface: a record NamedTuple with a `recorder` field (method id to `(threads, gpu_faster, ...)`) is read per method by `resolve_run_backend` and `backend_table`; `Experiments.gpu_record(root)` returns the field from the file.
+
+| Testset | Assertions | Criterion |
+|---------|-----------|-----------|
+| resolution reads the per-method record | 8 | D54a, D54c: device only for the methods with an entry at the run's threads and `gpu_faster` true; top-level flag ignored; absent method, other thread count (note) and not faster give the seventh reason; L6 the sixth; explicit requests; Double64 and BigFloat; empty table |
+| matrix of the resolution with per-method records | 1 (a list of mismatches that must be empty, 3 precisions x 3 requests x 4 device states x 4 record states x 3 methods) | D54b |
+| gpu_record reads the layout of the file | 4 | D54d |
+| campaign: backend table and chunks follow the per-method record | 21 | D54e |
+
+### RED log
+
+Before the code, `resolve_run_backend` ignored the field: `julia --project -t 4` on the quick runner (helpers plus ex_device.jl plus ex_record.jl): first testset Pass 3, Fail 5 (every case that reads a per-method entry or the absence of one); the remaining three testsets were not reached in that run because a failed top-level testset ends the runner. Running them against the unchanged code is not informative either: `gpu_record` returned no `recorder` field and the campaign used the single record. After the code: 34 of 34 (8, 1, 4, 21). D54f is the verify script.

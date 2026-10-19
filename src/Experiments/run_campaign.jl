@@ -105,7 +105,16 @@ end
 # Hashes the run is bound to: the preregistration by the E18 rule and the panel file by its bytes.
 _input_hashes(prereg, panel) = (prereg = prereg_hash(read(prereg, String)), panel = bytes2hex(sha256(read(panel))))
 
-"GPU benchmark record (data/gpu-benchmark.toml) of the device in force for Float64, or `nothing`."
+# D54: `[<device>."Float64".recorder.<method>]` as a Dict of NamedTuples; anything that is not a table of tables is an empty table.
+function _recorder_table(t)
+    t isa AbstractDict || return Dict{String, Any}()
+    return Dict{String, Any}(String(m) => (threads = get(r, "threads", 0), cpu_ns_per_step = get(r, "cpu_ns_per_step", nothing),
+        gpu_ns_per_step = get(r, "gpu_ns_per_step", nothing), gpu_faster = get(r, "gpu_faster", false), date = get(r, "date", ""),
+        launch_steps = get(r, "launch_steps", nothing), orbits = get(r, "orbits", nothing), steps = get(r, "steps", nothing))
+        for (m, r) in t if r isa AbstractDict)
+end
+
+"GPU benchmark record (data/gpu-benchmark.toml) of the device in force for Float64, with its per-method `recorder` table (D54), or `nothing`."
 function gpu_record(root::AbstractString = _root())
     dev = Foundation.probe(Foundation.DEVICE[], Float64).device
     path = joinpath(root, "data", "gpu-benchmark.toml")
@@ -116,7 +125,7 @@ function gpu_record(root::AbstractString = _root())
         return nothing
     end
     return (threads = get(r, "threads", 0), cpu_ns_per_step = get(r, "cpu_ns_per_step", nothing), gpu_ns_per_step = get(r, "gpu_ns_per_step", nothing),
-            gpu_faster = get(r, "gpu_faster", false), date = get(r, "date", ""))
+            gpu_faster = get(r, "gpu_faster", false), date = get(r, "date", ""), recorder = _recorder_table(get(r, "recorder", nothing)))
 end
 
 # Orbits per launch from the free memory (R3 item 3): the most demanding run type of the plan bounds it.

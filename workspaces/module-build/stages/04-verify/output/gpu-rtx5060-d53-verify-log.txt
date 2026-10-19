@@ -142,3 +142,51 @@ ATTR | Benettin | 7.163 ns per orbit-step | backend gpu
 ATTR | Benettin + RunMonitor | 10.98 ns per orbit-step | backend gpu
 ATTR | QRSpectrum(HouseholderQR) | 18.55 ns per orbit-step | backend gpu
 ATTR | QRSpectrum(HouseholderQR) + RunMonitor | 22.35 ns per orbit-step | backend gpu
+
+## Phase 5 (Amendment D54): per-method records on the recording chain, 2048 orbits x 2e5 steps, tangent-core plan, 23 threads: EXD_ONLY=record julia --project=verify -t 23 verify/experiments-device.jl (the first table is the state before: record without recorder table)
+# D53 device check, julia 1.13.2, threads 23, cpu arrowlake-s, horizon 20000
+# device ChaoslabCUDAExt.CUDADevice, NVIDIA GeForce RTX 5060 Laptop GPU, CUDA.jl 6.4.2, runtime 13.4.0, free 6925.0 MiB, stack limit 4096 B
+# plan (items = 15741, chunks = 1387), [run.k19].threads = 23, [run.verify] = Dict{String, Any}("rerun_sample" => 20, "backend_agreement" => Dict{String, Any}("mean_standard_errors" => 4.0, "per_orbit_sigma" => 6.0)), [run.budget].Float64 = Dict{String, Any}("ns_cpu_thread" => 33.09, "safety" => 2.0, "ns_gpu" => 2.468)
+# record in force (data/gpu-benchmark.toml, Float64): (threads = 23, cpu_ns_per_step = 3.3850819999999997, gpu_ns_per_step = 2.493011, gpu_faster = true, date = "2026-10-19", recorder = Dict{String, Any}())
+# backend table at 23 threads (precision, method: request, backend, device, reason, note)
+TABLE | BigFloat | L1 | cpu | cpu | cpu |  | 
+TABLE | BigFloat | L5 | cpu | cpu | cpu |  | 
+TABLE | BigFloat | L9 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L1 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L3 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L5 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L9 | cpu | cpu | cpu |  | 
+TABLE | Float64 | L1 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L2 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L3 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L4 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L4b | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L5 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L5b | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L6 | auto | cpu | cpu | reducer is CPU-only | 
+TABLE | Float64 | L9 | auto | cpu | cpu | GPU not faster for the element type | 
+RECORD | L1 | Dict{String, Any}("cpu_ns_per_step" => 4.1732900390625005, "gpu_ns_per_step" => 12.454087890624999, "date" => "2026-10-19", "orbits" => 2048, "threads" => 23, "steps" => 200000, "gpu_faster" => false, "launch_steps" => 105922)
+RECORD | L2 | Dict{String, Any}("cpu_ns_per_step" => 2.936629638671875, "gpu_ns_per_step" => 11.18673388671875, "date" => "2026-10-19", "orbits" => 2048, "threads" => 23, "steps" => 200000, "gpu_faster" => false, "launch_steps" => 105922)
+RECORD | L3 | Dict{String, Any}("cpu_ns_per_step" => 7.905718017578125, "gpu_ns_per_step" => 25.252251708984375, "date" => "2026-10-19", "orbits" => 2048, "threads" => 23, "steps" => 200000, "gpu_faster" => false, "launch_steps" => 105922)
+RECORD | L4 | Dict{String, Any}("cpu_ns_per_step" => 8.59375634765625, "gpu_ns_per_step" => 25.119717529296874, "date" => "2026-10-19", "orbits" => 2048, "threads" => 23, "steps" => 200000, "gpu_faster" => false, "launch_steps" => 105922)
+RECORD | L4b | Dict{String, Any}("cpu_ns_per_step" => 8.73210888671875, "gpu_ns_per_step" => 35.919566162109376, "date" => "2026-10-19", "orbits" => 2048, "threads" => 23, "steps" => 200000, "gpu_faster" => false, "launch_steps" => 105922)
+RECORD | L5 | Dict{String, Any}("cpu_ns_per_step" => 9.17050146484375, "gpu_ns_per_step" => 27.0822548828125, "date" => "2026-10-19", "orbits" => 2048, "threads" => 23, "steps" => 200000, "gpu_faster" => false, "launch_steps" => 105922)
+RECORD | L5b | Dict{String, Any}("cpu_ns_per_step" => 9.803899658203125, "gpu_ns_per_step" => 27.926836914062502, "date" => "2026-10-19", "orbits" => 2048, "threads" => 23, "steps" => 200000, "gpu_faster" => false, "launch_steps" => 105922)
+RECORD | L9 | Dict{String, Any}("cpu_ns_per_step" => 10.32854296875, "gpu_ns_per_step" => 38.66681665039062, "date" => "2026-10-19", "orbits" => 2048, "threads" => 23, "steps" => 200000, "gpu_faster" => false, "launch_steps" => 105922)
+# recorder records written to C:\Users\tesse\Documents\Vibe Coding\Chaos\data\gpu-benchmark.toml
+TABLE-AFTER | BigFloat | L1 | cpu | cpu | cpu |  | 
+TABLE-AFTER | BigFloat | L5 | cpu | cpu | cpu |  | 
+TABLE-AFTER | BigFloat | L9 | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | L1 | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | L3 | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | L5 | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | L9 | cpu | cpu | cpu |  | 
+TABLE-AFTER | Float64 | L1 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE-AFTER | Float64 | L2 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE-AFTER | Float64 | L3 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE-AFTER | Float64 | L4 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE-AFTER | Float64 | L4b | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE-AFTER | Float64 | L5 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE-AFTER | Float64 | L5b | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE-AFTER | Float64 | L6 | auto | cpu | cpu | reducer is CPU-only | 
+TABLE-AFTER | Float64 | L9 | auto | cpu | cpu | GPU not faster for the element type | 

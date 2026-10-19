@@ -6,6 +6,14 @@ cpu_only_method(id::AbstractString) = id == "L6"
 _element_type(label::AbstractString) = first(parse_precision(label == "BigFloat" ? "BigFloat(256)" : label))
 
 """
+    method_record(record, method) -> record or nothing
+
+D54: a record with a `recorder` table (method id => record on the recording chain of that method) is read per method, and a method
+without an entry has no record; a record without the field is the D53h form, one record for every method.
+"""
+method_record(record, method::AbstractString) = record === nothing || !hasproperty(record, :recorder) ? record : get(record.recorder, method, nothing)
+
+"""
     resolve_run_backend(request, T, method; threads, record) -> (backend, device, reason, note)
 
 Resolve a request (`:auto`, `:gpu`, `:cpu`) for one (element type, method) by the rules of `_config/architecture.md`, "Compute",
@@ -14,6 +22,7 @@ count of the run and says the device is faster. No tenth reason is added; a reco
 reason "GPU not faster for the element type" and a `note`.
 """
 function resolve_run_backend(request::Symbol, ::Type{T}, method::AbstractString; threads::Integer, record = nothing) where {T}
+    record = method_record(record, method)
     note = request === :auto && record !== nothing && record.threads != threads ?
            "device record taken at $(record.threads) threads, the run uses $threads threads (K19)" : ""
     function probe()

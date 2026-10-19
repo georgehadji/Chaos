@@ -295,3 +295,26 @@ Branch module/experiments-runner at 8b5dae8, not committed. Julia 1.13.2. This s
 | CPU path unchanged | pass | existing D53e to D53i, D53o stores bit-identical |
 | Device record equals CPU loop | pass | KA CPU bitwise; real device AC12(c) 16 of 16 |
 | Cost against A4 | FAIL | device 2.6 to 16 times `ns_gpu`, above the cap (K19 outcome) |
+
+### D54 per-method record on the recording chain (2026-10-19)
+
+Owner decision: keep `auto`, take the record on the chain the study runs (spec Amendment D54, decision D54). Code: `method_record` in `run_backend.jl` (a record with a `recorder` table is read per method, a method without an entry has no record, a record without the field is the D53h form), `_recorder_table` and the `recorder` field of `gpu_record` in `run_campaign.jl`, the `recorder` table in the manifest's `device_record` (`run_manifest.jl`). Resolution, reasons and strings are unchanged (a missing entry, another thread count or `gpu_faster` false give "GPU not faster for the element type"). Tests: `test/experiments/ex_record.jl`, 34 assertions (8, 1, 4, 21), RED log in the test plan.
+
+**Records** (`verify/experiments-device.jl`, `EXD_ONLY=record`, 23 threads, RTX 5060, 2048 orbits x 2e5 steps, lifted, tau 1, tangent-core launch plan with launch_steps 105922, end to end; written to `data/gpu-benchmark.toml` as `[<device>."Float64".recorder.<method>]`; raw output in the verify log, phase 5). ns per orbit-step, CPU wall at 23 threads / device / gpu_faster:
+
+| Method | CPU | GPU | gpu_faster |
+|--------|-----|-----|------------|
+| L1 | 4.17 | 12.45 | false |
+| L2 | 2.94 | 11.19 | false |
+| L3 | 7.91 | 25.25 | false |
+| L4 | 8.59 | 25.12 | false |
+| L4b | 8.73 | 35.92 | false |
+| L5 | 9.17 | 27.08 | false |
+| L5b | 9.80 | 27.93 | false |
+| L9 | 10.33 | 38.67 | false |
+
+**Resolved backend table, real preregistration and panel, 23 threads** (`EX.backend_table`, same log): Float64 L1, L2, L3, L4, L4b, L5, L5b, L9: request auto, backend cpu, reason "GPU not faster for the element type", no note; Float64 L6: cpu, "reducer is CPU-only"; Double64 (L1, L3, L5, L9) and BigFloat (L1, L5, L9): request cpu, backend cpu, empty reason. Before the recorder records existed (record without the sub-table) the same table was CPU with the seventh reason for the eight methods. The device path stays available for `gpu` requests and for a new device or launch plan.
+
+**Revised campaign estimate:** with the table all CPU, the estimate is the CPU-only one of the D53 device section: Float64 kernel methods 2195 s, L6 414 s, Double64 3471 s, BigFloat 3258 s, total 9338 s = 2.6 h on 23 threads (wall cap 12 h; the 1.03 h of the D53 section assumed 4-thread rates). Caution on the cap: the first-chunk cap of A4 on the CPU basis is 132.4 thread-ns (2 x 66.18); the thread cost measured at 23 threads on 2048 orbits is 98 (L1), 73 (L2), 206 (L3), 194 (L4), 232 (L4b), 229 (L5), 267 (L5b) and 238 (L9) ns. Arms that start with L1 or L2 pass; arm tau_sweep starts with L4 and would be paused by the cap at 194 unless its first group costs less at campaign group sizes. To be checked in the D53w reduced campaign; the cap override of R5 exists for it.
+
+**Limits:** the records are a property of the machine, the thread count and the launch plan; they must be retaken after any change of the recorder, the launch plan or the device; a run on another thread count falls to the CPU with the mismatch note.

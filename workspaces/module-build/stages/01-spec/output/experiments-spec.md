@@ -480,3 +480,24 @@ The owner approved Amendment D53 with the resolutions below. The base D53 text a
 - P23 Approved as proposed: binary64 storage for all precisions.
 - P24 Approved as proposed: h4 starts listed in the block, ids after the panel's last id, run as a subset of their own.
 - P25 Approved as proposed: extra grid fractions 1/10 and 1/2 of the horizon.
+
+
+## Amendment D54 (2026-10-19)
+
+Owner decision on K19 after the device path of D53: keep `auto` for Float64, but let it follow a record taken on the chain the study actually runs. The AC13 record (LogNorm reducer, `verify/gpu.jl`) says the GPU is 1.36 times faster than 23 threads; the recording chain (estimator, `RunMonitor`, grid records) is 1.7 to 3.9 times slower on the device than on 23 threads (`experiments-impl-notes.md`, "D53 device path"). Decision log: D54.
+
+**Rule.** R4 item 2 changes only in its source of `gpu_faster`. For an `auto` request of Float64 and a method, the record is the entry of that method on the recording chain: the per-orbit recording body of `src/Experiments/run_device.jl` on the device against the CPU recording loop of `run_record.jl`, same orbits, same horizon, end to end, the CPU at the thread count of the run, the device with the launch plan of tangent-core. The device is used only if the entry exists, its `threads` equals the thread count of the run and `gpu_faster` is true. Otherwise the CPU, reason "GPU not faster for the element type" (no tenth reason), and the manifest notes a thread-count mismatch as in D53. `gpu` and `cpu` requests, Double64, BigFloat and the CPU-only reducer (L6) resolve as before. The AC13 entry of the device and element type (`gpu_faster`, `gpu_ns_per_step`, `gpu_ns_per_step_wave`) stays in the file: the launch budget (D44) reads `gpu_ns_per_step_wave` from it.
+
+**Layout** (`_config/architecture.md`, "Compute", GPU record; `data/gpu-benchmark.toml`, git-ignored, per machine): a sub-table of the element type table, `[<device name>."Float64".recorder.<method id>]`, with `threads`, `cpu_ns_per_step`, `gpu_ns_per_step`, `gpu_faster` (`gpu_ns_per_step <= cpu_ns_per_step`), `date`, `launch_steps`, `orbits` and `steps` (the ensemble that was timed). Written by `verify/experiments-device.jl` (`EXD_ONLY=record`), which owns the records that need the Experiments module; `verify/gpu.jl` is unchanged. A file without the sub-table gives an empty recorder table: every method absent.
+
+**Interface.** `gpu_record()` returns the Float64 record with a `recorder` field (method id to record). `resolve_run_backend` and `backend_table` read the entry of the method when the record has the field; a record without it is read as one record for every method (the D53h form). The manifest holds the recorder table in `device_record`.
+
+**Acceptance criteria.**
+- D54a Per-method resolution. With a recorder table, `auto` Float64 resolves to the device exactly for the methods whose entry has `threads` equal to the run's and `gpu_faster` true; the top-level `gpu_faster` is ignored; a method without an entry, an entry at another thread count (note names the threads) or with `gpu_faster` false resolves to the CPU with the seventh reason; L6 gives the sixth reason.
+- D54b Matrix. The D53h matrix of (precision, request, device state, record state, CPU-only method) holds with the per-method record in place of the single record.
+- D54c Explicit requests. `gpu` resolves to the device and `cpu` to the CPU whatever the table says.
+- D54d File. `gpu_record` returns every field of the sub-table of a method (`threads`, ns values, `gpu_faster`, `date`, launch plan, sizes); a file without it gives an empty table.
+- D54e Campaign. On a simulated device with a recorder table the backend table, the chunk files (`backend`, reason) and the manifest follow the per-method entries, and the stored datasets equal the CPU campaign.
+- D54f [local] The record is retaken on the RTX 5060 at the run's thread count with the ensemble of the cost lines (2048 orbits, 2e5 steps, tangent-core plan); the resolved table for the real preregistration and panel is reported per method and precision.
+
+The D53 numbers (R4, K19) are otherwise unchanged. P-numbers: none new.

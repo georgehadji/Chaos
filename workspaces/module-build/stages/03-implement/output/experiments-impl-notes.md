@@ -151,3 +151,108 @@ Portraits (`verify/experiments.jl`): hyperbolic periodic points are no longer dr
 Results: experiments suite 2632/2632 (29 s); full `Pkg.test` 52253 pass, 0 fail, 0 error, 5 min 09 s; Aqua, JET and layering clean; coverage of `src/Experiments` 98.2 percent (694/707). Longest function 27 lines, longest file 163 lines (`orbits.jl`); no `@fastmath`; no dashes.
 
 Not fixed / caveats: the `delta_dup / 5` duplicate rule is untested on the full study inputs (the panel was not rebuilt); if a legitimate duplicate sits slightly farther than the linearized bound the build refuses with a message naming K index and period. M2's coordinate snap moves a point by at most about 4e-16 (its binary64 distance to 2 pi), well inside rho. `Manifest.toml` for Julia 1.10 still needs `Pkg.resolve()`.
+
+## Amendment D53 (study runner and run store, 2026-10-18 and 2026-10-19)
+
+Branch module/experiments-runner at 0082ef8, not committed. Julia 1.13.2 (1.10 is not installed here), 4 threads for the suite alone, 2 threads for `Pkg.test`, 23 threads for the real-panel smoke run. Tests untouched: `git diff 0082ef8 -- test/` is empty.
+
+### Result
+
+`test/experiments/` on 4 threads: 4279 pass, 7 fail, 3 error (4289); the 2632 earlier assertions all pass (AC28 included, see "Dependencies"). New part: 1647 pass, 7 fail, 3 error. The 10 non-passing results come from four defects of the tests themselves (next section), none from `src/`. With four minimal edits to a scratch copy of the tests (not the repository) the whole new part passes: 1668 of 1668. Full suite (`Pkg.test()`, 2 threads): 53900 pass, 7 fail, 3 error (53910), 4 min 07 s; the 10 non-passing results are the four test defects below, every earlier module passes. quality 12 of 12 (Aqua 11 checks, JET 1), JET clean (24 reports on the first run, all `Nothing` unions of regex matches and HDF5 `getindex`, fixed), layering 2 of 2.
+
+### Tests believed wrong (stop at the point, report)
+
+| Test | Where | Reason | Proposed fix |
+|------|-------|--------|--------------|
+| D53e, D53f (2 errors) | `ex_run_helpers.jl:411-414` (`ex_sys_x`), used by `ex_iter_states` (`ex_chunks.jl:80`) and `ex_direct` (`ex_chunks.jl:110`) | The fixture arm `wrap` (S_D, wrapped) contains the Y5 control, a `LinearSymplecticMap` (D53b requires that item: `ex_ref_items` takes it). The helper builds `torus_state(x)`, a 4-state, for it; `forward` and `tangent` of the linear map take 2-vectors only (`Systems/linear_symplectic.jl:30-32`), so the helper raises a MethodError whatever the runner stores. A linear map has no torus. The runner stores the Y5 control in wrapped mode in plane coordinates with zero winding counts. | `ex_sys_x`: `item.coordinate_mode == "wrapped" && item.system != "linear"` (and expect zero winding for linear items in D53e). |
+| D53l wall cap (2 fails) | `ex_health.jl:151` and `:154` | The injected clock gives 150 s to a group of 1500 orbit-steps, 5e5 times the Float64 budget line of the fixture (200 ns), so the first-chunk cost cap of R5 item 5 pauses arm main after group 1 (and tau after group 3). That is exactly the rule the next testset (`D53l first-chunk cost cap`, 2.01 against 1.99) requires, so groups 2 and 4 are skipped and `ran` is 1 to 4, 9 to 12 and 17, not 1 to 12. The two testsets cannot both hold on the same fixture. | Give the wall-cap fixture a large `first_chunk_cost_factor` (1e9 in the scratch copy), or a clock cost proportional to the steps. |
+| D53p input changed (1 error) | `ex_manifest.jl:117-118` and `:126` | `String(orig)` takes the memory of `orig::Vector{UInt8}` and leaves it empty, so `write(path, orig)` restores an empty file and the resumed run fails in `check_prereg` ("found 0" header rows). The 4 assertions before it pass. | `String(copy(orig))`. |
+| D53q pilot (5 fails) | `ex_pilot.jl:38` and `:47` (4 times) | The injected clock starts at 1.7e9 s, where binary64 spacing is 2.4e-7 s; the injected group durations are 1.2e-5 to 4.5e-4 s, so any wall time formed as a difference of two readings has a relative error of 1e-4 to 1e-2. Measured 1.50005e-7 against 1.5e-7; the check is `rtol = 1e-9`. No implementation can pass. | `ex_clock(...; start = 0.0)` (passes in the scratch copy). |
+
+### Files
+
+- `src/Experiments/` gains 14 files, 2348 lines (longest file 309 lines `run_record.jl`, longest function 30 lines `run_group!`): `run_block.jl` (A4 block validation, canonical text), `run_grid.jl` (recording grid, deviation frame, exact closed forms, `code_version`), `run_plan.jl` (items, chunks, hashes, steps), `run_backend.jl` (R4, launch groups), `run_record.jl` (recording of one orbit, non-raising monitor, `hot_loop_bytes`), `run_store.jl` (atomic HDF5 chunk files, JSON), `run_health.jl`, `run_campaign.jl` (hooks, start checks), `run_manifest.jl`, `run_resume.jl`, `run_groups.jl`, `run_session.jl` (`run_campaign`), `run_pilot.jl` (`run_pilot`, `rerun_check`), `run_cli.jl` (`cli`). `Experiments.jl`: imports Diagnostics, exports 30 names, includes.
+- `bin/chaoslab.jl` (7 lines, 4 of them code): `Chaoslab.Experiments.cli(ARGS)` and exit.
+- `Project.toml`: `HDF5` 0.17 (uuid f67ccb44), `JSON` 1 (682c06a0), `Dates` 1 (stdlib) in `[deps]` and `[compat]`. `Manifest-v1.13.toml` resolved (HDF5 0.17.4, JSON 1.11.0, and their jlls). `Manifest.toml` (Julia 1.10) is not resolved here (no 1.10); `verify/Manifest.toml` needs a `Pkg.resolve()` for the same two packages (Chaoslab is a path source there).
+- `schema/run-store.md`: one root attribute added, `setup_check` (needed so that the manifest can be rebuilt from the files, R8 item 2).
+- `bench/experiments.jl`: 6 entries added.
+- `src/Experiments/CONTEXT.md`: files and determinism.
+- No lower module changed. P18 needed nothing: `propagate` takes `W0` (the first deviation vector) and the per-orbit non-raising report is built in Experiments from the pure residual functions of Diagnostics.
+
+### Dependencies
+
+- HDF5.jl is required by R6. JSON.jl 1.x (JuliaIO, maintained, one version line since 2025) over JSON3: JSON3 brings StructTypes and a typed-object API this module does not use; the module needs `JSON.json` of nested dictionaries and `JSON.parse(...; dicttype = Dict{String,Any})`, two calls. A hand-written writer was the third option and would need its own tests. `Dates` only for UTC strings.
+- The old test AC28 (`ex_inputs.jl:148`) splits an import line at commas, so `import ..Tangent: a, b` counts `b` as a package. The new code therefore defines the monitor's methods as `Tangent.reducer_step(...)` and has no multi-name import line.
+
+### Design
+
+- Recording: the verified estimator reducers (`Benettin`, `QRSpectrum(alg)`, `SVDSpectrum`) run on the shared per-orbit body `Tangent._orbit_body` in segments between grid steps, with the reducer chain `(estimator, RunMonitor)` and the carried state; the value stored at a grid step is `reducer_final(...).lambda` of the same state sequence as a direct `propagate` to that step, which is why D53f holds with 0 difference (all nine methods, three precisions, wrapped mode). L2 does the same with `Lyapunov._shadow_body` and a carried end record. The two internals are reached by qualified name; exporting them would be the clean next step.
+- Diagnostics (P18, P20): `RunMonitor` keeps the running maxima of the det and symplecticity residuals (`eps_det`, `eps_symp` of Diagnostics) and the largest `|M|`; orthogonality, `G_max` come from the estimator state; sum and pairing are evaluated at the grid steps. Thresholds in force are those of Diagnostics (`det_threshold`, `symp_threshold`, `sum_threshold`, `orthogonality_threshold`) at the largest `|M|` and `G` of the item; the first exceedance is the first grid step above them. Nothing raises: a health failure of the stream is recorded as a message, the remaining rows are NaN and the chunk fails (R5 item 1a).
+- Plan: items in the order of R1 item 4 (precision, first arm, orbit); a chunk is one (run type, cell); the chunk hash adds the values that decide the status (the three health multipliers, `fail_fraction`, `control_bound`, `drift_bound`, `setup_check_tol`, `setup_check_steps`, `control_methods`, h1 flag). Closed-form K and extra starts are converted to 256-bit decimal texts (`_decimal_text`); decimals are read exactly in directions (`"0.3 + pi/5"` uses the decimal 0.3, not the binary64).
+- Launch groups: consecutive chunks of one run type up to the capacity; `order = :reverse` reverses groups and the chunks inside them.
+- Store: file written under `chunk-NNNNN.h5.tmp` with `complete` false, orbit groups, closed, read back and compared bit for bit, `complete` set, renamed. A replaced file goes to `aside/`, stale files to `stale/`, temporary files are listed in the manifest and removed. The manifest is written after every chunk (atomic, `.partial` then rename) and holds the session list; an initial manifest is written at start.
+- Timing: the group clock events are read after the input and cap checks; the default clock is epoch time at the resolution of `time_ns` (`time()` ticks in milliseconds on this system). Before its first group a run type is compiled outside the timed region (`warm_up!`, at most 1000 steps), and a first group of an unmeasured arm of at most 50 000 orbit-steps on the real clock is timed five times and the shortest taken. Tasks are spawned only for 4000 orbit-steps each (below that the group runs on one task; results do not depend on it, I12).
+
+### Deviations from the spec
+
+1. GPU: the recorder state is not isbits, so every chunk runs on the CPU. The backend table of R4 is resolved and recorded as specified; a pair that resolves to the device is executed on the CPU and the chunk records the existing reason "reducer is CPU-only". No device path exists in this build (known limit; see the estimate below).
+2. Sum and pairing running maxima are taken at the recorded grid steps, not at every handoff; for d = k = 2 pairing equals sum, and both use the sum threshold (the diagnostics spec leaves the pairing allowance to the caller).
+3. The Y5 control in wrapped mode runs in its plane coordinates and stores zero winding counts (a linear map has no torus; see the table above).
+4. A chunk that fails twice marks every orbit of the chunk `excluded`, not only the orbits named in the reasons. A control over its bound (R5 item 1c) writes the chunk as failed at attempt 1 without a rerun (a code defect, not a transient fault) and is not counted among the chunks that failed twice.
+5. `setup_check` is a root attribute of the file (schema addition above); the manifest value is per chunk: `ok`, `failed` (one orbit differs), `no reference` (no Float64 item of the plan with the same orbit, method, tau, direction and mode whose grid holds the steps), `not applicable`. The Float64 reference is computed by direct iteration of the map, so the check does not depend on the order in which chunks run.
+6. `code_version` hashes the working-tree files of `src/` and the lock in use (`Manifest-v<major>.<minor>.toml`, else `Manifest.toml`), CRLF read as LF; the spec says "committed content" and the tests change files without committing (test plan, choice 5).
+7. The budget line of an arm in the manifest and in the cost cap is that of its first precision (all arms of the real block have one), CPU basis (the only basis that runs). `rerun_attempts` above 1 is read as 1.
+8. A pilot writes the report and a store of the same layout under `<out>/store`; its parallel efficiency is the summed per-item time over wall time times workers, measured on the monotonic clock whatever the injected clock says.
+9. Defaults of the command line `run`: with no `--store` the store is `<repo>/data/<slug>` (`default_store`), with no `--manifest` the manifest is `workspaces/study/stages/03-run/output/<slug>-manifest.json`.
+
+### Performance (Julia 1.13.2, this machine, 4 threads, idle)
+
+Recording loop of one orbit, steady state, `RunMonitor` included, ns per orbit-step (Float64 at N = 2e5, Double64 at 2e4, BigFloat 256 bits at 2e3; minimum of 3 and 2 runs):
+
+| Method | Float64 | Double64 | BigFloat |
+|--------|---------|----------|----------|
+| L1 | 51.8 | 2432 | 20227 |
+| L2 | 36.0 | 1548 | 13677 |
+| L3 | 83.4 | 3114 | 36839 |
+| L4 | 84.8 | 3123 | 36696 |
+| L4b | 91.0 | 3324 | 40721 |
+| L5 | 90.9 | 3156 | 43113 |
+| L5b | 104.6 | 3156 | 40851 |
+| L6 | 179.6 | n/a | n/a |
+| L9 | 93.3 | 3333 | 46464 |
+| mean | 90.6 | 2898 | 34823 |
+
+Bench (`bench/experiments.jl`, BenchmarkTools, 4 threads, N = 1e5, Float64, minimum of 5): L1 4.69 ms (46.9 ns per orbit-step), L2 3.28 ms (32.8), L5 9.06 ms (90.6), L6 16.9 ms (169), L9 8.79 ms (87.9), all 0 B; one small campaign (panel of the bench fixture, one S_L orbit per cell, L5, 1e4 steps, files and manifest written) 210 ms, 7.3 MiB.
+
+Against `[run.budget]` of Amendment A4 (rate, line with safety, first-chunk cap = 2 times the line): Float64 33.09, 66.18, 132.4; Double64 1553.8, 4661, 9323; BigFloat 18200, 54600, 109200. The measured means are 2.7, 1.9 and 1.9 times the rates and below every cap; only L6 at Float64 (179.6) is above the Float64 cap, and no arm of the real block starts with L6. The rates of the preregistration come from the screening kernel (42.4 ns per step measured in the panel notes), the runner also keeps the monitor (one `tangent` evaluation and the det and symplecticity residuals at every handoff) and the grid records. Allocation: 0 bytes in the recording loop of all nine methods after warm-up (D53v). Writing a chunk file with read-back costs about 1.4 ms per orbit (60 orbits: 85 ms); a manifest write about 9 ms at 1387 chunks.
+
+Real plan (preregistration with Amendment A4, real panel of 883 orbits): 15 741 unique items, 1387 chunks, 3.067e11 orbit-steps after the merge (3.170e11 before, saving 1.032e10), plan time 4.9 s. Real-panel smoke run with horizons scaled down (3200 to 9600 steps) and the caps relaxed, 23 threads: 1100 chunks in 85 s of which 50 s writing and 14 s manifest, i.e. about 2 minutes for the 1387 chunks.
+
+Campaign estimate with the measured rates (unique items of the real plan): Float64 2.933e11 steps, 7.2 thread-hours; Double64 1.308e10 steps, 11.3 thread-hours; BigFloat 2.76e8 steps, 2.8 thread-hours; total 21.3 thread-hours (the budget lines of A4 without safety give 9.8). On 23 threads: 0.93 h with ideal scaling, 1.03 h at 90 percent efficiency, well inside the wall cap of 12 h. With the CPU alone that is the figure; a device path for the Float64 methods other than L6 (2.656e11 steps) would take about 0.18 h at the recorded 2.468 ns per step and leave Double64, BigFloat and L6 (15.5 thread-hours, 0.67 h on 23 threads), about 0.7 h in all, but it does not exist yet.
+
+Suite time (4 threads): new part 101.6 s (budget 120 s, spec), the whole slug 2 min 14 s (D35 ceiling 3 min); under `Pkg.test` with 2 threads the slug takes 2 min 07 s and the whole suite 4 min 07 s (budget 30 min).
+
+### Coverage
+
+`Pkg.test(coverage=true)`, 2 threads: `src/Experiments` 2047 of 2101 executable lines, 97.4 percent (new files `run_*`: 1353 of 1394, 97.1 percent); counted from the `.cov` files (merged over the two processes of the entry-point test), then deleted. Caution for that mode: instrumented code is several times slower, the fixtures' budget lines are 100 to 200 ns, and the first-chunk cost cap then pauses arms in the real-clock tests (134 failures in that run, 37 of them show the status `paused arms` directly and the rest follow from incomplete stores); the totals above come from the plain run. The same risk exists on a slow CI machine; it is a property of the fixture budgets, not of the module.
+
+### Known limits
+
+- No device path (deviation 1); the GPU fallback machinery of tangent-core is not used by the recorder.
+- The cost cap on the real clock is noisy for groups of a few thousand orbit-steps and is only informative from groups of about 1e5 orbit-steps; the injected clock path is exact.
+- `rerun_check` reruns on the CPU only (no device chunk exists in this build).
+- Manifest rewrite is O(chunks) per chunk (9 ms at 1387, 12 s in all); a journal would be needed beyond about 1e5 chunks.
+- The panel file is hashed (6 MB) before every launch group; a stat signature would save about 40 ms per group.
+- 1.10: not run; `Manifest.toml` and `verify/Manifest.toml` need `Pkg.resolve()`.
+
+### Audit (D53)
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| GREEN, including every earlier module | FAIL (10 results, 4 test defects) | see "Tests believed wrong"; scratch copy with four edits: new part 1668 of 1668; all earlier modules pass |
+| Quality | pass | Aqua 11 of 11, JET no report, layering 2 of 2 and AC28 2 of 2; coverage 97.4 percent (97.1 percent for the new files) |
+| Functions under 50 lines, files under 400 | pass | longest function 30 lines (`run_group!`), longest file 309 lines (scratch lint over `src/Experiments/run_*.jl`) |
+| Tests untouched | pass | `git diff 0082ef8 -- test/` empty |
+| No `@fastmath`; compensated logs | pass | no match; the sums are the `CompensatedSum` of the estimators, the runner adds none |
+| No em or en dashes in new files | pass | checked on `src/Experiments/run_*.jl`, `bin/chaoslab.jl`, `bench/experiments.jl`, this section |
+| Spec numbers | pass | grid 201 and 221 points; plan 52, 66 and 223 items; study caps plan 1100 x 9 x 1e7 |

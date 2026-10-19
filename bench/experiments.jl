@@ -34,3 +34,101 @@ end
 const DIR = mktempdir()
 const PREREG = bench_prereg(DIR)
 SUITE["build_panel small (8x8, 3 K, q_max 2)"] = @benchmarkable build_panel($PREREG; out = $(joinpath(DIR, "panel.toml"))) samples = 3 evals = 1
+
+# Study runner (D53): one work item per method family at N = 1e5 steps on the standard map; ns per orbit-step is time / 1e5.
+# The A4 budget lines are in preregistration Amendment A4 ([run.budget]); the numbers measured here go in the implementation notes.
+using StaticArrays
+
+const RUN_N = 100_000
+const RUN_GRID = record_grid(RUN_N, 1; points_per_decade = 20, first_steps = 100, extra_fractions = [0.1, 0.5])
+
+function run_item_bench(method)
+    sys, x0 = StandardMap(1.5), SVector(1.0, 2.0)
+    k = method in ("L1", "L2") ? 1 : 2
+    W0 = deviation_frame(Float64, "pi/4", k)
+    b = EXP._new_buf(RUN_GRID, k, false)
+    if method == "L2"
+        u0 = SVector(W0[1, 1], W0[2, 1])
+        return @benchmarkable EXP._record_shadow!($b, $sys, $x0, $u0, 1.0e-8, 1, RUN_N, 1) samples = 5 evals = 1
+    end
+    reducers = (EXP._estimator(method, 8.0), EXP.RunMonitor(sys))
+    st0 = EXP.Tangent._init_states(reducers, Float64, Val(2), Val(k))
+    return @benchmarkable EXP._record_loop!($b, $sys, $x0, $W0, $reducers, $st0, 1, RUN_N, 1) samples = 5 evals = 1
+end
+
+for (method, family) in (("L1", "Benettin"), ("L2", "two-trajectory"), ("L5", "QR family (Householder)"), ("L6", "QR library (LAPACK)"), ("L9", "SVD"))
+    SUITE["run item $method ($family), 1e5 steps"] = run_item_bench(method)
+end
+
+# A small campaign chunk: the panel of the bench fixture, one S_L orbit per cell, L5 at 1e4 steps, written to a store.
+const PANEL_HASH = prereg_hash(read(PREREG, String))
+const RUN_BLOCK = """
+[run]
+panel_prereg_sha256_accepted = ["$PANEL_HASH"]
+
+[run.primary]
+tau = 1
+eps = 1.0e-8
+direction = "pi/4"
+coordinate_mode = "lifted"
+
+[[run.arm]]
+name = "bench"
+orbits = "S_L"
+methods = ["L5"]
+precisions = ["Float64"]
+horizons = [10000]
+h1_check = true
+
+[run.grid]
+points_per_decade = 20
+first_steps = 100
+extra_fractions = [0.1, 0.5]
+
+[run.backend]
+Float64 = "cpu"
+
+[run.health]
+fail_fraction = 0.05
+control_bound = 0.01
+control_methods = ["L5"]
+setup_check_steps = { T = 5, R = 5, control_elliptic = 5, control_hyperbolic = 5, C = 5, S = 5, X = 5, h4 = 5 }
+setup_check_tol = 1.0e-9
+drift_bound = 1000000.0
+rerun_attempts = 1
+stop_failed_fraction = 0.05
+first_chunk_cost_factor = 1000.0
+wall_cap_hours = 1.0
+
+[run.budget.Float64]
+ns_cpu_thread = 100.0
+safety = 2.0
+
+[run.k19]
+threads = $(Threads.nthreads())
+
+[run.verify]
+backend_agreement = { per_orbit_sigma = 6.0, mean_standard_errors = 4.0 }
+rerun_sample = 2
+
+[run.pilot]
+orbits_per_k = 1
+horizon = 1000
+seed_label = "bench"
+"""
+
+function bench_run_prereg(dir)
+    text = replace(replace(read(PREREG, String), "\r\n" => "\n"), "|-------|-------|\n" => "|-------|-------|\n| Study slug | bench |\n"; count = 1)
+    text *= "\n## Amendment A4\n\n```toml\n" * RUN_BLOCK * "```\n"
+    path = joinpath(dir, "bench-run-prereg.md")
+    row = r"(?m)^(\| SHA-256 of this file[^|]*\|)[^|\n]*\|"
+    write(path, replace(text, row => m -> match(r"^\| SHA-256 of this file[^|]*\|", m).match * " " * prereg_hash(text) * " |"))
+    return path
+end
+
+const RUN_PREREG = bench_run_prereg(DIR)
+const RUN_PANEL = joinpath(DIR, "run-panel.toml")
+build_panel(PREREG; out = RUN_PANEL)
+const RUN_STORE = joinpath(DIR, "run-store")
+SUITE["run_campaign chunk (S_L, L5, 1e4 steps, written)"] = @benchmarkable run_campaign($RUN_PREREG, $RUN_PANEL; store = $RUN_STORE,
+    manifest = $(joinpath(DIR, "run-manifest.json")), threads = Threads.nthreads(), allow_dirty = true, code_version = "bench") setup = (rm($RUN_STORE; recursive = true, force = true)) samples = 3 evals = 1

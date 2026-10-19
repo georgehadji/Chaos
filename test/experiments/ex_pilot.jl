@@ -6,7 +6,7 @@
     fx = ex_fix(:small)
     plan = ex_plan(fx)
     run_pilot(out; fx = fx, cost_s = 150e-9, kw...) = EX.run_pilot(fx.prereg, fx.panel; out = out, threads = 1, thread_override = true,
-        allow_dirty = true, code_version = EX_CODE, capacity = 64, hooks = EX.RunHooks(clock = ex_clock(info -> info.steps * cost_s)), kw...)
+        allow_dirty = true, code_version = EX_CODE, capacity = 64, hooks = EX.RunHooks(clock = ex_clock(info -> info.steps * cost_s; start = 0.0)), kw...)   # start 0: binary64 spacing at 1.7e9 s exceeds the injected durations
     before = Set(readdir(EX_DIR))
     out = ex_path("q-pilot"); rm(out; recursive = true, force = true)
     res = run_pilot(out)

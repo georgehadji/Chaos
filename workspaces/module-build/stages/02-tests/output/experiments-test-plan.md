@@ -327,3 +327,14 @@ Command: `julia --project -t 4 -e 'using Test, Chaoslab; @testset "experiments" 
 ### Correction during D53 stage 02 (2026-10-18)
 
 `ex_inputs.jl` AC2 "frozen p1-le-benchmark": the real preregistration text is read with CRLF normalised to LF before the regex and hash helpers. A Windows checkout with `core.autocrlf` writes CRLF, and the block regex then found nothing; the module hash rule already normalises (E18).
+
+### Corrections during D53 stage 03 (2026-10-19)
+
+Four test defects found by the implementation, fixed in the tests (no src change):
+
+- `ex_run_helpers.jl` `ex_sys_x` and `ex_chunks.jl` D53e: the Y5 control (linear map) has no torus; in wrapped mode it runs in plane coordinates with zero winding counts.
+- `ex_health.jl` D53l: the wall-cap fixture sets `first_chunk_cost_factor` to 1e9 so the first-chunk cost cap (its own testset) does not pause the arm first.
+- `ex_manifest.jl` D53p: the restore writes back a copy of the original bytes (`String(orig)` had emptied the buffer).
+- `ex_pilot.jl` D53q: the injected clock starts at 0, since binary64 spacing at 1.7e9 s exceeds the injected durations and made rtol 1e-9 unreachable.
+
+Result: experiments suite 4300 of 4300.

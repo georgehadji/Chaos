@@ -115,7 +115,7 @@ end
         path = what == "prereg" ? fx.prereg : fx.panel
         orig = read(path)
         touch_it(pt, info) = (pt === :group_start && info.group == 2 &&
-                              write(path, what == "prereg" ? replace(String(orig), "End of file." => "End of file!") : String(orig) * "\n# touched\n"); nothing)
+                              write(path, what == "prereg" ? replace(String(copy(orig)), "End of file." => "End of file!") : String(copy(orig)) * "\n# touched\n"); nothing)
         store = ex_store("p-change-$what")
         res = ex_campaign(fx; store = store, hooks = EX.RunHooks(kill = touch_it))
         @test res.status == status

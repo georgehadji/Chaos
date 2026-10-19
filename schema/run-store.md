@@ -38,6 +38,7 @@ Layer 3, canonical. Shared contract between Julia (`Experiments`) and Python (`p
 | `grid_sha256` | string | hash of the recording grid |
 | `status` | string | `ok` or `failed` |
 | `attempt` | int | 1 or 2 (rerun on CPU) |
+| `setup_check` | string | `ok`, `failed`, `no reference` or `not applicable` (extended precision against Float64, R5 item 1d) |
 | `first_attempt_reasons`, `failure_reasons` | string list | empty when none |
 | `pilot` | bool | `false` for study files |
 | `arms` | string list | arms that contain the chunk |
@@ -72,7 +73,7 @@ N-body files use `system = "nbody:<name>"` and the same groups.
 ## Changes from v1
 
 - `schema_version` is 2.
-- New root attributes: `chunk_key`, `chunk_hash`, `plan_sha256`, `panel_sha256`, `code_version`, `backend_request`, `method`, `horizon`, `tau`, `vectors`, `coordinate_mode`, `direction`, `perturbation`, `grid_sha256`, `status`, `attempt`, `first_attempt_reasons`, `failure_reasons`, `pilot`, `arms`, the tangent-core provenance fields and `orthonormalizer`, `implementation`.
+- New root attributes: `chunk_key`, `chunk_hash`, `plan_sha256`, `panel_sha256`, `code_version`, `backend_request`, `method`, `horizon`, `tau`, `vectors`, `coordinate_mode`, `direction`, `perturbation`, `grid_sha256`, `status`, `attempt`, `setup_check`, `first_attempt_reasons`, `failure_reasons`, `pilot`, `arms`, the tangent-core provenance fields and `orthonormalizer`, `implementation`.
 - `config_sha256` is the hash of the canonical text of the run block.
 - `complete` means written to the end (atomic write), whatever `status` is; v1 meant only "chunk finished".
 - New orbit attributes: `item_hash`, `design_class`, `flags`, `steps_recorded`.

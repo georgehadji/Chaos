@@ -78,7 +78,10 @@ end
                       o.cost[it.method][2] == ex_vectors(it.method))
         miss!("attrs", o.attrs["item_hash"] == it.hash && o.attrs["steps_recorded"] == n)
         ref = ex_iter_states(it, o.t)
-        if it.coordinate_mode == "wrapped"
+        if it.coordinate_mode == "wrapped" && it.system == "linear"
+            # Y5 has no torus: plane coordinates with zero winding counts
+            miss!("wrapped linear", o.winding isa Matrix{Int64} && all(iszero, o.winding) && all(i -> o.state[i, :] == ref[i][1:2], 1:n))
+        elseif it.coordinate_mode == "wrapped"
             miss!("wrapped state", o.winding isa Matrix{Int64} && size(o.winding) == (n, 2) &&
                                    all(i -> o.state[i, :] == ref[i][1:2] && o.winding[i, :] == Int.(ref[i][3:4]), 1:n))
             # wrapped point plus winding counts reconstructs the lifted point to 1 ulp of the lifted value

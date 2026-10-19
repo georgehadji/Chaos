@@ -411,7 +411,7 @@ function ex_sys_x(item, T)
         Chaoslab.StandardMap(Chaoslab.exact(T, item.param))
     end
     x = SVector(Chaoslab.exact(T, item.x0), Chaoslab.exact(T, item.p0))
-    return sys, (item.coordinate_mode == "wrapped" ? Chaoslab.torus_state(x) : x)
+    return sys, (item.coordinate_mode == "wrapped" && item.system != "linear" ? Chaoslab.torus_state(x) : x)   # Y5 runs in plane coordinates
 end
 
 # states of a plan item after the steps ns (sorted), by direct iteration of the map, rounded once to binary64

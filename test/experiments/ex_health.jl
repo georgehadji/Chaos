@@ -144,7 +144,8 @@ end
 end
 
 @testset "D53l wall cap with an injected clock" begin
-    fx = ex_fix(:small)                                             # wall_cap_hours = 0.125 = 450 s; 6 launch groups
+    # a large first-chunk factor so that only the wall cap acts (the cost cap has its own testset)
+    fx = ex_fix_with(ex_rb_with(ex_rb(:small), ("health", "first_chunk_cost_factor") => 1e9), "l-wall")   # wall_cap_hours = 0.125 = 450 s; 6 launch groups
     store = ex_store("l-wall")
     res = ex_campaign(fx; store = store, threads = 1, hooks = EX.RunHooks(clock = ex_clock(info -> 150.0)))
     @test res.status == "stopped: wall cap"

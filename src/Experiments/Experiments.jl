@@ -13,6 +13,7 @@ using ..Systems
 using ..Tangent
 using ..Lyapunov
 using ..Diagnostics
+using KernelAbstractions
 using StaticArrays
 using LinearAlgebra
 using StableRNGs
@@ -56,6 +57,7 @@ include("run_record.jl")
 include("run_store.jl")
 include("run_health.jl")
 include("run_campaign.jl")
+include("run_device.jl")
 include("run_manifest.jl")
 include("run_resume.jl")
 include("run_groups.jl")

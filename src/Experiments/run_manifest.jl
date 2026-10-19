@@ -34,6 +34,8 @@ Base.@kwdef mutable struct Session
     status::String = "running"
     reasons::Vector{String} = String[]
     sha_end::NamedTuple = (prereg = "", panel = "")
+    provs::Dict{Int, NamedTuple} = Dict{Int, NamedTuple}()   # provenance of the launch group of each chunk computed in this session
+    device_lost::Base.RefValue{Bool} = Ref(false)
 end
 
 _record_dict(r::Nothing) = "absent"
@@ -82,10 +84,10 @@ function pending_entry(chunk, status)
         "drift" => Int[], "excluded" => Int[]), "setup_check" => "")
 end
 
-# Budget line of an arm in ns per orbit-step (R5 item 5): ns of the first precision times its safety factor, CPU.
-function budget_line_ns(rb::RunBlock, arm)
+# Budget line of an arm in ns per orbit-step (R5 item 5): ns of the first precision times its safety factor, for the CPU or the device.
+function budget_line_ns(rb::RunBlock, arm, backend::Symbol = :cpu)
     b = rb.raw["budget"][first(arm["precisions"])]
-    return b["ns_cpu_thread"] * b["safety"]
+    return (backend === :gpu ? get(b, "ns_gpu", b["ns_cpu_thread"]) : b["ns_cpu_thread"]) * b["safety"]
 end
 
 function _arm_entries(s::Session)

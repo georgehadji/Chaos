@@ -1,0 +1,144 @@
+## Phase 1: record in force at the start (taken at 4 threads, 2026-10-17); verify/experiments-device.jl, julia --project=verify -t 23
+# D53 device check, julia 1.13.2, threads 23, cpu arrowlake-s, horizon 20000
+# device ChaoslabCUDAExt.CUDADevice, NVIDIA GeForce RTX 5060 Laptop GPU, CUDA.jl 6.4.2, runtime 13.4.0, free 6925.0 MiB, stack limit 4096 B
+# plan (items = 15741, chunks = 1387), [run.k19].threads = 23, [run.verify] = Dict{String, Any}("rerun_sample" => 20, "backend_agreement" => Dict{String, Any}("mean_standard_errors" => 4.0, "per_orbit_sigma" => 6.0)), [run.budget].Float64 = Dict{String, Any}("ns_cpu_thread" => 33.09, "safety" => 2.0, "ns_gpu" => 2.468)
+# record in force (data/gpu-benchmark.toml, Float64): (threads = 4, cpu_ns_per_step = 8.254622999999999, gpu_ns_per_step = 2.467902, gpu_faster = true, date = "2026-10-17")
+# backend table at 23 threads (precision, method: request, backend, device, reason, note)
+TABLE | BigFloat | L1 | cpu | cpu | cpu |  | 
+TABLE | BigFloat | L5 | cpu | cpu | cpu |  | 
+TABLE | BigFloat | L9 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L1 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L3 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L5 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L9 | cpu | cpu | cpu |  | 
+TABLE | Float64 | L1 | auto | cpu | cpu | GPU not faster for the element type | device record taken at 4 threads, the run uses 23 threads (K19)
+TABLE | Float64 | L2 | auto | cpu | cpu | GPU not faster for the element type | device record taken at 4 threads, the run uses 23 threads (K19)
+TABLE | Float64 | L3 | auto | cpu | cpu | GPU not faster for the element type | device record taken at 4 threads, the run uses 23 threads (K19)
+TABLE | Float64 | L4 | auto | cpu | cpu | GPU not faster for the element type | device record taken at 4 threads, the run uses 23 threads (K19)
+TABLE | Float64 | L4b | auto | cpu | cpu | GPU not faster for the element type | device record taken at 4 threads, the run uses 23 threads (K19)
+TABLE | Float64 | L5 | auto | cpu | cpu | GPU not faster for the element type | device record taken at 4 threads, the run uses 23 threads (K19)
+TABLE | Float64 | L5b | auto | cpu | cpu | GPU not faster for the element type | device record taken at 4 threads, the run uses 23 threads (K19)
+TABLE | Float64 | L6 | auto | cpu | cpu | reducer is CPU-only | device record taken at 4 threads, the run uses 23 threads (K19)
+TABLE | Float64 | L9 | auto | cpu | cpu | GPU not faster for the element type | device record taken at 4 threads, the run uses 23 threads (K19)
+# format: ROW | mode | method | orbits | steps | ... 
+ROW | lifted | L1 | 883 | 20000 | identical series 82 of 883 | max |dlambda| 0.3949 | AC12c orbit/sigma 5.407 mean/SE 2.36 over 10 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 16.72 | cpu 23 threads ns/orbit-step 4.111 | thread ns 94.55
+PROV | lifted | L1 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | lifted | L2 | 883 | 20000 | identical series 77 of 883 | max |dlambda| 0.3948 | AC12c orbit/sigma 5.409 mean/SE 2.367 over 10 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 14.3 | cpu 23 threads ns/orbit-step 3.073 | thread ns 70.67
+PROV | lifted | L2 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | lifted | L3 | 883 | 20000 | identical series 0 of 883 | max |dlambda| 0.3949 | AC12c orbit/sigma 5.407 mean/SE 2.36 over 10 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 34.17 | cpu 23 threads ns/orbit-step 7.544 | thread ns 173.5
+PROV | lifted | L3 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | lifted | L4 | 883 | 20000 | identical series 0 of 883 | max |dlambda| 0.3949 | AC12c orbit/sigma 5.407 mean/SE 2.36 over 10 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 34.15 | cpu 23 threads ns/orbit-step 7.525 | thread ns 173.1
+PROV | lifted | L4 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | lifted | L4b | 883 | 20000 | identical series 0 of 883 | max |dlambda| 0.3949 | AC12c orbit/sigma 5.407 mean/SE 2.36 over 10 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 48.59 | cpu 23 threads ns/orbit-step 7.922 | thread ns 182.2
+PROV | lifted | L4b | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | lifted | L5 | 883 | 20000 | identical series 0 of 883 | max |dlambda| 0.3949 | AC12c orbit/sigma 5.407 mean/SE 2.36 over 10 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 37.56 | cpu 23 threads ns/orbit-step 7.817 | thread ns 179.8
+PROV | lifted | L5 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | lifted | L5b | 883 | 20000 | identical series 0 of 883 | max |dlambda| 0.3949 | AC12c orbit/sigma 5.407 mean/SE 2.36 over 10 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 38.77 | cpu 23 threads ns/orbit-step 8.186 | thread ns 188.3
+PROV | lifted | L5b | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | lifted | L9 | 883 | 20000 | identical series 0 of 883 | max |dlambda| 0.3949 | AC12c orbit/sigma 5.403 mean/SE 2.36 over 10 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 52.87 | cpu 23 threads ns/orbit-step 8.213 | thread ns 188.9
+PROV | lifted | L9 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | wrapped | L1 | 172 | 20000 | identical series 16 of 172 | max |dlambda| 0.3183 | AC12c orbit/sigma 0 mean/SE 0 over 0 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 80.1 | cpu 23 threads ns/orbit-step 4.494 | thread ns 103.4
+PROV | wrapped | L1 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | wrapped | L2 | 172 | 20000 | identical series 14 of 172 | max |dlambda| 0.3183 | AC12c orbit/sigma 0 mean/SE 0 over 0 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 90.55 | cpu 23 threads ns/orbit-step 4.598 | thread ns 105.7
+PROV | wrapped | L2 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | wrapped | L3 | 172 | 20000 | identical series 0 of 172 | max |dlambda| 0.3183 | AC12c orbit/sigma 0 mean/SE 0 over 0 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 155.4 | cpu 23 threads ns/orbit-step 8.304 | thread ns 191
+PROV | wrapped | L3 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | wrapped | L4 | 172 | 20000 | identical series 0 of 172 | max |dlambda| 0.3183 | AC12c orbit/sigma 0 mean/SE 0 over 0 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 155.7 | cpu 23 threads ns/orbit-step 8.578 | thread ns 197.3
+PROV | wrapped | L4 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | wrapped | L4b | 172 | 20000 | identical series 0 of 172 | max |dlambda| 0.3183 | AC12c orbit/sigma 0 mean/SE 0 over 0 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 213.1 | cpu 23 threads ns/orbit-step 8.452 | thread ns 194.4
+PROV | wrapped | L4b | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | wrapped | L5 | 172 | 20000 | identical series 0 of 172 | max |dlambda| 0.3183 | AC12c orbit/sigma 0 mean/SE 0 over 0 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 171.4 | cpu 23 threads ns/orbit-step 8.268 | thread ns 190.2
+PROV | wrapped | L5 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | wrapped | L5b | 172 | 20000 | identical series 0 of 172 | max |dlambda| 0.3183 | AC12c orbit/sigma 0 mean/SE 0 over 0 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 187.7 | cpu 23 threads ns/orbit-step 8.762 | thread ns 201.5
+PROV | wrapped | L5b | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+ROW | wrapped | L9 | 172 | 20000 | identical series 0 of 172 | max |dlambda| 0.3183 | AC12c orbit/sigma 0 mean/SE 0 over 0 ensembles | PASS | relaunch 777 equal true launches 26 | device ns/orbit-step 241.4 | cpu 23 threads ns/orbit-step 8.971 | thread ns 206.3
+PROV | wrapped | L9 | (backend = :gpu, device = "NVIDIA GeForce RTX 5060 Laptop GPU", reason = "", gpu_chunks = 2, chunk_size = 5472, launch_steps = 20000, launches = 1)
+# ensemble cost, 2048 orbits x 200000 steps; [run.budget].Float64 = Dict{String, Any}("ns_cpu_thread" => 33.09, "safety" => 2.0, "ns_gpu" => 2.468)
+ENS | L1 | (a) tangent-core plan 12.5 ns per orbit-step, launches 2 of 106883 steps, batches 3 of 1024 | (b) launches of 1e4 7.061 ns per orbit-step, batches 2 of 10944 | (c) cpu 23 threads 4.27 ns per orbit-step (98.22 thread-ns)
+ENS | L2 | (a) tangent-core plan 11.26 ns per orbit-step, launches 2 of 106883 steps, batches 3 of 1024 | (b) launches of 1e4 6.311 ns per orbit-step, batches 2 of 10944 | (c) cpu 23 threads 3.19 ns per orbit-step (73.38 thread-ns)
+ENS | L3 | (a) tangent-core plan 25.23 ns per orbit-step, launches 2 of 106883 steps, batches 3 of 1024 | (b) launches of 1e4 14.64 ns per orbit-step, batches 2 of 10944 | (c) cpu 23 threads 8.975 ns per orbit-step (206.4 thread-ns)
+ENS | L4 | (a) tangent-core plan 25.27 ns per orbit-step, launches 2 of 106883 steps, batches 3 of 1024 | (b) launches of 1e4 14.63 ns per orbit-step, batches 2 of 10944 | (c) cpu 23 threads 8.445 ns per orbit-step (194.2 thread-ns)
+ENS | L4b | (a) tangent-core plan 36.08 ns per orbit-step, launches 2 of 106883 steps, batches 3 of 1024 | (b) launches of 1e4 20.73 ns per orbit-step, batches 2 of 10944 | (c) cpu 23 threads 10.09 ns per orbit-step (232.2 thread-ns)
+ENS | L5 | (a) tangent-core plan 27.22 ns per orbit-step, launches 2 of 106883 steps, batches 3 of 1024 | (b) launches of 1e4 15.92 ns per orbit-step, batches 2 of 10944 | (c) cpu 23 threads 9.943 ns per orbit-step (228.7 thread-ns)
+ENS | L5b | (a) tangent-core plan 28.14 ns per orbit-step, launches 2 of 106883 steps, batches 3 of 1024 | (b) launches of 1e4 16.61 ns per orbit-step, batches 2 of 10944 | (c) cpu 23 threads 11.6 ns per orbit-step (266.8 thread-ns)
+ENS | L9 | (a) tangent-core plan 39.05 ns per orbit-step, launches 2 of 106883 steps, batches 3 of 1024 | (b) launches of 1e4 22.66 ns per orbit-step, batches 2 of 10944 | (c) cpu 23 threads 10.34 ns per orbit-step (237.9 thread-ns)
+
+real	7m49.965s
+user	0m0.000s
+sys	0m0.000s
+
+## Phase 2: AC13 record retaken at 23 threads: GPU_ONLY=record julia --project=verify -t 23 verify/gpu.jl (previous record copied to data/gpu-benchmark-4threads-2026-10-17.toml)
+# gpu verification, julia 1.13.2, threads 23, cpu arrowlake-s, base seed 20261012
+# device type ChaoslabCUDAExt.CUDADevice, name 'NVIDIA GeForce RTX 5060 Laptop GPU'
+# CUDA.jl 6.4.2, runtime 13.4.0, driver 13.4.0, capability 12.0.0, free memory 6925.0 MiB, stack limit 4096 B (extension minimum D40)
+# Windows TDR registry values (GraphicsDrivers): TdrDelay    REG_DWORD    0x8; TdrDDIDelay    REG_DWORD    0xa; TdrLevel    REG_DWORD    0x3
+# record file: C:\Users\tesse\Documents\Vibe Coding\Chaos\data\gpu-benchmark.toml (exists at start)
+# probe Float64: (loadable = true, functional = true, device = "NVIDIA GeForce RTX 5060 Laptop GPU", compiles = true, gpu_faster = true)
+# probe Double64: (loadable = true, functional = true, device = "NVIDIA GeForce RTX 5060 Laptop GPU", compiles = false, gpu_faster = false)
+# format: AC<n> | quantity | value | bound | verdict
+# starting 1-thread CPU child run (AC13 sizes: Dict{DataType, Tuple{Int64, Int64}}(Double64 => (500, 1000), Float64 => (20000, 1000)))
+D44 | tangent-core: record: GPU ns/orbit-step at one wave, T=Float64 (1024 orbits x 1e4 steps, one launch, slower of 2) | 9.22 | recorded | INFO
+AC13 | tangent-core: GPU wall s, T=Float64, 100000 orbits x 1000 steps (d=2, k=2, K=2pi, LogNorm reducer, tau=1, chunk 8000): 2.493 ns/orbit-step vs CPU 1 thread(s) 38.15 ns/orbit-step; speedup 15.3; extrapolated to 1e6 x 1e4: 24.93 s | 0.2493 | GPU<=CPU: 3.815 s | PASS
+AC13 | tangent-core: GPU wall s, T=Float64, 100000 orbits x 1000 steps (d=2, k=2, K=2pi, LogNorm reducer, tau=1, chunk 8000): 2.493 ns/orbit-step vs CPU 23 thread(s) 3.385 ns/orbit-step; speedup 1.358; extrapolated to 1e6 x 1e4: 24.93 s | 0.2493 | GPU<=CPU: 0.3385 s | PASS
+# record Float64 -> Dict{String, Any}("cpu_ns_per_step" => 3.3850819999999997, "gpu_ns_per_step" => 2.493011, "date" => "2026-10-19", "threads" => 23, "gpu_ns_per_step_wave" => 9.21958984375, "gpu_faster" => true)
+AC13 | tangent-core: GPU wall s, T=Double64, 2000 orbits x 1000 steps, vs CPU 1 thread(s): 1750 ns/orbit-step | - | GPU<=CPU | FALLBACK(kernel does not compile for the element type)
+AC13 | tangent-core: GPU wall s, T=Double64, 2000 orbits x 1000 steps, vs CPU 23 thread(s): 132.5 ns/orbit-step | - | GPU<=CPU | FALLBACK(kernel does not compile for the element type)
+# record Double64 -> Dict{String, Any}("cpu_ns_per_step" => 132.45755000000003, "reason" => "kernel does not compile for the element type", "date" => "2026-10-19", "threads" => 23, "gpu_faster" => false)
+AC11 | precision: GPU Double64/Float64 time ratio, same ensemble as AC13: Float64 GPU 2.493 ns/orbit-step; CPU ratio 39.13 (4 threads, this run) | - | reported, no threshold | FALLBACK(kernel does not compile for the element type)
+┌ Warning: linking module flags 'Dwarf Version': IDs have conflicting values ('i32 4' from globals with 'i32 2' from start)
+└ @ LLVM C:\Users\tesse\.julia\packages\LLVM\tiRVR\src\core\context.jl:209
+# after the record: resolve_backend(:auto, Float64) = BackendChoice(:gpu, "NVIDIA GeForce RTX 5060 Laptop GPU", ""); (:auto, Double64) = BackendChoice(:cpu, "cpu", "kernel does not compile for the element type")
+# SUMMARY FALLBACK=3, INFO=1, PASS=2 (6 lines)
+
+real	0m21.326s
+user	0m0.015s
+sys	0m0.015s
+
+## Phase 3: backend table after the record (EXD_ONLY=table), then a pilot on the real device (run_pilot, real prereg and panel, 23 threads)
+# D53 device check, julia 1.13.2, threads 23, cpu arrowlake-s, horizon 20000
+# device ChaoslabCUDAExt.CUDADevice, NVIDIA GeForce RTX 5060 Laptop GPU, CUDA.jl 6.4.2, runtime 13.4.0, free 6925.0 MiB, stack limit 4096 B
+# plan (items = 15741, chunks = 1387), [run.k19].threads = 23, [run.verify] = Dict{String, Any}("rerun_sample" => 20, "backend_agreement" => Dict{String, Any}("mean_standard_errors" => 4.0, "per_orbit_sigma" => 6.0)), [run.budget].Float64 = Dict{String, Any}("ns_cpu_thread" => 33.09, "safety" => 2.0, "ns_gpu" => 2.468)
+# record in force (data/gpu-benchmark.toml, Float64): (threads = 23, cpu_ns_per_step = 3.3850819999999997, gpu_ns_per_step = 2.493011, gpu_faster = true, date = "2026-10-19")
+# backend table at 23 threads (precision, method: request, backend, device, reason, note)
+TABLE | BigFloat | L1 | cpu | cpu | cpu |  | 
+TABLE | BigFloat | L5 | cpu | cpu | cpu |  | 
+TABLE | BigFloat | L9 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L1 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L3 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L5 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L9 | cpu | cpu | cpu |  | 
+TABLE | Float64 | L1 | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+TABLE | Float64 | L2 | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+TABLE | Float64 | L3 | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+TABLE | Float64 | L4 | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+TABLE | Float64 | L4b | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+TABLE | Float64 | L5 | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+TABLE | Float64 | L5b | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+TABLE | Float64 | L6 | auto | cpu | cpu | reducer is CPU-only | 
+TABLE | Float64 | L9 | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+PILOT | wall s 169.4 | out C:\Users\tesse\AppData\Local\Temp\jl_wuBMH6
+PILOT-COST | L1 | BigFloat | cpu | thread-s/orbit-step 0.00021065894484519957 | wall-s/orbit-step 9.159084558486938e-6
+PILOT-COST | L1 | Double64 | cpu | thread-s/orbit-step 4.963891406853993e-6 | wall-s/orbit-step 2.1582136551539103e-7
+PILOT-COST | L1 | Float64 | gpu | thread-s/orbit-step 1.7410703831248813e-7 | wall-s/orbit-step 1.7410703831248813e-7
+PILOT-COST | L2 | Float64 | gpu | thread-s/orbit-step 1.5984795490900676e-7 | wall-s/orbit-step 1.5984795490900676e-7
+PILOT-COST | L3 | Double64 | cpu | thread-s/orbit-step 6.618484556674957e-6 | wall-s/orbit-step 2.877601981163025e-7
+PILOT-COST | L3 | Float64 | gpu | thread-s/orbit-step 3.7107770641644793e-7 | wall-s/orbit-step 3.7107770641644793e-7
+PILOT-COST | L4 | Float64 | gpu | thread-s/orbit-step 1.97675625483195e-7 | wall-s/orbit-step 1.97675625483195e-7
+PILOT-COST | L4b | Float64 | gpu | thread-s/orbit-step 5.267669757207234e-7 | wall-s/orbit-step 5.267669757207234e-7
+PILOT-COST | L5 | BigFloat | cpu | thread-s/orbit-step 0.000340612979332606 | wall-s/orbit-step 1.480925997098287e-5
+PILOT-COST | L5 | Double64 | cpu | thread-s/orbit-step 7.0996751387914026e-6 | wall-s/orbit-step 3.0868152777353925e-7
+PILOT-COST | L5 | Float64 | gpu | thread-s/orbit-step 3.06978980700175e-7 | wall-s/orbit-step 3.06978980700175e-7
+PILOT-COST | L5b | Float64 | gpu | thread-s/orbit-step 4.7019814451535544e-7 | wall-s/orbit-step 4.7019814451535544e-7
+PILOT-COST | L6 | Float64 | cpu | thread-s/orbit-step 5.428916712601979e-7 | wall-s/orbit-step 2.360398570696513e-8
+PILOT-COST | L9 | BigFloat | cpu | thread-s/orbit-step 0.00036443209707736967 | wall-s/orbit-step 1.5844873785972596e-5
+PILOT-COST | L9 | Double64 | cpu | thread-s/orbit-step 7.433504660924276e-6 | wall-s/orbit-step 3.231958548227946e-7
+PILOT-COST | L9 | Float64 | gpu | thread-s/orbit-step 6.073143250412412e-7 | wall-s/orbit-step 6.073143250412412e-7
+PILOT-FILES | 288 chunk files by (backend, reason): Dict(("gpu", "") => 234, ("cpu", "") => 42, ("cpu", "reducer is CPU-only") => 12)
+PILOT-ARMS | Dict{String, Any}("projected_thread_seconds" => 29641.05986942537, "first_chunk_cap_ns" => 132.36, "wall_cap_hours" => 12.0, "budget_line_ns" => 66.18, "planned_unique_steps" => 79470000000, "projected_wall_seconds" => 1353.4583715466383)
+
+## Phase 4: attribution of the device cost (propagate on the device with and without the recorder's monitor)
+# attribution of the device cost per orbit-step, 2048 orbits x 2e5 steps, K = 5, same launch plan (propagate, default plan), lifted, tau 1
+ATTR | Benettin | 7.163 ns per orbit-step | backend gpu
+ATTR | Benettin + RunMonitor | 10.98 ns per orbit-step | backend gpu
+ATTR | QRSpectrum(HouseholderQR) | 18.55 ns per orbit-step | backend gpu
+ATTR | QRSpectrum(HouseholderQR) + RunMonitor | 22.35 ns per orbit-step | backend gpu

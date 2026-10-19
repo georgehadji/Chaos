@@ -1,6 +1,6 @@
 # Experiments
 
-Study inputs built from a frozen preregistration, and the study runner. First scope (decision D49): the orbit panel of a study, read by study/02 and then study/03. Second scope (decision D53): the run plan, the chunked and resumable executor with health checks, the run store (one HDF5 file per chunk), the manifest, the pilot and the command-line entry point `bin/chaoslab.jl` (panel, run, pilot). Imports Foundation, Systems, Tangent, Lyapunov and Diagnostics; nothing imports it. The panel builder is CPU only (class assignment must be bit-identical); the recorder of the runner is CPU only too (known limit, see the implementation notes).
+Study inputs built from a frozen preregistration, and the study runner. First scope (decision D49): the orbit panel of a study, read by study/02 and then study/03. Second scope (decision D53): the run plan, the chunked and resumable executor with health checks, the run store (one HDF5 file per chunk), the manifest, the pilot and the command-line entry point `bin/chaoslab.jl` (panel, run, pilot). Imports Foundation, Systems, Tangent, Lyapunov and Diagnostics; nothing imports it. The panel builder is CPU only (class assignment must be bit-identical); the recorder of the runner runs on the CPU, and on the device for the eight kernel-path methods (L1, L2, L3, L4, L4b, L5, L5b, L9; L6 is CPU only).
 
 Spec: `workspaces/module-build/stages/01-spec/output/experiments-spec.md` (amendments D50 withdrawn, D51, D52, D53). Store layout: `schema/run-store.md` (version 2). Run block: preregistration Amendment A4. Report: `stages/04-verify/output/experiments-verification.md`. Oracle script: `verify/experiments.jl`.
 
@@ -30,6 +30,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/experiments-spec.md` (amend
 | `run_grid.jl` | `record_grid`, `grid_hash`, `deviation_frame`, `code_version`; exact closed-form evaluation (decimals read as decimals) |
 | `run_plan.jl` | `plan_run`, `plan_text`, `chunk_text`, `item_text`, `item_hash`: work items, chunks, hashes, step counts (R1, I11) |
 | `run_backend.jl` | `resolve_run_backend`, `backend_table`, `cpu_only_method`, `launch_capacity`, `launch_groups` (R3, R4) |
+| `run_device.jl` | `device_records`, `compute_group`: the isbits recorder on the KernelAbstractions kernels (CPU backend in tests, CUDA on the device), step-chunked launches, grid records in preallocated per-orbit arrays, fallback per group |
 | `run_record.jl` | `OrbitRecord`, the non-raising residual monitor, the per-orbit recording loop on the shared tangent body, `hot_loop_bytes` (R2) |
 | `run_store.jl` | `write_chunk` (atomic), `read_chunk`, `chunk_layout`, `read_json` (R6, R10) |
 | `run_health.jl` | health checks of a chunk attempt: non-finite values, exceedance fraction, drift, setup check, exact-exponent controls (R5) |
@@ -45,4 +46,4 @@ Spec: `workspaces/module-build/stages/01-spec/output/experiments-spec.md` (amend
 
 Same inputs, same machine and Julia version: byte-identical panel file at any thread count (D52). The manifest records the Julia version and the StableRNGs version; host, time and thread data go only to the sidecar.
 
-Runner: the stored datasets of a work item depend on its inputs and the code version only (I12): bit-identical for any thread count, launch capacity, chunk grouping and run order on the CPU. A resumed campaign equals an uninterrupted one in every dataset and attribute except times, host fields and session lists (I14). No random numbers are used by the runner; pilot starts come from a stream keyed by the pilot seed label.
+Runner: the stored datasets of a work item depend on its inputs and the code version only (I12): bit-identical for any thread count, launch capacity, chunk grouping and run order on the CPU. A device chunk records `backend` gpu and agrees with the CPU loop within backend_agreement (bit for bit on the KernelAbstractions CPU backend); a failed device chunk is rerun on the CPU. A resumed campaign equals an uninterrupted one in every dataset and attribute except times, host fields and session lists (I14). No random numbers are used by the runner; pilot starts come from a stream keyed by the pilot seed label.

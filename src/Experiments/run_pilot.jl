@@ -102,27 +102,29 @@ end
 # One pilot group: compute, time by the clock hook, write one chunk file per K, return what the report needs.
 function _pilot_group!(plan, ctx, hooks, store, its, gi, ordinal0, o)
     steps = sum(it.horizon for it in its)
-    info = (group = gi, chunks = Int[], arms = String[], orbits = length(its), steps = steps, backend = :cpu)
+    row = o.table[(_label(first(its).precision), first(its).method)]
+    info = (group = gi, chunks = Int[], arms = String[], orbits = length(its), steps = steps,
+            backend = row.backend === :gpu && !o.lost[] ? :gpu : :cpu)
     ntask = tasks_for(first(its).precision, o.threads, steps)
     prime_frames!(ctx, its)
-    warm_up!(ctx, its, ntask)
+    warm_up!(ctx, its, ntask; dev = info.backend === :gpu)
     times = zeros(length(its))
     t0 = _now(hooks, :group_start, info)
     r0 = time_ns()
-    recs = compute_records(ctx, its, ntask; times = times)
+    recs, prov = compute_group(ctx, its, ntask, row, o.lost; times = times)
     t1 = _now(hooks, :group_end, info)
     real_wall = (time_ns() - r0) / NS_PER_S
-    workers = min(ntask, length(its))
+    workers = prov.backend === :gpu ? 1 : min(ntask, length(its))
     cells = _cells(its)
     for (n, idx) in enumerate(cells)
         it, key = its[first(idx)], _chunk_key(its[first(idx)])
         hash = bytes2hex(sha256(key * join(sort(String[its[i].hash for i in idx]), ",")))
         attrs = _attrs(plan, it, o.table[(_label(it.precision), it.method)], ordinal0 + n, key, hash, String[], length(idx); git = o.git.sha,
                        threads = o.threads, capacity = o.capacity, utc = _utc(t1), status = "ok", attempt = 1, first_reasons = String[],
-                       failure_reasons = String[], setup = "not applicable", pilot = true)
+                       failure_reasons = String[], setup = "not applicable", pilot = true, prov = prov)
         write_chunk(chunk_path(store, ordinal0 + n), attrs, recs[idx])
     end
-    return (its = its, recs = recs, steps = steps, wall = t1 - t0, workers = workers, cells = length(cells),
+    return (its = its, recs = recs, steps = steps, wall = t1 - t0, workers = workers, cells = length(cells), backend = prov.backend,
             eff = real_wall > 0 ? clamp(sum(times) / (real_wall * workers), 0.0, 1.0) : 1.0)
 end
 
@@ -154,6 +156,7 @@ end
 
 function _pilot_report(plan, starts, groups, o, dirty)
     cost = _pilot_costs(groups)
+    bk = Dict((first(g.its).method, _label(first(g.its).precision)) => g.backend for g in groups)
     eff = isempty(groups) ? 1.0 : sum(g.eff for g in groups) / length(groups)
     share = Dict{String, Any}()
     for m in unique(it.method for it in plan.items)
@@ -161,7 +164,7 @@ function _pilot_report(plan, starts, groups, o, dirty)
         share[m] = isempty(rs) ? 0.0 : count(exceeded, rs) / length(rs)
     end
     return Dict{String, Any}("not_study_data" => PILOT_NOTE, "starts" => starts, "plan_sha256" => plan.hash,
-        "cost" => [Dict{String, Any}("method" => m, "precision" => p, "backend" => "cpu", "thread_seconds_per_orbit_step" => c[3] / c[1],
+        "cost" => [Dict{String, Any}("method" => m, "precision" => p, "backend" => String(bk[(m, p)]), "thread_seconds_per_orbit_step" => c[3] / c[1],
                                      "wall_seconds_per_orbit_step" => c[2] / c[1]) for ((m, p), c) in sort!(collect(cost); by = first)],
         "arms" => _pilot_arms(plan, cost, eff, o.threads), "first_departure" => _first_departure(plan, starts),
         "k19" => Dict{String, Any}("threads" => plan.block.raw["k19"]["threads"], "device_record" => _record_dict(o.records[1]),
@@ -187,7 +190,7 @@ function run_pilot(prereg::AbstractString, panel::AbstractString; out::AbstractS
     items, groups = pilot_items(plan, starts)
     ctx = make_ctx(plan, items)
     cap = capacity === nothing ? _launch_capacity(plan, Int(Sys.free_memory()), 0.5) : max(1, Int(capacity))
-    o = (threads = Int(threads), capacity = cap, git = git, records = (rec, prior_record), table = backend_table(plan; threads = threads, record = rec))
+    o = (threads = Int(threads), capacity = cap, git = git, records = (rec, prior_record), lost = Ref(false), table = backend_table(plan; threads = threads, record = rec))
     store = joinpath(out, "store")
     mkpath(store)
     Threads.nthreads() > 1 && LinearAlgebra.BLAS.set_num_threads(1)

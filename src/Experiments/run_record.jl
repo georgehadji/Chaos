@@ -264,9 +264,9 @@ const WARM_STEPS = 1000   # steps of the warm-up run of a run type (an item shor
 
 # Compile every code path of the run types once (and the parallel path when `nt > 1`), outside the timed region of the first group
 # (R5 item 5 measures a warm run).
-function warm_up!(ctx, items, nt::Integer)
+function warm_up!(ctx, items, nt::Integer; dev::Bool = false)
     for it in items
-        key = (typeof(it), it.precision, it.method, it.vectors, it.coordinate_mode, it.system)
+        key = (typeof(it), it.precision, it.method, it.vectors, it.coordinate_mode, it.system, dev)
         key in ctx.warmed && continue
         push!(ctx.warmed, key)
         w = merge(it, (horizon = min(it.horizon, it.tau * cld(WARM_STEPS, it.tau)),))
@@ -274,7 +274,8 @@ function warm_up!(ctx, items, nt::Integer)
             gr = ctx.plan.block.raw["grid"]
             record_grid(w.horizon, w.tau; points_per_decade = gr["points_per_decade"], first_steps = gr["first_steps"], extra_fractions = gr["extra_fractions"])
         end
-        compute_records(ctx, NamedTuple[w for _ in 1:max(1, Int(nt))], nt)
+        ws = NamedTuple[w for _ in 1:max(1, Int(nt))]
+        dev ? device_records(ctx, ws; hook = false) : compute_records(ctx, ws, nt)
     end
 end
 

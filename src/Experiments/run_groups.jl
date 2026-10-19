@@ -11,30 +11,39 @@ function _impl(method)
 end
 
 function _attrs(plan, it, row, ordinal, key, hash, arms, norbits; git, threads, capacity, utc, status, attempt, first_reasons, failure_reasons,
-                setup, pilot)
-    reason = row.backend === :gpu ? Foundation.FALLBACK_REASONS[6] : row.reason     # the recorder is CPU-only (known limit)
+                setup, pilot, prov = cpu_prov(row.reason))
+    gpu = prov.backend === :gpu
     orth, impl = _impl(it.method)
     a = Dict{String, Any}("schema_version" => 2, "study" => plan.study, "chunk" => ordinal, "chunk_key" => key, "chunk_hash" => hash,
         "plan_sha256" => plan.hash, "panel_sha256" => plan.panel.sha256, "git_sha" => git, "code_version" => plan.code_version,
         "prereg_sha256" => plan.prereg_header, "config_sha256" => block_hash(plan.block), "julia_version" => string(VERSION),
         "packages" => packages_hash(), "cpu" => Sys.CPU_NAME, "threads" => threads, "backend_request" => String(row.request),
-        "backend" => "cpu", "device" => "cpu", "backend_fallback_reason" => reason, "precision" => it.precision, "method" => it.method,
+        "backend" => String(prov.backend), "device" => prov.device, "backend_fallback_reason" => prov.reason, "precision" => it.precision, "method" => it.method,
         "horizon" => it.horizon, "tau" => it.tau, "vectors" => it.vectors, "coordinate_mode" => it.coordinate_mode,
         "direction" => it.direction, "grid_sha256" => it.grid_sha256, "status" => status, "attempt" => attempt,
         "first_attempt_reasons" => first_reasons, "failure_reasons" => failure_reasons, "pilot" => pilot, "arms" => arms,
-        "renorm_interval_tau" => it.tau, "deviation_vectors_k" => it.vectors, "seed" => parse(Int, it.run_seed), "chunk_size" => capacity,
-        "gpu_chunks" => 0, "steps_per_launch" => it.horizon, "launches_per_chunk" => cld(norbits, capacity), "orthonormalizer" => orth,
+        "renorm_interval_tau" => it.tau, "deviation_vectors_k" => it.vectors, "seed" => parse(Int, it.run_seed),
+        "chunk_size" => gpu ? prov.chunk_size : capacity, "gpu_chunks" => prov.gpu_chunks, "steps_per_launch" => gpu ? prov.launch_steps : it.horizon,
+        "launches_per_chunk" => gpu ? prov.launches : cld(norbits, capacity), "orthonormalizer" => orth,
         "implementation" => impl, "setup_check" => setup, "created_utc" => utc, "complete" => true)
     it.eps === nothing || (a["perturbation"] = it.eps)
     return a
 end
 
+# Provenance of a chunk: the group's; the rerun of attempt 2 is on the CPU, after a device attempt for the fifth reason.
+function _chunk_prov(s, chunk, row, attempt)
+    prov = get(s.provs, chunk.ordinal, cpu_prov(row.reason))
+    return attempt >= 2 && prov.backend === :gpu ? cpu_prov(Foundation.FALLBACK_REASONS[5]) : prov
+end
+
 function chunk_attrs(s, chunk, status, attempt, first_reasons, failure_reasons, setup)
     plan = s.ctx.plan
     it = plan.items[first(chunk.items)]
-    return _attrs(plan, it, s.table[(_label(it.precision), it.method)], chunk.ordinal, chunk.key, chunk.hash, chunk.arms, length(chunk.items);
+    row = _row(s, it)
+    return _attrs(plan, it, row, chunk.ordinal, chunk.key, chunk.hash, chunk.arms, length(chunk.items);
                   git = s.git.sha, threads = s.threads, capacity = s.capacity, utc = _utc(s.now), status = status, attempt = attempt,
-                  first_reasons = first_reasons, failure_reasons = failure_reasons, setup = setup, pilot = false)
+                  first_reasons = first_reasons, failure_reasons = failure_reasons, setup = setup, pilot = false,
+                  prov = _chunk_prov(s, chunk, row, attempt))
 end
 
 # ---------------------------------------------------------------- computing
@@ -80,7 +89,8 @@ end
 # ---------------------------------------------------------------- one chunk
 function _attempt!(s::Session, chunk, attempt, recs)
     plan = s.ctx.plan
-    s.hooks.mutate === nothing || s.hooks.mutate((ordinal = chunk.ordinal, attempt = attempt, backend = :cpu, chunk = chunk,
+    backend = attempt == 1 ? get(s.provs, chunk.ordinal, cpu_prov()).backend : :cpu
+    s.hooks.mutate === nothing || s.hooks.mutate((ordinal = chunk.ordinal, attempt = attempt, backend = backend, chunk = chunk,
                                                   items = plan.items[chunk.items], arms = chunk.arms), recs)
     return check_chunk!(s.ctx, chunk, recs)
 end
@@ -126,12 +136,16 @@ function finish_chunk!(s::Session, chunk, recs)
 end
 
 # ---------------------------------------------------------------- one group
+_row(s::Session, it) = s.table[(_label(it.precision), it.method)]
+
 function group_info(s::Session, gi, todo)
     plan = s.ctx.plan
     its = [plan.items[i] for o in todo for i in plan.chunks[o].items]
+    row = _row(s, first(its))
     armset = Set(a for o in todo for a in plan.chunks[o].arms)
     arms = [a["name"] for a in plan.block.raw["arm"] if a["name"] in armset]
-    return (group = gi, chunks = todo, arms = arms, orbits = length(its), steps = sum(it.horizon for it in its; init = 0), backend = :cpu)
+    return (group = gi, chunks = todo, arms = arms, orbits = length(its), steps = sum(it.horizon for it in its; init = 0),
+            backend = row.backend === :gpu && !s.device_lost[] ? :gpu : :cpu)
 end
 
 function _refresh_paused!(s::Session)
@@ -155,7 +169,7 @@ function pre_group_stop(s::Session, t)
 end
 
 # First completed group of an arm against its budget line (R5 item 5): over first_chunk_cost_factor times the line pauses the arm.
-function measure_arms!(s::Session, info, wall, workers)
+function measure_arms!(s::Session, info, wall, workers, backend::Symbol = :cpu)
     rb = s.ctx.plan.block
     factor = rb.raw["health"]["first_chunk_cost_factor"]
     cost_ns = NS_PER_S * wall * workers / info.steps
@@ -164,9 +178,10 @@ function measure_arms!(s::Session, info, wall, workers)
         (name in info.arms && !(name in s.measured)) || continue
         push!(s.measured, name)
         name in s.cap_override && continue
-        if cost_ns > factor * budget_line_ns(rb, arm)
+        line = budget_line_ns(rb, arm, backend)
+        if cost_ns > factor * line
             push!(s.paused, name)
-            push!(s.reasons, "arm $name paused: measured $(round(cost_ns; digits = 3)) ns per orbit-step above $factor times the budget line $(budget_line_ns(rb, arm)) ns")
+            push!(s.reasons, "arm $name paused: measured $(round(cost_ns; digits = 3)) ns per orbit-step above $factor times the budget line $line ns")
         end
     end
 end
@@ -175,15 +190,15 @@ end
 # by cold-start effects and timer jitter: its first measurement is repeated and the shortest wall time taken (same results).
 function timed_compute!(s::Session, items, ntask, info)
     small = s.hooks.clock === nothing && info.steps <= SMALL_GROUP_STEPS && any(a -> !(a in s.measured || a in s.cap_override), info.arms)
-    best, recs = Inf, OrbitRecord[]
+    best, recs, prov = Inf, OrbitRecord[], cpu_prov()
     for _ in 1:(small ? 5 : 1)
         t = _now(s.hooks, :group_start, info)
         s.now = t
-        recs = compute_records(s.ctx, items, ntask)
+        recs, prov = compute_group(s.ctx, items, ntask, _row(s, first(items)), s.device_lost)
         s.now = _now(s.hooks, :group_end, info)
         best = min(best, s.now - t)
     end
-    return recs, best
+    return recs, best, prov
 end
 
 # Run one launch group; true when the campaign stops here.
@@ -196,7 +211,7 @@ function run_group!(s::Session, gi, ordinals)
     items = NamedTuple[plan.items[i] for o in todo for i in plan.chunks[o].items]
     prime_frames!(s.ctx, items)
     ntask = tasks_for(first(items).precision, s.threads, info.steps)
-    warm_up!(s.ctx, items, ntask)
+    warm_up!(s.ctx, items, ntask; dev = info.backend === :gpu)
     t = _now(s.hooks, :group_start, info)
     s.now = t
     stop = pre_group_stop(s, t)
@@ -205,10 +220,13 @@ function run_group!(s::Session, gi, ordinals)
         push!(s.reasons, stop[2])
         return true
     end
-    recs, wall = timed_compute!(s, items, ntask, info)
-    workers = min(ntask, length(items))
+    recs, wall, prov = timed_compute!(s, items, ntask, info)
+    for o in todo
+        s.provs[o] = prov
+    end
+    workers = prov.backend === :gpu ? 1 : min(ntask, length(items))
     _fill_costs!(recs, items, wall, workers, info.steps)
-    measure_arms!(s, info, wall, workers)
+    measure_arms!(s, info, wall, workers, prov.backend)
     lo = 0
     for o in todo
         n = length(plan.chunks[o].items)

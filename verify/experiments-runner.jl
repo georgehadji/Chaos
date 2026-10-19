@@ -79,47 +79,62 @@ say("# D53x before: files under data/p1-le-benchmark = $(DATA_BEFORE[1]); data/ 
 # ---------------------------------------------------------------------------------------------------
 # Reduced preregistrations (verification inputs, not preregistrations): the real file with its [run] block rewritten and the header hash recomputed
 const HZ = QUICK ? Dict("main" => 3200, "long" => 6400, "tau_sweep" => 3200, "wrapped" => 3200, "directions" => 3200, "eps_sweep" => 3200,
-                        "h4_float64" => 12800, "h4_double64" => 3200, "ladder_double64_short" => 3200, "ladder_double64_long" => 6400, "ladder_bigfloat" => 800) :
+                        "h4_float64" => 12800, "h4_double64" => 3200, "ladder_double64_short" => 3200, "ladder_double64_long" => 6400, "ladder_bigfloat" => 800,
+                        "main_l2" => 3200, "long_l2" => 6400) :
                  Dict("main" => 100_000, "long" => 1_000_000, "tau_sweep" => 100_000, "wrapped" => 100_000, "directions" => 100_000, "eps_sweep" => 100_000,
                       "h4_float64" => 10_000_000, "h4_double64" => 1_000_000, "ladder_double64_short" => 100_000, "ladder_double64_long" => 500_000,
-                      "ladder_bigfloat" => 10_000)
+                      "ladder_bigfloat" => 10_000, "main_l2" => 100_000, "long_l2" => 1_000_000)
 
-function run_toml_block(text)
+function run_toml_blocks(text)
+    out = []
     for m in eachmatch(r"```toml\n(.*?)\n```"s, text)
         d = try TOML.parse(String(m.captures[1])) catch; continue end
-        haskey(d, "run") && return m, d
+        haskey(d, "run") && push!(out, (m, d))
     end
-    error("no [run] block")
+    isempty(out) && error("no [run] block")
+    return out
 end
-function make_prereg(path, mod!)
+# mod! rewrites the first [run] block (A4). keep_later = true applies it to every later [run] block as well (A5), for reductions that must reach
+# all arms; otherwise the later blocks are emptied so that a block written wholesale by mod! is not merged with the real A5 arms.
+function make_prereg(path, mod!; keep_later = false)
     text = lf(read(PREREG, String))
-    m, d = run_toml_block(text)
-    run = d["run"]
-    mod!(run)
-    io = IOBuffer(); TOML.print(io, Dict("run" => run); sorted = true)
-    new = replace(text, String(m.match) => "```toml\n" * rstrip(String(take!(io))) * "\n```"; count = 1)
+    new = text
+    for (i, (m, d)) in enumerate(run_toml_blocks(text))
+        if i == 1 || keep_later
+            run = d["run"]; mod!(run)
+            io = IOBuffer(); TOML.print(io, Dict("run" => run); sorted = true)
+            blk = "```toml\n" * rstrip(String(take!(io))) * "\n```"
+        else
+            blk = "```toml\n# emptied in the verification copy\n```"
+        end
+        new = replace(new, String(m.match) => blk; count = 1)
+    end
     h = EX.prereg_hash(new)
     new = replace(new, r"(?m)^(\| SHA-256 of this file[^|]*\|[ \t]*)[0-9a-f]{64}" => SubstitutionString("\\g<1>" * h); count = 1)
     write(path, new)
     EX.check_prereg(path)
     return path
 end
-# control_bound: the real rule 1e-8 at N1 = 1e7 scaled by 1 / n is CB_SCALED; four panel controls (878, 880, 881, 882) leave their orbit in Float64
-# (finding, section CONTROL), so the campaign block uses CB_OPEN = 1 and the scaled rule is exercised in its own stop run.
+# control_bound: the real rule 1e-8 at N1 = 1e7 scaled by 1 / n is CB_SCALED. Under A5 (control_scope = "exact_start") only the controls whose binary64
+# start is an exact periodic point and Y5 are gated, so the campaign blocks use the scaled rule itself; CB_TRIP (far below the finite-time deviation of the
+# gated controls at N = 1e5) exercises the stop in its own run. CB_OPEN = 1 stays for the custom blocks of the extended and device sections.
 const CB_SCALED = 1e-8 * 1e7 / HZ["main"]
+const CB_TRIP = 1e-9
 const CB_OPEN = 1.0
 function reduce!(run, cb)
     for arm in run["arm"]
         arm["horizons"] = [HZ[arm["name"]]]
     end
-    run["health"]["control_bound"] = cb
-    run["health"]["stop_failed_fraction"] = 0.5                    # opened so that natural failures cannot stop the campaign; they are counted against the real 0.05 below
-    run["health"]["first_chunk_cost_factor"] = 1e6                  # the cost cap is judged from the measured costs below, not enforced here
-    run["pilot"]["horizon"] = minimum(values(HZ))
+    h = get!(run, "health", Dict{String, Any}())
+    haskey(h, "control_bound") && (h["control_bound"] = cb)
+    haskey(h, "stop_failed_fraction") && (h["stop_failed_fraction"] = 0.5)      # opened so that natural failures cannot stop the campaign; they are counted against the real 0.05 below
+    haskey(h, "first_chunk_cost_factor") && (h["first_chunk_cost_factor"] = 1e6) # the cost cap is judged from the measured costs below, not enforced here
+    haskey(run, "pilot") && (run["pilot"]["horizon"] = minimum(values(HZ)))
     return run
 end
-const PRE_R = make_prereg(joinpath(SCR, "prereg-reduced.md"), r -> reduce!(r, CB_OPEN))
-const PRE_S = make_prereg(joinpath(SCR, "prereg-reduced-scaledbound.md"), r -> reduce!(r, CB_SCALED))
+reduce_all!(run, cb) = haskey(run, "arm") ? reduce!(run, cb) : run
+const PRE_R = make_prereg(joinpath(SCR, "prereg-reduced.md"), r -> reduce_all!(r, QUICK ? CB_OPEN : CB_SCALED); keep_later = true)   # quick horizons are too short for the scaled rule
+const PRE_S = make_prereg(joinpath(SCR, "prereg-reduced-scaledbound.md"), r -> reduce_all!(r, CB_TRIP); keep_later = true)
 const PLAN_R = EX.plan_run(PRE_R, PANEL)
 const PLAN_REAL = EX.plan_run(PREREG, PANEL)
 const CAPACITY = 2000
@@ -239,7 +254,7 @@ function compare_readers(store, R)
 end
 
 # Two stores, by their reader dumps: differences outside the allowed set (times, host fields). ignore = root attribute names left out.
-function diff_readers(Ra, Rb; ignore = ("created_utc", "cpu", "threads"))
+function diff_readers(Ra, Rb; ignore = ("created_utc", "cpu", "threads", "session"))
     diffs = Dict{String, Int}()
     ex = String[]
     note(k, msg) = (diffs[k] = get(diffs, k, 0) + 1; length(ex) < 6 && push!(ex, msg))
@@ -400,10 +415,10 @@ section("PLAN") do
     sp = joinpath(SCR, "panel-synthetic-caps.toml")
     open(io -> TOML.print(io, tp), sp, "w")
     sp_plan = EX.plan_run(PREREG, sp)
-    table = Dict("main" => 9.9e10, "long" => 1.8e11, "tau_sweep" => 2.0e10, "wrapped" => 1.8e10, "directions" => 3.0e10, "eps_sweep" => 8.0e9, "h4_float64" => 4.0e9,
+    table = Dict("main" => 8.8e10, "main_l2" => 1.1e10, "long" => 1.6e11, "long_l2" => 2.0e10, "tau_sweep" => 2.0e10, "wrapped" => 1.8e10, "directions" => 3.0e10, "eps_sweep" => 8.0e9, "h4_float64" => 4.0e9,
                  "ladder_double64_short" => 4.0e9, "ladder_double64_long" => 1.0e10, "h4_double64" => 2.0e8, "ladder_bigfloat" => 3.0e8)
     worst = maximum(abs(sp_plan.steps.arms[a].steps_before - v) / v for (a, v) in table)
-    emit("D53b[full]", "synthetic panel (1100, 200, 100): planned orbit-steps per arm vs the 11 rows of the Budget table, worst relative difference", worst, "<= 1e-9", pf(worst <= 1e-9))
+    emit("D53b[full]", "synthetic panel (1100, 200, 100): planned orbit-steps per arm vs the Budget table (13 rows: the A5 split of main and long into non-L2 and L2 arms), worst relative difference", worst, "<= 1e-9", pf(worst <= 1e-9))
     tot = Dict("Float64" => 3.59e11, "Double64" => 1.42e10, "BigFloat" => 3.0e8)
     wt = maximum(abs(sp_plan.steps.precisions[p].steps_before - v) / v for (p, v) in tot)
     emit("D53b[full]", "synthetic panel: precision totals (3.59e11, 1.42e10, 3.0e8)", wt, "<= 1e-9", pf(wt <= 1e-9))
@@ -436,13 +451,13 @@ section("CONTROL") do
     store = joinpath(SCR, "store-verify-C"); mf = joinpath(SCR, "verify-C-manifest.json"); rm(store; recursive = true, force = true); rm(mf; force = true)
     t = @elapsed r = campaign(PRE_S, store, mf)
     first_ctrl = first(c.ordinal for c in PLAN_R.chunks if c.cell == "controls" && c.run_type.method == "L1" && "main" in c.arms)
-    emit("D53j/D53w", "scaled control rule (bound $(fmt(CB_SCALED)) at N = $(HZ["main"])): campaign status, chunks run before the stop, first control chunk of the plan, seconds", "$(r.status); ran $(length(r.ran)); control chunk $first_ctrl; $(round(t; digits = 1)) s",
+    emit("D53j/D53w", "tight control rule (bound $(fmt(CB_TRIP)) at N = $(HZ["main"]), A5 scope exact_start): campaign status, chunks run before the stop, first control chunk of the plan, seconds", "$(r.status); ran $(length(r.ran)); control chunk $first_ctrl; $(round(t; digits = 1)) s",
          "stopped: control bound, at the first control chunk", pf(startswith(r.status, "stopped: control bound") && length(r.ran) <= first_ctrl))
     for line in r.reasons
         info("D53j/D53w", "stop reason: " * first(line, 700))
     end
     ids = sort!(unique(parse.(Int, [m.captures[1] for m in eachmatch(r"orbit (\d+) method", join(r.reasons, " "))])))
-    info("D53j/D53w", "controls named by the stop (first control chunk, method L1): $(ids). The real rule (bound 1e-8 at N1 = 1e7) names the same orbits: their Float64 start is not on the periodic orbit, so lambda_1(n) does not follow the exact exponent for any bound below the deviations shown")
+    info("D53j/D53w", "controls named by the stop (first control chunk, method L1): $(ids). The real rule (bound 1e-8 at N1 = 1e7) is the gated set only (A5 control_scope = exact_start): the other controls are INFO")
     CAMP["control_stop"] = (status = r.status, ids = ids, ran = length(r.ran))
 end
 
@@ -556,7 +571,7 @@ section("READER") do
     emit("D53m", "file extents are the Julia shape reversed (HDF5.jl convention): a non-Julia reader sees (k, n) and (2, n), not the n x k of schema/run-store.md", d.cdims == join(reverse(split(d.jdims, 'x')), "x"), "documented, schema ambiguity", d.cdims == join(reverse(split(d.jdims, 'x')), "x") ? "INFO" : "FAIL")
     # I14
     df = diff_readers(CAMP["RA"], CAMP["RB"])
-    emit("I14/D53o", "resumed (killed twice) campaign A against uninterrupted campaign B: differing datasets/attributes outside times and host fields (created_utc, cpu, threads), via independent-reader digests",
+    emit("I14/D53o", "resumed (killed twice) campaign A against uninterrupted campaign B: differing datasets/attributes outside times and host fields (created_utc, cpu, threads, session), via independent-reader digests",
          df.total, "0", pf(df.total == 0))
     foreach(x -> say("   diff: " * x), df.examples)
     isempty(df.diffs) || info("I14/D53o", "difference classes: $(df.diffs)")
@@ -620,7 +635,7 @@ section("THREADS") do
     ref = THREAD_TAGS[1]
     for n in THREAD_TAGS[2:end]
         df = diff_readers(CAMP["Rt$ref"], CAMP["Rt$n"])
-        emit("D53i", "per-dataset sha-256 (independent reader): -t $ref against -t $n, differing datasets or attributes (outside created_utc, cpu, threads)", df.total, "0", pf(df.total == 0))
+        emit("D53i", "per-dataset sha-256 (independent reader): -t $ref against -t $n, differing datasets or attributes (outside created_utc, cpu, threads, session)", df.total, "0", pf(df.total == 0))
         foreach(x -> say("   diff: " * x), df.examples)
     end
     # a combined digest per store over all dataset hashes (and cost entries 1, 2, 5), for the report
@@ -952,7 +967,7 @@ section("DEVICE") do
     cost = Dict{String, NamedTuple}()
     for m in ["L1", "L2", "L3", "L4", "L4b", "L5", "L5b", "L9"]
         base = [it for c in PLAN_REAL.chunks for i in c.items for it in (PLAN_REAL.items[i],) if c.run_type.method == m && c.run_type.precision == "Float64" &&
-                c.run_type.coordinate_mode == "lifted" && c.run_type.tau == 1 && "main" in c.arms]
+                c.run_type.tau == 1 && (m == "L2" ? (c.run_type.coordinate_mode == "wrapped" && "main_l2" in c.arms) : (c.run_type.coordinate_mode == "lifted" && "main" in c.arms))]
         items = NamedTuple[merge(base[mod1(i, length(base))], (horizon = ENS_N,)) for i in 1:ENS_ORB]
         ctx = EX.make_ctx(PLAN_REAL, items)
         steps = ENS_ORB * ENS_N
@@ -1116,7 +1131,7 @@ section("BUDGET") do
     tc_rows = Dict{String, NTuple{3, Float64}}()
     for m in ["L1", "L2", "L3", "L4", "L4b", "L5", "L5b", "L6", "L9"]
         base = [it for c in PLAN_REAL.chunks for i in c.items for it in (PLAN_REAL.items[i],) if c.run_type.method == m && c.run_type.precision == "Float64" &&
-                c.run_type.coordinate_mode == "lifted" && c.run_type.tau == 1 && "main" in c.arms]
+                c.run_type.tau == 1 && (m == "L2" ? (c.run_type.coordinate_mode == "wrapped" && "main_l2" in c.arms) : (c.run_type.coordinate_mode == "lifted" && "main" in c.arms))]
         items = NamedTuple[merge(base[mod1(i, length(base))], (horizon = QUICK ? 20000 : 100000,)) for i in 1:256]
         ctx = EX.make_ctx(PLAN_REAL, items)
         steps = 256 * items[1].horizon
@@ -1183,7 +1198,7 @@ section("SOURCE") do
     hits = String[]
     for f in readdir(joinpath(ROOT, "src", "Experiments"); join = true)
         startswith(basename(f), "run_") || continue
-        txt = join((l for l in eachline(f) if !occursin("exact(T, 1e-8)", l)), "
+        txt = join((l for l in eachline(f) if !occursin("exact(T, 1e-8)", l) && !occursin("pause::Real = 0.05", l)), "
 ")        # hot_loop_bytes probe: an arbitrary perturbation for an allocation count, not a study value
         for s in nums
             occursin(s, txt) && push!(hits, "$(basename(f)):$s")

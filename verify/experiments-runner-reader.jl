@@ -85,13 +85,15 @@ for fn in files
                 chk(fn, haskey(oa, nm), "orbit $oname attribute $nm missing")
             end
             flags = get(oa, "flags", String[])
-            chk(fn, all(x -> x in ("diagnostics exceeded", "drift", "excluded"), flags), "orbit $oname flags $flags")
+            chk(fn, all(x -> x in ("diagnostics exceeded", "drift", "excluded", "breakdown_tau"), flags), "orbit $oname flags $flags")
+            bd = "breakdown_tau" in flags                  # D56: breakdown in a stop_exempt arm; rows after the breakdown are blank in an ok chunk
+            chk(fn, !bd || (haskey(oa, "breakdown_step") && haskey(oa, "breakdown_kind")), "orbit $oname breakdown_tau without breakdown_step and breakdown_kind")
             t = dump_dataset(fn, oname, "t", g["t"])
             n = length(t)
             chk(fn, eltype(t) === Int64 && ndims(t) == 1, "orbit $oname t not Int64 vector")
             chk(fn, get(oa, "steps_recorded", -1) == n, "orbit $oname steps_recorded differs from the length of t")
             kk = count(>(0), t)       # a failed chunk blanks the rows after the failure point (t = 0, values NaN)
-            chk(fn, issorted(t[1:kk]; lt = <=) && all(==(0), t[(kk + 1):end]) && (status != "ok" || (kk == n && (n == 0 || t[end] == horizon))), "orbit $oname t: strictly increasing to the horizon in an ok chunk, blank tail only in a failed one")
+            chk(fn, issorted(t[1:kk]; lt = <=) && all(==(0), t[(kk + 1):end]) && (status != "ok" || bd || (kk == n && (n == 0 || t[end] == horizon))), "orbit $oname t: strictly increasing to the horizon in an ok chunk, blank tail only in a failed one")
             S = dump_dataset(fn, oname, "state", g["state"])
             chk(fn, eltype(S) === Float64 && size(S) == (n, 2), "orbit $oname state shape/type")
             chk(fn, haskey(g, "winding") == wrapped, "orbit $oname winding presence ($wrapped)")
@@ -107,7 +109,7 @@ for fn in files
                     chk(fn, dn in DIAG_NAMES, "orbit $oname diagnostics name $dn")
                     D = dump_dataset(fn, oname, "diagnostics/" * dn, g["diagnostics"][dn])
                     chk(fn, eltype(D) === Float64 && size(D) == (n,), "orbit $oname diagnostics/$dn shape/type")
-                    status == "ok" && chk(fn, all(isfinite, D) && issorted(D), "orbit $oname diagnostics/$dn not finite and non-decreasing")
+                    status == "ok" && chk(fn, all(isfinite, D[1:(bd ? kk : n)]) && issorted(D[1:(bd ? kk : n)]), "orbit $oname diagnostics/$dn not finite and non-decreasing")
                     da = g["diagnostics"][dn]
                     chk(fn, haskey(HDF5.attributes(da), "threshold") && haskey(HDF5.attributes(da), "first_exceedance_step"), "orbit $oname diagnostics/$dn attributes")
                 end
@@ -117,7 +119,7 @@ for fn in files
             println(out, "K|", fn, "|", oname, "|cost/", method, "|", rawsha(C[[1, 2, 5]]))      # cost entries without the two time values
             chk(fn, eltype(C) === Float64 && length(C) == 5, "orbit $oname cost shape/type")
             if status == "ok"
-                chk(fn, all(isfinite, S) && all(isfinite, L) && all(isfinite, C), "orbit $oname non-finite value in an ok chunk")
+                chk(fn, all(isfinite, S[1:(bd ? kk : n), :]) && all(isfinite, L[1:(bd ? kk : n), :]) && all(isfinite, C), "orbit $oname non-finite value in an ok chunk")
             end
         end
     end

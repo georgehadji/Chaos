@@ -69,7 +69,7 @@ Layer 3, canonical. Shared contract between Julia (`Experiments`) and Python (`p
     <name>                     final values, shape (nx, ny)
 ```
 
-`flags` lists any of `diagnostics exceeded`, `drift`, `excluded`. `design_class` is the a-priori class (the former `class_label`, which stays for N-body files). A failed chunk file holds the root attributes and the orbit groups that exist.
+`flags` lists any of `diagnostics exceeded`, `drift`, `excluded`, `breakdown_tau`. `design_class` is the a-priori class (the former `class_label`, which stays for N-body files). A failed chunk file holds the root attributes and the orbit groups that exist.
 
 Axis order. The tables above write the Julia shape `(n, k)`. HDF5.jl stores a Julia array column-major with the dimensions reversed, so the file extents are `(k, n)` (`h5ls` and h5py show `(k, n)` for `lyap/<method>` and `(2, n)` for `state`); a reader in another language indexes the recorded step first in Julia and last in the file. Julia readers through `read_chunk` see the shapes of the tables.
 
@@ -90,3 +90,5 @@ N-body files use `system = "nbody:<name>"` and the same groups.
 ## Review fixes before any study data (version stays 2)
 
 Added by the D53 review fixes, while no study file exists: root attributes `dirty`, `session`, `control_stop`; the statements on axis order and on failed files above. The write now also compares the root attributes on the read-back and flushes the temporary file to the disk before the rename.
+
+- Added by Amendment D56 (version stays 2): orbit flag `breakdown_tau` with orbit attributes `breakdown_step` (int) and `breakdown_kind` (string) for an orthonormalisation breakdown in an arm marked `stop_exempt`; orbit attributes `control_scope` (`"bound"` or `"info"`) and `control_deviation` (float) for the controls of an `h1_check` arm when the run uses `control_scope = "exact_start"`.

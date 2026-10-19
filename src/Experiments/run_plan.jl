@@ -72,21 +72,38 @@ function _setup_class(o)
     return st == "hyperbolic" ? "control_hyperbolic" : "control_elliptic"
 end
 
+# D56: a control is under the control bound only if its binary64 start is an exact periodic point of the lifted Float64 map: the Y5
+# map, or a point whose Float64 iterate after the known period is the start itself, bit for bit (residual exactly 0). An orbit with a
+# non-zero winding never is: the lifted state moves by the binary64 value of 2 pi, which is not the period of the map. Decided here,
+# from the panel, once per orbit.
+function _exact_start(o, param, x0, p0)
+    o["control"] || return false
+    get(o, "control_kind", "") == "y5" && return true
+    sys = StandardMap(exact(Float64, param))
+    start = SVector(exact(Float64, x0), exact(Float64, p0))
+    x = start
+    for _ in 1:Int(get(o, "period", 1))
+        x = forward(sys, x)
+    end
+    return x[1] == start[1] && x[2] == start[2]
+end
+
 function _panel_base(o)
     ctrl = o["control"]
     lin = o["system"] == "linear"
     param = lin ? string(o["mu"]) : _decimal_text(String(get(o, "K_text", string(o["K"]))))
-    return (id = Int(o["id"]), system = String(o["system"]), param = param, x0 = String(get(o, "x0_dec", string(o["x0"]))),
-            p0 = String(get(o, "p0_dec", string(o["p0"]))), run_seed = String(o["run_seed"]), orbit_seed = String(o["orbit_seed"]),
+    x0, p0 = String(get(o, "x0_dec", string(o["x0"]))), String(get(o, "p0_dec", string(o["p0"])))
+    return (id = Int(o["id"]), system = String(o["system"]), param = param, x0 = x0,
+            p0 = p0, run_seed = String(o["run_seed"]), orbit_seed = String(o["orbit_seed"]),
             design_class = ctrl ? "control" : String(o["class"]), setup_class = _setup_class(o),
             cell = ctrl ? "controls" : "k$(o["k_index"]):$(o["class"])", exponent = ctrl ? Float64(o["exponent"]) : nothing,
-            in_SD = Bool(o["in_SD"]), in_SL = Bool(o["in_SL"]), k_index = Int(get(o, "k_index", 0)))
+            in_SD = Bool(o["in_SD"]), in_SL = Bool(o["in_SL"]), k_index = Int(get(o, "k_index", 0)), control_exact = _exact_start(o, param, x0, p0))
 end
 
 function _h4_base(h, id, seed)
     return (id = id, system = "standard", param = _decimal_text(h["K"]), x0 = _decimal_text(h["x0"]), p0 = _decimal_text(h["p0"]),
             run_seed = string(seed), orbit_seed = string(orbit_seed(seed, id)), design_class = "h4", setup_class = "h4", cell = "h4",
-            exponent = nothing, in_SD = false, in_SL = false, k_index = 0)
+            exponent = nothing, in_SD = false, in_SL = false, k_index = 0, control_exact = false)
 end
 
 # ---------------------------------------------------------------- work items
@@ -104,7 +121,7 @@ function _make_item(id, b, method, prec, N, tau, eps, dir, mode, ctx)
             coordinate_mode = mode, vectors = method in ("L1", "L2") ? 1 : 2, grid_sha256 = g.hash, code_version = ctx.cv,
             hash_version = HASH_VERSION)
     return (; id = id, base..., hash = item_hash(base), arms = String[], design_class = b.design_class, setup_class = b.setup_class,
-            cell = b.cell, exponent = b.exponent)
+            cell = b.cell, exponent = b.exponent, control_exact = b.control_exact)
 end
 
 # All (orbit id, method, precision, horizon, tau, eps, direction, mode) of one arm and one precision, in the order of R1 item 4.
@@ -169,7 +186,7 @@ function _status_text(rb, df)
 end
 
 # The values a chunk takes from the panel besides the item hashes (M6): design class, setup class and the exponent of a control.
-_panel_text(it) = "item=$(it.hash) design=$(it.design_class) setup=$(it.setup_class) exponent=$(it.exponent === nothing ? "-" : repr(it.exponent))"
+_panel_text(it) = "item=$(it.hash) design=$(it.design_class) setup=$(it.setup_class) exponent=$(it.exponent === nothing ? "-" : repr(it.exponent)) exact=$(it.control_exact)"
 
 function _chunk_text(key, its, status, h1)
     return "chaoslab-chunk 2\nkey=" * key * "\n" * join(sort!([_panel_text(it) for it in its]), "\n") * "\nh1_check=$(h1)\n" * status

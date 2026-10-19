@@ -11,8 +11,8 @@ FROZEN 2026-10-17. Every value marked "proposed" was approved by the owner at th
 | Claims tested | C1, C2. C3 is out of scope (P2). |
 | Value types | FALSIFIES (C1, C2), REPRODUCES (SalaArtuso2015), TOOL (Chaoslab v0.1.0 at M3 exit), NEGATIVE allowed (`/_config/value-types.md`) |
 | Git SHA at freeze | 1e760e229eabf9d8323ad4d8097cc1dbd017f845 (parent commit of the freeze commit) |
-| SHA-256 of this file (current version) | 3a1c042c8f8f5f288f690e9d2e564ddaea823bf9b0e4eb033873d3e256a1fa33 (rule: Amendment A1, item 1) |
-| Amendment log | A1 (2026-10-17, section "Amendment A1"; parent commit 963345d86570366f5f0ea3ee6950288e20edcfa7; replaces freeze hash fa84e883405a7acbdb4774be2527bbecb8399a4c369fa79fbfc4d563d98bea87); A2 (2026-10-17, section "Amendment A2"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash c9ad3c2cf3ba1220990d118c81e55da2104a7130b0f49e7dcd83cf75461fdcef); A3 (2026-10-17, section "Amendment A3"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash d89d2bf99e4eaa5740be88da436ec28b2d92f7859a278c50fe734ff4a02ae69c); A4 (2026-10-18, section "Amendment A4"; parent commit e020bef1aea6148ba39257d5d279ae647421fd05; replaces hash 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46) |
+| SHA-256 of this file (current version) | 1e440a2f9b313306016fc541f75f8e48d4c20942d76c34b807c1213e4bc3ee4f (rule: Amendment A1, item 1) |
+| Amendment log | A1 (2026-10-17, section "Amendment A1"; parent commit 963345d86570366f5f0ea3ee6950288e20edcfa7; replaces freeze hash fa84e883405a7acbdb4774be2527bbecb8399a4c369fa79fbfc4d563d98bea87); A2 (2026-10-17, section "Amendment A2"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash c9ad3c2cf3ba1220990d118c81e55da2104a7130b0f49e7dcd83cf75461fdcef); A3 (2026-10-17, section "Amendment A3"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash d89d2bf99e4eaa5740be88da436ec28b2d92f7859a278c50fe734ff4a02ae69c); A4 (2026-10-18, section "Amendment A4"; parent commit e020bef1aea6148ba39257d5d279ae647421fd05; replaces hash 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46); A5 (2026-10-19, section "Amendment A5"; parent commit d787d25fbce52444f28a2868709249fdbb7c9026; replaces hash 3a1c042c8f8f5f288f690e9d2e564ddaea823bf9b0e4eb033873d3e256a1fa33) |
 
 Value types, in the words of `value-types.md`:
 - FALSIFIES: H1 to H3 each have a decision rule below, fixed before any data exists.
@@ -522,3 +522,78 @@ label = "SalaArtuso2015_K2pi"   # A4: proposed in D53
 ```
 
 Notes on the block. Arms that list a sweep key give its values; a key absent from an arm means the primary value of `[run.primary]`. Identical items of different arms are one item (the primary values of a sweep coincide with the main arm). `ns_gpu` is absent for Double64 and BigFloat because they run on CPU only (Methods). `setup_check_steps` is by class: `control` is every control, `h4` the two H4 starts.
+
+
+## Amendment A5 (2026-10-19)
+
+Approved by the owner on the evidence of the stage 04 verification of the runner (`experiments-runner-verification.md`, findings 1, 2 and 4) and the diagnosis recorded in decision D56, before stage 03-run produced any data file. Base sections and Amendments A1 to A4 are left as written; where they differ, this section wins. The block below holds only the changed or added `[run]` keys and its values override the A4 block key by key: the reader merges the `[run]` tables of all blocks in file order, a later key replaces an earlier one, tables merge, and arms are replaced by name (new arms are appended after the existing ones). A5 changes no hypothesis, threshold, subset, horizon or panel input, so the panel stays valid under the hash that A5 gives this file (`panel_prereg_sha256_accepted` is not repeated and keeps the value of A4).
+
+1. L2 runs in wrapped coordinates. In lifted coordinates the running x of an orbit grows to 1e4 to 1e10, ulp(|x|) then exceeds the initial separation d0, and the two-trajectory separation cannot be represented; the method raises the "separation" error exactly as its specification prescribes (Algorithm step 1, invariant I2, validity rule T5, E_ro at most 0.5). All 656 failures of the reduced campaign reproduce this way. All 714 failing (eps, orbit, horizon) combinations complete in wrapped coordinates, with d_prev / d0 between 0.9995 and 1.0006 at every renormalisation. The L2 items of the arms main, long and eps_sweep therefore run in wrapped coordinates: main and long lose L2 from their method lists, the new arms main_l2 and long_l2 run L2 on the same orbits and horizons in wrapped coordinates, and eps_sweep takes the coordinate mode wrapped. Every other method keeps its coordinates. H1c compares the wrapped L2 value with the lifted L5 value of the same orbit; estimators are compared, never trajectories (K16). The L2 items of the arm wrapped (S_D, primary eps) are the same items as those of main_l2 and eps_sweep and are computed once.
+2. The reorthonormalisation sweep reports the method limit. The sweep tau in {1, 2, 4, 8, 16} stays for every K. For tau above tau_max(K) = floor(ln(1/eps) / (2 lambda_1)) (5 at K = 10, 7 at K = 2 pi) the Householder and Gram-Schmidt reorthonormalisation breaks down (G_w eps at least 0.5), which is the stated limit of the method; tau 1, 2 and 4 never fail. The frozen sentence that the sweep "stays within tau_max(T)" is read as: the sweep reports where tau_max is exceeded. The runner records such a breakdown as a per-orbit result (flag `breakdown_tau`, with the step and the kind) and not as a failed chunk, and the arm tau_sweep carries `stop_exempt = true`: its failed chunks do not count toward `stop_failed_fraction`. Every other arm keeps the rule.
+3. Control scope. The bound `control_bound` of A4 item 4 applies to the Y5 control and to the controls whose binary64 start is an exact periodic point: the Float64 iterate of the standard map returns to the start after the known period with a torus residual of exactly 0. The other periodic-point controls (their binary64 start leaves the orbit, so lambda_1 at N_1 differs from the analytic value by 0.10 to 0.65) are reported as INFO with their measured deviation and never stop the campaign. An orbit with a non-zero winding is never exact, because the lifted binary64 state moves by the binary64 value of 2 pi. On the panel of this study the controls 871, 873, 875, 877, 879 and the Y5 control 883 are under the bound; 878, 880, 881 and 882 are reported as INFO (controls with exponent 0 are not checked, as in A4). The rule is `control_scope = "exact_start"`; the exactness is decided from the panel data when the plan is built and recorded per work item.
+4. Budget. `ns_cpu_thread` per precision is the mean over the methods of the thread-ns per orbit-step measured at 23 workers in the pilot of the stage 04 verification (`experiments-runner-verify-log.txt`, rows PILOT-COST): Float64 207.6 (9 methods), Double64 6634.6 (L1, L3, L5, L9), BigFloat 296311.3 (L1, L5, L9). The safety factors and `ns_gpu` are unchanged. The values of A4 came from a 4-thread measurement; the cost per step grows about 1.7 times from 4 to 23 workers.
+
+```toml
+[run.health]
+control_scope = "exact_start"
+
+[run.budget.Float64]
+ns_cpu_thread = 207.6
+
+[run.budget.Double64]
+ns_cpu_thread = 6634.6
+
+[run.budget.BigFloat]
+ns_cpu_thread = 296311.3
+
+[[run.arm]]
+name = "main"
+orbits = "P"
+methods = ["L1", "L3", "L4", "L4b", "L5", "L5b", "L6", "L9"]
+precisions = ["Float64"]
+horizons = [10000000]
+h1_check = true
+
+[[run.arm]]
+name = "long"
+orbits = "S_D"
+methods = ["L1", "L3", "L4", "L4b", "L5", "L5b", "L6", "L9"]
+precisions = ["Float64"]
+horizons = [100000000]
+
+[[run.arm]]
+name = "tau_sweep"
+orbits = "S_D"
+methods = ["L4", "L5"]
+precisions = ["Float64"]
+horizons = [10000000]
+tau = [1, 2, 4, 8, 16]
+stop_exempt = true
+
+[[run.arm]]
+name = "eps_sweep"
+orbits = "S_D"
+methods = ["L2"]
+precisions = ["Float64"]
+horizons = [10000000]
+eps = [1e-6, 1e-8, 1e-10, 1e-12]
+coordinate_mode = ["wrapped"]
+
+[[run.arm]]
+name = "main_l2"
+orbits = "P"
+methods = ["L2"]
+precisions = ["Float64"]
+horizons = [10000000]
+coordinate_mode = ["wrapped"]
+
+[[run.arm]]
+name = "long_l2"
+orbits = "S_D"
+methods = ["L2"]
+precisions = ["Float64"]
+horizons = [100000000]
+coordinate_mode = ["wrapped"]
+```
+
+Notes on the block. The arms main, long, tau_sweep and eps_sweep replace the arms of the same name in A4 (their other keys are repeated because an arm is replaced as a whole); main_l2 and long_l2 are new. The `[run.budget]` tables change one key each.

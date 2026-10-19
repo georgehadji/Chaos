@@ -56,7 +56,7 @@ function pilot_items(plan::RunPlan, starts)
             id = nid + j
             base = (id = id, system = "standard", param = ktext[st["k_index"]], x0 = string(st["x0"]), p0 = string(st["p0"]), run_seed = string(df["seed"]),
                     orbit_seed = string(orbit_seed(df["seed"], id)), design_class = "pilot", setup_class = "T", cell = "pilot:k$(st["k_index"])",
-                    exponent = nothing, in_SD = false, in_SL = false, k_index = st["k_index"])
+                    exponent = nothing, in_SD = false, in_SL = false, k_index = st["k_index"], control_exact = false)
             push!(items, _make_item(length(items) + 1, base, m, prec, rb.raw["pilot"]["horizon"], tau, eps === nothing ? nothing : parse(Float64, eps), dir, mode, ctx0))
             push!(ids, length(items))
         end

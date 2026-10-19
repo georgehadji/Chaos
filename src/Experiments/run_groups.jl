@@ -249,7 +249,8 @@ end
 function _failed_stop!(s::Session)
     h = s.ctx.plan.block.raw["health"]
     M = s.ctx.plan.counts.chunks
-    nf = count(e -> e["status"] == "failed", s.entries)
+    ex = Set(a["name"] for a in s.ctx.plan.block.raw["arm"] if get(a, "stop_exempt", false))
+    nf = count(e -> e["status"] == "failed" && !all(in(ex), e["arms"]), s.entries)   # arms marked stop_exempt (D56) are not counted
     nf > h["stop_failed_fraction"] * M * (1 + STRICT_SLACK) || return false
     s.status = "stopped: failed chunks"
     push!(s.reasons, "$nf of $M chunks failed twice, more than stop_failed_fraction $(h["stop_failed_fraction"])")

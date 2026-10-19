@@ -376,3 +376,40 @@ Branch module/experiments-runner at 05792a3, not committed. Julia 1.13.2. Stage 
 | Coverage of `src/Experiments` | pass | 2367 of 2409 executable lines, 98.3 percent (`Pkg.test(coverage=true)`, `.cov` files merged over the processes, counted, then deleted); run_store.jl 121/123, run_resume.jl 83/86, run_session.jl 88/91, run_groups.jl 170/171 |
 
 Coverage-mode caution (as in the D53 section above): instrumented code is slow and the real-clock fixtures of D53o, D53j and others trip the first-chunk cost cap, so that run reported 142 failures and 1 error in the older tests (paused arms); the plain runs above are green. The one such failure in `ex_review.jl` (stop fraction test) was fixed by giving it the zero clock; the other new testsets already use it.
+
+
+## D56 preregistration A5 and runner support (2026-10-19)
+
+Branch module/experiments-runner at d787d25, not committed. Stage 02 role first (`ex_a5.jl`, RED log in the test plan, "Amendment D56"), then the code.
+
+### Code
+
+| Item | Change | Where |
+|------|--------|-------|
+| Reader | `merge_run`: later keys replace earlier ones, tables merge, `arm` entries by `name` and `h4` entries by `label` replaced in place, new ones appended; `read_run_block` merges the `[run]` table of every ```toml block in file order and validates the result. | `run_block.jl` |
+| Block keys | Arm `stop_exempt` (boolean) and `[run.health].control_scope` (`all` or `exact_start`); `control_scope` is stored in the parsed block only when the file has it, so earlier block hashes are unchanged. | `run_block.jl` |
+| Coordinates of L2 | No code: A5 splits L2 into arms (`main_l2`, `long_l2`) and sets `coordinate_mode` on `eps_sweep`; the arm model has the lists already. A per-method override was not built. | prereg A5 |
+| Exempt arms | `chunk_exempt` (all arms of the chunk are exempt); in an exempt chunk an orbit whose failure text is an `orthonormalisation breakdown` error gets the flag `breakdown_tau`, `breakdown_step`, `breakdown_kind` and is not a reason of the chunk; `_failed_stop!` does not count failed chunks that are exempt. | `run_health.jl`, `run_groups.jl` |
+| Control scope | `control_exact` is computed in `_panel_base` from the panel (Y5, or the lifted Float64 iterate after the period equals the start bit for bit), carried on the work item and in the chunk text; `control_reasons` stores `control_scope` and `control_deviation` on each checked control and skips the bound for `info` controls; the manifest chunk entry lists them (`control_info`). | `run_plan.jl`, `run_health.jl`, `run_manifest.jl`, `run_pilot.jl` |
+
+### Decisions
+
+- Value `exact_start` and not `exact_binary64`: the D53r source scan refuses any text of the study block with 12 characters or more and a digit in the module.
+- Exactness is the bit-for-bit lifted return, not the torus residual: a periodic point with a winding returns on the torus but not in the lifted Float64 state (it moves by the binary64 value of 2 pi), and control 881 fails the lifted check exactly as the stage 04 campaign found. With it the real panel gives: under the bound 871, 873, 875, 877, 879 and Y5 (883) (48 control items of the main arm); INFO 878, 880, 881, 882 (32 items); 872, 874, 876 have exponent 0 and are not checked.
+- Budget values: the mean over the methods of the thread-ns per orbit-step at 23 workers in the stage 04 pilot (PILOT-COST rows: Float64 9 methods 207.6, Double64 4 methods 6634.6, BigFloat 3 methods 296311.3). The reduced campaign's first-group costs (92 to 119 for the first run type of Float64 arms, 193638 for the first BigFloat group) are inside the new caps (2 x 415.2, 2 x 19903.8, 2 x 888934).
+- The test of the exempt arm injects NaN for the "other failures still fail" case and runs a real breakdown (K = 10, tau = 16, step 48) for the main case; the lifted L2 failure itself is not run in the suite (it needs horizons of 1e6 and more); the diagnosis scripts and the stage 04 log carry it.
+
+### Plan-only check, real preregistration and panel (`plan_run`, 4.5 s)
+
+15569 items, 1363 chunks (A4: 15741 and 1387), steps 316986000000 before and 304946000000 after the merge of identical items. Unique items per arm (chunks that hold items of the arm): main 7064 (192), long 1376 (192), tau_sweep 1720 (240, exempt), wrapped 1548 (216), directions 2580 (360), eps_sweep 688 (96, wrapped), h4_float64 4 (2), h4_double64 2 (1), ladder_double64_short 368 (92), ladder_double64_long 92 (23), ladder_bigfloat 276 (69), main_l2 883 (24, wrapped), long_l2 172 (24, wrapped). L2 items: 1571, all wrapped. Items with tau 8 or 16: 688, all in the 192 exempt chunks. `control_exact` items: 294 (orbits 871, 873, 875, 877, 879, 883); control items 637; of the checked ones (main arm, control methods, exponent not 0) 48 are under the bound and 32 INFO (878, 880, 881, 882).
+
+### Audit (D56)
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| RED first | pass | 16 results, 4 pass, 6 fail, 6 error before the code |
+| GREEN | pass | experiments 4807 of 4807 (2 min 50 s inside `Pkg.test`, ceiling 3 min); `Pkg.test` 54428 of 54428 |
+| Quality | pass | Aqua 11, JET clean, layering 2 of 2 |
+| Preregistration | pass | `check_prereg` accepts the file, 5 amendments; panel hash of A4 still accepted |
+| Existing assertions | changed in 3 places | `ex_real_run`, D53r budget numbers, D53b method sum (see the test plan) |
+| Coverage of `src/Experiments` | pass | 2427 of 2459 executable lines, 98.7 percent (`Pkg.test(coverage=true)`, `.cov` files counted then deleted; coverage mode trips the real-clock cost caps of older tests, 144 failures and 1 error there, none in `ex_a5.jl`) |

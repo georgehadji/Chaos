@@ -501,3 +501,27 @@ Owner decision on K19 after the device path of D53: keep `auto` for Float64, but
 - D54f [local] The record is retaken on the RTX 5060 at the run's thread count with the ensemble of the cost lines (2048 orbits, 2e5 steps, tangent-core plan); the resolved table for the real preregistration and panel is reported per method and precision.
 
 The D53 numbers (R4, K19) are otherwise unchanged. P-numbers: none new.
+
+
+## Amendment D56 (2026-10-19)
+
+Preregistration Amendment A5 (decision D56) fixes three study inputs after the stage 04 verification of the runner and asks the runner for four things. D53 and D54 are otherwise unchanged. P-numbers: none new.
+
+**Reader.** `read_run_block` merges the `[run]` tables of all ```toml blocks of the preregistration in file order: a later key replaces an earlier one, tables merge key by key, and the lists of tables `arm` (by `name`) and `h4` (by `label`) are replaced entry by entry, new entries appended after the existing ones. The merged table is validated as before. A file with one run block reads as before. No per-method coordinate override exists: A5 gives L2 its own arms (`main_l2`, `long_l2`) and sets `coordinate_mode` on `eps_sweep`, which the arm model already supports.
+
+**Block keys.** `stop_exempt` (arm, boolean, optional): the failed chunks of the arm are not counted by the stop rule, and its orthonormalisation breakdowns are per-orbit results (below). `control_scope` (`[run.health]`, optional, `"all"` or `"exact_start"`, default `"all"`).
+
+**Method-limit flags.** A chunk is exempt when every arm that holds it has `stop_exempt = true`. In an exempt chunk an orbit whose failure is a `NumericalHealthError` of kind `orthonormalisation breakdown` is not a failure of the chunk: the orbit gets the flag `breakdown_tau` and the attributes `breakdown_step` (the step of the error) and `breakdown_kind`; its rows from the failure on stay blank (R2); the chunk is `ok` if nothing else is wrong. Any other failure of an exempt chunk (non-finite values, another health error, the exceedance fraction, the setup check) still fails the chunk, and the stop rule of R5 item 4b does not count failed chunks that are exempt. Chunks of other arms, and chunks shared with a non-exempt arm, keep every rule.
+
+**Control scope.** With `control_scope = "exact_start"` the control bound of R5 item 1c applies to the Y5 control and to the controls whose binary64 start is an exact periodic point of the lifted Float64 map: the iterate after the known period equals the start bit for bit (return residual 0). An orbit with a non-zero winding never is (the lifted state moves by the binary64 value of 2 pi). The flag `control_exact` is decided when the plan is built, from the panel data, recorded on the work item and part of the chunk text (chunk text version 2 keeps its number; the line of each item gains `exact=`). For a control outside the scope the orbit gets `control_scope = "info"` and `control_deviation` (the measured |lambda_1 - exact| at the end of the horizon); a control under the bound gets `control_scope = "bound"` and its deviation. The manifest lists the INFO controls per chunk entry (`control_info`: orbit, method, deviation). Without the key the rule of D53 holds.
+
+**Budget.** The values are block data; the runner reads them as before.
+
+**Acceptance criteria.**
+- D56a Merge. A second run block over the first replaces scalar keys, merges tables, replaces arms of the same name as a whole and appends new arms; the result equals the run table written out by hand; a file with one block reads as before; an unknown key, a bad `control_scope` or a non-boolean `stop_exempt` is refused naming the key.
+- D56b Real preregistration. The header hash holds with five amendments; the merged block has L2 only in wrapped coordinates, `main` and `long` without L2, `main_l2` and `long_l2`, `tau_sweep` as the only exempt arm, `control_scope` set, the A5 budget values with the safety factors and `ns_gpu` of A4, and the panel hash of A4 accepted; it equals an independent merge of the two blocks.
+- D56c Exactness. `control_exact` is true for a control at a binary64 fixed point and for Y5, false for a control whose binary64 start leaves its orbit and for every orbit with a winding, false for every other item; it enters the chunk hash.
+- D56d Scope. Without the key an off-orbit control over the bound stops the campaign; with `exact_start` it does not, its deviation is stored and listed in the manifest (also after a resume), and an exact control over the bound still stops it.
+- D56e Breakdown. In an exempt arm a real breakdown (tau 16 at K = 10) leaves the chunk `ok` with the orbit flagged, the step and the kind stored and the rows blank from the failure on; in an arm that is not exempt the same run fails the chunk; the failure text is parsed for kind `orthonormalisation breakdown` only.
+- D56f Stop rule. A failed chunk of an exempt arm is not counted by `stop_failed_fraction`; the same failure in a non-exempt arm stops the campaign; a chunk shared with a non-exempt arm is not exempt; a failure that is not a breakdown still fails an exempt chunk.
+- D56g [local] Plan only, real preregistration and panel: items, chunks per arm, the items that carry `control_exact`, the exempt chunks, and the L2 items by coordinate mode are reported.

@@ -20,6 +20,27 @@ function _first_nonfinite(o::OrbitRecord)
     return ""
 end
 
+# D56: an orthonormalisation breakdown at a large reorthonormalisation interval is a limit of the method, a result of the tau sweep,
+# not a defect: (kind, step) of such a failure text, else nothing.
+function breakdown_of(failure::AbstractString)
+    m = match(r"NumericalHealthError: (orthonormalisation breakdown) = .* at step (\d+),", failure)
+    return m === nothing ? nothing : (kind = String(m.captures[1]), step = parse(Int, m.captures[2]))
+end
+
+"A chunk whose arms are all marked `stop_exempt` in the block (D56)."
+chunk_exempt(plan::RunPlan, chunk) = !isempty(chunk.arms) && all(a -> any(x -> x["name"] == a && get(x, "stop_exempt", false), plan.block.raw["arm"]), chunk.arms)
+
+# Flag the breakdown orbits of an exempt chunk (`breakdown_tau`, with step and kind) and return the other orbits.
+function _flag_breakdowns!(recs)
+    for o in recs
+        b = breakdown_of(o.failure)
+        b === nothing && continue
+        push!(o.attrs["flags"], "breakdown_tau")
+        o.attrs["breakdown_step"], o.attrs["breakdown_kind"] = b.step, b.kind
+    end
+    return OrbitRecord[o for o in recs if !("breakdown_tau" in o.attrs["flags"])]
+end
+
 function nonfinite_reasons(recs)
     out = String[]
     for o in recs
@@ -30,7 +51,9 @@ function nonfinite_reasons(recs)
     return out
 end
 
-# Exact-exponent controls in an h1_check arm for a method of control_methods; exponent zero is not checked (R5 item 1c).
+# Exact-exponent controls in an h1_check arm for a method of control_methods; exponent zero is not checked (R5 item 1c). With
+# `control_scope = "exact_start"` (D56) only controls whose binary64 start is an exact periodic point are under the bound; the
+# others keep their measured deviation as `control_scope = "info"` on the orbit (reported in the manifest, never a stop).
 function control_reasons(plan::RunPlan, chunk, recs)
     h = plan.block.raw["health"]
     h1 = Set(a["name"] for a in plan.block.raw["arm"] if get(a, "h1_check", false))
@@ -39,6 +62,10 @@ function control_reasons(plan::RunPlan, chunk, recs)
         it = plan.items[i]
         (it.exponent === nothing || it.exponent == 0 || !(it.method in h["control_methods"]) || !any(in(h1), it.arms)) && continue
         err = abs(o.lyap[it.method][end, 1] - it.exponent)
+        if get(h, "control_scope", "all") == "exact_start" && isfinite(err)
+            o.attrs["control_scope"], o.attrs["control_deviation"] = it.control_exact ? "bound" : "info", err
+            it.control_exact || continue
+        end
         err > h["control_bound"] && push!(out, "control bound exceeded: orbit $(o.id) method $(it.method), |lambda_1 - exact| = $err above $(h["control_bound"])")
     end
     return out
@@ -93,7 +120,7 @@ defect that stops the campaign), `setup` the setup-check status.
 """
 function check_chunk!(ctx, chunk, recs)
     h = ctx.plan.block.raw["health"]
-    reasons = nonfinite_reasons(recs)
+    reasons = nonfinite_reasons(chunk_exempt(ctx.plan, chunk) ? _flag_breakdowns!(recs) : recs)
     nex = 0
     for o in recs
         isempty(_first_nonfinite(o)) || continue
@@ -117,3 +144,7 @@ function mark_excluded!(recs)
 end
 
 flagged_ids(recs, flag) = [o.id for o in recs if flag in o.attrs["flags"]]
+
+"Measured deviations of the controls outside the control bound (D56): `(orbit, method, deviation)` per orbit marked `info`."
+control_info(recs) = [Dict{String, Any}("orbit" => o.id, "method" => first(keys(o.lyap)), "deviation" => o.attrs["control_deviation"])
+                      for o in recs if get(o.attrs, "control_scope", "") == "info"]

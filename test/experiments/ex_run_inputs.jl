@@ -2,14 +2,37 @@
 # Block-level checks go through EX.run_block(dict); file-level refusals through plan_run and run_campaign. All refuse before any
 # computation and write nothing.
 
-# the run table of the real preregistration (Amendment A4): the second ```toml block
+# the run table of the real preregistration: the run blocks of Amendments A4 and A5 merged, a later key over an earlier one, arms by
+# name (D56; written here independently of the module's merge)
 function ex_real_run()
     text = replace(read(EX_REAL_PREREG, String), "\r\n" => "\n")
+    run = nothing
     for m in eachmatch(r"```toml\n(.*?)\n```"s, text)
         d = TOML.parse(String(m.captures[1]))
-        haskey(d, "run") && return d["run"]
+        haskey(d, "run") || continue
+        run = run === nothing ? d["run"] : ex_merge_tables(run, d["run"])
     end
-    error("no run block in $EX_REAL_PREREG")
+    run === nothing && error("no run block in $EX_REAL_PREREG")
+    return run
+end
+
+function ex_merge_tables(a, b)
+    out = Dict{String, Any}(a)
+    for (k, v) in b
+        if v isa AbstractDict && get(out, k, nothing) isa AbstractDict
+            out[k] = ex_merge_tables(out[k], v)
+        elseif k == "arm" && haskey(out, k)
+            arms = Any[x for x in out[k]]
+            for e in v
+                i = findfirst(x -> x["name"] == e["name"], arms)
+                i === nothing ? push!(arms, e) : (arms[i] = e)
+            end
+            out[k] = arms
+        else
+            out[k] = v
+        end
+    end
+    return out
 end
 
 @testset "API exported through Chaoslab (D53)" begin
@@ -170,7 +193,7 @@ end
         end
     end
     walk(real)
-    @test 33.09 in nums && 1553.8 in nums && 1e8 in nums && !isempty(strs)
+    @test 207.6 in nums && 6634.6 in nums && 1e8 in nums && !isempty(strs)      # the budget values of A5 (D56)
     # the files of the first scope (panel builder, D49) are covered by the base spec; every other file of the module is scanned
     old = ("parallel", "geometry", "inputs", "prereg", "periodic", "newton", "orbits", "search", "screening", "predicates", "draw",
            "subsets", "provenance", "cells", "panel_tables", "panel", "portrait")

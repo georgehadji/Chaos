@@ -113,8 +113,8 @@ end
     plan = EX.plan_run(EX_REAL_PREREG, pp; code_version = EX_CODE, ntasks = 4)
     ref = ex_ref_items(real, orbs)
     @test plan.counts.items == ref.nunique
-    @test plan.steps.arms["main"].steps_before == 1100 * 9 * 10^7     # P x 9 methods x N_1: the first row of the Budget table
-    @test plan.steps.arms["long"].steps_before == 200 * 9 * 10^8
+    @test plan.steps.arms["main"].steps_before + plan.steps.arms["main_l2"].steps_before == 1100 * 9 * 10^7     # P x 9 methods x N_1: the first row of the Budget table (L2 in its own arm since A5)
+    @test plan.steps.arms["long"].steps_before + plan.steps.arms["long_l2"].steps_before == 200 * 9 * 10^8
     for (name, b) in ref.before
         @test plan.steps.arms[name].items_before == b.items && plan.steps.arms[name].steps_before == b.steps
     end

@@ -76,20 +76,20 @@ end
 "Manifest entry of a chunk from its attributes and orbit records (a file read back, or the buffers just written)."
 function chunk_entry(chunk, attrs, recs)
     cost = [c for o in recs for c in values(o.cost)]
-    flags = Dict{String, Any}(f => flagged_ids(recs, f) for f in ("diagnostics exceeded", "drift", "excluded"))
+    flags = Dict{String, Any}(f => flagged_ids(recs, f) for f in ("diagnostics exceeded", "drift", "excluded", "breakdown_tau"))
     return Dict{String, Any}("ordinal" => chunk.ordinal, "key" => chunk.key, "hash" => chunk.hash, "arms" => chunk.arms,
         "status" => attrs["status"], "attempt" => attrs["attempt"], "backend" => attrs["backend"],
         "fallback_reason" => attrs["backend_fallback_reason"], "orbits" => length(recs), "steps" => round(Int, sum(c[1] for c in cost; init = 0.0)),
         "wall_seconds" => sum(c[3] for c in cost; init = 0.0), "thread_seconds" => sum(c[4] for c in cost; init = 0.0),
         "first_attempt_reasons" => attrs["first_attempt_reasons"], "flags" => flags, "setup_check" => get(attrs, "setup_check", "not applicable"),
-        "control_stop" => get(attrs, "control_stop", false) === true)
+        "control_stop" => get(attrs, "control_stop", false) === true, "control_info" => control_info(recs))
 end
 
 function pending_entry(chunk, status)
     return Dict{String, Any}("ordinal" => chunk.ordinal, "key" => chunk.key, "hash" => chunk.hash, "arms" => chunk.arms, "status" => status,
         "attempt" => 0, "backend" => "", "fallback_reason" => "", "orbits" => length(chunk.items), "steps" => 0, "wall_seconds" => 0.0,
         "thread_seconds" => 0.0, "first_attempt_reasons" => String[], "flags" => Dict{String, Any}("diagnostics exceeded" => Int[],
-        "drift" => Int[], "excluded" => Int[]), "setup_check" => "")
+        "drift" => Int[], "excluded" => Int[], "breakdown_tau" => Int[]), "setup_check" => "", "control_info" => Any[])
 end
 
 # Budget line in ns per orbit-step (R5 item 5): ns of a precision (the arm's first unless given) times its safety factor, for the CPU or the device.

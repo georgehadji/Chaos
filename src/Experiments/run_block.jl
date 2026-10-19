@@ -68,7 +68,8 @@ function _rb_primary(p)
 end
 
 const _ARM_REQUIRED = ("name", "orbits", "methods", "precisions", "horizons")
-const _ARM_OPTIONAL = ("tau", "eps", "direction", "coordinate_mode", "h1_check")
+const _ARM_OPTIONAL = ("tau", "eps", "direction", "coordinate_mode", "h1_check", "stop_exempt")
+const RB_CONTROL_SCOPES = ("all", "exact_start")
 
 function _rb_arm(a, path)
     _rb_keys(a, path, _ARM_REQUIRED, _ARM_OPTIONAL)
@@ -83,9 +84,10 @@ function _rb_arm(a, path)
     haskey(a, "direction") && (out["direction"] = _rb_list(a["direction"], "$path.direction", _rb_direction))
     haskey(a, "coordinate_mode") &&
         (out["coordinate_mode"] = _rb_list(a["coordinate_mode"], "$path.coordinate_mode", (x, p) -> _rb_str(x, p, RB_MODES)))
-    if haskey(a, "h1_check")
-        a["h1_check"] isa Bool || _rb_err("$path.h1_check", "must be true or false, got $(repr(a["h1_check"]))")
-        out["h1_check"] = a["h1_check"]
+    for k in ("h1_check", "stop_exempt")
+        haskey(a, k) || continue
+        a[k] isa Bool || _rb_err("$path.$k", "must be true or false, got $(repr(a[k]))")
+        out[k] = a[k]
     end
     return out
 end
@@ -150,7 +152,7 @@ end
 function _rb_health(h, arms)
     keys_ = ("fail_fraction", "control_bound", "control_methods", "setup_check_steps", "setup_check_tol", "drift_bound",
              "rerun_attempts", "stop_failed_fraction", "first_chunk_cost_factor", "wall_cap_hours")
-    _rb_keys(h, "health", keys_)
+    _rb_keys(h, "health", keys_, ("control_scope",))
     pos(k) = _rb_real(h[k], "health.$k"; ok = >(0), what = "positive")
     frac(k) = _rb_real(h[k], "health.$k"; ok = x -> 0 <= x < 1, what = "inside [0, 1)")
     s = h["setup_check_steps"]
@@ -160,12 +162,14 @@ function _rb_health(h, arms)
     for (c, n) in steps
         n <= shortest || _rb_err("health.setup_check_steps.$c", "$n steps exceed the shortest horizon $shortest")
     end
-    return Dict{String, Any}("fail_fraction" => frac("fail_fraction"), "control_bound" => pos("control_bound"),
+    scope = haskey(h, "control_scope") ? Dict{String, Any}("control_scope" => _rb_str(h["control_scope"], "health.control_scope", RB_CONTROL_SCOPES)) :
+            Dict{String, Any}()
+    return merge(scope, Dict{String, Any}("fail_fraction" => frac("fail_fraction"), "control_bound" => pos("control_bound"),
         "control_methods" => _rb_list(h["control_methods"], "health.control_methods", (x, p) -> _rb_str(x, p, RB_METHODS)),
         "setup_check_steps" => steps, "setup_check_tol" => pos("setup_check_tol"), "drift_bound" => pos("drift_bound"),
         "rerun_attempts" => _rb_int(h["rerun_attempts"], "health.rerun_attempts"; min = 0),
         "stop_failed_fraction" => frac("stop_failed_fraction"), "first_chunk_cost_factor" => pos("first_chunk_cost_factor"),
-        "wall_cap_hours" => pos("wall_cap_hours"))
+        "wall_cap_hours" => pos("wall_cap_hours")))
 end
 
 function _rb_misc(d, arms, prim)
@@ -260,20 +264,48 @@ end
 "SHA-256 (64 hexadecimal digits) of [`block_text`](@ref)."
 block_hash(rb::RunBlock) = bytes2hex(sha256(block_text(rb)))
 
+# Merge of the run tables of successive amendments (A5 over A4): a later key replaces an earlier one, tables merge key by key, the
+# lists of tables `arm` (by `name`) and `h4` (by `label`) are replaced entry by entry and new entries are appended in order.
+const _LIST_KEYS = Dict("arm" => "name", "h4" => "label")
+
+function merge_run(a::AbstractDict, b::AbstractDict)
+    out = Dict{String, Any}(a)
+    for (k, v) in b
+        old = get(out, k, nothing)
+        if v isa AbstractDict && old isa AbstractDict
+            out[k] = merge_run(old, v)
+        elseif haskey(_LIST_KEYS, k) && v isa AbstractVector && old isa AbstractVector
+            id = _LIST_KEYS[k]
+            list = Any[e for e in old]
+            for e in v
+                i = findfirst(x -> get(x, id, nothing) == get(e, id, missing), list)
+                i === nothing ? push!(list, e) : (list[i] = e)
+            end
+            out[k] = list
+        else
+            out[k] = v
+        end
+    end
+    return out
+end
+
 """
     read_run_block(prereg_path) -> RunBlock
 
-Check the preregistration hash (E18), then validate the `[run]` table of its TOML block that has one (LF and CRLF files).
+Check the preregistration hash (E18), merge the `[run]` tables of all its TOML blocks in file order (Amendment A4, then A5: see
+[`merge_run`](@ref)) and validate the result (LF and CRLF files).
 """
 function read_run_block(path::AbstractString)
     check_prereg(path)
+    merged = nothing
     for m in eachmatch(r"```toml\n(.*?)\n```"s, _lf(read(path, String)))
         d = try
             TOML.parse(string(m.captures[1]))
         catch
             continue
         end
-        haskey(d, "run") && return run_block(d["run"])
+        haskey(d, "run") && (merged = merged === nothing ? d["run"] : merge_run(merged, d["run"]))
     end
-    throw(ArgumentError("$path: no ```toml block with a [run] table (Amendment A4)"))
+    merged === nothing && throw(ArgumentError("$path: no ```toml block with a [run] table (Amendment A4)"))
+    return run_block(merged)
 end

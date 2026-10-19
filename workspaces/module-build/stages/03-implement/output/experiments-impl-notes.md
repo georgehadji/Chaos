@@ -318,3 +318,61 @@ Owner decision: keep `auto`, take the record on the chain the study runs (spec A
 **Revised campaign estimate:** with the table all CPU, the estimate is the CPU-only one of the D53 device section: Float64 kernel methods 2195 s, L6 414 s, Double64 3471 s, BigFloat 3258 s, total 9338 s = 2.6 h on 23 threads (wall cap 12 h; the 1.03 h of the D53 section assumed 4-thread rates). Caution on the cap: the first-chunk cap of A4 on the CPU basis is 132.4 thread-ns (2 x 66.18); the thread cost measured at 23 threads on 2048 orbits is 98 (L1), 73 (L2), 206 (L3), 194 (L4), 232 (L4b), 229 (L5), 267 (L5b) and 238 (L9) ns. Arms that start with L1 or L2 pass; arm tau_sweep starts with L4 and would be paused by the cap at 194 unless its first group costs less at campaign group sizes. To be checked in the D53w reduced campaign; the cap override of R5 exists for it.
 
 **Limits:** the records are a property of the machine, the thread count and the launch plan; they must be retaken after any change of the recorder, the launch plan or the device; a run on another thread count falls to the CPU with the mismatch note.
+
+
+## D53 review fixes (return of the runner to stage 03 after the stage 04 independent review, 2026-10-19)
+
+Branch module/experiments-runner at 05792a3, not committed. Julia 1.13.2. Stage 02 role first: `test/experiments/ex_review.jl` (12 testsets, 108 assertions, RED log in the test plan, "Amendment D53 review fixes"), then the code. Existing assertions are untouched; two helper lines changed (see the test plan). Experiments suite (4 threads): 4757 of 4757 (4649 before). Full `Pkg.test()` (2 threads): 54378 of 54378, 4 min 41 s, experiments 2 min 47 s; quality 12 of 12 (Aqua 11, JET clean after one fix: a `join` result inside `*`), layering 2 of 2. The schema `schema/run-store.md` stays at version 2 (no study file exists): three new root attributes and the two statements asked for.
+
+### Fixes
+
+| ID | Change | Where |
+|----|--------|-------|
+| H1 | A control-bound stop writes its chunk file with `status = "failed"`, the new root attribute `control_stop = true`, no `excluded` flag, and a record in the manifest's `control_stops` (ordinal, code version, session, reasons, `retried`). The file is not a result: `classify_store` returns it as `halted`, a plain resume throws before anything is written, and `retry_control_stop = true` (CLI `--retry-control-stop`) moves it to `aside/`, recomputes it and records `overrides.retry_control_stop` and `retried = true`. A changed code version changes the item hashes, so the file is stale and the existing `stale` rule applies. The status is set before the file is written, so the manifest written with the file already says `stopped: control bound`. | `run_groups.jl` (`finish_chunk!`, `_write_result!`), `run_resume.jl` (`classify_store`, `refuse_halted`, `handle_halted!`), `run_session.jl` |
+| H2 | At resume, with kept chunks, the new backend table (request, backend, reason per precision and method) is compared with the previous manifest's, and each kept file's `backend` attribute with the table (a `gpu` file against a CPU row, or a `cpu` file with an empty fallback reason against a GPU row). A difference throws, listing up to ten, unless `backend_override = true` (CLI `--backend-override`), which records the list in `overrides.backend_table`. It works without a manifest (files only). | `run_resume.jl` (`check_backends!`) |
+| M1 | `write_chunk` never overwrites: a taken final name is moved to `<name>.old<k>` and the temporary file is renamed without `force`; the rename retries on EBUSY, EACCES and EPERM (8 tries, 0.05 s steps). The JSON write (manifest, pilot report) writes `.partial`, rotates numbered backups `<file>.1` to `.3` (manifests only), then replaces with `Base.Filesystem.rename` (atomic, replaces on Windows) under the same retry. When the replace still fails the previous manifest stays whole and the error propagates (the chunk file is already on disk, the next resume rebuilds the entries from files). | `run_store.jl` (`_move_retry`, `_take_name!`, `_write_json`) |
+| M2 | After `complete` is set and before the rename the temporary file is flushed to the disk (`fsync`, `_commit` on Windows, both through `ccall`: Julia has no `fsync`). The read-back compares the root attributes too (`_attr_diff`) and checks `complete` after it is set. | `run_store.jl` (`write_chunk`, `_fsync`, `_attr_diff`) |
+| M3 | `write_manifest` reads the session clock (`:manifest_write` event of the clock hook) and keeps the larger of it and `s.now`, so a killed session counts its time up to the last write. | `run_manifest.jl` |
+| M4 | Chunk files without a readable manifest: the newest readable numbered backup is used (a reason says so); with none, the run is refused unless `manifest_reset = true` (CLI `--manifest-reset`, recorded as `overrides.manifest_reset`). A store with no chunk files needs nothing, and a stale backup beside an emptied store is ignored. | `run_session.jl` (`_prev_manifest`) |
+| M5 | `code_version` hashes the `*.jl` files under `src/` and `ext/`, `Project.toml` and the lock in use, paths sorted with `/`, content with LF endings. A root without `ext/` or `Project.toml` is defined. | `run_grid.jl` |
+| M6 | The chunk text (now `chaoslab-chunk 2`) lists each item with its design class, setup class and control exponent, so a changed panel-derived value changes the chunk hash; a kept file whose `panel_sha256` differs from the plan's panel is stale. A control without `stability` is hyperbolic only with a positive analytic exponent, else the plan is refused. Every chunk hash changes with this version (no study data exist). | `run_plan.jl`, `run_resume.jl` |
+| M7 | `_check_threads` also compares `threads` with `Threads.nthreads()` and refuses a difference unless `thread_override = true`. The k19 check stays first and keeps its message. See the deviation below. | `run_campaign.jl` |
+| M8 | When a group's measurement adds a paused arm, the manifest is written before the first chunk file of the group. A resume then keeps the arm paused (its prior status `paused: cost cap` is read from the manifest). | `run_groups.jl` (`run_group!`) |
+| M9 | Chunk files carry `dirty` (the session's tree was not clean) and `session` (index in the manifest's session list, also stored as `sessions[i].index`); pilot files carry `dirty` and `session = 1`. The schema lists the three new attributes, the axis order (Julia `(n, k)` is stored by HDF5.jl with file extents `(k, n)`), and that failed files blank the rows after the failure point (`t = 0`, `NaN`). | `run_groups.jl`, `run_pilot.jl`, schema |
+| L1 | `csize = 0` (not one orbit fits the free device memory) falls back with the out-of-memory reason instead of failing in `Iterators.partition`. | `run_device.jl` |
+| L2 | The first-chunk budget line is the one of the group's own precision (`info.precision`), not the arm's first. The manifest's per-arm `budget_ns` is still the arm's first precision. | `run_groups.jl`, `run_manifest.jl` |
+| L3 | `sha_start` comes from the plan (`prereg_header`, panel bytes hash), not from a second read of the files. | `run_session.jl` |
+| L4 | The failed-fraction stop is also applied at the start of a session. | `run_session.jl` |
+| L5 | Unknown `cap_override` names are refused before anything is written (module and CLI). | `run_session.jl` |
+| L6 | The plan refuses L6 at Double64 or BigFloat. | `run_plan.jl` |
+
+### Deviation and decisions
+
+- M7: the refusal could not be unconditional. D53o, D53p and the pilot tests run with 1, 2 or 4 threads on a machine with 2 or 4 Julia threads and pass `thread_override = true`; those assertions are unchanged, so the override also covers the Julia-thread mismatch. The manifest records `threads.used` and `threads.available` as before (a mismatch is visible there); only the k19 mismatch lands in `overrides`, because D53p asserts that `overrides` is empty for a run at k19 threads.
+- M4: `ex_campaign` (helper) passes `manifest_reset = true`: D53o (a) and (b) copy a finished store without its manifest. The refusal is tested in `ex_review.jl` with `manifest_reset = false`.
+- `manifest_reset`, `backend_override` and `retry_control_stop` are recorded when used; each defaults to false in the module and the CLI.
+- `chaoslab-chunk 2` is a structural change of a hash text; `_config/decision-log.md` was not touched (the task did not ask for it).
+
+### Not fixed (LOW items)
+
+- Control rule on attempt 1 only: a control over its bound at attempt 2 (the rerun) is a failed chunk, not a stop. Left as specified.
+- Launch budget calibrated on the AC13 chain: the budget lines of A4 stay as measured; the K19 records on the recording chain (D54) are the remedy.
+- `rerun_attempts` is not in the chunk hash: changing it between sessions keeps old files. It changes no value of a result, only whether a failure is retried.
+- No lock on the store: two campaigns on one store are not prevented. A lock file is a feature, not a fix.
+- Stop check after a group: the wall cap and the input hashes are checked before each group, a group in progress is finished. The failed-fraction check now also runs at the start of a session (L4).
+- Default manifest path not git-ignored: `workspaces/study/stages/03-run/output/<slug>-manifest.json` and its backups are untracked files that a clean-tree check would flag; add them to `.gitignore` or pass `--manifest` outside the tree.
+- M1: a persistent EBUSY on the manifest ends the session with the error (the chunk file is on disk, the previous manifest is whole); there is no in-memory queue of manifest writes.
+
+### Audit (D53 review fixes)
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| RED first | pass | 69 results, 17 pass, 22 fail, 30 error before the code (test plan) |
+| GREEN | pass | experiments 4757 of 4757; `Pkg.test` 54378 of 54378 |
+| Quality | pass | Aqua 11, JET clean, layering 2 of 2 |
+| Existing assertions untouched | pass | `git diff -- test/` shows `ex_run_helpers.jl` (two helper lines), `runtests.jl` (one include) and the new `ex_review.jl` only |
+| Functions under 50 lines, files under 400 | pass | longest function 38 (`run_group!`), longest file 311 (`run_record.jl`) |
+| No `@fastmath`; no em or en dashes | pass | script over `src/Experiments`, `ex_review.jl` and the three documents |
+| Coverage of `src/Experiments` | pass | 2367 of 2409 executable lines, 98.3 percent (`Pkg.test(coverage=true)`, `.cov` files merged over the processes, counted, then deleted); run_store.jl 121/123, run_resume.jl 83/86, run_session.jl 88/91, run_groups.jl 170/171 |
+
+Coverage-mode caution (as in the D53 section above): instrumented code is slow and the real-clock fixtures of D53o, D53j and others trip the first-chunk cost cap, so that run reported 142 failures and 1 error in the older tests (paused arms); the plain runs above are green. The one such failure in `ex_review.jl` (stop fraction test) was fixed by giving it the zero clock; the other new testsets already use it.

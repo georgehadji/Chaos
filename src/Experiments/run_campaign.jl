@@ -94,12 +94,15 @@ function _check_tree(repo, allow_dirty::Bool)
     return g, dirty ? (paths = vcat(g.tracked, g.untracked), diff_sha256 = g.diff_sha256) : nothing
 end
 
-# The thread count of the run against [run.k19].threads: a difference is a refusal unless overridden (R4 item 2).
+# The thread count of the run against [run.k19].threads (R4 item 2) and against the threads Julia was started with (M7): a difference
+# is a refusal unless overridden. The k19 mismatch is recorded in the overrides, the used and available counts in the manifest.
 function _check_threads(plan::RunPlan, threads::Integer, override::Bool)
     k19 = plan.block.raw["k19"]["threads"]
-    threads == k19 && return nothing
-    override || throw(ArgumentError("the thread count $threads differs from [run.k19].threads = $k19 (pass thread_override = true to record an override)"))
-    return (used = Int(threads), k19 = k19)
+    differs = threads != k19
+    differs && !override && throw(ArgumentError("the thread count $threads differs from [run.k19].threads = $k19 (pass thread_override = true to record an override)"))
+    threads == Threads.nthreads() || override || throw(ArgumentError("the thread count $threads differs from Threads.nthreads() = $(Threads.nthreads()): " *
+        "start Julia with -t $threads (the runner cannot use more or fewer workers than Julia has), or pass thread_override = true"))
+    return differs ? (used = Int(threads), k19 = k19) : nothing
 end
 
 # Hashes the run is bound to: the preregistration by the E18 rule and the panel file by its bytes.

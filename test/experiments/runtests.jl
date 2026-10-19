@@ -23,3 +23,4 @@ include(joinpath(@__DIR__, "ex_manifest.jl"))
 include(joinpath(@__DIR__, "ex_pilot.jl"))
 include(joinpath(@__DIR__, "ex_device.jl"))
 include(joinpath(@__DIR__, "ex_record.jl"))
+include(joinpath(@__DIR__, "ex_review.jl"))   # Amendment D53 review fixes

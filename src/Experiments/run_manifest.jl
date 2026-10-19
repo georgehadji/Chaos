@@ -36,6 +36,9 @@ Base.@kwdef mutable struct Session
     sha_end::NamedTuple = (prereg = "", panel = "")
     provs::Dict{Int, NamedTuple} = Dict{Int, NamedTuple}()   # provenance of the launch group of each chunk computed in this session
     device_lost::Base.RefValue{Bool} = Ref(false)
+    prev::Any = nothing                                       # the manifest of the previous session (or its numbered backup), if any
+    control_stops::Vector{Any} = Any[]                        # control-bound stops of all sessions (H1)
+    session_index::Int = 1                                    # ordinal of this session in the manifest's session list
 end
 
 _record_dict(r::Nothing) = "absent"
@@ -78,7 +81,8 @@ function chunk_entry(chunk, attrs, recs)
         "status" => attrs["status"], "attempt" => attrs["attempt"], "backend" => attrs["backend"],
         "fallback_reason" => attrs["backend_fallback_reason"], "orbits" => length(recs), "steps" => round(Int, sum(c[1] for c in cost; init = 0.0)),
         "wall_seconds" => sum(c[3] for c in cost; init = 0.0), "thread_seconds" => sum(c[4] for c in cost; init = 0.0),
-        "first_attempt_reasons" => attrs["first_attempt_reasons"], "flags" => flags, "setup_check" => get(attrs, "setup_check", "not applicable"))
+        "first_attempt_reasons" => attrs["first_attempt_reasons"], "flags" => flags, "setup_check" => get(attrs, "setup_check", "not applicable"),
+        "control_stop" => get(attrs, "control_stop", false) === true)
 end
 
 function pending_entry(chunk, status)
@@ -88,9 +92,9 @@ function pending_entry(chunk, status)
         "drift" => Int[], "excluded" => Int[]), "setup_check" => "")
 end
 
-# Budget line of an arm in ns per orbit-step (R5 item 5): ns of the first precision times its safety factor, for the CPU or the device.
-function budget_line_ns(rb::RunBlock, arm, backend::Symbol = :cpu)
-    b = rb.raw["budget"][first(arm["precisions"])]
+# Budget line in ns per orbit-step (R5 item 5): ns of a precision (the arm's first unless given) times its safety factor, for the CPU or the device.
+function budget_line_ns(rb::RunBlock, arm, backend::Symbol = :cpu, precision = first(arm["precisions"]))
+    b = rb.raw["budget"][precision]
     return (backend === :gpu ? get(b, "ns_gpu", b["ns_cpu_thread"]) : b["ns_cpu_thread"]) * b["safety"]
 end
 
@@ -124,8 +128,15 @@ function manifest_dict(s::Session)
     m["chunks"] = s.entries
     m["arms"] = _arm_entries(s)
     m["overrides"] = s.overrides
+    m["control_stops"] = s.control_stops
     m["wall"] = Dict{String, Any}("total_seconds" => sum(x["wall_seconds"] for x in sessions), "cap_hours" => s.ctx.plan.block.raw["health"]["wall_cap_hours"])
     return m
 end
 
-write_manifest(s::Session) = _write_json(s.manifest, manifest_dict(s))
+const MANIFEST_BACKUPS = 3   # numbered backups manifest.json.1 .. .3 (newest first)
+
+# The session clock is read at every write, so a killed session counts its time up to the last manifest (M3).
+function write_manifest(s::Session)
+    s.now = max(s.now, _now(s.hooks, :manifest_write))
+    return _write_json(s.manifest, manifest_dict(s); keep = MANIFEST_BACKUPS)
+end

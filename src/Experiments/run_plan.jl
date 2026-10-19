@@ -63,7 +63,14 @@ function _study_slug(text)
 end
 
 # ---------------------------------------------------------------- orbit bases
-_setup_class(o) = !o["control"] ? o["class"] : get(o, "stability", "hyperbolic") == "hyperbolic" ? "control_hyperbolic" : "control_elliptic"
+# A control without a `stability` key is hyperbolic only if its analytic exponent is positive (M6); anything else is refused.
+function _setup_class(o)
+    o["control"] || return o["class"]
+    st = get(o, "stability") do
+        get(o, "exponent", 0.0) > 0 ? "hyperbolic" : throw(ArgumentError("control orbit $(o["id"]) has no stability key and no positive analytic exponent"))
+    end
+    return st == "hyperbolic" ? "control_hyperbolic" : "control_elliptic"
+end
 
 function _panel_base(o)
     ctrl = o["control"]
@@ -161,8 +168,11 @@ function _status_text(rb, df)
     return String(take!(io))
 end
 
-function _chunk_text(key, hashes, status, h1)
-    return "chaoslab-chunk 1\nkey=" * key * "\n" * join(("item=" * h for h in sort(hashes)), "\n") * "\nh1_check=$(h1)\n" * status
+# The values a chunk takes from the panel besides the item hashes (M6): design class, setup class and the exponent of a control.
+_panel_text(it) = "item=$(it.hash) design=$(it.design_class) setup=$(it.setup_class) exponent=$(it.exponent === nothing ? "-" : repr(it.exponent))"
+
+function _chunk_text(key, its, status, h1)
+    return "chaoslab-chunk 2\nkey=" * key * "\n" * join(sort!([_panel_text(it) for it in its]), "\n") * "\nh1_check=$(h1)\n" * status
 end
 
 function _build_chunks(items, rb, df)
@@ -182,7 +192,7 @@ function _build_chunks(items, rb, df)
         key = _chunk_key(first(its))
         arms = sort!(unique(vcat((it.arms for it in its)...)); by = a -> armorder[a])
         h1 = any(it -> any(in(h1arms), it.arms), its)
-        (ordinal = ordinal, key = key, hash = bytes2hex(sha256(_chunk_text(key, [it.hash for it in its], status, h1))),
+        (ordinal = ordinal, key = key, hash = bytes2hex(sha256(_chunk_text(key, its, status, h1))),
          cell = first(its).cell, run_type = _runtype(first(its)), items = ids, orbits = [it.orbit for it in its], arms = arms)
     end
 end
@@ -192,7 +202,7 @@ function chunk_text(plan::RunPlan, ordinal::Integer)
     c = plan.chunks[ordinal]
     h1arms = Set(a["name"] for a in plan.block.raw["arm"] if get(a, "h1_check", false))
     h1 = any(i -> any(in(h1arms), plan.items[i].arms), c.items)
-    return _chunk_text(c.key, [plan.items[i].hash for i in c.items], _status_text(plan.block, plan.defaults), h1)
+    return _chunk_text(c.key, plan.items[c.items], _status_text(plan.block, plan.defaults), h1)
 end
 
 # ---------------------------------------------------------------- step counts
@@ -250,6 +260,10 @@ function plan_run(prereg::AbstractString, panel::AbstractString; code_version = 
     ctx = (grids = Dict{Tuple{Int, Int}, NamedTuple}(), grid = rb.raw["grid"], bits = df["bigfloat_bits"], cv = cv)
     items, before, pre_steps = _build_items(rb, bases, ctx)
     isempty(items) && throw(ArgumentError("run plan holds zero items: the arms select no orbit of the panel"))
+    for it in items
+        it.method == "L6" && _label(it.precision) != "Float64" &&
+            throw(ArgumentError("run plan has method L6 at $(it.precision): L6 (library QR) runs in Float64 only"))
+    end
     chunks = _build_chunks(items, rb, df)
     steps = _steps(items, before, pre_steps, rb)
     text = _plan_text(chunks, items, steps, rb, df, pnl, study, cv)

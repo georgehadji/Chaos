@@ -105,14 +105,22 @@ _file_digest(f) = sha256(codeunits(replace(String(read(f)), "\r\n" => "\n")))
 """
     code_version(root = <package root>) -> String
 
-Content identifier (hex) of the files under `root/src` and of the dependency lock (`Manifest-v<major>.<minor>.toml`, else
-`Manifest.toml`); no other file enters.
+Content identifier (hex) of the code a result depends on: the `*.jl` files under `root/src` and `root/ext`, `root/Project.toml`, and the
+dependency lock (`Manifest-v<major>.<minor>.toml`, else `Manifest.toml`); no other file enters. Paths are sorted with `/` separators and
+the content is hashed with LF line ends, so a CRLF checkout agrees with an LF one.
 """
 function code_version(root::AbstractString = _root())
     io = IOBuffer()
-    files = sort!([relpath(joinpath(d, f), root) for (d, _, fs) in walkdir(joinpath(root, "src")) for f in fs]; by = p -> replace(p, '\\' => '/'))
-    for rel in files
-        println(io, replace(rel, '\\' => '/')," ", bytes2hex(_file_digest(joinpath(root, rel))))
+    files = String[]
+    for top in ("src", "ext")
+        isdir(joinpath(root, top)) || continue
+        for (d, _, fs) in walkdir(joinpath(root, top)), f in fs
+            endswith(f, ".jl") && push!(files, replace(relpath(joinpath(d, f), root), '\\' => '/'))
+        end
+    end
+    isfile(joinpath(root, "Project.toml")) && push!(files, "Project.toml")
+    for rel in sort!(files)
+        println(io, rel, " ", bytes2hex(_file_digest(joinpath(root, rel))))
     end
     lock = _lock_file(root)
     println(io, "lock ", isempty(lock) ? "none" : bytes2hex(_file_digest(lock)))

@@ -239,7 +239,8 @@ ex_plan(fx; kw...) = EX.plan_run(fx.prereg, fx.panel; code_version = EX_CODE, kw
 function ex_campaign(fx; store, manifest = store * "-manifest.json", threads = 4, kw...)
     # capacity 64 orbits per launch unless a test sets it: the chunk-size attribute then does not depend on the free memory of the host
     return EX.run_campaign(fx.prereg, fx.panel; store = store, manifest = manifest, threads = threads, thread_override = true,
-                           allow_dirty = true, code_version = EX_CODE, capacity = 64, kw...)
+                           allow_dirty = true, code_version = EX_CODE, capacity = 64,
+                           manifest_reset = true, kw...)   # D53 review M4: stores copied without their manifest still resume; ex_review.jl tests the refusal
 end
 ex_store(name) = (d = ex_path(name); rm(d; recursive = true, force = true); d)
 
@@ -278,7 +279,7 @@ ex_tmp_files(store) = sort(filter(f -> endswith(f, ".tmp"), readdir(store; join 
 ex_ordinal(f) = parse(Int, match(r"chunk-(\d{5})\.h5", basename(f)).captures[1])
 
 # canonical bytes of a read-back chunk: datasets always; attributes except host and time fields on request (I12, I14)
-const EX_ROOT_SKIP = ("created_utc", "cpu", "threads")
+const EX_ROOT_SKIP = ("created_utc", "cpu", "threads", "session")      # the session index differs between a killed and an uninterrupted run
 function ex_canon(ch; attrs::Bool = false)
     io = IOBuffer()
     if attrs

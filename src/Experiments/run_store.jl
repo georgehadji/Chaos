@@ -17,12 +17,37 @@ _jsonable(x) = string(x)
 "Parsed JSON: objects as `Dict{String,Any}`, integers as `Int`, other numbers as `Float64`."
 read_json(path::AbstractString) = JSON.parse(read(path, String); dicttype = Dict{String, Any})
 
-# Atomic write of a JSON file: temporary name next to it, then rename.
-function _write_json(path::AbstractString, obj)
+# A file held for a moment by another process (a reader, a virus scanner) fails with one of these codes on Windows.
+const RETRY_CODES = (Base.UV_EBUSY, Base.UV_EACCES, Base.UV_EPERM)
+
+"Rename `src` to `dst` (replacing a file on every platform), trying again when another process holds a file. `mover` is a test seam."
+function _move_retry(src, dst; mover = Base.Filesystem.rename, tries::Integer = 8, pause::Real = 0.05)
+    for k in 1:tries
+        try
+            return mover(src, dst)
+        catch e
+            (e isa Base.IOError && e.code in RETRY_CODES && k < tries) || rethrow()
+            sleep(pause * k)
+        end
+    end
+end
+
+# Rotate `path.1` .. `path.keep`: the newest copy of the file about to be replaced is `path.1`.
+function _rotate_backups(path, keep)
+    for k in (keep - 1):-1:1
+        isfile("$path.$k") && cp("$path.$k", "$path.$(k + 1)"; force = true)
+    end
+    isfile(path) && cp(path, "$path.1"; force = true)
+end
+
+# Write of a JSON file: temporary name next to it, then an atomic replace with retries. The previous file stays whole when the
+# replace fails; `keep > 0` also keeps that many numbered backups of the previous versions.
+function _write_json(path::AbstractString, obj; keep::Integer = 0, mover = Base.Filesystem.rename)
     mkpath(dirname(abspath(path)))
     tmp = path * ".partial"
     write(tmp, JSON.json(_jsonable(obj)))
-    mv(tmp, path; force = true)
+    keep > 0 && _rotate_backups(path, keep)
+    _move_retry(tmp, path; mover = mover)
     return path
 end
 
@@ -68,17 +93,41 @@ end
 
 _nohook(point) = nothing
 
+# Flush the file to the disk before it gets its final name (a power cut must not leave a final name with lost data).
+function _fsync(path)
+    open(path, "r+") do io
+        fd = Base.fd(io)
+        r = Sys.iswindows() ? ccall(:_commit, Cint, (RawFD,), fd) : ccall(:fsync, Cint, (RawFD,), fd)
+        r == 0 || error("write_chunk: fsync of $path failed ($r)")
+    end
+end
+
+# Names of the root attributes whose read-back differs from what was written.
+_attr_diff(want, got) = sort!(String[k for k in union(keys(want), keys(got)) if !(haskey(want, k) && haskey(got, k) && isequal(want[k], got[k]))])
+
+# A final name that is taken is moved to `<name>.old<k>` first: the rename itself never overwrites.
+function _take_name!(path)
+    ispath(path) || return
+    k = 1
+    while ispath("$path.old$k")
+        k += 1
+    end
+    mv(path, "$path.old$k")
+end
+
 """
     write_chunk(path, attrs, orbits)
 
-Write a chunk file atomically: under `path * ".tmp"` with `complete` false, orbit groups, close, read back and compare bit for bit,
-set `complete`, rename to `path`. `attrs` are the root attributes, `orbits` the orbit records.
+Write a chunk file atomically: under `path * ".tmp"` with `complete` false, orbit groups, close, read back and compare bit for bit (root
+attributes included), set `complete`, flush to the disk, rename to `path` (a file already there is moved to `<path>.old<k>` first; the
+rename retries while another process holds a file). `attrs` are the root attributes, `orbits` the orbit records.
 """
 function write_chunk(path::AbstractString, attrs::AbstractDict, orbits::AbstractVector; hook = _nohook)
     tmp = path * ".tmp"
     mkpath(dirname(abspath(path)))
+    want = merge(Dict{String, Any}(attrs), Dict{String, Any}("complete" => false))
     HDF5.h5open(tmp, "w") do f
-        _put_attrs!(f, merge(Dict{String, Any}(attrs), Dict{String, Any}("complete" => false)))
+        _put_attrs!(f, want)
         HDF5.create_group(f, "orbits")
         hook(:before_data)
         half = cld(length(orbits), 2)
@@ -90,13 +139,18 @@ function write_chunk(path::AbstractString, attrs::AbstractDict, orbits::Abstract
     back = read_chunk(tmp)
     length(back.orbits) == length(orbits) && all(_same(a, b) for (a, b) in zip(orbits, back.orbits)) ||
         error("write_chunk: $tmp differs from the buffers after the write")
+    bad = _attr_diff(want, back.attrs)
+    isempty(bad) || error("write_chunk: root attributes of $tmp differ from the buffers after the write: " * join(bad, ", "))
     hook(:after_data)
     HDF5.h5open(tmp, "r+") do f
         HDF5.delete_attribute(f, "complete")
         HDF5.write_attribute(f, "complete", true)
     end
+    read_chunk_attrs(tmp)["complete"] === true || error("write_chunk: $tmp does not read back complete")
+    _fsync(tmp)
     hook(:before_rename)
-    mv(tmp, path; force = true)
+    _take_name!(path)
+    _move_retry(tmp, path)
     hook(:after_rename)
     return path
 end

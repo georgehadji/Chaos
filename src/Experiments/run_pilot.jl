@@ -121,7 +121,7 @@ function _pilot_group!(plan, ctx, hooks, store, its, gi, ordinal0, o)
         hash = bytes2hex(sha256(key * join(sort(String[its[i].hash for i in idx]), ",")))
         attrs = _attrs(plan, it, o.table[(_label(it.precision), it.method)], ordinal0 + n, key, hash, String[], length(idx); git = o.git.sha,
                        threads = o.threads, capacity = o.capacity, utc = _utc(t1), status = "ok", attempt = 1, first_reasons = String[],
-                       failure_reasons = String[], setup = "not applicable", pilot = true, prov = prov)
+                       failure_reasons = String[], setup = "not applicable", pilot = true, prov = prov, dirty = o.dirty)
         write_chunk(chunk_path(store, ordinal0 + n), attrs, recs[idx])
     end
     return (its = its, recs = recs, steps = steps, wall = t1 - t0, workers = workers, cells = length(cells), backend = prov.backend,
@@ -190,7 +190,7 @@ function run_pilot(prereg::AbstractString, panel::AbstractString; out::AbstractS
     items, groups = pilot_items(plan, starts)
     ctx = make_ctx(plan, items)
     cap = capacity === nothing ? _launch_capacity(plan, Int(Sys.free_memory()), 0.5) : max(1, Int(capacity))
-    o = (threads = Int(threads), capacity = cap, git = git, records = (rec, prior_record), lost = Ref(false), table = backend_table(plan; threads = threads, record = rec))
+    o = (threads = Int(threads), capacity = cap, git = git, dirty = dirty !== nothing, records = (rec, prior_record), lost = Ref(false), table = backend_table(plan; threads = threads, record = rec))
     store = joinpath(out, "store")
     mkpath(store)
     Threads.nthreads() > 1 && LinearAlgebra.BLAS.set_num_threads(1)

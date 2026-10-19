@@ -222,6 +222,7 @@ function device_records(ctx::RunCtx, items; hook::Bool = true)
         dev = Foundation.DEVICE[]
         backend = Tangent.device_backend(dev)
         csize = min(_device_capacity(ctx, it, T, Foundation.free_memory(dev)), cap)
+        csize >= 1 || return (recs = nothing, prov = cpu_prov(FALLBACK_REASONS[4]))   # not one orbit fits: out of memory, not an error
         starts = [_system_start(T, i) for i in items]
         for idx in _by_system(starts), r in Iterators.partition(idx, csize)
             nbatch += 1

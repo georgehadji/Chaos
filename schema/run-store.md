@@ -44,6 +44,9 @@ Layer 3, canonical. Shared contract between Julia (`Experiments`) and Python (`p
 | `arms` | string list | arms that contain the chunk |
 | `renorm_interval_tau`, `deviation_vectors_k`, `seed`, `chunk_size`, `gpu_chunks`, `steps_per_launch`, `launches_per_chunk` | int | tangent-core provenance fields |
 | `orthonormalizer`, `implementation` | string | Gram-Schmidt provenance (P3) |
+| `dirty` | bool | the working tree of the writing session was not clean (an override of the run, recorded in the manifest) |
+| `session` | int | 1-based index of the writing session in the manifest's session list |
+| `control_stop` | bool | `true` only for a file written when a control exceeded its bound and the campaign stopped; such a file is not a result, a resume refuses it unless the retry is asked for |
 | `created_utc` | string | ISO 8601, e.g. `2026-10-12T14:03:00Z` |
 | `complete` | bool | `true` |
 
@@ -68,6 +71,10 @@ Layer 3, canonical. Shared contract between Julia (`Experiments`) and Python (`p
 
 `flags` lists any of `diagnostics exceeded`, `drift`, `excluded`. `design_class` is the a-priori class (the former `class_label`, which stays for N-body files). A failed chunk file holds the root attributes and the orbit groups that exist.
 
+Axis order. The tables above write the Julia shape `(n, k)`. HDF5.jl stores a Julia array column-major with the dimensions reversed, so the file extents are `(k, n)` (`h5ls` and h5py show `(k, n)` for `lyap/<method>` and `(2, n)` for `state`); a reader in another language indexes the recorded step first in Julia and last in the file. Julia readers through `read_chunk` see the shapes of the tables.
+
+Failed chunk files. Rows after the failure point are blanked, not removed: the recorded step count `t` is 0 and the values are `NaN` (state, exponents, diagnostics) from the first row that was not computed to the end of the array, so every dataset keeps its full length. `status = "failed"` and `failure_reasons` say why; an orbit that failed twice has the flag `excluded`. A file written by a control-bound stop (`control_stop = true`) has no `excluded` flag.
+
 N-body files use `system = "nbody:<name>"` and the same groups.
 
 ## Changes from v1
@@ -79,3 +86,7 @@ N-body files use `system = "nbody:<name>"` and the same groups.
 - New orbit attributes: `item_hash`, `design_class`, `flags`, `steps_recorded`.
 - New orbit datasets: `state`, `winding`; `diagnostics/<name>` holds running maxima with attributes `threshold` and `first_exceedance_step`; `cost/<method>` gains thread seconds and resident bytes.
 - `/grid/` is unchanged and unused by the study runner.
+
+## Review fixes before any study data (version stays 2)
+
+Added by the D53 review fixes, while no study file exists: root attributes `dirty`, `session`, `control_stop`; the statements on axis order and on failed files above. The write now also compares the root attributes on the read-back and flushes the temporary file to the disk before the rename.

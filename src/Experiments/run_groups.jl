@@ -11,7 +11,7 @@ function _impl(method)
 end
 
 function _attrs(plan, it, row, ordinal, key, hash, arms, norbits; git, threads, capacity, utc, status, attempt, first_reasons, failure_reasons,
-                setup, pilot, prov = cpu_prov(row.reason))
+                setup, pilot, prov = cpu_prov(row.reason), dirty = false, session = 1, control_stop = false)
     gpu = prov.backend === :gpu
     orth, impl = _impl(it.method)
     a = Dict{String, Any}("schema_version" => 2, "study" => plan.study, "chunk" => ordinal, "chunk_key" => key, "chunk_hash" => hash,
@@ -25,7 +25,8 @@ function _attrs(plan, it, row, ordinal, key, hash, arms, norbits; git, threads, 
         "renorm_interval_tau" => it.tau, "deviation_vectors_k" => it.vectors, "seed" => parse(Int, it.run_seed),
         "chunk_size" => gpu ? prov.chunk_size : capacity, "gpu_chunks" => prov.gpu_chunks, "steps_per_launch" => gpu ? prov.launch_steps : it.horizon,
         "launches_per_chunk" => gpu ? prov.launches : cld(norbits, capacity), "orthonormalizer" => orth,
-        "implementation" => impl, "setup_check" => setup, "created_utc" => utc, "complete" => true)
+        "implementation" => impl, "setup_check" => setup, "dirty" => dirty, "session" => session, "control_stop" => control_stop,
+        "created_utc" => utc, "complete" => true)
     it.eps === nothing || (a["perturbation"] = it.eps)
     return a
 end
@@ -36,14 +37,14 @@ function _chunk_prov(s, chunk, row, attempt)
     return attempt >= 2 && prov.backend === :gpu ? cpu_prov(Foundation.FALLBACK_REASONS[5]) : prov
 end
 
-function chunk_attrs(s, chunk, status, attempt, first_reasons, failure_reasons, setup)
+function chunk_attrs(s, chunk, status, attempt, first_reasons, failure_reasons, setup; control_stop = false)
     plan = s.ctx.plan
     it = plan.items[first(chunk.items)]
     row = _row(s, it)
     return _attrs(plan, it, row, chunk.ordinal, chunk.key, chunk.hash, chunk.arms, length(chunk.items);
                   git = s.git.sha, threads = s.threads, capacity = s.capacity, utc = _utc(s.now), status = status, attempt = attempt,
                   first_reasons = first_reasons, failure_reasons = failure_reasons, setup = setup, pilot = false,
-                  prov = _chunk_prov(s, chunk, row, attempt))
+                  prov = _chunk_prov(s, chunk, row, attempt), dirty = !s.session["clean"], session = s.session_index, control_stop = control_stop)
 end
 
 # ---------------------------------------------------------------- computing
@@ -95,9 +96,10 @@ function _attempt!(s::Session, chunk, attempt, recs)
     return check_chunk!(s.ctx, chunk, recs)
 end
 
+# `final_failed = false` is a control-bound stop: the file records it (`control_stop`), no orbit is excluded, a resume refuses it (H1).
 function _write_result!(s::Session, chunk, recs, status, attempt, first_reasons, failure_reasons, setup; final_failed = true)
-    status == "failed" && mark_excluded!(recs)
-    attrs = chunk_attrs(s, chunk, status, attempt, first_reasons, failure_reasons, setup)
+    status == "failed" && final_failed && mark_excluded!(recs)
+    attrs = chunk_attrs(s, chunk, status, attempt, first_reasons, failure_reasons, setup; control_stop = !final_failed)
     s.hooks.observe === nothing || s.hooks.observe((ordinal = chunk.ordinal, attempt = attempt), attrs, recs)
     path = chunk_path(s.store, chunk.ordinal)
     ispath(path) && move_aside!(s.store, path, "aside")
@@ -116,8 +118,10 @@ function finish_chunk!(s::Session, chunk, recs)
     r1 = _attempt!(s, chunk, 1, recs)
     if !isempty(r1.fatal)
         push!(s.reasons, "control bound exceeded in chunk $(chunk.ordinal): " * join(r1.fatal, "; "))
-        _write_result!(s, chunk, recs, "failed", 1, String[], r1.fatal, r1.setup; final_failed = false)
+        push!(s.control_stops, Dict{String, Any}("ordinal" => chunk.ordinal, "code_version" => s.ctx.plan.code_version, "session" => s.session_index,
+                                                 "reasons" => r1.fatal, "retried" => false))
         s.status = "stopped: control bound"
+        _write_result!(s, chunk, recs, "failed", 1, String[], r1.fatal, r1.setup; final_failed = false)
         return true
     end
     if isempty(r1.reasons)
@@ -144,7 +148,7 @@ function group_info(s::Session, gi, todo)
     row = _row(s, first(its))
     armset = Set(a for o in todo for a in plan.chunks[o].arms)
     arms = [a["name"] for a in plan.block.raw["arm"] if a["name"] in armset]
-    return (group = gi, chunks = todo, arms = arms, orbits = length(its), steps = sum(it.horizon for it in its; init = 0),
+    return (group = gi, chunks = todo, arms = arms, precision = _label(first(its).precision), orbits = length(its), steps = sum(it.horizon for it in its; init = 0),
             backend = row.backend === :gpu && !s.device_lost[] ? :gpu : :cpu)
 end
 
@@ -169,7 +173,7 @@ function pre_group_stop(s::Session, t)
 end
 
 # First completed group of an arm against its budget line (R5 item 5): over first_chunk_cost_factor times the line pauses the arm.
-function measure_arms!(s::Session, info, wall, workers, backend::Symbol = :cpu)
+function measure_arms!(s::Session, info, wall, workers, backend::Symbol = :cpu)   # the line of the group's own precision
     rb = s.ctx.plan.block
     factor = rb.raw["health"]["first_chunk_cost_factor"]
     cost_ns = NS_PER_S * wall * workers / info.steps
@@ -178,7 +182,7 @@ function measure_arms!(s::Session, info, wall, workers, backend::Symbol = :cpu)
         (name in info.arms && !(name in s.measured)) || continue
         push!(s.measured, name)
         name in s.cap_override && continue
-        line = budget_line_ns(rb, arm, backend)
+        line = budget_line_ns(rb, arm, backend, info.precision)
         if cost_ns > factor * line
             push!(s.paused, name)
             push!(s.reasons, "arm $name paused: measured $(round(cost_ns; digits = 3)) ns per orbit-step above $factor times the budget line $line ns")
@@ -226,7 +230,12 @@ function run_group!(s::Session, gi, ordinals)
     end
     workers = prov.backend === :gpu ? 1 : min(ntask, length(items))
     _fill_costs!(recs, items, wall, workers, info.steps)
+    npaused = length(s.paused)
     measure_arms!(s, info, wall, workers, prov.backend)
+    if length(s.paused) != npaused   # a pause reaches the disk before the first chunk file of its group (M8)
+        _refresh_paused!(s)
+        write_manifest(s)
+    end
     lo = 0
     for o in todo
         n = length(plan.chunks[o].items)

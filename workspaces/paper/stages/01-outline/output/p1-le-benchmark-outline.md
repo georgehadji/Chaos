@@ -1,7 +1,7 @@
 # Outline: paper p1-le-benchmark
 
 - Slug: p1-le-benchmark
-- Status: draft
+- Status: approved
 - Journal: to be decided
 - Studies used: p1-le-benchmark, accepted results document `workspaces/study/stages/05-report/output/p1-le-benchmark-results.md`
 - Scope source: `_config/research-question.md`, "Paper sequence", row P1. Claims tested: C1 (asymptotic equivalence) and C2 (finite-time inequivalence).

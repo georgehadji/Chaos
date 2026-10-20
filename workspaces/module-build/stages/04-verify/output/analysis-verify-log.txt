@@ -1,0 +1,48 @@
+== TRANSCRIPTION ==
+P1 | parameter file read by the module: keys, unknown or missing | 37 | 37 keys | PASS
+P1 | every value has its literal text in the preregistration section named for it (list of misses) | none | none | PASS
+P1 | numeric values equal the numbers of the cited text (mismatches) | none | none | PASS
+== RUN ==
+RUN | inputs fingerprinted before the run: manifest, panel, parameter file, preregistration, chunk files (count) | 1367 | 1363 chunk files + 4 | PASS
+O21 | wall time of analyze on the real store with figures (s), 23 threads, first call included | 54.0499 | <= 600 s | PASS
+O21 | peak resident memory of the process after the run (GiB) | 2.4465 | <= 8 GiB | PASS
+O21 | allocated by analyze (GiB), garbage-collector time (s) | 17.1, 2.3 | - | INFO
+RUN | status | ok | :ok | PASS
+O17 | inputs unchanged after the run (files compared by SHA-256) | true | true | PASS
+O18 | seven figure files, each non-empty with the PDF signature (sizes kB) | 106.0 64.8 9.5 7.7 11.2 6.8 13.9 | 7 files | PASS
+O18 | digest lines of the tables file equal the digests of the figure data | true | true | PASS
+O16 | tables file at 23 threads against 1 thread: byte-identical (1-thread run 39.8 s) | true | true | PASS
+O17 | inputs unchanged after the second run | true | true | PASS
+== K0 ==
+O1 | class T orbits at K = 0 in the panel | 40 | 40 | PASS
+O1 | K = 0: largest |lambda_m(n) - closed form| over 40 orbits, every recorded n, per method (L9 against the singular-value closed form) | L1 1.66533e-16, L3 1.66533e-16, L4 1.66533e-16, L4b 1.66533e-16, L5 2.22045e-16, L5b 2.22045e-16, L6 2.22045e-16, L9 5.55112e-17 | <= 1e-9 | PASS
+O1 | finding: L9 against the deviation-vector closed form (spec O1 as written), largest over 40 orbits | 0.0415767 | - | INFO
+== COMPARE ==
+O3 | orbits in the independent file and in the module | 883 and 883 | equal | PASS
+O3 | per-orbit quantity R_nH2: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity defined: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity delta_qb: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity diff_l2: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity diff_l9: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity final label: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity flags: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity forced: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity horizon: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity ladder_same: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity lam_ref: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity nconv: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | per-orbit quantity raw label: orbits that differ from the independent value (of 883) | 0 | 0 | PASS
+O3 | E_ch, W, S: independent ids equal the module's (sizes) | 209 355 80 | equal | PASS
+O3 | dropped orbits and S orbits without positive growth | 1, 0 | equal | PASS
+O3 | H1: eligible orbits and passes a, b, c | 209 209 209 162 | equal | PASS
+O3 | H2: n, median (exact), interval ends within 0.05 of the width, verdict | 355 2.23588e-05 [1.92572e-05, 2.31226e-05] | equal / 0.05 w | PASS
+O3 | H3: sizes, medians, ratio (exact), interval ends within 0.05 of the width, verdict | 355 80 2.51189e+06 224 11213.8 [7924.47, 14117.3] | equal / 0.05 w | PASS
+O3 | H4: eight values equal, verdict | 0.256067 0.256067 1.17019 1.17019 0.299257 0.299013 1.17244 1.17179 | equal | PASS
+O3 | H5: sizes and counts of the three sub-rules, verdict | 92/92 883/84 334/19 | equal | PASS
+O3 | label counts per cell and label pair: entries / differing entries | 47 / 0 | 0 differ | PASS
+O3 | independent K = 0 closed forms: largest deviation of the seven deviation-vector methods, and of L9 against the singular-value form, over 40 orbits | 2.22045e-16, 5.55112e-17 | <= 1e-9 | PASS
+== CLI ==
+O22 | bin/chaoslab.jl analyze on the real inputs: exit code | 0 | 0 | PASS
+O22 | tables file and seven figure files written | 8 | 8 | PASS
+O22 | unknown option and too few arguments: exit code | 1 | 1 | PASS
+TOTAL | PASS 40 | FAIL 0 | INFO 2 | 2026-10-20 15:50

@@ -1,0 +1,64 @@
+# Parameter table of the analysis of p1-le-benchmark: a transcription of the frozen values of the preregistration
+# (workspaces/study/stages/01-design/output/p1-le-benchmark-preregistration.md, Amendments A1 to A6), one key per value.
+# The preregistration is the home of every value (spec analysis-spec.md, E0 and open point P1); a difference is a defect of this file.
+# Section names are those of the preregistration.
+
+# "Metrics" (Horizons), "Label rules"
+N_1 = 10000000
+N_long = 100000000
+N_B = 1000000
+# "H2"
+n_H2 = 10000
+
+# "H1"
+h1a_bound = 1e-8
+h1a_fraction = 0.98
+h1b_bound = 1e-6
+h1b_fraction = 0.98
+h1c_bound = 5e-3
+h1c_fraction = 0.90
+h1c_eps = 1e-8
+
+# "H1", Amendment A4 item 4, Amendment A6 item 1
+control_bound = 1e-8
+control_bound_L9 = 5e-8
+
+# "H2"
+h2_median = 0.10
+h2_interval = 0.05
+bootstrap_resamples = 10000
+bootstrap_level = 0.95
+
+# "H3"
+h3_band = 0.05
+h3_ratio = 10.0
+h3_interval = 3.0
+
+# "H4"
+h4_ref_halfpi = 0.298
+h4_tol_halfpi = 0.01
+h4_ref_2pi = 1.172
+h4_tol_2pi = 0.02
+h4_T = 1000000000
+h4_T_cross = 100000000
+
+# "H5"
+h5a_min = 0.90
+h5b_max = 0.30
+h5c_max = 0.30
+
+# "Label rules"
+lambda_threshold = 1e-4
+growth_ratio = 5.0
+rotation_tol = 1e-7
+return_tol = 1e-10
+ladder_tol = 5e-3
+
+# "Eligible sets"
+drift_bound = 1e6
+
+# "Analysis plan"
+min_set = 20
+
+# "K values"
+K_c = 0.971635406

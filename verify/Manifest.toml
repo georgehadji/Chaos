@@ -397,10 +397,11 @@ deps = ["Dates", "DoubleFloats", "HDF5", "JSON", "KernelAbstractions", "LinearAl
 path = ".."
 uuid = "1d9ee621-a3a2-43c0-acfa-d3a4a467f53c"
 version = "0.0.1"
-weakdeps = ["CUDA"]
+weakdeps = ["CUDA", "CairoMakie"]
 
     [deps.Chaoslab.extensions]
     ChaoslabCUDAExt = "CUDA"
+    ChaoslabCairoMakieExt = "CairoMakie"
 
 [[deps.CodecZstd]]
 deps = ["TranscodingStreams", "Zstd_jll"]

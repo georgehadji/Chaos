@@ -26,14 +26,15 @@ Fallback if the human overrides to Python: P1/P2 survive (float64 + mpmath oracl
 | `TimeSeries` | Julia | plain functions | embedding, Wolf, Rosenstein, Kantz, Eckmann-Ruelle (P4) |
 | `Shadow` | Julia | symbolic -> generated code: Symbolics.jl BCH Poisson brackets, `build_function` | modified Hamiltonian H_h for R2 |
 | `Experiments` | Julia | command (`RunSpec` -> `run`), repository (`Store`), content-addressed cache | TOML.jl configs, HDF5.jl store, manifests, chunked resumable sweeps |
-| `Figures` | Julia | scripts | CairoMakie (single language end to end) |
+| `Analysis` | Julia | pure functions over a loaded series table; one command `analyze` | study analysis of `analysis-spec.md` (D60): store reading, labels, hypothesis decisions, tables, figure data; no plotting dependency |
+| `Figures` | Julia | package extension (weak dependency), scripts | CairoMakie (single language end to end), loaded under the verify environment like CUDA (D60) |
 | `nbody` (P6) | Python | adapters | REBOUND/REBOUNDx/celmech in venv A; ASSIST pins `rebound<5`: venv B or WSL2; CPU only, parallel as one process per independent simulation |
 | `scripts/` (ICM) | Python stdlib | one script, one job | `icm_status.py`, `icm_validate.py`, `bibcheck.py` (Crossref), `promote.py`, `fetch_horizons.py` |
 
 
 ## Layering
 
-`Foundation <- Systems <- Integrators <- Tangent <- {Lyapunov, Indicators, Diagnostics} <- {Shadow, TimeSeries} <- Experiments <- Figures`. A test parses each file's `using`/`import` lines and fails on an upward edge. Python never imports Julia and vice versa.
+`Foundation <- Systems <- Integrators <- Tangent <- {Lyapunov, Indicators, Diagnostics} <- {Shadow, TimeSeries} <- Experiments <- Analysis <- Figures`. A test parses each file's `using`/`import` lines and fails on an upward edge. Python never imports Julia and vice versa.
 
 ## Compute
 

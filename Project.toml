@@ -18,13 +18,16 @@ TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [weakdeps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 
 [extensions]
 ChaoslabCUDAExt = "CUDA"
+ChaoslabCairoMakieExt = "CairoMakie"
 
 [compat]
 Aqua = "0.8"
 CUDA = "6"
+CairoMakie = "0.15"
 Dates = "1"
 DoubleFloats = "1.4"
 ForwardDiff = "1"

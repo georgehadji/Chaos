@@ -1,0 +1,27 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Chirikov(1979)]{Chirikov1979}
+B.~V. Chirikov.
+\newblock {A universal instability of many-dimensional oscillator systems}.
+\newblock \emph{Physics Reports}, 52\penalty0 (5):\penalty0 263--379, 1979.
+\newblock \doi{10.1016/0370-1573(79)90023-1}.
+
+\bibitem[Sala and Artuso(2015)]{SalaArtuso2015}
+M.~Sala and R.~Artuso.
+\newblock Oseledets' splitting of standard-like maps.
+\newblock \emph{Chaos: An Interdisciplinary Journal of Nonlinear Science},
+  25\penalty0 (2):\penalty0 023113, 2015.
+\newblock \doi{10.1063/1.4909524}.
+
+\bibitem[Shevchenko(2014)]{Shevchenko2014}
+I.I. Shevchenko.
+\newblock Lyapunov exponents in resonance multiplets.
+\newblock \emph{Physics Letters A}, 378\penalty0 (1-2):\penalty0 34--42, 2014.
+\newblock \doi{10.1016/j.physleta.2013.10.035}.
+
+\end{thebibliography}

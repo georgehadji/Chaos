@@ -1,6 +1,6 @@
 name = "Chaoslab"
 uuid = "1d9ee621-a3a2-43c0-acfa-d3a4a467f53c"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["georgehadji"]
 
 [deps]
@@ -42,7 +42,7 @@ StableRNGs = "1"
 StaticArrays = "1.9"
 TOML = "1"
 Test = "1"
-julia = "1.10"
+julia = "1.11"
 
 [extras]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"

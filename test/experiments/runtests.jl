@@ -25,3 +25,4 @@ include(joinpath(@__DIR__, "ex_device.jl"))
 include(joinpath(@__DIR__, "ex_record.jl"))
 include(joinpath(@__DIR__, "ex_review.jl"))   # Amendment D53 review fixes
 include(joinpath(@__DIR__, "ex_a5.jl"))   # Amendment D56 and preregistration A5
+include(joinpath(@__DIR__, "ex_a6.jl"))   # Amendment D57 and preregistration A6

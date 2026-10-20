@@ -525,3 +525,18 @@ Preregistration Amendment A5 (decision D56) fixes three study inputs after the s
 - D56e Breakdown. In an exempt arm a real breakdown (tau 16 at K = 10) leaves the chunk `ok` with the orbit flagged, the step and the kind stored and the rows blank from the failure on; in an arm that is not exempt the same run fails the chunk; the failure text is parsed for kind `orthonormalisation breakdown` only.
 - D56f Stop rule. A failed chunk of an exempt arm is not counted by `stop_failed_fraction`; the same failure in a non-exempt arm stops the campaign; a chunk shared with a non-exempt arm is not exempt; a failure that is not a breakdown still fails an exempt chunk.
 - D56g [local] Plan only, real preregistration and panel: items, chunks per arm, the items that carry `control_exact`, the exempt chunks, and the L2 items by coordinate mode are reported.
+
+## Amendment D57 (2026-10-20)
+
+Preregistration Amendment A6 (decision D57) sets a bound per method for the control check after the stage 04 verification of the runner (finding 1): at the real horizon N = 1e7 the method L9 deviates from the exact exponent by 1.8e-8 (control 877) and 2.3e-8 (control 879), the other seven methods by at most 5.3e-9; the deviation of L9 falls as 1/n, so the constant |ln c| is 0.18 and 0.23 and the campaign would stop at the first L9 control chunk. D53, D54 and D56 are otherwise unchanged. P-numbers: none new.
+
+**Block key.** `control_bound_method` (`[run.health]`, optional): a table from a method name to a positive number. The bound of the control check (R5 item 1c) for an item of that method is the table value; for every other method it is `control_bound`. A key that is not a method, a method that is not in `control_methods`, a value that is not a positive number or a value that is not a table is refused naming the key (`health.control_bound_method.<method>`). Without the key every method has `control_bound`, as before.
+
+**Hash.** The table enters the status text of a chunk (R3 item 2) as one line `control_bound_method=<method>:<value>,...` in method order, only when the key is present; a block without the key gives the chunk hashes of D56.
+
+**Acceptance criteria.**
+- D57a Block. The table is read from a single block and from a later block over an earlier one (tables merge); a block without the key reads as before; the five refusals above name the key.
+- D57b Check. A deviation over the method bound stops the campaign and the stop reason names the method and the method bound; the same deviation in a method without an entry passes under `control_bound`; a bound above `control_bound` lets a larger deviation of that method pass; without the key nothing changes.
+- D57c Hash. The table changes the hash of the chunks it decides and no hash when absent.
+- D57d Real preregistration. The header hash holds with six amendments; the merged block has `control_bound = 1e-8`, `control_bound_method = {L9 = 5e-8}` and `control_scope = "exact_start"`.
+- D57e [local] Real horizon, gated controls (871, 873, 875, 877, 879, Y5): all variational methods are within their bound at N = 1e7 (verify section CTRL).

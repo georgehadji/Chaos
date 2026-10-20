@@ -1,8 +1,8 @@
-# Verification: experiments runner and run store (Amendments D53, D54, D55, D56)
+# Verification: experiments runner and run store (Amendments D53, D54, D55, D56, D57)
 
-Module-build stage 04 for the second scope of `experiments`. Branch `module/experiments-runner`, code of D55 and D56 (commits d787d25 and 4219a42), verify scripts at fa84391 plus the edits committed with this report. The first verification (code at 9cd8df6) failed the audit on H1 and H2; this report is the repeat after D55, preregistration A5 and D56.
+Module-build stage 04 for the second scope of `experiments`. Branch `module/experiments-runner`, code of D55, D56 and D57 (commits d787d25, 4219a42 and the D57 commit), verify scripts at fa84391 plus the edits committed with this report. The first verification (code at 9cd8df6) failed the audit on H1 and H2; this report is the repeat after D55, preregistration A5 and D56.
 
-Raw output: `experiments-runner-verify-log.txt` (main run: PASS 80, FAIL 6, INFO 58, 3329 s at 23 threads; addendum: rerun of sections Y5, REALFAIL and DEVICE after three script corrections); device log `gpu-rtx5060-d53-verify-log.txt`; figure `experiments-runner-cost.png`. Scripts: `verify/experiments-runner.jl`, `verify/experiments-runner-reader.jl` (HDF5.jl and SHA only, separate process).
+Raw output: `experiments-runner-verify-log.txt` (main run: PASS 80, FAIL 6, INFO 58, 3329 s at 23 threads; addendum 1: rerun of sections Y5, REALFAIL and DEVICE after three script corrections; addendum 2: section CTRL against the bounds of Amendment A6); device log `gpu-rtx5060-d53-verify-log.txt`; figure `experiments-runner-cost.png`. Scripts: `verify/experiments-runner.jl`, `verify/experiments-runner-reader.jl` (HDF5.jl and SHA only, separate process).
 
 The script had been written for A4. Under A5 it needed five corrections, all in the verification, none in the runner: reduce every `[run]` block, the A5 Budget rows (main and long split into non-L2 and L2 arms), the A5 control scope, the `breakdown_tau` flag in the independent reader, the `session` attribute in the resume comparison. A new section CTRL runs the real control rule at the real horizon.
 
@@ -26,12 +26,12 @@ The script had been written for A4. Under A5 it needed five corrections, all in 
 | D53q pilot | totals: 60.8 projected thread-hours against 174.1 allowed by the A4 lines with safety; no arm pauses; 11 of 12 arms within a factor 2 of the reduced-campaign cost; tau_sweep 2.46 (the pilot overestimates) | FAIL (marginal, conservative) |
 | D53t device agreement | ensemble means within 2.39 SE (bound 4) for all 8 methods; per-orbit worst 5.63 sigma for 7 methods (bound 6), L2 16.2 sigma | FAIL for L2 only |
 | D54f recorder retake | 7 of 8 methods within 1.5x of the stored entry on both CPU and device, L2 1.6x to 1.7x on both (twice), L5b CPU 5.6x once (transient); gpu slower than cpu for all 8 in every retake | FAIL (L2 record not reproducible; no decision changes) |
-| CTRL (real control rule at N = 1e7) | gated controls 871, 873, 875, 877, 879, Y5: L1, L3, L4, L4b, L5, L5b, L6 at most 4.6e-9; L9 1.8e-8 (877) and 2.3e-8 (879) against the bound 1e-8 | FAIL for L9 |
+| CTRL (real control rule at N = 1e7) | gated controls 871, 873, 875, 877, 879, Y5: L1, L3, L4, L4b, L5, L5b, L6 at most 5.3e-9 (control 871) against 1e-8; L9 1.8e-8 (877) and 2.3e-8 (879) against 5e-8 (A6). Main run before A6: L9 FAIL against 1e-8; addendum 2 after A6: 8 of 8 PASS | PASS (after A6) |
 | D53r | no study value in `run_*.jl` | PASS |
 
 ## Findings for the owner
 
-1. **Control bound and L9 (new, needs a decision before any study chunk).** At the real horizon N = 1e7, L9 deviates from the exact exponent by 1.8e-8 on control 877 (K = 2 pi) and 2.3e-8 on control 879 (K = 10); the bound is 1e-8. The deviation falls as 1/n (1.8e-6 at 1e5, 1.8e-7 at 1e6, 1.8e-8 at 1e7), so it is the constant |ln c| = 0.18 and 0.23, not an error that shrinks away. The other seven methods are at most 4.6e-9 on the same orbits. The real campaign stops at the first L9 control chunk (ordinal 192 of the reduced plan). Options: a per-method bound (L9 at 5e-8), a single looser bound (3e-8), or L9 outside the control gate; each is an amendment, allowed until data exist.
+1. **Control bound and L9 (resolved by Amendment A6 and D57).** At the real horizon N = 1e7, L9 deviates from the exact exponent by 1.8e-8 on control 877 (K = 2 pi) and 2.3e-8 on control 879 (K = 10); the bound is 1e-8. The deviation falls as 1/n (1.8e-6 at 1e5, 1.8e-7 at 1e6, 1.8e-8 at 1e7), so it is the constant |ln c| = 0.18 and 0.23, not an error that shrinks away. The other seven methods are at most 4.6e-9 on the same orbits. The real campaign stops at the first L9 control chunk (ordinal 192 of the reduced plan). The owner chose a per-method bound: Amendment A6 sets L9 to 5e-8 (2.2 times the larger L9 deviation) and keeps 1e-8 for the other seven methods; decision D57 added the optional `[run.health.control_bound_method]` table to the runner. The CTRL check against the A6 bounds passes for all eight methods (addendum 2 of the log).
 2. **L2 recorder record.** The stored L2 entry (CPU 2.94 ns, device 11.19 ns per orbit-step) is not reproduced: retakes give 4.8 and 17.8 ns (1.6x to 1.7x, twice). The gpu stays slower than the CPU by 3.6x, so `auto` still resolves to CPU. A new record at the start of stage 03-run (K19) fixes it.
 3. **L2 per-orbit device agreement** 16.2 sigma (heavy-tailed L2 at long horizons). No study effect while `auto` resolves to CPU.
 4. **Pilot and budget.** The pilot overestimates tau_sweep by 2.46 (conservative). Reduced-campaign costs projected on the real plan: 59.1 thread-hours against 174.1 with safety (63.6 without); no arm's first run type exceeds the first-chunk cap. Estimated wall time at 23 threads about 2.6 to 4.5 hours.
@@ -49,6 +49,6 @@ Read only the spec, A4, the schema and the code. No CRITICAL. H1 and H2 and the 
 |-------|--------|
 | Evidence | every criterion has a number |
 | Review closed | PASS: H1, H2, M1 to M9 closed by D55 |
-| Open FAIL rows | CTRL (L9 bound, owner decision), D54f L2 record, D53t L2 device agreement, D53q tau_sweep: none is a defect of the runner |
+| Open FAIL rows | D54f L2 record, D53t L2 device agreement, D53q tau_sweep: none is a defect of the runner and none changes a decision |
 
-Outcome: stage 04 complete for the runner. Finding 1 needs an owner decision (amendment A6 or an accepted risk) before stage 03-run of the study.
+Outcome: stage 04 complete for the runner. The D57 change (per-method control bound) is covered by 14 package tests (`ex_a6.jl`) and the real-horizon CTRL check; the preregistration is at six amendments.

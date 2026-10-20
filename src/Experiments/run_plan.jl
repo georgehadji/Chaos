@@ -181,6 +181,7 @@ function _status_text(rb, df)
         println(io, k, "=", repr(h[k]))
     end
     println(io, "control_methods=", join(h["control_methods"], ","))
+    haskey(h, "control_bound_method") && println(io, "control_bound_method=", join(("$m:$(repr(h["control_bound_method"][m]))" for m in sort(collect(keys(h["control_bound_method"])))), ","))
     println(io, "setup_check_steps=", join(("$c:$(h["setup_check_steps"][c])" for c in sort(collect(keys(h["setup_check_steps"])))), ","))
     return String(take!(io))
 end

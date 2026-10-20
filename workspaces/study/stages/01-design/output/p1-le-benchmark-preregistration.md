@@ -11,8 +11,8 @@ FROZEN 2026-10-17. Every value marked "proposed" was approved by the owner at th
 | Claims tested | C1, C2. C3 is out of scope (P2). |
 | Value types | FALSIFIES (C1, C2), REPRODUCES (SalaArtuso2015), TOOL (Chaoslab v0.1.0 at M3 exit), NEGATIVE allowed (`/_config/value-types.md`) |
 | Git SHA at freeze | 1e760e229eabf9d8323ad4d8097cc1dbd017f845 (parent commit of the freeze commit) |
-| SHA-256 of this file (current version) | 1e440a2f9b313306016fc541f75f8e48d4c20942d76c34b807c1213e4bc3ee4f (rule: Amendment A1, item 1) |
-| Amendment log | A1 (2026-10-17, section "Amendment A1"; parent commit 963345d86570366f5f0ea3ee6950288e20edcfa7; replaces freeze hash fa84e883405a7acbdb4774be2527bbecb8399a4c369fa79fbfc4d563d98bea87); A2 (2026-10-17, section "Amendment A2"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash c9ad3c2cf3ba1220990d118c81e55da2104a7130b0f49e7dcd83cf75461fdcef); A3 (2026-10-17, section "Amendment A3"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash d89d2bf99e4eaa5740be88da436ec28b2d92f7859a278c50fe734ff4a02ae69c); A4 (2026-10-18, section "Amendment A4"; parent commit e020bef1aea6148ba39257d5d279ae647421fd05; replaces hash 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46); A5 (2026-10-19, section "Amendment A5"; parent commit d787d25fbce52444f28a2868709249fdbb7c9026; replaces hash 3a1c042c8f8f5f288f690e9d2e564ddaea823bf9b0e4eb033873d3e256a1fa33) |
+| SHA-256 of this file (current version) | 62011ba5af514da4f1238aef9ae6cb35ca21093c4343b71dd696df360b9994bf (rule: Amendment A1, item 1) |
+| Amendment log | A1 (2026-10-17, section "Amendment A1"; parent commit 963345d86570366f5f0ea3ee6950288e20edcfa7; replaces freeze hash fa84e883405a7acbdb4774be2527bbecb8399a4c369fa79fbfc4d563d98bea87); A2 (2026-10-17, section "Amendment A2"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash c9ad3c2cf3ba1220990d118c81e55da2104a7130b0f49e7dcd83cf75461fdcef); A3 (2026-10-17, section "Amendment A3"; parent commit ceb5227dfcbd258d4f72dfc4ff99602258320b36; replaces hash d89d2bf99e4eaa5740be88da436ec28b2d92f7859a278c50fe734ff4a02ae69c); A4 (2026-10-18, section "Amendment A4"; parent commit e020bef1aea6148ba39257d5d279ae647421fd05; replaces hash 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46); A5 (2026-10-19, section "Amendment A5"; parent commit d787d25fbce52444f28a2868709249fdbb7c9026; replaces hash 3a1c042c8f8f5f288f690e9d2e564ddaea823bf9b0e4eb033873d3e256a1fa33); A6 (2026-10-20, section "Amendment A6"; parent commit b0b51ce6b04f6f1b8bca1c601cb60f79b635692f; replaces hash 1e440a2f9b313306016fc541f75f8e48d4c20942d76c34b807c1213e4bc3ee4f) |
 
 Value types, in the words of `value-types.md`:
 - FALSIFIES: H1 to H3 each have a decision rule below, fixed before any data exists.
@@ -597,3 +597,14 @@ coordinate_mode = ["wrapped"]
 ```
 
 Notes on the block. The arms main, long, tau_sweep and eps_sweep replace the arms of the same name in A4 (their other keys are repeated because an arm is replaced as a whole); main_l2 and long_l2 are new. The `[run.budget]` tables change one key each.
+
+## Amendment A6 (2026-10-20)
+
+Approved by the owner on the evidence of the repeated stage 04 verification of the runner (`experiments-runner-verification.md`, finding 1, section CTRL) and decision D57, before stage 03-run produced any data file. Base sections and Amendments A1 to A5 are left as written; where they differ, this section wins. The block below holds only the added `[run]` key; the reader merges it over the earlier blocks as for A5. A6 changes no hypothesis, threshold other than the one named, subset, horizon, arm or panel input, so the panel stays valid under the hash that A6 gives this file (`panel_prereg_sha256_accepted` keeps the value of A4).
+
+1. Control bound per method. The bound `control_bound = 1e-8` of A4 item 4 stays for the methods L1, L3, L4, L4b, L5, L5b and L6. For L9 it is 5e-8. Evidence: at the real horizon N_1 = 1e7 the gated controls (871, 873, 875, 877, 879 and Y5, A5 item 3) give |lambda_1(N_1) - exact| of at most 5.3e-9 for the seven methods above and 1.8e-8 (control 877, K = 2 pi) and 2.3e-8 (control 879, K = 10) for L9; for L9 the deviation falls as 1/n (1.8e-6 at 1e5, 1.8e-7 at 1e6, 1.8e-8 at 1e7), so it is the constant |ln c| = 0.18 and 0.23 of the L9 start and not an error that shrinks away. With the single bound 1e-8 the campaign would stop at the first L9 control chunk. 5e-8 is 2.2 times the larger L9 deviation and 5 times the bound it replaces; the control keeps its purpose, since a wrong exponent is far above both bounds (the off-orbit controls deviate by 0.1 to 0.65). The check (A4 item 4, A5 item 3) is otherwise unchanged: it applies to the same controls and the same horizon.
+
+```toml
+[run.health.control_bound_method]
+L9 = 5e-8
+```

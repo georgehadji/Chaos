@@ -426,3 +426,15 @@ New interface under test: `merge_run`, `read_run_block` over several blocks; arm
 ### RED log (D56)
 
 Command: the new file against the tree at d787d25 (`git archive HEAD` in the scratchpad, with the new `ex_a5.jl` and `ex_run_inputs.jl`; the old tree has the A4-only preregistration and none of the code; Julia 1.13.2, 4 threads). Result: `Pass 4, Fail 6, Error 6, Total 16` (a testset stops at its first error): D56a 2/6/1, D56b 0/0/1 (no `main_l2` arm in the file), D56c 0/0/1 (`control_exact` missing), D56d 0/0/1 (key refused), D56e 0/0/1 (`stop_exempt` unknown key), D56f 2/0/1 (`chunk_exempt` undefined). After the implementation: 48 of 48. The control-exactness test first used the torus residual of the first return and marked control 881 exact; the plan-only check on the real panel showed it must be the lifted bit-for-bit return (the lifted state moves by the binary64 2 pi), which is the rule now in the spec and in the winding assertion of D56c.
+
+## Amendment D57 (per-method control bound)
+
+Spec: Amendment D57. New file `test/experiments/ex_a6.jl` (registered after `ex_a5.jl`); `ex_a5.jl` D56b reads the amendment count as at least 5 (A6 adds a sixth).
+
+| ID | Property | Input | Expected |
+|----|----------|-------|----------|
+| D57a | block key read, merged and validated | single block, A4 plus a second block with the table, five bad tables | table kept; second block merges; a block without the key has none; refusals name `health.control_bound_method` and the method |
+| D57b | method bound replaces `control_bound` for its method | exact control 14, deviation +0.01 injected in the L5 control chunk, table `L5 = 1e-3`; same without the table; the L1 chunk with the table; table `L5 = 2.0` with +1.0 | `stopped: control bound` naming method L5 and `above 0.001`; `complete`; `complete`; `complete` |
+| D57c | table enters the chunk hash | plan with and without the table | hashes differ with the table, equal to the plan without the key when absent |
+| D57d | real preregistration | `p1-le-benchmark-preregistration.md` | `check_prereg` accepts 6 amendments; `control_bound` 1e-8, `control_bound_method` `{L9 = 5e-8}`, scope `exact_start` |
+| D57e | [local] real horizon | verify section CTRL | stage 04, not in the package suite |

@@ -66,7 +66,8 @@ function control_reasons(plan::RunPlan, chunk, recs)
             o.attrs["control_scope"], o.attrs["control_deviation"] = it.control_exact ? "bound" : "info", err
             it.control_exact || continue
         end
-        err > h["control_bound"] && push!(out, "control bound exceeded: orbit $(o.id) method $(it.method), |lambda_1 - exact| = $err above $(h["control_bound"])")
+        bound = get(get(h, "control_bound_method", Dict{String, Any}()), it.method, h["control_bound"])
+        err > bound && push!(out, "control bound exceeded: orbit $(o.id) method $(it.method), |lambda_1 - exact| = $err above $bound")
     end
     return out
 end

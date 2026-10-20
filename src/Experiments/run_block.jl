@@ -152,7 +152,7 @@ end
 function _rb_health(h, arms)
     keys_ = ("fail_fraction", "control_bound", "control_methods", "setup_check_steps", "setup_check_tol", "drift_bound",
              "rerun_attempts", "stop_failed_fraction", "first_chunk_cost_factor", "wall_cap_hours")
-    _rb_keys(h, "health", keys_, ("control_scope",))
+    _rb_keys(h, "health", keys_, ("control_scope", "control_bound_method"))
     pos(k) = _rb_real(h[k], "health.$k"; ok = >(0), what = "positive")
     frac(k) = _rb_real(h[k], "health.$k"; ok = x -> 0 <= x < 1, what = "inside [0, 1)")
     s = h["setup_check_steps"]
@@ -164,6 +164,17 @@ function _rb_health(h, arms)
     end
     scope = haskey(h, "control_scope") ? Dict{String, Any}("control_scope" => _rb_str(h["control_scope"], "health.control_scope", RB_CONTROL_SCOPES)) :
             Dict{String, Any}()
+    cbm = Dict{String, Any}()                      # D57: optional per-method control bound; a method not listed keeps `control_bound`
+    if haskey(h, "control_bound_method")
+        t = h["control_bound_method"]
+        t isa AbstractDict || _rb_err("health.control_bound_method", "must be a table")
+        for (m, v) in t
+            m in RB_METHODS || _rb_err("health.control_bound_method.$m", "unknown method")
+            m in h["control_methods"] || _rb_err("health.control_bound_method.$m", "method is not in control_methods")
+            cbm[m] = _rb_real(v, "health.control_bound_method.$m"; ok = >(0), what = "positive")
+        end
+        scope["control_bound_method"] = cbm
+    end
     return merge(scope, Dict{String, Any}("fail_fraction" => frac("fail_fraction"), "control_bound" => pos("control_bound"),
         "control_methods" => _rb_list(h["control_methods"], "health.control_methods", (x, p) -> _rb_str(x, p, RB_METHODS)),
         "setup_check_steps" => steps, "setup_check_tol" => pos("setup_check_tol"), "drift_bound" => pos("drift_bound"),

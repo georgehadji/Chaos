@@ -53,7 +53,7 @@ end
 
 @testset "D56 the real preregistration: A5 over A4" begin
     chk = EX.check_prereg(EX_REAL_PREREG)
-    @test chk.amendments == 5 && chk.header_sha256 == chk.computed_sha256
+    @test chk.amendments >= 5 && chk.header_sha256 == chk.computed_sha256
     rb = EX.read_run_block(EX_REAL_PREREG)
     arms = Dict(a["name"] => a for a in rb.raw["arm"])
     # L2 runs only in wrapped coordinates; the other methods of main and long are unchanged

@@ -382,3 +382,20 @@ REALFAIL | L5 N=10000000 tau=8 eps=- arms=Any["tau_sweep"] | 0 | 24
 D53k/REALFAIL | real horizons, L2 (main_l2, long_l2, eps_sweep; wrapped) and L4, L5 (tau_sweep; stop_exempt) only (360 of 1363 chunks, 4.5 min): chunks failed twice by the health checks, against the real stop limit 0.05 x 1363 = 68.15 chunks | 0 failed; status complete | <= 68.15 (else the real campaign stops: stopped, failed fraction) | PASS
 # section REALFAIL took 273.0 s
 # summary: PASS 15, FAIL 2, INFO 22, total 740.0 s
+
+# ADDENDUM 2 (section CTRL rerun against the control bounds of Amendment A6 (D57): L9 5e-8, others 1e-8). Supersedes the CTRL lines above.
+# experiments runner verification, julia 1.13.2, threads 23, cpu arrowlake-s, HDF5.jl 0.17.4, full
+# prereg workspaces\study\stages\01-design\output\p1-le-benchmark-preregistration.md, panel workspaces\study\stages\02-panel\output\p1-le-benchmark-panel.toml, scratch C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\runner-verify\full
+# git head b0b51ce6b04f6f1b8bca1c601cb60f79b635692f, tracked or untracked changes: M _config/decision-log.md;  M src/Experiments/run_block.jl;  M src/Experiments/run_health.jl;  M src/Experiments/run_plan.jl;  M test/experiments/ex_a5.jl;  M test/experiments/runtests.jl;  M verify/experiments-runner.jl;  M workspaces/module-build/stages/01-spec/output/experiments-spec.md;  M workspaces/module-build/stages/02-tests/output/experiments-test-plan.md;  M workspaces/study/stages/01-design/output/p1-le-benchmark-preregistration.md; ?? test/experiments/ex_a6.jl
+# D53x before: files under data/p1-le-benchmark = 0; data/ entries = 2; study manifest dir entries = 1
+CTRL | real control rule at N = 1e7: gated controls x methods run (23 threads): items, seconds | 48, 4.7 s | - | INFO
+CTRL | gated controls, method L1: worst |lambda_1(1e7) - exact| (orbit 871) against its control bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L3: worst |lambda_1(1e7) - exact| (orbit 871) against its control bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L4: worst |lambda_1(1e7) - exact| (orbit 871) against its control bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L4b: worst |lambda_1(1e7) - exact| (orbit 871) against its control bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L5: worst |lambda_1(1e7) - exact| (orbit 871) against its control bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L5b: worst |lambda_1(1e7) - exact| (orbit 871) against its control bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L6: worst |lambda_1(1e7) - exact| (orbit 871) against its control bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L9: worst |lambda_1(1e7) - exact| (orbit 879) against its control bound 5e-08 | 2.283e-08 | <= 5e-08 | PASS
+# section CTRL took 5.2 s
+# summary: PASS 8, FAIL 0, INFO 1, total 26.2 s

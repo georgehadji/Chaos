@@ -413,3 +413,16 @@ Branch module/experiments-runner at d787d25, not committed. Stage 02 role first 
 | Preregistration | pass | `check_prereg` accepts the file, 5 amendments; panel hash of A4 still accepted |
 | Existing assertions | changed in 3 places | `ex_real_run`, D53r budget numbers, D53b method sum (see the test plan) |
 | Coverage of `src/Experiments` | pass | 2427 of 2459 executable lines, 98.7 percent (`Pkg.test(coverage=true)`, `.cov` files counted then deleted; coverage mode trips the real-clock cost caps of older tests, 144 failures and 1 error there, none in `ex_a5.jl`) |
+
+## Amendment D57 (per-method control bound)
+
+Changed: `run_block.jl` (`_rb_health` reads the optional table `control_bound_method`, validates the method name, membership in `control_methods` and a positive number, and keeps it in the validated health dictionary), `run_health.jl` (`control_reasons` takes the bound of the item's method, else `control_bound`; the stop reason names the bound used), `run_plan.jl` (`_status_text` adds one line `control_bound_method=...` to the chunk hash only when the table is present, so blocks without the key keep the hashes of D56). The reader merge of D56 needed no change: the table merges key by key.
+
+### Audit (D57)
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| Tests first | pass | `ex_a6.jl` written before the code lines; the real-preregistration testset failed (3 results) until A6 was in the file |
+| GREEN | pass | experiments 4824 of 4824 (standalone run with 4 threads, 3 min 32 s; inside `Pkg.test` the suite took 2 min 50 s before D57, ceiling 3 min of D35: recheck in stage 05) |
+| Preregistration | pass | `check_prereg` accepts the file, 6 amendments, header hash 62011ba5af514da4f1238aef9ae6cb35ca21093c4343b71dd696df360b9994bf; panel hash of A4 still accepted |
+| Existing assertions | changed in 1 place | `ex_a5.jl` D56b: amendment count read as at least 5 |

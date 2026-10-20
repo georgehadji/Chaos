@@ -782,7 +782,8 @@ section("CTRL") do
     plan = PLAN_REAL
     pan = Dict(Int(o["id"]) => o for o in TOML.parsefile(PANEL)["orbit"])
     gated = (871, 873, 875, 877, 879, 883)
-    bound = PLAN_REAL.block.raw["health"]["control_bound"]
+    hl = PLAN_REAL.block.raw["health"]
+    bound_of(m) = get(get(hl, "control_bound_method", Dict{String, Any}()), m, hl["control_bound"])      # A6: bound per method
     items = [it for it in plan.items if it.orbit in gated && it.precision == "Float64" && it.tau == 1 && it.coordinate_mode == "lifted" && it.horizon == 10^7 && it.method != "L2" && "main" in it.arms]
     ctx = EX.make_ctx(plan, items)
     t = @elapsed recs = EX.compute_records(ctx, items, NT)
@@ -795,7 +796,7 @@ section("CTRL") do
     emit("CTRL", "real control rule at N = 1e7: gated controls x methods run ($NT threads): items, seconds", "$(length(items)), $(round(t; digits = 1)) s", "-", "INFO")
     for m in sort(collect(keys(worst)))
         d, o = worst[m]
-        emit("CTRL", "gated controls, method $m: worst |lambda_1(1e7) - exact| (orbit $o) against control_bound $(fmt(bound))", d, "<= $(fmt(bound))", pf(d <= bound))
+        emit("CTRL", "gated controls, method $m: worst |lambda_1(1e7) - exact| (orbit $o) against its control bound $(fmt(bound_of(m)))", d, "<= $(fmt(bound_of(m)))", pf(d <= bound_of(m)))
     end
 end
 

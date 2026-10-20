@@ -40,7 +40,7 @@ const ENS_ORB = parse(Int, get(ENV, "EXD_ENS_ORB", "2048"))
 const ENS_N = parse(Int, get(ENV, "EXD_ENS_N", "200000"))
 function measure_recorder(m)
     base = [it for c in plan.chunks for i in c.items for it in (plan.items[i],) if c.run_type.method == m && c.run_type.precision == "Float64" &&
-            c.run_type.coordinate_mode == "lifted" && c.run_type.tau == 1 && "main" in c.arms]
+            c.run_type.tau == 1 && (m == "L2" ? (c.run_type.coordinate_mode == "wrapped" && "main_l2" in c.arms) : (c.run_type.coordinate_mode == "lifted" && "main" in c.arms))]   # A5: L2 runs wrapped, in main_l2
     items = NamedTuple[merge(base[mod1(i, length(base))], (horizon = ENS_N,)) for i in 1:ENS_ORB]
     ctx = EX.make_ctx(plan, items)
     steps = ENS_ORB * ENS_N

@@ -1,94 +1,99 @@
 # experiments runner verification, julia 1.13.2, threads 23, cpu arrowlake-s, HDF5.jl 0.17.4, full
 # prereg workspaces\study\stages\01-design\output\p1-le-benchmark-preregistration.md, panel workspaces\study\stages\02-panel\output\p1-le-benchmark-panel.toml, scratch C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\runner-verify\full
-# git head 9cd8df6e5e6d7a9cfc5965fad299277690e112d3, tracked or untracked changes: M verify/Manifest.toml;  M verify/Project.toml; ?? verify/experiments-runner-reader.jl; ?? verify/experiments-runner.jl; ?? workspaces/module-build/stages/04-verify/output/experiments-runner-verify-log.txt
+# git head fa843912a5b21b88e19765a4e785562fdad50edf, tracked or untracked changes: M verify/experiments-runner.jl;  M workspaces/module-build/stages/04-verify/output/experiments-runner-verify-log.txt
 # D53x before: files under data/p1-le-benchmark = 0; data/ entries = 2; study manifest dir entries = 1
-D53w | reduced prereg written; hash check E18 passes; horizons (arm: N) | directions: 100000, eps_sweep: 100000, h4_double64: 1000000, h4_float64: 10000000, ladder_bigfloat: 10000, ladder_double64_long: 500000, ladder_double64_short: 100000, long: 1000000, main: 100000, tau_sweep: 100000, wrapped: 100000 | - | INFO
-D53w | reduced plan: items, chunks (equals the full plan: only horizons differ) | (items = 15741, chunks = 1387) vs (items = 15741, chunks = 1387) | equal | PASS
-D53w | planned unique orbit-steps Float64 / Double64 / BigFloat | 2.93e+09 / 8.48e+07 / 2.76e+06 | Float64 < 1e10, Double64 < 1e8 | PASS
+D53w | reduced prereg written; hash check E18 passes; horizons (arm: N) | directions: 100000, eps_sweep: 100000, h4_double64: 1000000, h4_float64: 10000000, ladder_bigfloat: 10000, ladder_double64_long: 500000, ladder_double64_short: 100000, long: 1000000, long_l2: 1000000, main: 100000, main_l2: 100000, tau_sweep: 100000, wrapped: 100000 | - | INFO
+D53w | reduced plan: items, chunks (equals the full plan: only horizons differ) | (items = 15569, chunks = 1363) vs (items = 15569, chunks = 1363) | equal | PASS
+D53w | planned unique orbit-steps Float64 / Double64 / BigFloat | 2.92e+09 / 8.48e+07 / 2.76e+06 | Float64 < 1e10, Double64 < 1e8 | PASS
 D53w | reduced [run.health]: control_bound of the campaign block / of the scaled-rule block (real 1e-8 at N1 = 1e7, scaled by 1/n) / first_chunk_cost_factor | 1.0 / 1.0e-6 / 1.0e6 | - | INFO
-D53w | injected faults: NaN at attempt 1 in chunk (rerun passes) / NaN at attempts 1 and 2 in chunk (final failed) | 121 / 193 | - | INFO
+D53w | injected faults: NaN at attempt 1 in chunk (rerun passes) / NaN at attempts 1 and 2 in chunk (final failed) | 97 / 169 | - | INFO
 # section SETUP took 0.0 s
 D53b[full] | real panel subsets: P, S_D, S_L, h4 starts | 883, 172, 92, 2 | 883, 172, 92, 2 | PASS
-O14 | independent unique item count (TOML block x panel flags, merge by run-type key) / plan item count | 15741 / 15741 | equal | PASS
+O14 | independent unique item count (TOML block x panel flags, merge by run-type key) / plan item count | 15569 / 15569 | equal | PASS
 D53b[full] | real panel: per-arm items and steps (before and after merge) equal the independent count, 11 arms | true | true | PASS
-D53b[full] | real panel: totals per precision (before / after) Float64, Double64, BigFloat | Float64 3.0363e+11 / 2.9331e+11; Double64 1.308e+10 / 1.308e+10; BigFloat 2.76e+08 / 2.76e+08 | equal to independent | PASS
-D53b[full] | real panel: merge saving (orbit-steps) / chunks | 10320000000 / 1387 | reported | INFO
+D53b[full] | real panel: totals per precision (before / after) Float64, Double64, BigFloat | Float64 3.0363e+11 / 2.9159e+11; Double64 1.308e+10 / 1.308e+10; BigFloat 2.76e+08 / 2.76e+08 | equal to independent | PASS
+D53b[full] | real panel: merge saving (orbit-steps) / chunks | 12040000000 / 1363 | reported | INFO
 O14 | independent item text (own field order) equals item_text, on 400 seeded items of the reduced plan | 400 | 400 | PASS
 O14 | platform sha256sum of the independent text equals the plan hash | 400 | 400 | PASS
-O14 | independent chunk count (run type x cell) / plan chunk count | 1387 / 1387 | equal | PASS
-D53b[full] | synthetic panel (1100, 200, 100): planned orbit-steps per arm vs the 11 rows of the Budget table, worst relative difference | 0 | <= 1e-9 | PASS
+O14 | independent chunk count (run type x cell) / plan chunk count | 1363 / 1363 | equal | PASS
+D53b[full] | synthetic panel (1100, 200, 100): planned orbit-steps per arm vs the Budget table (13 rows: the A5 split of main and long into non-L2 and L2 arms), worst relative difference | 0 | <= 1e-9 | PASS
 D53b[full] | synthetic panel: precision totals (3.59e11, 1.42e10, 3.0e8) | 0 | <= 1e-9 | PASS
-D53b[full] | synthetic panel: items, chunks, merge saving | (items = 18906, chunks = 1387), saving 12000000000 | - | INFO
-D53b | plan hash of the real plan (identical in every manifest below) | 42c2cc9d358bec4d6c97ea567488119351ff5385196d64914c490f227bbc3d37 | - | INFO
-# section PLAN took 1.6 s
+D53b[full] | synthetic panel: items, chunks, merge saving | (items = 18706, chunks = 1363), saving 14000000000 | - | INFO
+D53b | plan hash of the real plan (identical in every manifest below) | c0e3f961d81e587cc29031207ed325b264858da6e27e0f4a9ef4cad044fa03c5 | - | INFO
+# section PLAN took 1.5 s
 D53a | thread count differing from [run.k19].threads without override is refused, message names threads, nothing written | the thread count 24 differs from [run.k19].threads = 23 (pass thread_override = true to re | ArgumentError, 0 files | PASS
 D53a | preregistration with a changed byte is refused (E18), nothing written | C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | ArgumentError, 0 files | PASS
 D53a | panel built under a hash outside panel_prereg_sha256_accepted is refused, nothing written | C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | ArgumentError, 0 files | PASS
 D53u | exit status for complete, failed chunks, stopped (2 reasons), paused arms | 0,2,3,3,4 | 0,2,3,3,4 | PASS
-# section REFUSALS took 0.4 s
-D53j/D53w | scaled control rule (bound 1e-06 at N = 100000): campaign status, chunks run before the stop, first control chunk of the plan, seconds | stopped: control bound; ran 24; control chunk 24; 16.7 s | stopped: control bound, at the first control chunk | PASS
-D53j/D53w | INFO | stop reason: control bound exceeded in chunk 24: control bound exceeded: orbit 878 method L1, |lambda_1 - exact| = 0.23055846954013548 above 1.0e-6; control bound exceeded: orbit 880 method L1, |lambda_1 - exact| = 0.43993882307265464 above 1.0e-6; control bound exceeded: orbit 881 method L1, |lambda_1 - exact| = 0.650558736794846 above 1.0e-6; control bound exceeded: orbit 882 method L1, |lambda_1 - exact| = 0.10011725262246052 above 1.0e-6
-D53j/D53w | INFO | controls named by the stop (first control chunk, method L1): [878, 880, 881, 882]. The real rule (bound 1e-8 at N1 = 1e7) names the same orbits: their Float64 start is not on the periodic orbit, so lambda_1(n) does not follow the exact exponent for any bound below the deviations shown
-# section CONTROL took 16.7 s
-D53w | session 1 of the interrupted campaign killed after 277 chunks (injected), final files / temporary files left | true: 277 / 0 | killed | PASS
-D53w | session 2 killed during the data of chunk 278: no final file for it, temporary file left (I13) | true: final=false tmp=["chunk-00278.h5.tmp"] | killed, no final file, one .tmp | PASS
+# section REFUSALS took 0.3 s
+D53j/D53w | tight control rule (bound 1e-09 at N = 100000, A5 scope exact_start): campaign status, chunks run before the stop, first control chunk of the plan, seconds | stopped: control bound; ran 24; control chunk 24; 15.5 s | stopped: control bound, at the first control chunk | PASS
+D53j/D53w | INFO | stop reason: control bound exceeded in chunk 24: control bound exceeded: orbit 871 method L1, |lambda_1 - exact| = 5.268025782267927e-7 above 1.0e-9; control bound exceeded: orbit 873 method L1, |lambda_1 - exact| = 2.487363562897471e-7 above 1.0e-9; control bound exceeded: orbit 875 method L1, |lambda_1 - exact| = 5.161773029005445e-7 above 1.0e-9; control bound exceeded: orbit 877 method L1, |lambda_1 - exact| = 4.5971779627507203e-7 above 1.0e-9; control bound exceeded: orbit 879 method L1, |lambda_1 - exact| = 3.4840134421898483e-7 above 1.0e-9
+D53j/D53w | INFO | controls named by the stop (first control chunk, method L1): [871, 873, 875, 877, 879]. The real rule (bound 1e-8 at N1 = 1e7) is the gated set only (A5 control_scope = exact_start): the other controls are INFO
+# section CONTROL took 15.5 s
+D53w | session 1 of the interrupted campaign killed after 272 chunks (injected), final files / temporary files left | true: 272 / 0 | killed | PASS
+D53w | session 2 killed during the data of chunk 273: no final file for it, temporary file left (I13) | true: final=false tmp=["chunk-00273.h5.tmp"] | killed, no final file, one .tmp | PASS
 O13 | independent reader on the store after the two kills: every final file complete and valid; non-chunk entries ignored (.tmp) | true | reader PASS | PASS
-D53w | interrupted campaign resumed to the end: status, chunks run in session 3, skipped, failed twice in session 3, wall s | complete with failed chunks: ran 1110, skipped 277, failed 51, 160.7 s | complete or complete with failed chunks | PASS
-D53w | uninterrupted campaign (same injections): status, chunks run, failed twice, wall s | complete with failed chunks: ran 1387, failed 66, 236.4 s | complete or complete with failed chunks | PASS
-D53k | injected NaN, chunk 121: file status / attempt / backend of the attempt / first-attempt reasons recorded | ok / 2 / cpu / 1 reason(s) | ok / 2 / cpu | PASS
-D53k | injected NaN, chunk 193: file status / attempt / backend of the attempt / first-attempt reasons recorded | failed / 2 / cpu / 1 reason(s) | failed / 2 / cpu | PASS
+D53w | interrupted campaign resumed to the end: status, chunks run in session 3, skipped, failed twice in session 3, wall s | complete with failed chunks: ran 1091, skipped 272, failed 0, 156.9 s | complete or complete with failed chunks | PASS
+D53w | uninterrupted campaign (same injections): status, chunks run, failed twice, wall s | complete with failed chunks: ran 1363, failed 1, 218.6 s | complete or complete with failed chunks | PASS
+D53k | injected NaN, chunk 97: file status / attempt / backend of the attempt / first-attempt reasons recorded | ok / 2 / cpu / 1 reason(s) | ok / 2 / cpu | PASS
+D53k | injected NaN, chunk 169: file status / attempt / backend of the attempt / first-attempt reasons recorded | failed / 2 / cpu / 1 reason(s) | failed / 2 / cpu | PASS
 D53o | second run on the finished campaign: chunks run, files modified | 0, 0 | 0, 0 | PASS
-D53p/R7 | manifest A: all R7 keys, chunk and arm entries, statuses sum to the plan (1387 of 1387: Dict("ok" => 1321, "failed" => 66)), hashes stable, plan hash, git sha, dirty override recorded, sessions 4 | true | true | PASS
-D53p/R7 | manifest B: all R7 keys, chunk and arm entries, statuses sum to the plan (1387 of 1387: Dict("ok" => 1321, "failed" => 66)), hashes stable, plan hash, git sha, dirty override recorded, sessions 1 | true | true | PASS
-D53p/R7 | manifest A after the resume session: 3 sessions recorded, the killed chunk's temporary file listed in removed_temporaries and gone from the store | 3 sessions; removed_temporaries Any["chunk-00278.h5.tmp"]; .tmp left: 0 | 3; one .tmp listed; 0 left | PASS
-D53w | chunks failed twice: injected chunk 193 present; failed set of the resumed campaign equals that of the uninterrupted one; natural failures (not injected) | 66 failed, 65 natural, sets equal: true | ORD_TWICE in set, sets equal | PASS
-D53k | failed twice (natural and injected) against the REAL stop_failed_fraction 0.05 x chunks (the campaign stops when strictly more): failed twice / limit | 66 / 69.35000000000001 | <= limit (no stop) | PASS
-NATURAL-FAILURE | 47 chunk(s) | L2 tau=1 mode=lifted | numerical health error: NumericalHealthError: separation = # (threshol
-NATURAL-FAILURE | 6 chunk(s) | L4 tau=16 mode=lifted | numerical health error: NumericalHealthError: orthonormalisation break
-NATURAL-FAILURE | 3 chunk(s) | L4 tau=8 mode=lifted | numerical health error: NumericalHealthError: orthonormalisation break
-NATURAL-FAILURE | 6 chunk(s) | L5 tau=16 mode=lifted | numerical health error: NumericalHealthError: orthonormalisation break
-NATURAL-FAILURE | 3 chunk(s) | L5 tau=8 mode=lifted | numerical health error: NumericalHealthError: orthonormalisation break
-D53k | INFO | natural failures by cell: SubString{String}["controls", "k1:R", "k1:T", "k2:C", "k2:R", "k2:S", "k2:T", "k2:X", "k3:C", "k3:R", "k3:S", "k3:T", "k3:X", "k4:C", "k4:R", "k4:S", "k4:T", "k4:X", "k5:C", "k5:S", "k5:T", "k5:X", "k6:C", "k6:X"]; methods: SubString{String}["L2", "L4", "L5"]; tau: SubString{String}["1", "16", "8"]
+D53p/R7 | manifest A: all R7 keys, chunk and arm entries, statuses sum to the plan (1363 of 1363: Dict("ok" => 1362, "failed" => 1)), hashes stable, plan hash, git sha, dirty override recorded, sessions 4 | true | true | PASS
+D53p/R7 | manifest B: all R7 keys, chunk and arm entries, statuses sum to the plan (1363 of 1363: Dict("ok" => 1362, "failed" => 1)), hashes stable, plan hash, git sha, dirty override recorded, sessions 1 | true | true | PASS
+D53p/R7 | manifest A after the resume session: 3 sessions recorded, the killed chunk's temporary file listed in removed_temporaries and gone from the store | 3 sessions; removed_temporaries Any["chunk-00273.h5.tmp"]; .tmp left: 0 | 3; one .tmp listed; 0 left | PASS
+D53w | chunks failed twice: injected chunk 169 present; failed set of the resumed campaign equals that of the uninterrupted one; natural failures (not injected) | 1 failed, 0 natural, sets equal: true | ORD_TWICE in set, sets equal | PASS
+D53k | failed twice (natural and injected) against the REAL stop_failed_fraction 0.05 x chunks (the campaign stops when strictly more): failed twice / limit | 1 / 68.15 | <= limit (no stop) | PASS
+D53k | INFO | natural failures by cell: Any[]; methods: Any[]; tau: Any[]
 D53p/R7 | manifest B: device, backend table rows, git clean flag, thread count recorded | device=NVIDIA GeForce RTX 5060 Laptop GPU; table rows 16; clean=false; threads=Dict{String, Any}("available" => 23, "used" => 23) | - | INFO
-# section CAMPAIGN took 523.0 s
-O13 | independent reader (HDF5.jl in a separate process, no Chaoslab), store A: files read, checks failed, seconds | 1387 of 1387 files, 0 failed, 27.9 s | all files, 0 failed | PASS
-O13 | store A: module read_chunk equals the independent reader: files, attributes, datasets (sha-256 of raw bytes, dtype, shape) | 1387 files, 204228 attributes, 187688 datasets, 0 differ | 0 differ | PASS
+# section CAMPAIGN took 484.7 s
+O13 | independent reader (HDF5.jl in a separate process, no Chaoslab), store A: files read, checks failed, seconds | 1363 of 1363 files, 0 failed, 23.5 s | all files, 0 failed | PASS
+O13 | store A: module read_chunk equals the independent reader: files, attributes, datasets (sha-256 of raw bytes, dtype, shape) | 1363 files, 206053 attributes, 188399 datasets, 0 differ | 0 differ | PASS
 D53m | INFO | store A datasets by group and element type: cost: Float64; diagnostics: Float64; lyap: Float64; state: Float64; t: Int64; winding: Int64
-O13 | independent reader (HDF5.jl in a separate process, no Chaoslab), store B: files read, checks failed, seconds | 1387 of 1387 files, 0 failed, 27.3 s | all files, 0 failed | PASS
-O13 | store B: module read_chunk equals the independent reader: files, attributes, datasets (sha-256 of raw bytes, dtype, shape) | 1387 files, 204228 attributes, 187688 datasets, 0 differ | 0 differ | PASS
+O13 | independent reader (HDF5.jl in a separate process, no Chaoslab), store B: files read, checks failed, seconds | 1363 of 1363 files, 0 failed, 23.7 s | all files, 0 failed | PASS
+O13 | store B: module read_chunk equals the independent reader: files, attributes, datasets (sha-256 of raw bytes, dtype, shape) | 1363 files, 206053 attributes, 188399 datasets, 0 differ | 0 differ | PASS
 D53m | INFO | store B datasets by group and element type: cost: Float64; diagnostics: Float64; lyap: Float64; state: Float64; t: Int64; winding: Int64
-D53m | INFO | dimension convention: Julia shape of lyap/L5 is 86x2, HDF5 file extents (row-major, as h5py/h5dump see them) are 2x86; state 86x2 vs file 2x86. Schema text says n x k and n x 2
+D53m | INFO | dimension convention: Julia shape of lyap/L5 is 111x2, HDF5 file extents (row-major, as h5py/h5dump see them) are 2x111; state 111x2 vs file 2x111. Schema text says n x k and n x 2
 D53m | file extents are the Julia shape reversed (HDF5.jl convention): a non-Julia reader sees (k, n) and (2, n), not the n x k of schema/run-store.md | true | documented, schema ambiguity | INFO
-I14/D53o | resumed (killed twice) campaign A against uninterrupted campaign B: differing datasets/attributes outside times and host fields (created_utc, cpu, threads), via independent-reader digests | 0 | 0 | PASS
+I14/D53o | resumed (killed twice) campaign A against uninterrupted campaign B: differing datasets/attributes outside times and host fields (created_utc, cpu, threads, session), via independent-reader digests | 0 | 0 | PASS
 O13 | HDF5 command-line tool h5dump (-m %.17g; no HDF5.jl, no Chaoslab) on 12 ok files, lyap / state / t datasets of one orbit each: equal to the module's values exactly | 36 datasets, 0 differ | 0 differ | PASS
-# section READER took 261.0 s
-D53t/O12 | CPU reference rerun of rerun_sample = 20 items per arm, store B (11 arms, 76.5 s): items, bitwise equal, backend of stored items | 186, 186, cpu | all bitwise (CPU) | PASS
-# section RERUN took 76.6 s
-D53i | julia -t 1 bin/chaoslab.jl run (reduced block): exit code, wall seconds | 2, 897.5 s | 0 (complete) or 2 (complete with failed chunks) | PASS
-O13 | independent reader on store of -t 1: ok, files | true, 1387 | PASS, 1387 | PASS
-D53i | julia -t 4 bin/chaoslab.jl run (reduced block): exit code, wall seconds | 2, 297.5 s | 0 (complete) or 2 (complete with failed chunks) | PASS
-O13 | independent reader on store of -t 4: ok, files | true, 1387 | PASS, 1387 | PASS
-D53i | julia -t 23 bin/chaoslab.jl run (reduced block): exit code, wall seconds | 2, 191.0 s | 0 (complete) or 2 (complete with failed chunks) | PASS
-O13 | independent reader on store of -t 23: ok, files | true, 1387 | PASS, 1387 | PASS
-D53i | per-dataset sha-256 (independent reader): -t 1 against -t 4, differing datasets or attributes (outside created_utc, cpu, threads) | 0 | 0 | PASS
-D53i | per-dataset sha-256 (independent reader): -t 1 against -t 23, differing datasets or attributes (outside created_utc, cpu, threads) | 0 | 0 | PASS
-D53i | INFO | -t 1: combined SHA-256 of all 110359 datasets e320fad1f7b007eba25a52eab8ef6deeb058cdbb411467de2bb3f56c606f53de; cost entries (steps, vectors, bytes) 0f96a9f4475c00c49fc3bfd641f46c6e2f013925e61083c3fa704aa5a1fef87f
-D53i | INFO | -t 4: combined SHA-256 of all 110359 datasets e320fad1f7b007eba25a52eab8ef6deeb058cdbb411467de2bb3f56c606f53de; cost entries (steps, vectors, bytes) 0f96a9f4475c00c49fc3bfd641f46c6e2f013925e61083c3fa704aa5a1fef87f
-D53i | INFO | -t 23: combined SHA-256 of all 110359 datasets e320fad1f7b007eba25a52eab8ef6deeb058cdbb411467de2bb3f56c606f53de; cost entries (steps, vectors, bytes) 0f96a9f4475c00c49fc3bfd641f46c6e2f013925e61083c3fa704aa5a1fef87f
+# section READER took 205.2 s
+D53t/O12 | CPU reference rerun of rerun_sample = 20 items per arm, store B (13 arms, 64.8 s): items, bitwise equal, backend of stored items | 226, 226, cpu | all bitwise (CPU) | PASS
+# section RERUN took 64.9 s
+D53i | julia -t 1 bin/chaoslab.jl run (reduced block): exit code, wall seconds | 0, 745.4 s | 0 (complete) or 2 (complete with failed chunks) | PASS
+O13 | independent reader on store of -t 1: ok, files | true, 1363 | PASS, 1363 | PASS
+D53i | julia -t 4 bin/chaoslab.jl run (reduced block): exit code, wall seconds | 0, 306.5 s | 0 (complete) or 2 (complete with failed chunks) | PASS
+O13 | independent reader on store of -t 4: ok, files | true, 1363 | PASS, 1363 | PASS
+D53i | julia -t 23 bin/chaoslab.jl run (reduced block): exit code, wall seconds | 0, 203.6 s | 0 (complete) or 2 (complete with failed chunks) | PASS
+O13 | independent reader on store of -t 23: ok, files | true, 1363 | PASS, 1363 | PASS
+D53i | per-dataset sha-256 (independent reader): -t 1 against -t 4, differing datasets or attributes (outside created_utc, cpu, threads, session) | 0 | 0 | PASS
+D53i | per-dataset sha-256 (independent reader): -t 1 against -t 23, differing datasets or attributes (outside created_utc, cpu, threads, session) | 0 | 0 | PASS
+D53i | INFO | -t 1: combined SHA-256 of all 111242 datasets d6464909e18c73f36585683287cd2cf7e49e4509e4bc1121d7d95e3ce83cc38e; cost entries (steps, vectors, bytes) 09f19c9e2eb868fd000089efa82b04660db7ebcd54d52faeeb0bcbfe9516d900
+D53i | INFO | -t 4: combined SHA-256 of all 111242 datasets d6464909e18c73f36585683287cd2cf7e49e4509e4bc1121d7d95e3ce83cc38e; cost entries (steps, vectors, bytes) 09f19c9e2eb868fd000089efa82b04660db7ebcd54d52faeeb0bcbfe9516d900
+D53i | INFO | -t 23: combined SHA-256 of all 111242 datasets d6464909e18c73f36585683287cd2cf7e49e4509e4bc1121d7d95e3ce83cc38e; cost entries (steps, vectors, bytes) 09f19c9e2eb868fd000089efa82b04660db7ebcd54d52faeeb0bcbfe9516d900
 D53i | manifests -t 1 and -t 4 differ only in provenance (sessions, threads, wall, launch inputs, overrides, versions, host, times, costs): other differing keys |  | none | PASS
 D53i | manifests -t 1 and -t 23 differ only in provenance (sessions, threads, wall, launch inputs, overrides, versions, host, times, costs): other differing keys |  | none | PASS
-D53i | INFO | -t 1 manifest: threads Dict{String, Any}("available" => 1, "used" => 1), override Dict{String, Any}("k19" => 23, "used" => 1), status complete with failed chunks, plan_sha256 777c142c886a, wall 876.3 s
-D53i | INFO | -t 4 manifest: threads Dict{String, Any}("available" => 4, "used" => 4), override Dict{String, Any}("k19" => 23, "used" => 4), status complete with failed chunks, plan_sha256 777c142c886a, wall 280.1 s
-D53i | INFO | -t 23 manifest: threads Dict{String, Any}("available" => 23, "used" => 23), override none, status complete with failed chunks, plan_sha256 777c142c886a, wall 172.6 s
+D53i | INFO | -t 1 manifest: threads Dict{String, Any}("available" => 1, "used" => 1), override Dict{String, Any}("k19" => 23, "used" => 1), status complete, plan_sha256 844cbe6979f6, wall 726.1 s
+D53i | INFO | -t 4 manifest: threads Dict{String, Any}("available" => 4, "used" => 4), override Dict{String, Any}("k19" => 23, "used" => 4), status complete, plan_sha256 844cbe6979f6, wall 286.0 s
+D53i | INFO | -t 23 manifest: threads Dict{String, Any}("available" => 23, "used" => 23), override none, status complete, plan_sha256 844cbe6979f6, wall 184.6 s
 D53i | plan hash identical in the manifests of all processes and the in-process plan | 1 | 1 | PASS
-D53i | INFO | store of -t 23 process vs in-process B: differing datasets 47 (B carries the injected failures: expected differences are chunk 121 (first-attempt reasons) and 193 (failed)): classes Dict("attr:failure_reasons" => 1, "oattr:flags" => 40, "data:lyap/L9" => 1, "attr:attempt" => 2, "attr:first_attempt_reasons" => 2, "attr:status" => 1)
-# section THREADS took 1466.8 s
-D53f | extended-precision campaign (S_L, h4; Float64 x 9 methods, Double64 and BigFloat x 8 methods; tau 1 lifted and tau 4 wrapped): status, chunks, seconds | complete, 974 chunks, 91.4 s | complete | PASS
+D53i | INFO | store of -t 23 process vs in-process B: differing datasets 47 (B carries the injected failures: expected differences are chunk 97 (first-attempt reasons) and 169 (failed)): classes Dict("attr:failure_reasons" => 1, "oattr:flags" => 40, "data:lyap/L9" => 1, "attr:attempt" => 2, "attr:first_attempt_reasons" => 2, "attr:status" => 1)
+# section THREADS took 1329.9 s
+D53f | extended-precision campaign (S_L, h4; Float64 x 9 methods, Double64 and BigFloat x 8 methods; tau 1 lifted and tau 4 wrapped): status, chunks, seconds | complete, 974 chunks, 103.0 s | complete | PASS
 D53f | stored lambda equals the direct call of the verified estimator, bit for bit: 3 orbits x 5 grid steps per (method, precision, mode) | 0 differences in 630 comparisons over 42 cells | 0 | PASS
 D53f | INFO | cells: L1/BigFloat/l L1/Double64/l L1/Double64/w L1/Float64/l L1/Float64/w L2/BigFloat/l L2/Double64/l L2/Double64/w L2/Float64/l L2/Float64/w L3/BigFloat/l L3/Double64/l L3/Double64/w L3/Float64/l L3/Float64/w L4/BigFloat/l L4/Double64/l L4/Double64/w L4/Float64/l L4/Float64/w L4b/BigFloat/l L4b/Double64/l L4b/Double64/w L4b/Float64/l L4b/Float64/w L5/BigFloat/l L5/Double64/l L5/Double64/w L5/Float64/l L5/Float64/w L5b/BigFloat/l L5b/Double64/l L5b/Double64/w L5b/Float64/l L5b/Float64/w L6/Float64/l L6/Float64/w L9/BigFloat/l L9/Double64/l L9/Double64/w L9/Float64/l L9/Float64/w
-D53f | INFO | L6 (library QR) at Double64 in a block: plan accepted
+D53f | INFO | L6 (library QR) at Double64 in a block: run plan has method L6 at Double64: L6 (library QR) runs in Float64 only
 O13 | independent reader on the extended-precision store (Double64, BigFloat, wrapped, tau 4) | true | PASS | PASS
-# section EXTENDED took 117.2 s
+# section EXTENDED took 128.8 s
+CTRL | real control rule at N = 1e7: gated controls x methods run (23 threads): items, seconds | 48, 4.4 s | - | INFO
+CTRL | gated controls, method L1: worst |lambda_1(1e7) - exact| (orbit 871) against control_bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L3: worst |lambda_1(1e7) - exact| (orbit 871) against control_bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L4: worst |lambda_1(1e7) - exact| (orbit 871) against control_bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L4b: worst |lambda_1(1e7) - exact| (orbit 871) against control_bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L5: worst |lambda_1(1e7) - exact| (orbit 871) against control_bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L5b: worst |lambda_1(1e7) - exact| (orbit 871) against control_bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L6: worst |lambda_1(1e7) - exact| (orbit 871) against control_bound 1e-08 | 5.268e-09 | <= 1e-08 | PASS
+CTRL | gated controls, method L9: worst |lambda_1(1e7) - exact| (orbit 879) against control_bound 1e-08 | 2.283e-08 | <= 1e-08 | FAIL
+# section CTRL took 4.7 s
 D53s | Y5 control: panel exponent equals ln mu at 256 bits (mu = (3 + sqrt 5) / 2) | 0.9624 | 0.96242365011920694 | PASS
 D53s | Y5 at horizon 1e7: items run on the CPU (23 threads): count, seconds | 20, 2.2 s | - | INFO
 D53s | Y5, direction pi/4 (unstable eigenvector, c = 1), horizon 1e7, 8 variational methods, all recorded grid steps: max |lambda_1(n) - ln mu| / (B_S(n)/n), B_S = 8 eps (n + G) | 0.0625 | <= 1 | PASS
@@ -129,7 +134,7 @@ TABLE | Float64 | L6 | auto | cpu | cpu | reducer is CPU-only |
 TABLE | Float64 | L9 | auto | cpu | cpu | GPU not faster for the element type | 
 D54f/D54a | real preregistration and panel at 23 threads, auto: Float64 kernel methods resolve to cpu with the seventh reason (recorder gpu_faster false), L6 to cpu CPU-only, Double64 and BigFloat cpu | 8 kernel methods | all cpu | PASS
 D54a | resolved backend equals gpu exactly for methods whose entry has threads == 23 and gpu_faster | true | true | PASS
-D53h | request gpu on the reduced arm (883 orbits x 9 methods lifted + 172 x 9 wrapped, N = 50000): status, seconds; same arm request cpu: status, seconds | complete 94.9 s; complete 62.2 s | complete, complete | PASS
+D53h | request gpu on the reduced arm (883 orbits x 9 methods lifted + 172 x 9 wrapped, N = 50000): status, seconds; same arm request cpu: status, seconds | complete 99.6 s; complete 66.9 s | complete, complete | PASS
 D53h | INFO | provenance L1: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
 D53h | INFO | provenance L2: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
 D53h | INFO | provenance L3: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
@@ -143,116 +148,19 @@ D53h | chunk provenance for the 8 kernel methods: backend_request gpu, backend g
 D53h | gpu manifest: device name and both K19 values (device_record threads, cpu and gpu ns) recorded | NVIDIA GeForce RTX 5060 Laptop GPU; threads 23, cpu 3.385, gpu 2.493, prior absent | - | INFO
 D53t/D54f | gpu against cpu store of the same arm, chaotic cells (C, X) with >= 8 orbits, AC12(c) form: worst per-orbit |dlambda_1| / sigma_FT and worst difference of ensemble means / SE per method | L1 5.631/2.36 (10 ens.); L2 16.23/2.386 (10 ens.); L3 5.631/2.36 (10 ens.); L4 5.631/2.36 (10 ens.); L4b 5.631/2.36 (10 ens.); L5 5.631/2.36 (10 ens.); L5b 5.631/2.36 (10 ens.); L9 5.632/2.36 (10 ens.) | <= 6.0 and <= 4.0 | FAIL
 D53t | INFO | orbits whose gpu record equals the cpu record bit for bit: 1244 of 9495 (L6 runs on the CPU in both)
-D53t/O12 | INFO | rerun_check on the gpu store (3.3 s): 40 items, stored on gpu: 33, bitwise: 2, max |dlambda| over gpu items 0.3183; cpu-stored (L6) bitwise 7 of 7
+D53t/O12 | INFO | rerun_check on the gpu store (3.3 s): 40 items, stored on gpu: 34, bitwise: 0, max |dlambda| over gpu items 0.2379; cpu-stored (L6) bitwise 6 of 6
 D53t | gpu items rerun on the CPU: L6 items (stored on cpu) reproduce bit for bit | true | true | PASS
 O13 | independent reader on the gpu store | true | PASS | PASS
-ENS | L1 | 2048 x 200000 | cpu 23 threads wall 4.104 ns/orbit-step, thread 94.38 | device 12.45 ns/orbit-step | record: cpu 4.173 gpu 12.45
-ENS | L2 | 2048 x 200000 | cpu 23 threads wall 3.362 ns/orbit-step, thread 77.33 | device 11.16 ns/orbit-step | record: cpu 2.937 gpu 11.19
-ENS | L3 | 2048 x 200000 | cpu 23 threads wall 8.998 ns/orbit-step, thread 207 | device 25.13 ns/orbit-step | record: cpu 7.906 gpu 25.25
-ENS | L4 | 2048 x 200000 | cpu 23 threads wall 9.203 ns/orbit-step, thread 211.7 | device 25.16 ns/orbit-step | record: cpu 8.594 gpu 25.12
-ENS | L4b | 2048 x 200000 | cpu 23 threads wall 9.234 ns/orbit-step, thread 212.4 | device 35.82 ns/orbit-step | record: cpu 8.732 gpu 35.92
-ENS | L5 | 2048 x 200000 | cpu 23 threads wall 9.179 ns/orbit-step, thread 211.1 | device 27.01 ns/orbit-step | record: cpu 9.171 gpu 27.08
-ENS | L5b | 2048 x 200000 | cpu 23 threads wall 10.12 ns/orbit-step, thread 232.7 | device 27.9 ns/orbit-step | record: cpu 9.804 gpu 27.93
-ENS | L9 | 2048 x 200000 | cpu 23 threads wall 9.416 ns/orbit-step, thread 216.6 | device 38.64 ns/orbit-step | record: cpu 10.33 gpu 38.67
-D54f | recorder cost lines retaken now (2048 orbits x 2e5 steps, 23 threads): every device and CPU value within 1.5x of the stored entry; gpu slower than cpu for all 8 methods | agree=true; gpu/cpu ratios L1 3.035 L2 3.32 L3 2.793 L4 2.734 L4b 3.879 L5 2.943 L5b 2.758 L9 4.103 | ratio > 1 for all (auto -> cpu) | PASS
-# section DEVICE took 482.8 s
-D53q | pilot with the real K values on the real preregistration and panel: seconds, report fields complete, statement 'not study data', dirty override recorded | 137.0 s; missing String[]; pilot measurements: not study data (Amen... | complete | PASS
-D53q/I15 | pilot starts: count, none within 1e-6 of a panel start (min torus distance); files in the study store before / after | 24, min 0.02706; 0 / 0 | >= 1e-6; 0 / 0 | PASS
-D53q | pilot store: chunk files, all marked pilot = true (sampled 50) | 288, Bool[1] | marked | PASS
-D53q | INFO | pilot: parallel efficiency 0.5745, threads 23, device record threads 23
-D53q | INFO | first departure of Double64 / BigFloat from Float64 beyond setup_check_tol, per K index (steps): K1: 1169 / 1169; K2: 504 / 504; K3: 31 / 31; K4: 18 / 18; K5: 10 / 10; K6: 7 / 7
-D53q | INFO | diagnostics share above thresholds per method: L1 0, L2 0, L3 0, L4 0, L4b 0, L5 0, L5b 0, L6 0, L9 0
-PILOT-TABLE | arm | planned unique steps | line ns (with safety) | cap ns | projected thread-h | budget thread-h (line x steps) | ratio | projected wall-h | cap check
-PILOT-TABLE | main | 7.947e+10 | 66.18 | 132.36 | 4.584 | 1.461 | 3.14 | 0.347 | wall cap 12 h
-PILOT-TABLE | long | 1.548e+11 | 66.18 | 132.36 | 8.929 | 2.846 | 3.14 | 0.676 | wall cap 12 h
-PILOT-TABLE | tau_sweep | 1.376e+10 | 66.18 | 132.36 | 0.587 | 0.253 | 2.32 | 0.044 | wall cap 12 h
-PILOT-TABLE | wrapped | 1.548e+10 | 66.18 | 132.36 | 0.893 | 0.285 | 3.14 | 0.068 | wall cap 12 h
-PILOT-TABLE | directions | 2.064e+10 | 66.18 | 132.36 | 1.147 | 0.379 | 3.02 | 0.087 | wall cap 12 h
-PILOT-TABLE | eps_sweep | 5.16e+09 | 66.18 | 132.36 | 0.112 | 0.095 | 1.18 | 0.008 | wall cap 12 h
-PILOT-TABLE | h4_float64 | 4e+09 | 66.18 | 132.36 | 0.207 | 0.074 | 2.82 | 0.016 | wall cap 12 h
-PILOT-TABLE | h4_double64 | 2e+08 | 4661.4 | 9322.8 | 0.368 | 0.259 | 1.42 | 0.028 | wall cap 12 h
-PILOT-TABLE | ladder_double64_short | 3.68e+09 | 4661.4 | 9322.8 | 6.782 | 4.765 | 1.42 | 0.513 | wall cap 12 h
-PILOT-TABLE | ladder_double64_long | 9.2e+09 | 4661.4 | 9322.8 | 16.941 | 11.912 | 1.42 | 1.282 | wall cap 12 h
-PILOT-TABLE | ladder_bigfloat | 2.76e+08 | 54600 | 1.092e+05 | 22.717 | 4.186 | 5.43 | 1.719 | wall cap 12 h
-D53q/P14 | pilot totals: projected thread-hours, A4 budget lines x steps (thread-hours, with safety), projected wall-hours (sum of arms) against the 12 h cap | 63.3, 26.5, 4.79 | wall < 12 | PASS
-PILOT-COST | method | precision | backend | thread-ns per orbit-step | wall-ns per orbit-step
-PILOT-COST | L1 | BigFloat | cpu | 199977.2 | 8694.66
-PILOT-COST | L5 | BigFloat | cpu | 333686.3 | 14508.10
-PILOT-COST | L9 | BigFloat | cpu | 355270.5 | 15446.54
-PILOT-COST | L1 | Double64 | cpu | 5100.9 | 221.78
-PILOT-COST | L3 | Double64 | cpu | 7390.6 | 321.33
-PILOT-COST | L5 | Double64 | cpu | 6629.2 | 288.22
-PILOT-COST | L9 | Double64 | cpu | 7417.5 | 322.50
-PILOT-COST | L1 | Float64 | cpu | 196.5 | 8.54
-PILOT-COST | L2 | Float64 | cpu | 78.2 | 3.40
-PILOT-COST | L3 | Float64 | cpu | 199.9 | 8.69
-PILOT-COST | L4 | Float64 | cpu | 130.7 | 5.68
-PILOT-COST | L4b | Float64 | cpu | 212.3 | 9.23
-PILOT-COST | L5 | Float64 | cpu | 176.3 | 7.67
-PILOT-COST | L5b | Float64 | cpu | 245.4 | 10.67
-PILOT-COST | L6 | Float64 | cpu | 402.2 | 17.49
-PILOT-COST | L9 | Float64 | cpu | 227.3 | 9.88
-# section PILOT took 140.7 s
-BUDGET-TABLE | arm | run types | planned unique steps | line ns (safety incl.) | cap ns | first run type: method, thread-ns | max thread-ns (method) | projected thread-h | budget thread-h (line) | budget thread-h (without safety) | projected / line | first group above cap | any run type above cap
-BUDGET-TABLE | main | 9 | 7.947e+10 | 66.18 | 132.36 | L1 92.6 | 360.8 (L6) | 4.107 | 1.461 | 0.730 | 2.81 | no | yes
-BUDGET-TABLE | long | 9 | 1.548e+11 | 66.18 | 132.36 | L1 118.7 | 429.8 (L6) | 9.641 | 2.846 | 1.423 | 3.39 | no | yes
-BUDGET-TABLE | tau_sweep | 8 | 1.376e+10 | 66.18 | 132.36 | L4 118.7 | 118.7 (L4) | 0.268 | 0.253 | 0.126 | 1.06 | no | no
-BUDGET-TABLE | wrapped | 9 | 1.548e+10 | 66.18 | 132.36 | L1 91.7 | 338.1 (L6) | 0.800 | 0.285 | 0.142 | 2.81 | no | yes
-BUDGET-TABLE | directions | 12 | 2.064e+10 | 66.18 | 132.36 | L1 104.6 | 214.1 (L9) | 0.961 | 0.379 | 0.190 | 2.53 | no | yes
-BUDGET-TABLE | eps_sweep | 3 | 3.44e+09 | 66.18 | 132.36 | L2 78.2 | 78.2 (L2) | 0.061 | 0.063 | 0.032 | 0.96 | no | no
-BUDGET-TABLE | h4_float64 | 2 | 4e+09 | 66.18 | 132.36 | L1 107.2 | 159.2 (L5) | 0.148 | 0.074 | 0.037 | 2.01 | no | yes
-BUDGET-TABLE | h4_double64 | 1 | 2e+08 | 4661.4 | 9322.8 | L5 3838.2 | 3838.2 (L5) | 0.213 | 0.259 | 0.086 | 0.82 | no | no
-BUDGET-TABLE | ladder_double64_short | 4 | 3.68e+09 | 4661.4 | 9322.8 | L1 4089.3 | 5833.2 (L9) | 5.283 | 4.765 | 1.588 | 1.11 | no | no
-BUDGET-TABLE | ladder_double64_long | 1 | 9.2e+09 | 4661.4 | 9322.8 | L5 6431.4 | 6431.4 (L5) | 16.436 | 11.912 | 3.971 | 1.38 | no | no
-BUDGET-TABLE | ladder_bigfloat | 3 | 2.76e+08 | 54600 | 1.092e+05 | L1 193637.9 | 319386.4 (L9) | 20.732 | 4.186 | 1.395 | 4.95 | YES (pauses) | yes
-PILOT-VS-CAMPAIGN | arm | pilot projected thread-h | reduced-campaign projected thread-h (same real steps) | ratio
-PILOT-VS-CAMPAIGN | main | 4.584 | 4.107 | 1.12
-PILOT-VS-CAMPAIGN | long | 8.929 | 9.641 | 0.93
-PILOT-VS-CAMPAIGN | tau_sweep | 0.587 | 0.268 | 2.19
-PILOT-VS-CAMPAIGN | wrapped | 0.893 | 0.800 | 1.12
-PILOT-VS-CAMPAIGN | directions | 1.147 | 0.961 | 1.19
-PILOT-VS-CAMPAIGN | eps_sweep | 0.112 | 0.061 | 1.85
-PILOT-VS-CAMPAIGN | h4_float64 | 0.207 | 0.148 | 1.40
-PILOT-VS-CAMPAIGN | h4_double64 | 0.368 | 0.213 | 1.73
-PILOT-VS-CAMPAIGN | ladder_double64_short | 6.782 | 5.283 | 1.28
-PILOT-VS-CAMPAIGN | ladder_double64_long | 16.941 | 16.436 | 1.03
-PILOT-VS-CAMPAIGN | ladder_bigfloat | 22.717 | 20.732 | 1.10
-D53q | pilot projection (24 starts, horizon 1e5) against the projection from the cost measured in the reduced campaign, per arm, ratio range / arms outside a factor 2 | 0.9262 to 2.194; 1 of 11 | all within 0.5 to 2 | FAIL
-THREADCOST | method | thread-ns at 1 worker | at 4 | at 23 | A4 line 66.18, cap 132.36
-THREADCOST | L1 | 43.1 | 44.2 | 74.3
-THREADCOST | L2 | 30.4 | 31.7 | 53.8
-THREADCOST | L3 | 79.4 | 81.4 | 159.0
-THREADCOST | L4 | 79.3 | 81.3 | 153.5
-THREADCOST | L4b | 85.0 | 87.2 | 154.2
-THREADCOST | L5 | 88.8 | 90.3 | 153.1
-THREADCOST | L5b | 94.7 | 107.0 | 183.3
-THREADCOST | L6 | 175.4 | 198.2 | 352.0
-THREADCOST | L9 | 88.9 | 98.1 | 172.3
-D53q/P14 | reduced-campaign costs (campaign group sizes, 23 threads, thread-ns per orbit-step) projected on the real plan's unique steps: total thread-hours / A4 budget with safety / without safety | 58.7 / 26.5 / 9.7 | reported | INFO
-D53q/P14 | arms whose FIRST run type exceeds the first-chunk cap (2 x line with safety) and would pause; arms with any run type above the cap | pause: [ladder_bigfloat]; any run type above: [main, long, wrapped, directions, h4_float64, ladder_bigfloat] | none pause (else A4 budget lines need an amendment before data, A5) | FAIL: arms would pause
-D53q | INFO | manifest B arm directions: steps 471300000, measured 167.5 ns per orbit-step against budget line 66.18, status complete
-D53q | INFO | manifest B arm eps_sweep: steps 139900000, measured 61.44 ns per orbit-step against budget line 66.18, status complete
-D53q | INFO | manifest B arm h4_double64: steps 2000000, measured 3838 ns per orbit-step against budget line 4661, status complete
-D53q | INFO | manifest B arm h4_float64: steps 40000000, measured 133.2 ns per orbit-step against budget line 66.18, status complete
-D53q | INFO | manifest B arm ladder_bigfloat: steps 2760000, measured 2.704e+05 ns per orbit-step against budget line 5.46e+04, status complete
-D53q | INFO | manifest B arm ladder_double64_long: steps 46000000, measured 6431 ns per orbit-step against budget line 4661, status complete
-D53q | INFO | manifest B arm ladder_double64_short: steps 36800000, measured 5169 ns per orbit-step against budget line 4661, status complete
-D53q | INFO | manifest B arm long: steps 1548000000, measured 224.2 ns per orbit-step against budget line 66.18, status complete
-D53q | INFO | manifest B arm main: steps 794700000, measured 186.1 ns per orbit-step against budget line 66.18, status complete
-D53q | INFO | manifest B arm tau_sweep: steps 314200000, measured 135.3 ns per orbit-step against budget line 66.18, status complete
-D53q | INFO | manifest B arm wrapped: steps 154800000, measured 186.1 ns per orbit-step against budget line 66.18, status complete
-D53q | figure | workspaces\module-build\stages\04-verify\output\experiments-runner-cost.png | - | INFO
-# section BUDGET took 128.6 s
-D53r | source files src/Experiments/run_*.jl searched for the study block's numbers (horizons, budget rates, bounds) and the study slug: hits | 0 | 0 (comments aside) | PASS
-# section SOURCE took 0.0 s
-D53x | files under data/p1-le-benchmark before / after the whole verification | 0 / 0 | 0 / 0 | PASS
-D53x | data/ listing unchanged (gpu-benchmark.toml not rewritten) | true | true | PASS
-D53x | study manifest folder workspaces/study/stages/03-run/output unchanged | true | true | PASS
-D53x | all stores of this verification live under the scratch folder, named verify | true | true | PASS
-# section ISOLATION took 0.0 s
-# summary: PASS 73, FAIL 4, INFO 53, total 3239.5 s
-# ---- addendum 1 (separate invocations of the same script and of scratch analysis scripts, after the main run) ----
-# addendum: section REALFAIL (EXR_ONLY=REALFAIL), real horizons, failure-prone run types only; its own header and summary line follow
+ENS | L1 | 2048 x 200000 | cpu 23 threads wall 4.634 ns/orbit-step, thread 106.6 | device 12.46 ns/orbit-step | record: cpu 4.173 gpu 12.45
+ENS | L2 | 2048 x 200000 | cpu 23 threads wall 4.829 ns/orbit-step, thread 111.1 | device 17.76 ns/orbit-step | record: cpu 2.937 gpu 11.19
+ENS | L3 | 2048 x 200000 | cpu 23 threads wall 8.831 ns/orbit-step, thread 203.1 | device 25.13 ns/orbit-step | record: cpu 7.906 gpu 25.25
+ENS | L4 | 2048 x 200000 | cpu 23 threads wall 8.542 ns/orbit-step, thread 196.5 | device 25.12 ns/orbit-step | record: cpu 8.594 gpu 25.12
+ENS | L4b | 2048 x 200000 | cpu 23 threads wall 9.119 ns/orbit-step, thread 209.7 | device 35.85 ns/orbit-step | record: cpu 8.732 gpu 35.92
+ENS | L5 | 2048 x 200000 | cpu 23 threads wall 9.01 ns/orbit-step, thread 207.2 | device 27.01 ns/orbit-step | record: cpu 9.171 gpu 27.08
+ENS | L5b | 2048 x 200000 | cpu 23 threads wall 9.264 ns/orbit-step, thread 213.1 | device 27.86 ns/orbit-step | record: cpu 9.804 gpu 27.93
+ENS | L9 | 2048 x 200000 | cpu 23 threads wall 10.16 ns/orbit-step, thread 233.6 | device 38.67 ns/orbit-step | record: cpu 10.33 gpu 38.67
+D54f | recorder cost lines retaken now (2048 orbits x 2e5 steps, 23 threads): every device and CPU value within 1.5x of the stored entry; gpu slower than cpu for all 8 methods | agree=false; gpu/cpu ratios L1 2.689 L2 3.678 L3 2.846 L4 2.941 L4b 3.931 L5 2.998 L5b 3.008 L9 3.808 | ratio > 1 for all (auto -> cpu) | FAIL
+# section DEVICE took 502.0 s
 REALFAIL | run type | chunks failed twice | chunks of the type (real horizons 1e7 and 1e8)
 REALFAIL | L2 N=10000000 tau=1 eps=1.0e-10 arms=Any["eps_sweep"] | 23 | 24
 REALFAIL | L2 N=10000000 tau=1 eps=1.0e-12 arms=Any["eps_sweep"] | 24 | 24
@@ -269,21 +177,208 @@ REALFAIL | L5 N=10000000 tau=16 eps=- arms=Any["tau_sweep"] | 6 | 24
 REALFAIL | L5 N=10000000 tau=2 eps=- arms=Any["tau_sweep"] | 0 | 24
 REALFAIL | L5 N=10000000 tau=4 eps=- arms=Any["tau_sweep"] | 0 | 24
 REALFAIL | L5 N=10000000 tau=8 eps=- arms=Any["tau_sweep"] | 3 | 24
-D53k/REALFAIL | real horizons, L2 (main, long, eps_sweep) and L4, L5 (tau_sweep) only (360 of 1387 chunks, 4.3 min): chunks failed twice by the health checks, against the real stop limit 0.05 x 1387 = 69.35 chunks | 103 failed; status complete with failed chunks | <= 69.35 (else the real campaign stops: stopped, failed fraction) | FAIL: the real campaign would stop on the failed-chunk fraction
+D53k/REALFAIL | real horizons, L2 (main, long, eps_sweep) and L4, L5 (tau_sweep) only (360 of 1363 chunks, 4.8 min): chunks failed twice by the health checks, against the real stop limit 0.05 x 1363 = 68.15 chunks | 103 failed; status complete with failed chunks | <= 68.15 (else the real campaign stops: stopped, failed fraction) | FAIL: the real campaign would stop on the failed-chunk fraction
 REALFAIL | INFO | 18 chunks, first reason: numerical health error: NumericalHealthError: orthonormalisation breakdown = # (threshold 
 REALFAIL | INFO | 85 chunks, first reason: numerical health error: NumericalHealthError: separation = # (threshold #) at step #, orbi
-# section REALFAIL took 261.1 s
-# summary: PASS 0, FAIL 1, INFO 2, total 277.3 s
-# addendum: scratch analysis of the L2 device-versus-cpu AC12(c) failure (k6:C, orbit 806, N = 50000)
-ADDENDUM | l2diag2 | store-verify-dev-cpu L1 cpu [1.61532, 1.61363, 1.62396, 1.62151]
-ADDENDUM | l2diag2 | store-verify-dev-cpu L2 cpu [1.61533, 1.61391, 1.62416, 1.62654]
-ADDENDUM | l2diag2 | store-verify-dev-cpu L5 cpu [1.61532, 1.61363, 1.62396, 1.62151]
-ADDENDUM | l2diag2 | store-verify-dev-gpu L1 gpu [1.61037, 1.62289, 1.61304, 1.61907]
-ADDENDUM | l2diag2 | store-verify-dev-gpu L2 gpu [1.61033, 1.6221, 1.624, 1.52649]
-ADDENDUM | l2diag2 | store-verify-dev-gpu L5 gpu [1.61037, 1.62289, 1.61304, 1.61907]
-ADDENDUM | l2tail | L2 orbit 806 (K=10, class C), 64 ulp-perturbed starts on the CPU, lambda_1(5e4): mean 1.6168 std 0.0284 min 1.4801 max 1.6388; values below 1.55: 3; value at the unperturbed start 1.6265
-ADDENDUM | l2tail | L1 orbit 806 (K=10, class C), 64 ulp-perturbed starts on the CPU, lambda_1(5e4): mean 1.6199 std 0.0047 min 1.6103 max 1.6303; values below 1.55: 0; value at the unperturbed start 1.6215
-ADDENDUM | l2diag | L1 k6:C ens 40 worst ratio 4.748 at step n=28184 orbit 819 cpu 1.6355175771356891 gpu 1.6078989603795975 sigma 0.005817246047292189 | max |d|/sigma at the last step 3.0894479742097816
-ADDENDUM | l2diag | L1 k6:X ens 40 worst ratio 4.521 at step n=355 orbit 836 cpu 1.5034907317940067 gpu 1.755926008307841 sigma 0.05583001548705824 | max |d|/sigma at the last step 3.003655440968362
-ADDENDUM | l2diag | L2 k6:C ens 40 worst ratio 16.234 at step n=50000 orbit 806 cpu 1.62653600802711 gpu 1.526492452991867 sigma 0.006162596203527078 | max |d|/sigma at the last step 16.233994850739112
-ADDENDUM | l2diag | L2 k6:X ens 40 worst ratio 4.628 at step n=50000 orbit 845 cpu 1.5419230431247788 gpu 1.6366575250942057 sigma 0.020470457338867216 | max |d|/sigma at the last step 4.627863481562512
+# section REALFAIL took 290.2 s
+D53q | pilot with the real K values on the real preregistration and panel: seconds, report fields complete, statement 'not study data', dirty override recorded | 142.6 s; missing String[]; pilot measurements: not study data (Amen... | complete | PASS
+D53q/I15 | pilot starts: count, none within 1e-6 of a panel start (min torus distance); files in the study store before / after | 24, min 0.02706; 0 / 0 | >= 1e-6; 0 / 0 | PASS
+D53q | pilot store: chunk files, all marked pilot = true (sampled 50) | 282, Bool[1] | marked | PASS
+D53q | INFO | pilot: parallel efficiency 0.6289, threads 23, device record threads 23
+D53q | INFO | first departure of Double64 / BigFloat from Float64 beyond setup_check_tol, per K index (steps): K1: 1169 / 1169; K2: 504 / 504; K3: 31 / 31; K4: 18 / 18; K5: 10 / 10; K6: 7 / 7
+D53q | INFO | diagnostics share above thresholds per method: L1 0, L2 0, L3 0, L4 0, L4b 0, L5 0, L5b 0, L6 0, L9 0
+PILOT-TABLE | arm | planned unique steps | line ns (with safety) | cap ns | projected thread-h | budget thread-h (line x steps) | ratio | projected wall-h | cap check
+PILOT-TABLE | main | 7.064e+10 | 415.2 | 830.4 | 4.205 | 8.147 | 0.52 | 0.291 | wall cap 12 h
+PILOT-TABLE | long | 1.376e+11 | 415.2 | 830.4 | 8.192 | 15.870 | 0.52 | 0.566 | wall cap 12 h
+PILOT-TABLE | tau_sweep | 1.376e+10 | 415.2 | 830.4 | 0.562 | 1.587 | 0.35 | 0.039 | wall cap 12 h
+PILOT-TABLE | wrapped | 1.548e+10 | 415.2 | 830.4 | 0.871 | 1.785 | 0.49 | 0.060 | wall cap 12 h
+PILOT-TABLE | directions | 2.064e+10 | 415.2 | 830.4 | 1.068 | 2.380 | 0.45 | 0.074 | wall cap 12 h
+PILOT-TABLE | eps_sweep | 5.16e+09 | 415.2 | 830.4 | 0.157 | 0.595 | 0.26 | 0.011 | wall cap 12 h
+PILOT-TABLE | h4_float64 | 4e+09 | 415.2 | 830.4 | 0.190 | 0.461 | 0.41 | 0.013 | wall cap 12 h
+PILOT-TABLE | h4_double64 | 2e+08 | 19904 | 39808 | 0.318 | 1.106 | 0.29 | 0.022 | wall cap 12 h
+PILOT-TABLE | ladder_double64_short | 3.68e+09 | 19904 | 39808 | 6.452 | 20.346 | 0.32 | 0.446 | wall cap 12 h
+PILOT-TABLE | ladder_double64_long | 9.2e+09 | 19904 | 39808 | 14.639 | 50.865 | 0.29 | 1.012 | wall cap 12 h
+PILOT-TABLE | ladder_bigfloat | 2.76e+08 | 8.8893e+05 | 1.7779e+06 | 23.400 | 68.152 | 0.34 | 1.618 | wall cap 12 h
+PILOT-TABLE | main_l2 | 7.11e+09 | 415.2 | 830.4 | 0.216 | 0.820 | 0.26 | 0.015 | wall cap 12 h
+PILOT-TABLE | long_l2 | 1.72e+10 | 415.2 | 830.4 | 0.523 | 1.984 | 0.26 | 0.036 | wall cap 12 h
+D53q/P14 | pilot totals: projected thread-hours, A4 budget lines x steps (thread-hours, with safety), projected wall-hours (sum of arms) against the 12 h cap | 60.8, 174.1, 4.20 | wall < 12 | PASS
+PILOT-COST | method | precision | backend | thread-ns per orbit-step | wall-ns per orbit-step
+PILOT-COST | L1 | BigFloat | cpu | 203001.6 | 8826.16
+PILOT-COST | L5 | BigFloat | cpu | 341296.4 | 14838.97
+PILOT-COST | L9 | BigFloat | cpu | 371357.1 | 16145.96
+PILOT-COST | L1 | Double64 | cpu | 4425.2 | 192.40
+PILOT-COST | L3 | Double64 | cpu | 7234.9 | 314.56
+PILOT-COST | L5 | Double64 | cpu | 5728.1 | 249.05
+PILOT-COST | L9 | Double64 | cpu | 7857.4 | 341.63
+PILOT-COST | L1 | Float64 | cpu | 175.5 | 7.63
+PILOT-COST | L2 | Float64 | cpu | 109.4 | 4.76
+PILOT-COST | L3 | Float64 | cpu | 200.4 | 8.71
+PILOT-COST | L4 | Float64 | cpu | 128.0 | 5.56
+PILOT-COST | L4b | Float64 | cpu | 225.1 | 9.79
+PILOT-COST | L5 | Float64 | cpu | 166.2 | 7.23
+PILOT-COST | L5b | Float64 | cpu | 210.2 | 9.14
+PILOT-COST | L6 | Float64 | cpu | 391.9 | 17.04
+PILOT-COST | L9 | Float64 | cpu | 217.2 | 9.45
+# section PILOT took 146.4 s
+BUDGET-TABLE | arm | run types | planned unique steps | line ns (safety incl.) | cap ns | first run type: method, thread-ns | max thread-ns (method) | projected thread-h | budget thread-h (line) | budget thread-h (without safety) | projected / line | first group above cap | any run type above cap
+BUDGET-TABLE | main | 8 | 7.064e+10 | 415.2 | 830.4 | L1 99.3 | 360.4 (L6) | 3.967 | 8.147 | 4.074 | 0.49 | no | no
+BUDGET-TABLE | long | 8 | 1.376e+11 | 415.2 | 830.4 | L1 136.6 | 404.7 (L6) | 8.936 | 15.870 | 7.935 | 0.56 | no | no
+BUDGET-TABLE | tau_sweep | 8 | 1.376e+10 | 415.2 | 830.4 | L4 89.3 | 97.5 (L5) | 0.229 | 1.587 | 0.793 | 0.14 | no | no
+BUDGET-TABLE | wrapped | 9 | 2.259e+10 | 415.2 | 830.4 | L1 89.1 | 339.8 (L6) | 0.931 | 2.605 | 1.303 | 0.36 | no | no
+BUDGET-TABLE | directions | 12 | 2.064e+10 | 415.2 | 830.4 | L1 90.4 | 193.7 (L9) | 0.859 | 2.380 | 1.190 | 0.36 | no | no
+BUDGET-TABLE | eps_sweep | 3 | 5.16e+09 | 415.2 | 830.4 | L2 86.5 | 93.0 (L2) | 0.127 | 0.595 | 0.298 | 0.21 | no | no
+BUDGET-TABLE | h4_float64 | 2 | 4e+09 | 415.2 | 830.4 | L1 76.4 | 122.7 (L5) | 0.111 | 0.461 | 0.231 | 0.24 | no | no
+BUDGET-TABLE | h4_double64 | 1 | 2e+08 | 19904 | 39808 | L5 3331.2 | 3331.2 (L5) | 0.185 | 1.106 | 0.369 | 0.17 | no | no
+BUDGET-TABLE | ladder_double64_short | 4 | 3.68e+09 | 19904 | 39808 | L1 4655.8 | 6467.7 (L9) | 5.915 | 20.346 | 6.782 | 0.29 | no | no
+BUDGET-TABLE | ladder_double64_long | 1 | 9.2e+09 | 19904 | 39808 | L5 6109.8 | 6109.8 (L5) | 15.614 | 50.865 | 16.955 | 0.31 | no | no
+BUDGET-TABLE | ladder_bigfloat | 3 | 2.76e+08 | 8.8893e+05 | 1.7779e+06 | L1 199251.0 | 340426.5 (L9) | 21.744 | 68.152 | 22.717 | 0.32 | no | no
+BUDGET-TABLE | long_l2 | 1 | 1.72e+10 | 415.2 | 830.4 | L2 109.4 | 109.4 (L2) | 0.523 | 1.984 | 0.992 | 0.26 | no | no
+PILOT-VS-CAMPAIGN | arm | pilot projected thread-h | reduced-campaign projected thread-h (same real steps) | ratio
+PILOT-VS-CAMPAIGN | main | 4.205 | 3.967 | 1.06
+PILOT-VS-CAMPAIGN | long | 8.192 | 8.936 | 0.92
+PILOT-VS-CAMPAIGN | tau_sweep | 0.562 | 0.229 | 2.46
+PILOT-VS-CAMPAIGN | wrapped | 0.871 | 0.931 | 0.94
+PILOT-VS-CAMPAIGN | directions | 1.068 | 0.859 | 1.24
+PILOT-VS-CAMPAIGN | eps_sweep | 0.157 | 0.127 | 1.23
+PILOT-VS-CAMPAIGN | h4_float64 | 0.190 | 0.111 | 1.72
+PILOT-VS-CAMPAIGN | h4_double64 | 0.318 | 0.185 | 1.72
+PILOT-VS-CAMPAIGN | ladder_double64_short | 6.452 | 5.915 | 1.09
+PILOT-VS-CAMPAIGN | ladder_double64_long | 14.639 | 15.614 | 0.94
+PILOT-VS-CAMPAIGN | ladder_bigfloat | 23.400 | 21.744 | 1.08
+PILOT-VS-CAMPAIGN | long_l2 | 0.523 | 0.523 | 1.00
+D53q | pilot projection (24 starts, horizon 1e5) against the projection from the cost measured in the reduced campaign, per arm, ratio range / arms outside a factor 2 | 0.9167 to 2.458; 1 of 12 | all within 0.5 to 2 | FAIL
+THREADCOST | method | thread-ns at 1 worker | at 4 | at 23 | A4 line 66.18, cap 132.36
+THREADCOST | L1 | 43.2 | 48.5 | 68.7
+THREADCOST | L2 | 50.2 | 51.5 | 87.9
+THREADCOST | L3 | 79.2 | 81.2 | 164.1
+THREADCOST | L4 | 79.4 | 81.5 | 296.0
+THREADCOST | L4b | 85.6 | 87.4 | 160.5
+THREADCOST | L5 | 88.0 | 89.8 | 164.3
+THREADCOST | L5b | 94.3 | 100.0 | 174.5
+THREADCOST | L6 | 174.0 | 179.9 | 311.7
+THREADCOST | L9 | 85.6 | 103.2 | 181.6
+D53q/P14 | reduced-campaign costs (campaign group sizes, 23 threads, thread-ns per orbit-step) projected on the real plan's unique steps: total thread-hours / A4 budget with safety / without safety | 59.1 / 174.1 / 63.6 | reported | INFO
+D53q/P14 | arms whose FIRST run type exceeds the first-chunk cap (2 x line with safety) and would pause; arms with any run type above the cap | pause: []; any run type above: [] | none pause (else A4 budget lines need an amendment before data, A5) | PASS
+D53q | INFO | manifest B arm directions: steps 471300000, measured 154 ns per orbit-step against budget line 415.2, status complete
+D53q | INFO | manifest B arm eps_sweep: steps 139900000, measured 93.36 ns per orbit-step against budget line 415.2, status complete
+D53q | INFO | manifest B arm h4_double64: steps 2000000, measured 3331 ns per orbit-step against budget line 1.99e+04, status complete
+D53q | INFO | manifest B arm h4_float64: steps 40000000, measured 99.52 ns per orbit-step against budget line 415.2, status complete
+D53q | INFO | manifest B arm ladder_bigfloat: steps 2760000, measured 2.836e+05 ns per orbit-step against budget line 8.889e+05, status complete
+D53q | INFO | manifest B arm ladder_double64_long: steps 46000000, measured 6110 ns per orbit-step against budget line 1.99e+04, status complete
+D53q | INFO | manifest B arm ladder_double64_short: steps 36800000, measured 5786 ns per orbit-step against budget line 1.99e+04, status complete
+D53q | INFO | manifest B arm long: steps 1376000000, measured 233.8 ns per orbit-step against budget line 415.2, status complete
+D53q | INFO | manifest B arm long_l2: steps 172000000, measured 109.4 ns per orbit-step against budget line 415.2, status complete
+D53q | INFO | manifest B arm main: steps 706400000, measured 202.2 ns per orbit-step against budget line 415.2, status complete
+D53q | INFO | manifest B arm main_l2: steps 88300000, measured 96.02 ns per orbit-step against budget line 415.2, status complete
+D53q | INFO | manifest B arm tau_sweep: steps 314200000, measured 137.2 ns per orbit-step against budget line 415.2, status complete
+D53q | INFO | manifest B arm wrapped: steps 225900000, measured 148.3 ns per orbit-step against budget line 415.2, status complete
+D53q | figure | workspaces\module-build\stages\04-verify\output\experiments-runner-cost.png | - | INFO
+# section BUDGET took 131.8 s
+D53r | source files src/Experiments/run_*.jl searched for the study block's numbers (horizons, budget rates, bounds) and the study slug: hits | 0 | 0 (comments aside) | PASS
+# section SOURCE took 0.0 s
+D53x | files under data/p1-le-benchmark before / after the whole verification | 0 / 0 | 0 / 0 | PASS
+D53x | data/ listing unchanged (gpu-benchmark.toml not rewritten) | true | true | PASS
+D53x | study manifest folder workspaces/study/stages/03-run/output unchanged | true | true | PASS
+D53x | all stores of this verification live under the scratch folder, named verify | true | true | PASS
+# section ISOLATION took 0.0 s
+# summary: PASS 80, FAIL 6, INFO 58, total 3329.1 s
+
+# ADDENDUM (rerun of sections Y5, REALFAIL, DEVICE with the script of the same commit plus edits for D53w, REALFAIL and the D54f retake log). These lines supersede the lines of the same checks above (the D53w control line and D53k/REALFAIL above were stale A4 assumptions in the script).
+# experiments runner verification, julia 1.13.2, threads 23, cpu arrowlake-s, HDF5.jl 0.17.4, full
+# prereg workspaces\study\stages\01-design\output\p1-le-benchmark-preregistration.md, panel workspaces\study\stages\02-panel\output\p1-le-benchmark-panel.toml, scratch C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\runner-verify\full
+# git head fa843912a5b21b88e19765a4e785562fdad50edf, tracked or untracked changes: M verify/experiments-runner.jl;  M workspaces/module-build/stages/04-verify/output/experiments-runner-cost.png;  M workspaces/module-build/stages/04-verify/output/experiments-runner-verify-log.txt
+# D53x before: files under data/p1-le-benchmark = 0; data/ entries = 2; study manifest dir entries = 1
+D53s | Y5 control: panel exponent equals ln mu at 256 bits (mu = (3 + sqrt 5) / 2) | 0.9624 | 0.96242365011920694 | PASS
+D53s | Y5 at horizon 1e7: items run on the CPU (23 threads): count, seconds | 20, 2.6 s | - | INFO
+D53s | Y5, direction pi/4 (unstable eigenvector, c = 1), horizon 1e7, 8 variational methods, all recorded grid steps: max |lambda_1(n) - ln mu| / (B_S(n)/n), B_S = 8 eps (n + G) | 0.0625 | <= 1 | PASS
+D53s | INFO | per method: L1 0.0625, L3 0.0625, L4 0.0625, L4b 0.0625, L5 0.0625, L5b 0.0625, L6 0.0625, L9 0.0625; absolute error at n = 1e7: L1 1.11e-16, L3 1.11e-16, L4 1.11e-16, L4b 1.11e-16, L5 1.11e-16, L5b 1.11e-16, L6 1.11e-16, L9 1.11e-16
+D53s | Y5, other start directions in the plan (L1, L5, ...): max |lambda_1(n) - (ln mu + ln(c)/n)| / bound, c at 256 bits | 0.000665 | <= 1 | PASS
+CONTROL-TABLE | id | kind | exact exponent | max over control methods |lambda_1(N) - exact| at N = 100000 | follows ln|mu+| + ln(c)/n (fixed points) | |ln c| / 1e7 = projected bias at N1 = 1e7 | verdict against control_bound 1e-8 at 1e7
+CONTROL-TABLE | 871 | fixed | 0.693147 | 5.27e-07 | true | 5.27e-09 | ok
+CONTROL-TABLE | 873 | fixed | 0.949629 | 2.49e-07 | true | 2.49e-09 | ok
+CONTROL-TABLE | 875 | fixed | 1.183097 | 5.16e-07 | true | 5.16e-09 | ok
+CONTROL-TABLE | 877 | fixed | 2.099323 | 1.8e-06 | true | 4.6e-09 | ok
+CONTROL-TABLE | 878 | fixed | 1.395100 | 0.231 | false | 1.86e-08 | OFF ORBIT in Float64
+CONTROL-TABLE | 879 | fixed | 2.477889 | 2.28e-06 | true | 3.48e-09 | ok
+CONTROL-TABLE | 880 | fixed | 2.063437 | 0.44 | false | 7.96e-09 | OFF ORBIT in Float64
+CONTROL-TABLE | 881 | newton (periodic orbit) | 2.269671 | 0.651 | not applicable | not computed | OFF ORBIT in Float64
+CONTROL-TABLE | 882 | newton (periodic orbit) | 1.722949 | 0.1 | not applicable | not computed | OFF ORBIT in Float64
+CONTROL-TABLE | 883 | y5 | 0.962424 | 1.11e-16 | direction pi/4 is the unstable eigenvector, c = 1 | 0 | ok
+D53s | fixed-point controls that stay on their orbit: max |lambda_1(n) - (ln|mu+| + ln(c)/n)| / (B_S/n + 1e-12) over 6958 grid points (n >= 20, controls that stay on the orbit) | 0.004494 | <= 1 | PASS
+D53w | positive-exponent controls (10), A5 control_scope = exact_start: controls that start off their orbit in Float64 (INFO, expected 878, 880, 881, 882) / controls on the orbit whose bias |ln c| / N1 exceeds 1e-8 at N1 = 1e7 | off orbit: [878, 880, 881, 882]; bias above bound: Int64[] | off orbit = [878, 880, 881, 882]; bias above bound: none | PASS
+# section Y5 took 6.0 s
+D53h | device in force, CUDA.jl, free memory MiB | NVIDIA GeForce RTX 5060 Laptop GPU, 6.4.2, 6925.0 | RTX 5060 | PASS
+D54f | record in force (data/gpu-benchmark.toml, Float64): threads, AC13 cpu / gpu ns, gpu_faster, recorder methods | 23, 3.385 / 2.493, true, ["L1", "L2", "L3", "L4", "L4b", "L5", "L5b", "L9"] | threads == 23 | PASS
+D54f | recorder entries: all taken at 23 threads on 2048 orbits x 2e5 steps; gpu_faster per method | L1 false (cpu 4.173, gpu 12.45, 2048x200000); L2 false (cpu 2.937, gpu 11.19, 2048x200000); L3 false (cpu 7.906, gpu 25.25, 2048x200000); L4 false (cpu 8.594, gpu 25.12, 2048x200000); L4b false (cpu 8.732, gpu 35.92, 2048x200000); L5 false (cpu 9.171, gpu 27.08, 2048x200000); L5b false (cpu 9.804, gpu 27.93, 2048x200000); L9 false (cpu 10.33, gpu 38.67, 2048x200000) | threads == 23, 2048 x 200000 | PASS
+TABLE | BigFloat | L1 | cpu | cpu | cpu |  | 
+TABLE | BigFloat | L5 | cpu | cpu | cpu |  | 
+TABLE | BigFloat | L9 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L1 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L3 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L5 | cpu | cpu | cpu |  | 
+TABLE | Double64 | L9 | cpu | cpu | cpu |  | 
+TABLE | Float64 | L1 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L2 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L3 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L4 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L4b | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L5 | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L5b | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | L6 | auto | cpu | cpu | reducer is CPU-only | 
+TABLE | Float64 | L9 | auto | cpu | cpu | GPU not faster for the element type | 
+D54f/D54a | real preregistration and panel at 23 threads, auto: Float64 kernel methods resolve to cpu with the seventh reason (recorder gpu_faster false), L6 to cpu CPU-only, Double64 and BigFloat cpu | 8 kernel methods | all cpu | PASS
+D54a | resolved backend equals gpu exactly for methods whose entry has threads == 23 and gpu_faster | true | true | PASS
+D53h | request gpu on the reduced arm (883 orbits x 9 methods lifted + 172 x 9 wrapped, N = 50000): status, seconds; same arm request cpu: status, seconds | complete 75.1 s; complete 39.8 s | complete, complete | PASS
+D53h | INFO | provenance L1: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
+D53h | INFO | provenance L2: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
+D53h | INFO | provenance L3: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
+D53h | INFO | provenance L4: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
+D53h | INFO | provenance L4b: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
+D53h | INFO | provenance L5: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
+D53h | INFO | provenance L5b: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
+D53h | INFO | provenance L6: gpu>cpu:cpu:[reducer is CPU-only]
+D53h | INFO | provenance L9: gpu>gpu:NVIDIA GeForce RTX 5060 Laptop GPU:[]
+D53h | chunk provenance for the 8 kernel methods: backend_request gpu, backend gpu, device name, empty reason; L6: cpu with the CPU-only reason | true | true | PASS
+D53h | gpu manifest: device name and both K19 values (device_record threads, cpu and gpu ns) recorded | NVIDIA GeForce RTX 5060 Laptop GPU; threads 23, cpu 3.385, gpu 2.493, prior absent | - | INFO
+D53t/D54f | gpu against cpu store of the same arm, chaotic cells (C, X) with >= 8 orbits, AC12(c) form: worst per-orbit |dlambda_1| / sigma_FT and worst difference of ensemble means / SE per method | L1 5.631/2.36 (10 ens.); L2 16.23/2.386 (10 ens.); L3 5.631/2.36 (10 ens.); L4 5.631/2.36 (10 ens.); L4b 5.631/2.36 (10 ens.); L5 5.631/2.36 (10 ens.); L5b 5.631/2.36 (10 ens.); L9 5.632/2.36 (10 ens.) | <= 6.0 and <= 4.0 | FAIL
+D53t | INFO | orbits whose gpu record equals the cpu record bit for bit: 1244 of 9495 (L6 runs on the CPU in both)
+D53t/O12 | INFO | rerun_check on the gpu store (2.1 s): 40 items, stored on gpu: 34, bitwise: 0, max |dlambda| over gpu items 0.2379; cpu-stored (L6) bitwise 6 of 6
+D53t | gpu items rerun on the CPU: L6 items (stored on cpu) reproduce bit for bit | true | true | PASS
+O13 | independent reader on the gpu store | true | PASS | PASS
+ENS | L1 | 2048 x 200000 | cpu 23 threads wall 4.56 ns/orbit-step, thread 104.9 | device 12.46 ns/orbit-step | record: cpu 4.173 gpu 12.45
+ENS | L2 | 2048 x 200000 | cpu 23 threads wall 4.971 ns/orbit-step, thread 114.3 | device 17.72 ns/orbit-step | record: cpu 2.937 gpu 11.19
+ENS | L3 | 2048 x 200000 | cpu 23 threads wall 8.717 ns/orbit-step, thread 200.5 | device 25.1 ns/orbit-step | record: cpu 7.906 gpu 25.25
+ENS | L4 | 2048 x 200000 | cpu 23 threads wall 8.379 ns/orbit-step, thread 192.7 | device 25.13 ns/orbit-step | record: cpu 8.594 gpu 25.12
+ENS | L4b | 2048 x 200000 | cpu 23 threads wall 9.401 ns/orbit-step, thread 216.2 | device 35.82 ns/orbit-step | record: cpu 8.732 gpu 35.92
+ENS | L5 | 2048 x 200000 | cpu 23 threads wall 9.288 ns/orbit-step, thread 213.6 | device 27 ns/orbit-step | record: cpu 9.171 gpu 27.08
+ENS | L5b | 2048 x 200000 | cpu 23 threads wall 55.12 ns/orbit-step, thread 1268 | device 27.87 ns/orbit-step | record: cpu 9.804 gpu 27.93
+ENS | L9 | 2048 x 200000 | cpu 23 threads wall 10.19 ns/orbit-step, thread 234.3 | device 38.63 ns/orbit-step | record: cpu 10.33 gpu 38.67
+D54f | INFO | retake against record, method L1: cpu wall ratio 1.093, device ratio 1.001
+D54f | INFO | retake against record, method L2: cpu wall ratio 1.693, device ratio 1.584
+D54f | INFO | retake against record, method L3: cpu wall ratio 1.103, device ratio 0.9941
+D54f | INFO | retake against record, method L4: cpu wall ratio 0.9751, device ratio 1
+D54f | INFO | retake against record, method L4b: cpu wall ratio 1.077, device ratio 0.9972
+D54f | INFO | retake against record, method L5: cpu wall ratio 1.013, device ratio 0.9971
+D54f | INFO | retake against record, method L5b: cpu wall ratio 5.622, device ratio 0.9979
+D54f | INFO | retake against record, method L9: cpu wall ratio 0.9865, device ratio 0.999
+D54f | recorder cost lines retaken now (2048 orbits x 2e5 steps, 23 threads): every device and CPU value within 1.5x of the stored entry; gpu slower than cpu for all 8 methods | agree=false; gpu/cpu ratios L1 2.733 L2 3.565 L3 2.88 L4 2.999 L4b 3.81 L5 2.907 L5b 0.5056 L9 3.791 | ratio > 1 for all (auto -> cpu) | FAIL
+# section DEVICE took 444.2 s
+REALFAIL | run type | chunks failed twice | chunks of the type (real horizons 1e7 and 1e8)
+REALFAIL | L2 N=10000000 tau=1 eps=1.0e-10 arms=Any["eps_sweep"] | 0 | 24
+REALFAIL | L2 N=10000000 tau=1 eps=1.0e-12 arms=Any["eps_sweep"] | 0 | 24
+REALFAIL | L2 N=10000000 tau=1 eps=1.0e-6 arms=Any["eps_sweep"] | 0 | 24
+REALFAIL | L2 N=10000000 tau=1 eps=1.0e-8 arms=Any["eps_sweep", "main_l2"] | 0 | 24
+REALFAIL | L2 N=100000000 tau=1 eps=1.0e-8 arms=Any["long_l2"] | 0 | 24
+REALFAIL | L4 N=10000000 tau=1 eps=- arms=Any["tau_sweep"] | 0 | 24
+REALFAIL | L4 N=10000000 tau=16 eps=- arms=Any["tau_sweep"] | 0 | 24
+REALFAIL | L4 N=10000000 tau=2 eps=- arms=Any["tau_sweep"] | 0 | 24
+REALFAIL | L4 N=10000000 tau=4 eps=- arms=Any["tau_sweep"] | 0 | 24
+REALFAIL | L4 N=10000000 tau=8 eps=- arms=Any["tau_sweep"] | 0 | 24
+REALFAIL | L5 N=10000000 tau=1 eps=- arms=Any["tau_sweep"] | 0 | 24
+REALFAIL | L5 N=10000000 tau=16 eps=- arms=Any["tau_sweep"] | 0 | 24
+REALFAIL | L5 N=10000000 tau=2 eps=- arms=Any["tau_sweep"] | 0 | 24
+REALFAIL | L5 N=10000000 tau=4 eps=- arms=Any["tau_sweep"] | 0 | 24
+REALFAIL | L5 N=10000000 tau=8 eps=- arms=Any["tau_sweep"] | 0 | 24
+D53k/REALFAIL | real horizons, L2 (main_l2, long_l2, eps_sweep; wrapped) and L4, L5 (tau_sweep; stop_exempt) only (360 of 1363 chunks, 4.5 min): chunks failed twice by the health checks, against the real stop limit 0.05 x 1363 = 68.15 chunks | 0 failed; status complete | <= 68.15 (else the real campaign stops: stopped, failed fraction) | PASS
+# section REALFAIL took 273.0 s
+# summary: PASS 15, FAIL 2, INFO 22, total 740.0 s

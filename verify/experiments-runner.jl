@@ -133,7 +133,7 @@ function reduce!(run, cb)
     return run
 end
 reduce_all!(run, cb) = haskey(run, "arm") ? reduce!(run, cb) : run
-const PRE_R = make_prereg(joinpath(SCR, "prereg-reduced.md"), r -> reduce_all!(r, QUICK ? CB_OPEN : CB_SCALED); keep_later = true)   # quick horizons are too short for the scaled rule
+const PRE_R = make_prereg(joinpath(SCR, "prereg-reduced.md"), r -> reduce_all!(r, CB_OPEN); keep_later = true)   # the real rule is checked at the real horizon in section CTRL (finding: L9 on controls 877 and 879)   # quick horizons are too short for the scaled rule
 const PRE_S = make_prereg(joinpath(SCR, "prereg-reduced-scaledbound.md"), r -> reduce_all!(r, CB_TRIP); keep_later = true)
 const PLAN_R = EX.plan_run(PRE_R, PANEL)
 const PLAN_REAL = EX.plan_run(PREREG, PANEL)
@@ -777,6 +777,28 @@ end
 lnmu_of(A) = setprecision(() -> (t = BigFloat(A[1, 1]) + BigFloat(A[2, 2]); Float64(log(abs(t + (t >= 0 ? 1 : -1) * sqrt(t^2 - 4)) / 2))), BigFloat, 256)
 BS(n, K, G) = 8 * EPS52 * (n + G) + 16 * abs(K) * n^2 * EPS52
 Gfirst(K, x) = (c = K * cos(x); (1 + c)^2 + 1 + c^2 + 1)
+section("CTRL") do
+    # The real control rule (A4 item 4 and A5 item 3: bound 1e-8 at N_1 = 1e7) on the gated controls 871, 873, 875, 877, 879 and Y5 (883), all variational methods, Float64, lifted, arm main
+    plan = PLAN_REAL
+    pan = Dict(Int(o["id"]) => o for o in TOML.parsefile(PANEL)["orbit"])
+    gated = (871, 873, 875, 877, 879, 883)
+    bound = PLAN_REAL.block.raw["health"]["control_bound"]
+    items = [it for it in plan.items if it.orbit in gated && it.precision == "Float64" && it.tau == 1 && it.coordinate_mode == "lifted" && it.horizon == 10^7 && it.method != "L2" && "main" in it.arms]
+    ctx = EX.make_ctx(plan, items)
+    t = @elapsed recs = EX.compute_records(ctx, items, NT)
+    worst = Dict{String, Tuple{Float64, Int}}()
+    for (it, r) in zip(items, recs)
+        L = r.lyap[it.method][:, 1]; j = findfirst(==(10^7), r.t)
+        d = abs(L[j] - pan[it.orbit]["exponent"])
+        d > first(get(worst, it.method, (0.0, 0))) && (worst[it.method] = (d, it.orbit))
+    end
+    emit("CTRL", "real control rule at N = 1e7: gated controls x methods run ($NT threads): items, seconds", "$(length(items)), $(round(t; digits = 1)) s", "-", "INFO")
+    for m in sort(collect(keys(worst)))
+        d, o = worst[m]
+        emit("CTRL", "gated controls, method $m: worst |lambda_1(1e7) - exact| (orbit $o) against control_bound $(fmt(bound))", d, "<= $(fmt(bound))", pf(d <= bound))
+    end
+end
+
 section("Y5") do
     # Y5 control at the REAL horizon 1e7 (arm main, CPU, all eight variational methods), direction pi/4 (unstable eigenvector of the symmetric block: c = 1)
     plan = PLAN_REAL
@@ -866,9 +888,9 @@ section("Y5") do
         end
     end
     emit("D53s", "fixed-point controls that stay on their orbit: max |lambda_1(n) - (ln|mu+| + ln(c)/n)| / (B_S/n + 1e-12) over $nchk grid points (n >= 20, controls that stay on the orbit)", fmt(fworst), "<= 1", pf(fworst <= 1))
-    bad = sort(vcat(offorbit, biased))
-    emit("D53w", "positive-exponent controls ($(length(ctrl))) and the A4 rule |lambda_1(N1) - exact| <= 1e-8 (h1_check arm, direction pi/4): controls that start off their orbit in Float64 / controls on the orbit whose bias |ln c| / N1 exceeds 1e-8 at N1 = 1e7",
-         "off orbit: $(offorbit); bias above bound: $(biased)", "none", isempty(bad) ? "PASS" : "FAIL: controls $(join(bad, ", ")) would stop the real campaign by the control rule (R5 1c)")
+    # A5 item 3: the controls that start off their orbit are INFO (never stop the campaign); the gated ones must have a projected bias within the bound
+    emit("D53w", "positive-exponent controls ($(length(ctrl))), A5 control_scope = exact_start: controls that start off their orbit in Float64 (INFO, expected 878, 880, 881, 882) / controls on the orbit whose bias |ln c| / N1 exceeds 1e-8 at N1 = 1e7",
+         "off orbit: $(offorbit); bias above bound: $(biased)", "off orbit = [878, 880, 881, 882]; bias above bound: none", sort(offorbit) == [878, 880, 881, 882] && isempty(biased) ? "PASS" : "FAIL: the gated set differs from A5 item 3")
     CAMP["control_findings"] = (offorbit = offorbit, biased = biased)
 end
 
@@ -979,6 +1001,9 @@ section("DEVICE") do
         say("ENS | $m | $ENS_ORB x $ENS_N | cpu $NT threads wall $(fmt(cost[m].cpu_wall)) ns/orbit-step, thread $(fmt(cost[m].cpu_thread)) | device $(fmt(cost[m].gpu)) ns/orbit-step | record: cpu $(fmt(rec.recorder[m].cpu_ns_per_step)) gpu $(fmt(rec.recorder[m].gpu_ns_per_step))")
     end
     CAMP["ens"] = cost
+    for m in sort(collect(keys(cost)))
+        info("D54f", "retake against record, method $m: cpu wall ratio $(fmt(cost[m].cpu_wall / rec.recorder[m].cpu_ns_per_step)), device ratio $(fmt(cost[m].gpu / rec.recorder[m].gpu_ns_per_step))")
+    end
     agree = all(m -> abs(log(cost[m].gpu / rec.recorder[m].gpu_ns_per_step)) < log(1.5) && abs(log(cost[m].cpu_wall / rec.recorder[m].cpu_ns_per_step)) < log(1.5), keys(cost))
     emit("D54f", "recorder cost lines retaken now (2048 orbits x 2e5 steps, $NT threads): every device and CPU value within 1.5x of the stored entry; gpu slower than cpu for all 8 methods", "agree=$agree; gpu/cpu ratios " * join(("$m $(fmt(c.gpu / c.cpu_wall))" for (m, c) in sort(collect(cost); by = first)), " "),
          "ratio > 1 for all (auto -> cpu)", pf(QUICK ? true : agree && all(c -> c.gpu > c.cpu_wall, values(cost))))
@@ -987,13 +1012,15 @@ end
 # ---------------------------------------------------------------------------------------------------
 # Health failures at the REAL horizons for the failure-prone run types of the reduced campaign (L2: separation; L4 and L5 at tau 8 and 16: orthonormalisation)
 section("REALFAIL") do
-    keep = Dict("main" => ["L2"], "long" => ["L2"], "eps_sweep" => ["L2"], "tau_sweep" => ["L4", "L5"])
+    # A5 arms: L2 in main_l2, long_l2 and eps_sweep (wrapped), L4 and L5 in tau_sweep (stop_exempt); applied to every [run] block
+    keep = Dict("main_l2" => ["L2"], "long_l2" => ["L2"], "eps_sweep" => ["L2"], "tau_sweep" => ["L4", "L5"])
     pre = make_prereg(joinpath(SCR, "prereg-realfail.md"), run -> begin
-        run["arm"] = [merge(a, Dict{String, Any}("methods" => keep[a["name"]])) for a in run["arm"] if haskey(keep, a["name"])]
+        run["arm"] = [merge(a, Dict{String, Any}("methods" => keep[a["name"]])) for a in get(run, "arm", []) if haskey(keep, a["name"])]
         foreach(a -> delete!(a, "h1_check"), run["arm"])
-        run["health"]["first_chunk_cost_factor"] = 1e6
-        run["health"]["stop_failed_fraction"] = 0.5
-    end)
+        h = get!(run, "health", Dict{String, Any}())
+        h["first_chunk_cost_factor"] = 1e6
+        h["stop_failed_fraction"] = 0.5
+    end; keep_later = true)
     store = joinpath(SCR, "store-verify-real-fail"); mf = joinpath(SCR, "verify-real-fail-manifest.json"); rm(store; recursive = true, force = true)
     t = @elapsed r = campaign(pre, store, mf)
     m = EX.read_json(mf)
@@ -1007,7 +1034,7 @@ section("REALFAIL") do
         say("REALFAIL | $k | $(get(bad, k, 0)) | $(tot[k])")
     end
     lim = PLAN_REAL.block.raw["health"]["stop_failed_fraction"] * PLAN_REAL.counts.chunks
-    emit("D53k/REALFAIL", "real horizons, L2 (main, long, eps_sweep) and L4, L5 (tau_sweep) only ($(length(m["chunks"])) of $(PLAN_REAL.counts.chunks) chunks, $(round(t / 60; digits = 1)) min): chunks failed twice by the health checks, against the real stop limit 0.05 x $(PLAN_REAL.counts.chunks) = $(fmt(lim)) chunks",
+    emit("D53k/REALFAIL", "real horizons, L2 (main_l2, long_l2, eps_sweep; wrapped) and L4, L5 (tau_sweep; stop_exempt) only ($(length(m["chunks"])) of $(PLAN_REAL.counts.chunks) chunks, $(round(t / 60; digits = 1)) min): chunks failed twice by the health checks, against the real stop limit 0.05 x $(PLAN_REAL.counts.chunks) = $(fmt(lim)) chunks",
          "$(length(f)) failed; status $(r.status)", "<= $(fmt(lim)) (else the real campaign stops: stopped, failed fraction)", length(f) <= lim ? "PASS" : "FAIL: the real campaign would stop on the failed-chunk fraction")
     reasons = Dict{String, Int}()
     for c in f

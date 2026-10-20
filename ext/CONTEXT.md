@@ -41,6 +41,10 @@ The per-machine record is `data/gpu-benchmark.toml` (git-ignored), written by `v
 - Package (no GPU in CI): `test/tangent-core/tc_device.jl` drives the device path with a fake device on the CPU backend, including the fake lost-device case.
 - Local GPU run: `verify/gpu.jl` (every GPU criterion of Batch A), on the GPU named in `_config/environment.md`, section "Local GPU" (the RTX 5060 Laptop GPU from D46; the GTX 1050 runs of Batch A, Batch B and D44 stay in the reports). A real launch timeout cannot be provoked on purpose.
 
+## ChaoslabCairoMakieExt
+
+Second extension, decision D60: draws the figures F1 to F7 of `Chaoslab.Analysis.analyze` as `<study>-fig-F<k>.pdf`. Weak dependency `CairoMakie` (compat `0.15`) in `Project.toml`; loaded by `bin/chaoslab.jl` under `julia --project=verify`. It exports nothing and fills one hook: `Analysis.FIGURE_DRAWER[]` in `__init__`. Without it `analyze` writes the tables and reports `:figures_skipped` (exit code 2). If drawing raises, the tables stay and the status is `:figures_failed`. The numbers it draws are the figure tables of the result, whose digests are in the tables file. Not reachable from the unit suite (CairoMakie is not a test dependency); drawn on the real store by `verify/analysis.jl`. Module notes: `src/Analysis/CONTEXT.md`.
+
 ## Deferred
 
 | Item | Where |

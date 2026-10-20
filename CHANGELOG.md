@@ -64,6 +64,16 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 - `bin/chaoslab.jl run|pilot --prior-record <file>` (D58): the older GPU record is written to the manifest as `prior_record` (preregistration A4 K19).
 - `verify/experiments-runner.jl`, `verify/experiments-runner-reader.jl`: reduced campaign with kills and resume, independent HDF5 reader in a separate process, `-t 1/4/23` runs, pilot against the budget lines, real-horizon control check, device records.
 
+### Added (M3 analysis, D60)
+
+- `Analysis` (new module slug `analysis`, between `Experiments` and `Figures`): reads a finished study run and computes the preregistered tables T1 to T7, the numbers behind the figures F1 to F7, the labels of D36 and D37 and the decisions H1 to H5 by the frozen rules; thresholds come from a parameter table (`read_params`), every input is checked and hashed before and after, refusals name their cause, the tables file is byte-identical at any thread count.
+- Figures: package extension `ChaoslabCairoMakieExt` (CairoMakie as a weak dependency, loaded under the verify environment) draws F1 to F7 as PDF files; `Project.toml` gained the weak dependency, the extension entry and the compat bound.
+- `bin/chaoslab.jl analyze <preregistration> <manifest> <panel> <parameters> [--store] [--out] [--threads]` (exit code 0, 1 refusal, 2 figures skipped).
+- Study stage 04 input: `workspaces/study/stages/04-analyze/references/p1-le-benchmark-analysis-parameters.toml`, the transcription of the frozen values of the preregistration (checked against its text by `verify/analysis.jl`).
+- `verify/analysis.jl`, `verify/analysis-independent.jl`: closed forms at K = 0 on the real store, run with figures (54 s, 2.45 GiB), byte-identical output at 1 and 23 threads, independent recomputation by a script that shares no code with the module (883 of 883 orbits, all sets, H1 to H5 and 47 label-count cells equal), the command.
+- Corrections of the specification found by the real store: oracle O1 does not hold for L9 (it has its own singular-value closed form); items of the tau sweep with a breakdown hold NaN rows; the Y5 control has no `K`; the ladder needs one common half point for the three precisions.
+- Layering: `Analysis` added to the layer list of `test/layering.jl`; `_config/architecture.md` and `_config/build-order.md` list the module (D60).
+
 ### Deferred, with reason
 
 - `bin/chaoslab.jl`, `python/nbody/`: no caller before M3 (D16).

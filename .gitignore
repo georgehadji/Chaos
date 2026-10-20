@@ -15,3 +15,6 @@ python/nbody/windows-build/wheels/
 
 # Julia coverage output
 *.cov
+
+# Numbered backups and the temporary write of the run manifest (D55, D59); the final manifest.json is the deliverable of study stage 03
+workspaces/study/stages/03-run/output/*-manifest.json.*

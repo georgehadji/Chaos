@@ -169,7 +169,7 @@ end
     for (d, _, fs) in walkdir(src), f in fs
         endswith(f, ".jl") || continue
         owner = first(splitpath(relpath(d, src)))
-        owner in ("Experiments", ".") && continue
+        owner in ("Experiments", ".", "Analysis") && continue      # Analysis sits above Experiments (D60)
         for line in eachline(joinpath(d, f))
             occursin(r"^\s*(?:using|import)\s", line) && occursin("Experiments", line) && push!(upward, "$owner/$f")
         end

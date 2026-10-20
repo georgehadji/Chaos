@@ -2,7 +2,7 @@
 # section "Layering"; this list implements it. Peers in the same layer may not import each other.
 const LAYERS = [["Foundation"], ["Systems"], ["Integrators"], ["Tangent"],
                 ["Lyapunov", "Indicators", "Diagnostics"], ["Shadow", "TimeSeries"],
-                ["Experiments"], ["Figures"]]
+                ["Experiments"], ["Analysis"], ["Figures"]]
 
 layer(name) = findfirst(l -> name in l, LAYERS)
 

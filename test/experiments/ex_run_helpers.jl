@@ -236,10 +236,12 @@ end
 ex_plan(fx; kw...) = EX.plan_run(fx.prereg, fx.panel; code_version = EX_CODE, kw...)
 
 # campaign with the defaults every test needs: thread check overridden, dirty tree allowed (the repository under test is dirty)
-function ex_campaign(fx; store, manifest = store * "-manifest.json", threads = 4, kw...)
+function ex_campaign(fx; store, manifest = store * "-manifest.json", threads = 4, hooks = EX.RunHooks(), kw...)
     # capacity 64 orbits per launch unless a test sets it: the chunk-size attribute then does not depend on the free memory of the host
+    # no clock given: a zero-cost clock, so the first-chunk cost cap (R5 item 5) cannot pause arms on a slow host; the cap tests inject their own
+    hooks.clock === nothing && (hooks = EX.RunHooks(clock = ex_clock(info -> 0.0), kill = hooks.kill, mutate = hooks.mutate, observe = hooks.observe))
     return EX.run_campaign(fx.prereg, fx.panel; store = store, manifest = manifest, threads = threads, thread_override = true,
-                           allow_dirty = true, code_version = EX_CODE, capacity = 64,
+                           allow_dirty = true, code_version = EX_CODE, capacity = 64, hooks = hooks,
                            manifest_reset = true, kw...)   # D53 review M4: stores copied without their manifest still resume; ex_review.jl tests the refusal
 end
 ex_store(name) = (d = ex_path(name); rm(d; recursive = true, force = true); d)

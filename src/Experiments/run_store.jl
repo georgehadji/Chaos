@@ -117,6 +117,7 @@ _nohook(point) = nothing
 function _fsync(path)
     open(path, "r+") do io
         fd = Base.fd(io)
+        fd isa RawFD || (fd = RawFD(fd))   # Julia 1.11 returns an Int, 1.13 a RawFD
         r = Sys.iswindows() ? ccall(:_commit, Cint, (RawFD,), fd) : ccall(:fsync, Cint, (RawFD,), fd)
         r == 0 || error("write_chunk: fsync of $path failed ($r)")
     end

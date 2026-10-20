@@ -2,7 +2,7 @@
 
 julia_version = "1.13.2"
 manifest_format = "2.1"
-project_hash = "a38487e9a300c5820459f7da7213f072629ede1c"
+project_hash = "169e6aa871f2b13ea0edbc65ef68a2bccf2bddd2"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra"]
@@ -71,13 +71,15 @@ version = "0.5.0"
 deps = ["Dates", "DoubleFloats", "HDF5", "JSON", "KernelAbstractions", "LinearAlgebra", "PrecompileTools", "SHA", "StableRNGs", "StaticArrays", "TOML"]
 path = "."
 uuid = "1d9ee621-a3a2-43c0-acfa-d3a4a467f53c"
-version = "0.0.1"
+version = "0.1.0"
 
     [deps.Chaoslab.extensions]
     ChaoslabCUDAExt = "CUDA"
+    ChaoslabCairoMakieExt = "CairoMakie"
 
     [deps.Chaoslab.weakdeps]
     CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+    CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 
 [[deps.Compat]]
 deps = ["TOML", "UUIDs"]

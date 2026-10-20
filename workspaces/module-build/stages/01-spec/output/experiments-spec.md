@@ -553,3 +553,17 @@ Preregistration Amendment A4 item K19 asks that the 4-thread GPU record be copie
 - D58a Reader. A record file gives the record of the named device with its fields and its recorder table (empty when the file has none); a missing file, a file that is not TOML, a device that is not in the file and a device without a Float64 table are refused naming the path or the device; `gpu_record` returns what it returned before.
 - D58b Option. `run` and `pilot` accept `--prior-record`; the shared keywords hold `prior_record` when the option is given and no key when it is not; the usage text names the option; without a device in force the command ends with status 1 and a message naming the option.
 - D58c Manifest. A campaign started with the record read from a file writes it as `prior_record` (threads, cpu and gpu cost, date) next to the unchanged `device_record`; a run without the option still writes `"absent"`.
+
+## Amendment D59 (2026-10-20)
+
+The first study campaign (2026-10-20, 377 of 1363 chunks done after 35 minutes) stopped with `IOError: open(".../p1-le-benchmark-manifest.json.2"): permission denied (EACCES)`: another process held the numbered backup for a moment while the manifest writer rotated the backups. M1 (D55) retries the final replace of the manifest and of chunk files on the codes busy, access denied and not permitted, but the rotation of `manifest.json.1` to `.3` and the write of `manifest.json.partial` had no retry, and a failed backup copy ended the campaign although the manifest itself was intact. D53 to D58 are otherwise unchanged. P-numbers: none new.
+
+**Retry.** A single helper tries an operation again, with a growing pause, when it fails with one of the three codes: 12 tries, pause 0.1 s times the attempt number (about 6.6 s in all); the pause is a settable seam for tests. It is used for the write of the temporary file, the replace (as M1 did, with the same helper), and every backup copy.
+
+**Best effort.** A backup copy that still fails with one of the three codes after the retries is skipped: the write goes on, the manifest is replaced, a warning is printed and the failure is kept in the session (`backup_failures`, one text per skipped copy). A later manifest of the session lists them under the key `backup_failures`; the key is absent when there were none, so a manifest without failures has the keys of R7. Any other error of a backup copy, and a failure of the temporary write or of the replace after the retries, still ends the write with the error (the previous manifest stays whole, M1).
+
+**Acceptance criteria.**
+- D59a Retry. A backup copy that fails twice with a busy, access-denied or not-permitted code and then works gives the same files as an undisturbed rotation; so does a temporary write that fails twice; a replace behaves as in M1.
+- D59b Best effort. A backup copy that always fails with one of the three codes does not end the write: the manifest holds the new content, the older backups that did copy are kept, and the failures are returned to the caller; an error of another kind in a backup copy is raised.
+- D59c Manifest. A campaign whose backup copies always fail ends `complete`; its manifest has `backup_failures` (non-empty); a campaign without failures has no such key.
+- D59d No change. `keep = 0`, the final replace and the numbering of the backups behave as before (the tests of M1 pass unchanged).

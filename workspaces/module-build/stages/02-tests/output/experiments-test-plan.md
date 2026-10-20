@@ -448,3 +448,14 @@ Spec: Amendment D58. New file `test/experiments/ex_prior.jl` (registered after `
 | D58a | record reader | fixture files in the format of `data/gpu-benchmark.toml`: the 4-thread record, a file with a per-method `recorder` table, a missing file, a text file, a file without the device, a device without Float64 | fields as in the file, empty recorder without a table, recorder entries with a table; four refusals naming the path or the device; `gpu_record` of a root without a file is `nothing` |
 | D58b | option | `EX._cli_common` with and without the option and a given device name; `EX.cli(["pilot", ... "--prior-record", f])` in the test environment (no device) | `prior_record` key with threads 4 only when given; usage names the option; exit status 1 and a message naming `--prior-record` and the device |
 | D58c | manifest | campaign with the record read from the fixture and `EX_REC` as device record; one without | `prior_record` has threads 4, cpu 8.254622999999999, date 2026-10-17 and `device_record` is `EX_REC`; without the option both stay as before |
+
+## Amendment D59 (manifest backups)
+
+Spec: Amendment D59. New file `test/experiments/ex_backup.jl` (registered after `ex_prior.jl`).
+
+| ID | Property | Input | Expected |
+|----|----------|-------|----------|
+| D59a | retry | copier failing twice with EBUSY, EACCES, EPERM then copying; writer failing twice then writing | backups equal those of an undisturbed rotation; the file is written |
+| D59b | best effort | copier always failing with EACCES; copier failing with ENOSPC | file replaced with the new content, older backups kept, one failure text per skipped copy; the ENOSPC error is raised |
+| D59c | manifest | small campaign with the failing copier installed in `EX.BACKUP_COPIER`; one without | status `complete`, `backup_failures` non-empty; no such key without failures |
+| D59d | no change | the tests of M1 in `ex_review.jl` | unchanged |

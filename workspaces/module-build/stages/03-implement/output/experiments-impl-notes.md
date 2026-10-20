@@ -439,3 +439,15 @@ Changed: `run_campaign.jl` (`read_gpu_record(path, device)`; `gpu_record` reads 
 | GREEN | pass | experiments 4843 of 4843 (standalone, 4 threads, 3 min 6 s; ceiling of D35 is 3 min, open item) |
 | Real command | pass | `bin/chaoslab.jl pilot ... --prior-record data/gpu-benchmark-4threads-2026-10-17.toml` in the verify environment: report holds the 4-thread record (threads 4, cpu 8.2546 ns, gpu 2.4679 ns, 2026-10-17) next to the device record of 23 threads; exit 0 |
 | Existing assertions | unchanged | none edited |
+
+## Amendment D59 (manifest backups)
+
+Changed: `run_store.jl` (`_retry` generic helper, `RETRY_TRIES = 12`, `RETRY_PAUSE`, `BACKUP_COPIER` seams; `_move_retry` is `_retry` around the mover; `_rotate_backups` skips a held copy and reports it; `_write_json` retries the temporary write and takes `failures` and `writer`), `run_manifest.jl` (`Session.backup_failures`, key `backup_failures` in the manifest when not empty, passed by `write_manifest`).
+
+### Audit (D59)
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| RED first | pass | `ex_backup.jl` errored on the undefined `RETRY_PAUSE` before the code |
+| GREEN | pass | `ex_backup.jl` 3 testsets; experiments 4861 of 4861 (standalone, 4 threads, 3 min 28 s; the D35 ceiling of 3 min stays an open item) |
+| Existing assertions | unchanged | the M1 tests of `ex_review.jl` pass without edits |

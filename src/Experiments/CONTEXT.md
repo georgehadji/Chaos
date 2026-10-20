@@ -2,7 +2,7 @@
 
 Study inputs built from a frozen preregistration, and the study runner. First scope (decision D49): the orbit panel of a study, read by study/02 and then study/03. Second scope (decision D53): the run plan, the chunked and resumable executor with health checks, the run store (one HDF5 file per chunk), the manifest, the pilot and the command-line entry point `bin/chaoslab.jl` (panel, run, pilot). Imports Foundation, Systems, Tangent, Lyapunov and Diagnostics; nothing imports it. The panel builder is CPU only (class assignment must be bit-identical); the recorder of the runner runs on the CPU, and on the device for the eight kernel-path methods (L1, L2, L3, L4, L4b, L5, L5b, L9; L6 is CPU only).
 
-Spec: `workspaces/module-build/stages/01-spec/output/experiments-spec.md` (amendments D50 withdrawn, D51, D52, D53, D54, D55, D56, D57, D58). Store layout: `schema/run-store.md` (version 2). Run block: preregistration Amendment A4, merged with the blocks of A5 and A6 in file order. Report: `stages/04-verify/output/experiments-verification.md`. Oracle script: `verify/experiments.jl`.
+Spec: `workspaces/module-build/stages/01-spec/output/experiments-spec.md` (amendments D50 withdrawn, D51, D52, D53, D54, D55, D56, D57, D58, D59). Store layout: `schema/run-store.md` (version 2). Run block: preregistration Amendment A4, merged with the blocks of A5 and A6 in file order. Report: `stages/04-verify/output/experiments-verification.md`. Oracle script: `verify/experiments.jl`.
 
 ## Files
 

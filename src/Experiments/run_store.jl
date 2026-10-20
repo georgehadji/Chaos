@@ -20,11 +20,15 @@ read_json(path::AbstractString) = JSON.parse(read(path, String); dicttype = Dict
 # A file held for a moment by another process (a reader, a virus scanner) fails with one of these codes on Windows.
 const RETRY_CODES = (Base.UV_EBUSY, Base.UV_EACCES, Base.UV_EPERM)
 
-"Rename `src` to `dst` (replacing a file on every platform), trying again when another process holds a file. `mover` is a test seam."
-function _move_retry(src, dst; mover = Base.Filesystem.rename, tries::Integer = 8, pause::Real = 0.05)
+const RETRY_TRIES = 12            # about 6.6 s in all with the pause below (D59)
+const RETRY_PAUSE = Ref(0.1)      # seconds, times the attempt number; a test seam
+const BACKUP_COPIER = Ref{Any}(cp)   # copies a file for the numbered backups; a test seam
+
+"Call `f()`, trying again when another process holds a file (the codes of `RETRY_CODES`); any other error, and the last failure, are raised."
+function _retry(f; tries::Integer = RETRY_TRIES, pause::Real = RETRY_PAUSE[])
     for k in 1:tries
         try
-            return mover(src, dst)
+            return f()
         catch e
             (e isa Base.IOError && e.code in RETRY_CODES && k < tries) || rethrow()
             sleep(pause * k)
@@ -32,21 +36,37 @@ function _move_retry(src, dst; mover = Base.Filesystem.rename, tries::Integer = 
     end
 end
 
-# Rotate `path.1` .. `path.keep`: the newest copy of the file about to be replaced is `path.1`.
-function _rotate_backups(path, keep)
-    for k in (keep - 1):-1:1
-        isfile("$path.$k") && cp("$path.$k", "$path.$(k + 1)"; force = true)
+"Rename `src` to `dst` (replacing a file on every platform), trying again when another process holds a file. `mover` is a test seam."
+_move_retry(src, dst; mover = Base.Filesystem.rename, tries::Integer = RETRY_TRIES, pause::Real = RETRY_PAUSE[]) =
+    _retry(() -> mover(src, dst); tries = tries, pause = pause)
+
+# Rotate `path.1` .. `path.keep`: the newest copy of the file about to be replaced is `path.1`. A copy that stays held after the retries is
+# skipped (a backup is a convenience, D59): a warning is printed and the text is pushed to `failures`. Other errors are raised.
+function _rotate_backups(path, keep; failures = nothing)
+    function copy1(a, b)
+        try
+            _retry(() -> BACKUP_COPIER[](a, b; force = true))
+        catch e
+            (e isa Base.IOError && e.code in RETRY_CODES) || rethrow()
+            msg = "backup $(basename(b)) skipped: $(sprint(showerror, e))"
+            @warn msg
+            failures === nothing || push!(failures, msg)
+        end
     end
-    isfile(path) && cp(path, "$path.1"; force = true)
+    for k in (keep - 1):-1:1
+        isfile("$path.$k") && copy1("$path.$k", "$path.$(k + 1)")
+    end
+    isfile(path) && copy1(path, "$path.1")
 end
 
 # Write of a JSON file: temporary name next to it, then an atomic replace with retries. The previous file stays whole when the
-# replace fails; `keep > 0` also keeps that many numbered backups of the previous versions.
-function _write_json(path::AbstractString, obj; keep::Integer = 0, mover = Base.Filesystem.rename)
+# replace fails; `keep > 0` also keeps that many numbered backups of the previous versions (best effort, D59). `writer` is a test seam.
+function _write_json(path::AbstractString, obj; keep::Integer = 0, mover = Base.Filesystem.rename, failures = nothing, writer = write)
     mkpath(dirname(abspath(path)))
     tmp = path * ".partial"
-    write(tmp, JSON.json(_jsonable(obj)))
-    keep > 0 && _rotate_backups(path, keep)
+    text = JSON.json(_jsonable(obj))
+    _retry(() -> writer(tmp, text))
+    keep > 0 && _rotate_backups(path, keep; failures = failures)
     _move_retry(tmp, path; mover = mover)
     return path
 end

@@ -38,6 +38,7 @@ Base.@kwdef mutable struct Session
     device_lost::Base.RefValue{Bool} = Ref(false)
     prev::Any = nothing                                       # the manifest of the previous session (or its numbered backup), if any
     control_stops::Vector{Any} = Any[]                        # control-bound stops of all sessions (H1)
+    backup_failures::Vector{String} = String[]                # numbered backups skipped in this session (D59)
     session_index::Int = 1                                    # ordinal of this session in the manifest's session list
 end
 
@@ -129,6 +130,7 @@ function manifest_dict(s::Session)
     m["arms"] = _arm_entries(s)
     m["overrides"] = s.overrides
     m["control_stops"] = s.control_stops
+    isempty(s.backup_failures) || (m["backup_failures"] = s.backup_failures)
     m["wall"] = Dict{String, Any}("total_seconds" => sum(x["wall_seconds"] for x in sessions), "cap_hours" => s.ctx.plan.block.raw["health"]["wall_cap_hours"])
     return m
 end
@@ -138,5 +140,5 @@ const MANIFEST_BACKUPS = 3   # numbered backups manifest.json.1 .. .3 (newest fi
 # The session clock is read at every write, so a killed session counts its time up to the last manifest (M3).
 function write_manifest(s::Session)
     s.now = max(s.now, _now(s.hooks, :manifest_write))
-    return _write_json(s.manifest, manifest_dict(s); keep = MANIFEST_BACKUPS)
+    return _write_json(s.manifest, manifest_dict(s); keep = MANIFEST_BACKUPS, failures = s.backup_failures)
 end

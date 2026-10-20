@@ -426,3 +426,16 @@ Changed: `run_block.jl` (`_rb_health` reads the optional table `control_bound_me
 | GREEN | pass | experiments 4824 of 4824 (standalone run with 4 threads, 3 min 32 s; inside `Pkg.test` the suite took 2 min 50 s before D57, ceiling 3 min of D35: recheck in stage 05) |
 | Preregistration | pass | `check_prereg` accepts the file, 6 amendments, header hash 62011ba5af514da4f1238aef9ae6cb35ca21093c4343b71dd696df360b9994bf; panel hash of A4 still accepted |
 | Existing assertions | changed in 1 place | `ex_a5.jl` D56b: amendment count read as at least 5 |
+
+## Amendment D58 (--prior-record)
+
+Changed: `run_campaign.jl` (`read_gpu_record(path, device)`; `gpu_record` reads `data/gpu-benchmark.toml` through it, same result), `run_cli.jl` (`--prior-record <file>` in the value options and the usage text; `_cli_common(opt; device)` reads the record of the device in force and passes it as `prior_record`, and refuses with an `ArgumentError` when no device is in force). `run_campaign` and `run_pilot` needed no change: they already took `prior_record` and wrote it to the manifest and the pilot report.
+
+### Audit (D58)
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| RED first | pass | `ex_prior.jl` errored on the undefined `read_gpu_record` before the code |
+| GREEN | pass | experiments 4843 of 4843 (standalone, 4 threads, 3 min 6 s; ceiling of D35 is 3 min, open item) |
+| Real command | pass | `bin/chaoslab.jl pilot ... --prior-record data/gpu-benchmark-4threads-2026-10-17.toml` in the verify environment: report holds the 4-thread record (threads 4, cpu 8.2546 ns, gpu 2.4679 ns, 2026-10-17) next to the device record of 23 threads; exit 0 |
+| Existing assertions | unchanged | none edited |

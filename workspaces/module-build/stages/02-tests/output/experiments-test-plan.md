@@ -438,3 +438,13 @@ Spec: Amendment D57. New file `test/experiments/ex_a6.jl` (registered after `ex_
 | D57c | table enters the chunk hash | plan with and without the table | hashes differ with the table, equal to the plan without the key when absent |
 | D57d | real preregistration | `p1-le-benchmark-preregistration.md` | `check_prereg` accepts 6 amendments; `control_bound` 1e-8, `control_bound_method` `{L9 = 5e-8}`, scope `exact_start` |
 | D57e | [local] real horizon | verify section CTRL | stage 04, not in the package suite |
+
+## Amendment D58 (--prior-record)
+
+Spec: Amendment D58. New file `test/experiments/ex_prior.jl` (registered after `ex_a6.jl`).
+
+| ID | Property | Input | Expected |
+|----|----------|-------|----------|
+| D58a | record reader | fixture files in the format of `data/gpu-benchmark.toml`: the 4-thread record, a file with a per-method `recorder` table, a missing file, a text file, a file without the device, a device without Float64 | fields as in the file, empty recorder without a table, recorder entries with a table; four refusals naming the path or the device; `gpu_record` of a root without a file is `nothing` |
+| D58b | option | `EX._cli_common` with and without the option and a given device name; `EX.cli(["pilot", ... "--prior-record", f])` in the test environment (no device) | `prior_record` key with threads 4 only when given; usage names the option; exit status 1 and a message naming `--prior-record` and the device |
+| D58c | manifest | campaign with the record read from the fixture and `EX_REC` as device record; one without | `prior_record` has threads 4, cpu 8.254622999999999, date 2026-10-17 and `device_record` is `EX_REC`; without the option both stay as before |

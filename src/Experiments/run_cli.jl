@@ -1,10 +1,10 @@
 # The command-line entry point (D16, D49, D53): argument parsing only; every command calls the module. `bin/chaoslab.jl` passes ARGS.
 
 const CLI_USAGE = "usage: chaoslab panel <prereg> --out <file> | run <prereg> <panel> [--store <dir>] [--manifest <file>] | pilot <prereg> <panel> --out <dir>; " *
-                  "options: --threads N --thread-override --allow-dirty --repo <dir> --code-version <text> --capacity N --cap-override a,b --stale move --retry-failed --retry-control-stop --backend-override --manifest-reset"
+                  "options: --threads N --thread-override --allow-dirty --repo <dir> --code-version <text> --capacity N --cap-override a,b --stale move --retry-failed --retry-control-stop --backend-override --manifest-reset --prior-record <file>"
 
 const CLI_FLAGS = ("--thread-override", "--allow-dirty", "--retry-failed", "--retry-control-stop", "--backend-override", "--manifest-reset")
-const CLI_VALUES = ("--out", "--store", "--manifest", "--threads", "--repo", "--code-version", "--capacity", "--cap-override", "--stale")
+const CLI_VALUES = ("--out", "--store", "--manifest", "--threads", "--repo", "--code-version", "--capacity", "--cap-override", "--stale", "--prior-record")
 
 function _cli_parse(args)
     pos, opt = String[], Dict{String, Any}()
@@ -27,13 +27,19 @@ end
 
 _cli_int(opt, key) = haskey(opt, key) ? (n = tryparse(Int, opt[key]); n === nothing ? throw(ArgumentError("$key needs an integer, got $(opt[key])")) : n) : nothing
 
+_device_name() = Foundation.probe(Foundation.DEVICE[], Float64).device
+
 # Keywords shared by `run` and `pilot`: only what the user gave, the module holds the defaults.
-function _cli_common(opt)
+function _cli_common(opt; device::AbstractString = _device_name())
     kw = Dict{Symbol, Any}(:thread_override => haskey(opt, "--thread-override"), :allow_dirty => haskey(opt, "--allow-dirty"))
     haskey(opt, "--repo") && (kw[:repo] = opt["--repo"])
     haskey(opt, "--code-version") && (kw[:code_version] = opt["--code-version"])
     (n = _cli_int(opt, "--threads")) === nothing || (kw[:threads] = n)
     (n = _cli_int(opt, "--capacity")) === nothing || (kw[:capacity] = n)
+    if haskey(opt, "--prior-record")      # D58: the record of the device in force from an older record file (A4 K19)
+        isempty(device) && throw(ArgumentError("--prior-record needs a device in force; run in the verify environment (julia --project=verify), which loads CUDA"))
+        kw[:prior_record] = read_gpu_record(opt["--prior-record"], device)
+    end
     return kw
 end
 

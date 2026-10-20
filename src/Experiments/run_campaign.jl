@@ -117,18 +117,36 @@ function _recorder_table(t)
         for (m, r) in t if r isa AbstractDict)
 end
 
+"""
+    read_gpu_record(path, device) -> NamedTuple
+
+Float64 record of `device` from a record file in the format of `data/gpu-benchmark.toml`, with its per-method `recorder` table (D54, D58).
+A missing or unreadable file, a device that is not in the file and a device without a Float64 table are an `ArgumentError` naming the path or the device.
+"""
+function read_gpu_record(path::AbstractString, device::AbstractString)
+    isfile(path) || throw(ArgumentError("record file $path does not exist"))
+    d = try
+        TOML.parsefile(path)
+    catch e
+        throw(ArgumentError("record file $path is not valid TOML: $(first(sprint(showerror, e), 200))"))
+    end
+    haskey(d, device) || throw(ArgumentError("record file $path has no table for the device $device"))
+    r = d[device] isa AbstractDict ? get(d[device], "Float64", nothing) : nothing
+    r isa AbstractDict || throw(ArgumentError("record file $path has no Float64 table for the device $device"))
+    return (threads = get(r, "threads", 0), cpu_ns_per_step = get(r, "cpu_ns_per_step", nothing), gpu_ns_per_step = get(r, "gpu_ns_per_step", nothing),
+            gpu_faster = get(r, "gpu_faster", false), date = get(r, "date", ""), recorder = _recorder_table(get(r, "recorder", nothing)))
+end
+
 "GPU benchmark record (data/gpu-benchmark.toml) of the device in force for Float64, with its per-method `recorder` table (D54), or `nothing`."
 function gpu_record(root::AbstractString = _root())
     dev = Foundation.probe(Foundation.DEVICE[], Float64).device
     path = joinpath(root, "data", "gpu-benchmark.toml")
     (isempty(dev) || !isfile(path)) && return nothing
-    r = try
-        TOML.parsefile(path)[dev]["Float64"]
+    return try
+        read_gpu_record(path, dev)
     catch
-        return nothing
+        nothing
     end
-    return (threads = get(r, "threads", 0), cpu_ns_per_step = get(r, "cpu_ns_per_step", nothing), gpu_ns_per_step = get(r, "gpu_ns_per_step", nothing),
-            gpu_faster = get(r, "gpu_faster", false), date = get(r, "date", ""), recorder = _recorder_table(get(r, "recorder", nothing)))
 end
 
 # Orbits per launch from the free memory (R3 item 3): the most demanding run type of the plan bounds it.

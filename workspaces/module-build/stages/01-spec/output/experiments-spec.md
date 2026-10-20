@@ -540,3 +540,16 @@ Preregistration Amendment A6 (decision D57) sets a bound per method for the cont
 - D57c Hash. The table changes the hash of the chunks it decides and no hash when absent.
 - D57d Real preregistration. The header hash holds with six amendments; the merged block has `control_bound = 1e-8`, `control_bound_method = {L9 = 5e-8}` and `control_scope = "exact_start"`.
 - D57e [local] Real horizon, gated controls (871, 873, 875, 877, 879, Y5): all variational methods are within their bound at N = 1e7 (verify section CTRL).
+
+## Amendment D58 (2026-10-20)
+
+Preregistration Amendment A4 item K19 asks that the 4-thread GPU record be copied into the run manifest next to the 23-thread record before the rerun overwrites it. The manifest already has the key `prior_record` (R7, D53) and `run_campaign` and `run_pilot` already take the keyword `prior_record`, but the command line has no way to give it, so a run started from `bin/chaoslab.jl` writes `"prior_record": "absent"`. D58 adds the option. D53, D54, D56 and D57 are otherwise unchanged. P-numbers: none new.
+
+**Option.** `--prior-record <file>` for `run` and `pilot`: a record file in the format of `data/gpu-benchmark.toml` (one table per device, the Float64 table with `threads`, `cpu_ns_per_step`, `gpu_ns_per_step`, `gpu_faster`, `date`, optional `recorder`). The record of the device in force for Float64 is read from it and passed as `prior_record`. `read_gpu_record(path, device)` is the reader; `gpu_record` (the record in force, D54) reads `data/gpu-benchmark.toml` through it, unchanged in behaviour.
+
+**Refusals (exit status 1, nothing written).** The file does not exist or is not TOML; the file has no table for the device in force or no `Float64` table for it; no device is in force (the message says the option needs a device and names the verify environment, which loads CUDA). Each message names the option and the path or device.
+
+**Acceptance criteria.**
+- D58a Reader. A record file gives the record of the named device with its fields and its recorder table (empty when the file has none); a missing file, a file that is not TOML, a device that is not in the file and a device without a Float64 table are refused naming the path or the device; `gpu_record` returns what it returned before.
+- D58b Option. `run` and `pilot` accept `--prior-record`; the shared keywords hold `prior_record` when the option is given and no key when it is not; the usage text names the option; without a device in force the command ends with status 1 and a message naming the option.
+- D58c Manifest. A campaign started with the record read from a file writes it as `prior_record` (threads, cpu and gpu cost, date) next to the unchanged `device_record`; a run without the option still writes `"absent"`.

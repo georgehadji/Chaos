@@ -304,7 +304,7 @@ end
     read_run_block(prereg_path) -> RunBlock
 
 Check the preregistration hash (E18), merge the `[run]` tables of all its TOML blocks in file order (Amendment A4, then A5: see
-[`merge_run`](@ref)) and validate the result (LF and CRLF files).
+`merge_run`) and validate the result (LF and CRLF files).
 """
 function read_run_block(path::AbstractString)
     check_prereg(path)

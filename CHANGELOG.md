@@ -4,6 +4,18 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 ## Unreleased
 
+## 0.1.1 (2026-10-21)
+
+### Added (D63)
+
+- User documentation with Documenter.jl (`docs/`): a home page with installation and a run example that executes at build, and the API page of every layer from the docstrings; `checkdocs = :exports` fails the build on an undocumented export.
+- `README.md`: installation, example, documentation build, citing.
+- CI job "Documentation build" (Ubuntu, current Julia).
+
+### Changed
+
+- Docstrings: `QR_PIVOT` and `QR_PASSES` documented; two cross-references in docstrings made resolvable.
+
 ## 0.1.0 (2026-10-21)
 
 ### Added (M0 bootstrap)

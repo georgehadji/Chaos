@@ -13,7 +13,9 @@ struct RGS <: Orthonormalizer end
 
 "Status of `orthonormalize`: success, a zero or non-finite pivot, a fifth Gram-Schmidt pass needed."
 const QR_OK = Int8(0)
+"Status of `orthonormalize`: a zero or non-finite pivot."
 const QR_PIVOT = Int8(1)
+"Status of `orthonormalize`: a fifth Gram-Schmidt pass needed."
 const QR_PASSES = Int8(2)
 
 const MAX_PASSES = 4

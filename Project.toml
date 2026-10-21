@@ -1,6 +1,6 @@
 name = "Chaoslab"
 uuid = "1d9ee621-a3a2-43c0-acfa-d3a4a467f53c"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["georgehadji"]
 
 [deps]

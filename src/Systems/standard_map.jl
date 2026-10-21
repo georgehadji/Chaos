@@ -3,7 +3,7 @@
 
 Chirikov-Taylor standard map on lifted coordinates, state `SVector(x, p)`:
 `p' = p + K sin x`, `x' = x + p'` (spec item 1). Tangent `[[1 + c, 1], [c, 1]]` with `c = K cos x`.
-`K` must be built in the state's element type (use [`exact`](@ref)).
+`K` must be built in the state's element type (use [`exact`](@ref Chaoslab.Foundation.exact)).
 """
 struct StandardMap{T} <: AbstractMap
     K::T

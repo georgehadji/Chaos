@@ -20,8 +20,8 @@ The run used package version 0.0.1, before the tagged release v0.1.0. The code i
 
 This paper reports a preregistered numerical study of largest-Lyapunov-exponent estimators on the standard map. The study tests two claims of the project, C1 (asymptotic equivalence) and C2 (finite-time inequivalence). The claim texts below are quoted from the project file `_config/research-question.md`. They are claims of the study. They are not statements supported by the literature cited in this paper. 
 
-Claim C1, as stated in `_config/research-question.md`: the Benettin, QR (Gram-Schmidt or Householder), stabilized SVD and well-conditioned tangent-map methods agree on the largest exponent when they run long enough at adequate precision. 
-Claim C2, as stated in `_config/research-question.md`: finite-time estimators differ substantially over realistic budgets. The difference is expected to be largest in weak chaos, in sticky layers and near separatrices. 
+Claim C1, as stated in `_config/research-question.md`: "Benettin, QR (Gram-Schmidt / Householder), stabilized SVD and well-conditioned tangent-map methods agree on lambda_1 when run long enough at adequate precision." 
+Claim C2, as stated in `_config/research-question.md`: "Finite-time LE estimators differ substantially over realistic budgets, most of all in weak chaos, sticky layers and near separatrices." Here LE stands for Lyapunov exponent and lambda_1 for the largest exponent. 
 The tests of C2 in this study run over the preregistered set W of Section 2.2, whose composition is shown in Tables 6 and 8. 
 
 The study also attempts to reproduce two published values. Sala and Artuso give 0.298 at K = pi/2 and 1.172 at K = 2 pi [@SalaArtuso2015]. 
@@ -63,12 +63,12 @@ This subsection restates the notation of the study design. Each item has a point
 ### 2.3 Panel and sets
 
 The study compares estimators on a panel of 883 orbits. The panel table [T1] gives its cells: 13 controls in the cell of K index 0; 40 orbits each in classes R and T at K index 1; and the cells at K index 2 to 6. At K index 2 the classes are C, R, S, T and X with 40, 40, 25, 40 and 40 orbits. At K index 3 and 4 the classes are C, R, S, T and X with 40 orbits each. At K index 5 the classes are C, S, T and X with 40, 5, 40 and 40 orbits. At K index 6 the classes are C and X with 40 orbits each. Cells that are short, empty or undefined are listed in D6 (Section 9). 
-K index 0 holds the exact-exponent controls. K index 1 is K = 0. K index 2 to 6 are K = 0.5, 0.971635406 (K_c), 1.57079632679 (pi/2), 6.28318530718 (2 pi) and 10. 
+K index 0 holds the exact-exponent controls. K index 1 is K = 0. K index 2 to 6 are K = 0.5, 0.971635406 (K_c, the breakup value of the golden-mean KAM torus, as given in [@FrahmShepelyansky2010; @CarlettiLaskar2000] and fixed in the preregistration), 1.57079632679 (pi/2), 6.28318530718 (2 pi) and 10. 
 "Class S" is a panel class. It is not the "strong-chaos set S" of H3, which is the class C orbits at K = 2 pi and K = 10. 
 One orbit, orbit 881, is dropped as drift. Under the preregistration, drift orbits are removed from E_ch, W and S. H5b is defined on all panel orbits, and the results document gives 883 for it. 
 The sets used by the decision rules have these sizes: E_ch 209, W 355, S 80 and S_L 92. H5b uses 883 orbits and H5c uses 334. 
 The program reads S as the class C orbits at K = 2 pi and K = 10 without a label condition. It reads E_ch as class C at K > 0 (plus the controls, Section 3.1). 
-For W this paper uses the preregistered definition of Section 2.2. The results document and the findings file state the reading of W in a shorter form, as class C at 0 < K <= K_c [findings E, reading 8]. That form does not describe the cells of Tables 6 and 8, which also contain classes S and X. The reconciliation is an open item for the owner (Section 10). 
+For W this paper, the results document and the findings file use the preregistered definition of Section 2.2. The analysis program prints a shorter phrase for W in its list of readings, class C at 0 < K <= K_c [findings E, reading 8]. That phrase is not the frozen definition and does not describe the cells of Tables 6 and 8, which also contain classes S and X (limitation 6, Section 10). 
 The estimator methods L1 to L9 and Q are defined in the study design (Section 2.2). The repository (Section 11) holds the details. 
 
 ### 2.4 Run identity
@@ -479,7 +479,7 @@ The tables do not show why.
 3. A set or cell with fewer than 20 orbits is not decidable and is neither pass nor fail. In the H2 and H3 tables only class S at K index 5 (5 drawn, 1 in W) is below that minimum. Class S at K index 2 has 25 drawn and 21 in W, which is above the minimum. Cell-level medians and intervals are descriptive, and the decisions use the pooled sets. H4 rests on one start per K, as the frozen text specifies, with no error bar. 
 4. L2 runs in wrapped coordinates. This affects the H1c metric, the sub-rule that failed. The tables do not show whether this accounts for any part of the H1c result. 
 5. The numbers were checked against the tables file of the run. The analysis program was verified against an independent recomputation (`analysis-verification.md`). The numbers were not recomputed from the stored series for the results document. Figures F1 to F7 were redrawn and viewed at paper stage 04; they plot the figure data of the tables file, unchanged. 
-6. W is defined here by the preregistration. The results document and the findings file state the reading of W in a shorter form (class C at 0 < K <= K_c) that does not describe the cells of Tables 6 and 8. Reconciling the two is an open item for the owner, and stage 05 of the study carries the shorter form. 
+6. W is defined here by the preregistration, as in the results document and the findings file. The analysis program still prints a shorter phrase for W in its list of readings (class C at 0 < K <= K_c), which does not describe the cells of Tables 6 and 8; the membership of W (355 orbits) does not depend on that phrase. 
 7. The controls are not fully accounted for. The panel table counts 13 controls and the controls table lists 10 ids. The ids and status of the other 3 are not in the tables read for this paper. Orbit 881 is an info control and the orbit dropped as drift. 
 8. Table 1 gives two git commits, one for the run and one for the analysis. They are related through the repository history only; the study manifests record each commit separately and no single run record names both. 
 9. The repository folder `data/` holds run outputs and is git-ignored (project folder map), so it is not part of the repository at the URL of Section 11. The results document does not state where the stored series are held, and no deposit location for them is recorded. 
@@ -487,7 +487,7 @@ The tables do not show why.
 11. Cost values come from a single run in which 23 of 23 available threads were used, with no repeated timing reported. The item sets differ between rows, and the Double64 and BigFloat rows have 186 and 92 items. The cost ratios are therefore not controlled comparisons. 
 12. n_conv takes recorded values of n, because the series are stored at 20 points per decade, log-spaced, plus the first 100 steps. Its resolution and its effect on the bootstrap intervals are not examined. 
 13. The column median_log10_nconv_ratio is 0.0 in all 31 sensitivity rows. It has not been checked whether this is an artefact. 
-14. Open items carried over from the study hand-off: the STRONG_K constant was kept by owner decision, and its role is not described in the results document. A Manifest.toml for Julia 1.10 is unresolved, so the pinning of dependency versions for that Julia version is not settled here. 
+14. Open items carried over from the study hand-off: the STRONG_K constant was kept by owner decision, and its role is not described in the results document. The package requires Julia 1.11 or later, so no dependency manifest for Julia 1.10 is kept. 
 
 ## 11. Data and code availability
 

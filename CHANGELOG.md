@@ -4,6 +4,10 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 ## Unreleased
 
+### Changed (figures)
+
+- `ChaoslabCairoMakieExt`: one method legend per figure (F1, F5), the Delta_V band named (F1), the pooled W panel titled and the bootstrap band named (F2), class colours and K-index line styles with a legend (F3), the two all-orbit bars set apart from the per-test bars (F4), the threshold drawn per distinct value and named as the median over the orbits (F5), a precision legend (F6), n axes ticked at powers of ten. The figure data and the tables file are unchanged.
+
 ## 0.1.1 (2026-10-21)
 
 ### Added (D63)

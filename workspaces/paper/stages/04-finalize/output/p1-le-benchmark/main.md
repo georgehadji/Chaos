@@ -506,7 +506,7 @@ Repository: <https://github.com/georgehadji/Chaos> (GPL-3.0-or-later). The numbe
 
 ## AI-use disclosure
 
-Drafting, adversarial review and revision of this manuscript, and the analysis code, were done with Claude models (Anthropic, Claude Sonnet 5.5) operated through Claude Code under the direction of the author. The author decided the scope, the framing and the preregistered rules, and accepted or redirected the output at each stage checkpoint. Numbers in the text were copied from a results document produced by the analysis program, which was checked against an independent recomputation. Citations are limited to entries verified in the project bibliography. The author is responsible for the content.
+Drafting, adversarial review and revision of this manuscript, and the analysis code, were done with Claude models (Anthropic, Claude Opus 5.5 and Claude Sonnet 5.5) operated through Claude Code under the direction of the author. The author decided the scope, the framing and the preregistered rules, and accepted or redirected the output at each stage checkpoint. Numbers in the text were copied from a results document produced by the analysis program, which was checked against an independent recomputation. Citations are limited to entries verified in the project bibliography. The author is responsible for the content.
 
 ## 12. Conclusion
 

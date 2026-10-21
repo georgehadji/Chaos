@@ -1,0 +1,236 @@
+# sali verification, julia 1.13.2, threads 2, base seed 20261012 (verify offset 56000), time 1.792613909e9 (unix)
+# timings in this log were taken on a machine that was not otherwise idle
+SUITE | package suite at full size (SL_FULL_RUN), assertions passed (fail + error = 0); wall time 61.8 s | 9210 | 0 fail, 0 error | PASS
+# section suite took 61.8 s
+AC1 | (a) max |d-, d+ - BigFloat(256)| / B_meas, 11000 random and near-parallel pairs (d = 2 and 4), Float64 | 0.75 | <= 1 | PASS
+AC1 | (a) SALI == min(d-, d+) failures over the 11000 pairs, Float64 | 0 | 0 | PASS
+AC1 | (b) max |d-^2 + d+^2 - 4| / (16 eps) (Amendment D67), Float64 | 0.75 | <= 1 | PASS
+AC1 | (b) same ratio against the original 8 eps of the spec text (above 1 means the amendment was needed), Float64 | 1.5 | reported | INFO
+AC1 | (b) same for the 28 constructed pairs (rotation by 10^-m, parallel and antiparallel), Float64 | 0.5 | <= 1 | PASS
+AC1 | (c) max |d- d+/2 - SALI max(d-, d+)/2| / (8 eps), Float64 | 0 | <= 1 | PASS
+AC1 | (d) max |SALI - SALI_exact| / B_meas, random pairs, Float64 | 0.5389 | <= 1 | PASS
+AC1 | (d) same for the 28 constructed pairs, Float64 | 0.0228 | <= 1 | PASS
+AC1 | (e) pairs whose SALI changes bitwise under a sign change of either vector or an exchange, Float64 | 0 | 0 | PASS
+AC1 | (f) identical and exactly opposite vectors giving exactly 0 (of 50), Float64 | 50 | 50 | PASS
+AC1 | (g) exactly orthogonal pairs: max |SALI - sqrt 2| / (4 eps), Float64 | 0 | <= 1 | PASS
+AC1 | constructed pairs with SALI >= 3 10^-m (the pair is not that close), Float64 | 0 | 0 | PASS
+AC1 | negative control: d- alone for an antiparallel pair (sali_pair gives 0), Float64 | 2 | > 1.9 | PASS
+AC1 | (a) max |d-, d+ - BigFloat(256)| / B_meas, 11000 random and near-parallel pairs (d = 2 and 4), Double64 | 0.04286 | <= 1 | PASS
+AC1 | (a) SALI == min(d-, d+) failures over the 11000 pairs, Double64 | 0 | 0 | PASS
+AC1 | (b) max |d-^2 + d+^2 - 4| / (16 eps) (Amendment D67), Double64 | 0.04286 | <= 1 | PASS
+AC1 | (b) same ratio against the original 8 eps of the spec text (above 1 means the amendment was needed), Double64 | 0.08571 | reported | INFO
+AC1 | (b) same for the 28 constructed pairs (rotation by 10^-m, parallel and antiparallel), Double64 | 0.02189 | <= 1 | PASS
+AC1 | (c) max |d- d+/2 - SALI max(d-, d+)/2| / (8 eps), Double64 | 0 | <= 1 | PASS
+AC1 | (d) max |SALI - SALI_exact| / B_meas, random pairs, Double64 | 0.0211 | <= 1 | PASS
+AC1 | (d) same for the 28 constructed pairs, Double64 | 0.0006372 | <= 1 | PASS
+AC1 | (e) pairs whose SALI changes bitwise under a sign change of either vector or an exchange, Double64 | 0 | 0 | PASS
+AC1 | (f) identical and exactly opposite vectors giving exactly 0 (of 50), Double64 | 50 | 50 | PASS
+AC1 | (g) exactly orthogonal pairs: max |SALI - sqrt 2| / (4 eps), Double64 | 0.003906 | <= 1 | PASS
+AC1 | constructed pairs with SALI >= 3 10^-m (the pair is not that close), Double64 | 0 | 0 | PASS
+AC1 | negative control: d- alone for an antiparallel pair (sali_pair gives 0), Double64 | 2 | > 1.9 | PASS
+# section AC1 took 0.5 s
+AC2 | K = 0.5 regular, Float64: max |SALI_tau - SALI_1| / (B_SALI^tau + B_SALI^1), tau in {2,5,10}, n in {10,100}, 20 starts | 0.0109 | <= 1 | PASS
+AC2 | K = 0.5 regular, Float64: max |L_tau - L_1| / (B_L^tau + B_L^1), same | 0.01421 | <= 1 | PASS
+AC2 | K = 2 pi, Float64: max |SALI_tau - SALI_1| / (B_SALI^tau + B_SALI^1), tau in {2,5,10}, n in {10,100}, 20 starts | 0.0426 | <= 1 | PASS
+AC2 | K = 2 pi, Float64: max |L_tau - L_1| / (B_L^tau + B_L^1), same | 0.04805 | <= 1 | PASS
+AC2 | K = 0.5 regular, Double64: max |SALI_tau - SALI_1| / (B_SALI^tau + B_SALI^1), tau in {2,5,10}, n in {10,100}, 20 starts | 0.0003822 | <= 1 | PASS
+AC2 | K = 0.5 regular, Double64: max |L_tau - L_1| / (B_L^tau + B_L^1), same | 0.000333 | <= 1 | PASS
+AC2 | K = 2 pi, Double64: max |SALI_tau - SALI_1| / (B_SALI^tau + B_SALI^1), tau in {2,5,10}, n in {10,100}, 20 starts | 0.001612 | <= 1 | PASS
+AC2 | K = 2 pi, Double64: max |L_tau - L_1| / (B_L^tau + B_L^1), same | 0.0008735 | <= 1 | PASS
+# section AC2 took 0.9 s
+AC3 | max |SALI - SALI_cf| / B_SALI, K = 0, seeded frame and W0 = I, tau in {1,10}, n in {10,100,1e4,1e6}, Float64 | 0.00715 | <= 1 | PASS
+AC3 | max |L - L_cf| / B_L, same, Float64 | 0.008171 | <= 1 | PASS
+AC3 | W0 = I: max |SALI n - 1| / (3/(8 n^2) + n B_SALI), Float64 | 0.9999 | <= 1 | PASS
+AC3 | SALI n^2 |b1 b2| / |det W0| at n = 1e4, first seeded start (A10: 1 - (a1/b1 + a2/b2)/n), Float64 | 1 | reported | INFO
+AC3 | max |SALI - SALI_cf| / B_SALI, K = 0, seeded frame and W0 = I, tau in {1,10}, n in {10,100,1e4,1e6}, Double64 | 0.0001131 | <= 1 | PASS
+AC3 | max |L - L_cf| / B_L, same, Double64 | 0.0002854 | <= 1 | PASS
+AC3 | W0 = I: max |SALI n - 1| / (3/(8 n^2) + n B_SALI), Double64 | 1 | <= 1 | PASS
+AC3 | SALI n^2 |b1 b2| / |det W0| at n = 1e4, first seeded start (A10: 1 - (a1/b1 + a2/b2)/n), Double64 | 1 | reported | INFO
+# section AC3 took 17.4 s
+AC4 | ids with |c1(1) c1(2)| < 0.01 excluded (of 100), Float64 | 0 | <= 10 | PASS
+AC4 | BigFloat product against the full eigen-expansion of A11 at n = 8, max |L difference|, Float64 | 2.764e-76 | < 1e-60 | PASS
+AC4 | (a) max |SALI - SALI_cf| / B_SALI at resolved n in {1,2,4,8} (tau = 5: {5,10}), 600 points, 100 ids, tau in {1,5}, Float64 | 0.07173 | <= 1 | PASS
+AC4 | (b) max |L - L_cf| / B_L, n in {20,100,200}, Float64 | 0.09548 | <= 1 | PASS
+AC4 | (c) max |(-L) - (2 n ln mu - ln|D| + ln|c1 c1|)| / (B_L + mu^(-4n)), n in {20,100}, Float64 | 0.09548 | <= 1 | PASS
+AC4 | ids with |c1(1) c1(2)| < 0.01 excluded (of 100), Double64 | 0 | <= 10 | PASS
+AC4 | BigFloat product against the full eigen-expansion of A11 at n = 8, max |L difference|, Double64 | 1.382e-76 | < 1e-60 | PASS
+AC4 | (a) max |SALI - SALI_cf| / B_SALI at resolved n in {1,2,4,8} (tau = 5: {5,10}), 600 points, 100 ids, tau in {1,5}, Double64 | 0.002698 | <= 1 | PASS
+AC4 | (b) max |L - L_cf| / B_L, n in {20,100,200}, Double64 | 0.002408 | <= 1 | PASS
+AC4 | (c) max |(-L) - (2 n ln mu - ln|D| + ln|c1 c1|)| / (B_L + mu^(-4n)), n in {20,100}, Double64 | 0.002164 | <= 1 | PASS
+AC5 | BigFloat product against the eigen-expansion of A12 at n = 8, K = 1, max |L difference|, Float64 | 2.764e-76 | < 1e-60 | PASS
+AC5 | (a) K = 1: max |SALI - SALI_closed| / B_SALI at resolved n (600 points), 100 ids, tau in {1,5}, Float64 | 0.07364 | <= 1 | PASS
+AC5 | (b) K = 1: max |(-L) - [2 n ln mu+ - ln|det W0| + sum ln(|a_i| ||vu||)]| / (B_L + 1.01 (c + 1) mu+^(-2n)), n in {20,100,200}, Float64 (largest frame coefficient c = 8.116e-76) | 0.09266 | <= 1 | PASS
+AC5 | BigFloat product against the eigen-expansion of A12 at n = 8, K = 2, max |L difference|, Float64 | 2.764e-75 | < 1e-60 | PASS
+AC5 | (a) K = 2: max |SALI - SALI_closed| / B_SALI at resolved n (600 points), 100 ids, tau in {1,5}, Float64 | 0.08169 | <= 1 | PASS
+AC5 | (b) K = 2: max |(-L) - [2 n ln mu+ - ln|det W0| + sum ln(|a_i| ||vu||)]| / (B_L + 1.01 (c + 1) mu+^(-2n)), n in {20,100,200}, Float64 (largest frame coefficient c = 241.8) | 0.1718 | <= 1 | PASS
+AC5 | BigFloat product against the eigen-expansion of A12 at n = 8, K = 6, max |L difference|, Float64 | 5.527e-76 | < 1e-60 | PASS
+AC5 | (a) K = 6: max |SALI - SALI_closed| / B_SALI at resolved n (455 points), 100 ids, tau in {1,5}, Float64 | 0.08785 | <= 1 | PASS
+AC5 | (b) K = 6: max |(-L) - [2 n ln mu+ - ln|det W0| + sum ln(|a_i| ||vu||)]| / (B_L + 1.01 (c + 1) mu+^(-2n)), n in {20,100,200}, Float64 (largest frame coefficient c = 85.46) | 0.1797 | <= 1 | PASS
+AC5 | BigFloat product against the eigen-expansion of A12 at n = 8, K = 1, max |L difference|, Double64 | 2.764e-76 | < 1e-60 | PASS
+AC5 | (a) K = 1: max |SALI - SALI_closed| / B_SALI at resolved n (600 points), 100 ids, tau in {1,5}, Double64 | 0.002671 | <= 1 | PASS
+AC5 | (b) K = 1: max |(-L) - [2 n ln mu+ - ln|det W0| + sum ln(|a_i| ||vu||)]| / (B_L + 1.01 (c + 1) mu+^(-2n)), n in {20,100,200}, Double64 (largest frame coefficient c = 8.116e-76) | 0.002303 | <= 1 | PASS
+AC5 | BigFloat product against the eigen-expansion of A12 at n = 8, K = 2, max |L difference|, Double64 | 2.764e-75 | < 1e-60 | PASS
+AC5 | (a) K = 2: max |SALI - SALI_closed| / B_SALI at resolved n (600 points), 100 ids, tau in {1,5}, Double64 | 0.002582 | <= 1 | PASS
+AC5 | (b) K = 2: max |(-L) - [2 n ln mu+ - ln|det W0| + sum ln(|a_i| ||vu||)]| / (B_L + 1.01 (c + 1) mu+^(-2n)), n in {20,100,200}, Double64 (largest frame coefficient c = 241.8) | 0.986 | <= 1 | PASS
+AC5 | BigFloat product against the eigen-expansion of A12 at n = 8, K = 6, max |L difference|, Double64 | 5.527e-76 | < 1e-60 | PASS
+AC5 | (a) K = 6: max |SALI - SALI_closed| / B_SALI at resolved n (600 points), 100 ids, tau in {1,5}, Double64 | 0.003724 | <= 1 | PASS
+AC5 | (b) K = 6: max |(-L) - [2 n ln mu+ - ln|det W0| + sum ln(|a_i| ||vu||)]| / (B_L + 1.01 (c + 1) mu+^(-2n)), n in {20,100,200}, Double64 (largest frame coefficient c = 85.46) | 0.003325 | <= 1 | PASS
+AC6 | (a) order-4 rotation: max |SALI(n) - SALI(0)| / B_SALI, n in {12,120,1200,9996}, tau in {1,3}, Float64 | 0.001124 | <= 1 | PASS
+AC6 | (a) the BigFloat reference itself keeps the angle: max |SALI_ref - SALI(0)|, Float64 | 1.727e-77 | reported | INFO
+AC6 | (b) K = -2 at (0,0): max |SALI - SALI_ref| / B_SALI over all n in 1..1000, tau in {1,2}, 100 ids (odd n: the closed form, even n: SALI(0) through the reference), Float64 | 0.03558 | <= 1 | PASS
+AC6 | (b) even n: max |SALI(n) - SALI(0)| / B_SALI, Float64 | 0.01904 | <= 1 | PASS
+AC6 | (b) min over n and ids of SALI(n) - (0.146 - B_SALI); smallest SALI observed 0.2887 (A13 lower bound 0.1459), Float64 | 0.1427 | >= 0 | PASS
+AC6 | (a) order-4 rotation: max |SALI(n) - SALI(0)| / B_SALI, n in {12,120,1200,9996}, tau in {1,3}, Double64 | 5.581e-06 | <= 1 | PASS
+AC6 | (a) the BigFloat reference itself keeps the angle: max |SALI_ref - SALI(0)|, Double64 | 1.727e-77 | reported | INFO
+AC6 | (b) K = -2 at (0,0): max |SALI - SALI_ref| / B_SALI over all n in 1..1000, tau in {1,2}, 100 ids (odd n: the closed form, even n: SALI(0) through the reference), Double64 | 0.001543 | <= 1 | PASS
+AC6 | (b) even n: max |SALI(n) - SALI(0)| / B_SALI, Double64 | 0.0007142 | <= 1 | PASS
+AC6 | (b) min over n and ids of SALI(n) - (0.146 - B_SALI); smallest SALI observed 0.2887 (A13 lower bound 0.1459), Double64 | 0.1427 | >= 0 | PASS
+# section AC4-6 took 17.7 s
+AC7 | K = 0.5 regular, Float64: rows (starts x checkpoints at every multiple of 10 up to 10000) | 20000 | 20000 | PASS
+AC7 | K = 0.5 regular, Float64: max |SALI_T - SALI_ref| / B_SALI (realized ratio R4), 20 starts, n up to 10000 | 0.01431 | <= 1 | PASS
+AC7 | K = 0.5 regular, Float64: max |error| in units of B_meas / median ratio error/B_SALI | 1.051e+04 / 0.0003395 | reported | INFO
+AC8 | (a) K = 0.5 regular, Float64, tau = 1: max |L - L_ref| / B_L (realized ratio R4), 20000 points | 0.01843 | <= 1 | PASS
+AC8 | (c) K = 0.5 regular, Float64, tau = 1: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 20000 resolved points | 0.04628 | <= 1 | PASS
+AC8 | (a) K = 0.5 regular, Float64, tau = 4: max |L - L_ref| / B_L (realized ratio R4), 10000 points | 0.01137 | <= 1 | PASS
+AC8 | (c) K = 0.5 regular, Float64, tau = 4: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 10000 resolved points | 0.01803 | <= 1 | PASS
+AC7 | K = 2 pi, Float64: rows (starts x checkpoints at every multiple of 10 up to 1000) | 2000 | 2000 | PASS
+AC7 | K = 2 pi, Float64: max |SALI_T - SALI_ref| / B_SALI (realized ratio R4), 20 starts, n up to 1000 | 0.08597 | <= 1 | PASS
+AC7 | K = 2 pi, Float64: max |error| in units of B_meas / median ratio error/B_SALI | 7.881 / 0 | reported | INFO
+AC7 | K = 2 pi, Float64: floor control, handoffs with SALI_ref < B_meas (1978) where SALI_T > 2 B_meas; resolved handoffs exist | 0, true | 0, true | PASS
+AC8 | (a) K = 2 pi, Float64, tau = 1: max |L - L_ref| / B_L (realized ratio R4), 2000 points | 0.074 | <= 1 | PASS
+AC8 | (c) K = 2 pi, Float64, tau = 1: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 22 resolved points | 0.06289 | <= 1 | PASS
+AC8 | (d) K = 2 pi, Float64, tau = 1: negative control S_1 only, min |(-S_1) - L_ref| / (10 B_L) over n >= 50 (1920 points) | 7.71e+11 | > 1 | PASS
+AC8 | (a) K = 2 pi, Float64, tau = 4: max |L - L_ref| / B_L (realized ratio R4), 1000 points | 0.07661 | <= 1 | PASS
+AC8 | (c) K = 2 pi, Float64, tau = 4: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 2 resolved points | 0.04624 | <= 1 | PASS
+AC8 | (d) K = 2 pi, Float64, tau = 4: negative control S_1 only, min |(-S_1) - L_ref| / (10 B_L) over n >= 50 (960 points) | 1.281e+12 | > 1 | PASS
+AC7 | K = 10, Float64: rows (starts x checkpoints at every multiple of 10 up to 1000) | 2000 | 2000 | PASS
+AC7 | K = 10, Float64: max |SALI_T - SALI_ref| / B_SALI (realized ratio R4), 20 starts, n up to 1000 | 0.05755 | <= 1 | PASS
+AC7 | K = 10, Float64: max |error| in units of B_meas / median ratio error/B_SALI | 0.1752 / 0 | reported | INFO
+AC7 | K = 10, Float64: floor control, handoffs with SALI_ref < B_meas (1989) where SALI_T > 2 B_meas; resolved handoffs exist | 0, true | 0, true | PASS
+AC8 | (a) K = 10, Float64, tau = 1: max |L - L_ref| / B_L (realized ratio R4), 2000 points | 0.1693 | <= 1 | PASS
+AC8 | (c) K = 10, Float64, tau = 1: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 9 resolved points | 0.05733 | <= 1 | PASS
+AC8 | (d) K = 10, Float64, tau = 1: negative control S_1 only, min |(-S_1) - L_ref| / (10 B_L) over n >= 50 (1920 points) | 3.27e+12 | > 1 | PASS
+AC8 | (a) K = 10, Float64, tau = 4: max |L - L_ref| / B_L (realized ratio R4), 1000 points | 0.1143 | <= 1 | PASS
+AC8 | (c) K = 10, Float64, tau = 4: no resolved point at the handoffs (chaotic, first handoff below the floor) | 0 | - | INFO
+AC8 | (d) K = 10, Float64, tau = 4: negative control S_1 only, min |(-S_1) - L_ref| / (10 B_L) over n >= 50 (960 points) | 3.42e+12 | > 1 | PASS
+AC7 | K = 0.5 regular, Double64: rows (starts x checkpoints at every multiple of 10 up to 10000) | 20000 | 20000 | PASS
+AC7 | K = 0.5 regular, Double64: max |SALI_T - SALI_ref| / B_SALI (realized ratio R4), 20 starts, n up to 10000 | 0.0005886 | <= 1 | PASS
+AC7 | K = 0.5 regular, Double64: max |error| in units of B_meas / median ratio error/B_SALI | 5.269 / 1.156e-05 | reported | INFO
+AC8 | (a) K = 0.5 regular, Double64, tau = 1: max |L - L_ref| / B_L (realized ratio R4), 20000 points | 0.0004662 | <= 1 | PASS
+AC8 | (c) K = 0.5 regular, Double64, tau = 1: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 20000 resolved points | 0.002347 | <= 1 | PASS
+AC8 | (a) K = 0.5 regular, Double64, tau = 4: max |L - L_ref| / B_L (realized ratio R4), 10000 points | 0.0002494 | <= 1 | PASS
+AC8 | (c) K = 0.5 regular, Double64, tau = 4: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 10000 resolved points | 0.000338 | <= 1 | PASS
+AC7 | K = 2 pi, Double64: rows (starts x checkpoints at every multiple of 10 up to 1000) | 2000 | 2000 | PASS
+AC7 | K = 2 pi, Double64: max |SALI_T - SALI_ref| / B_SALI (realized ratio R4), 20 starts, n up to 1000 | 0.003587 | <= 1 | PASS
+AC7 | K = 2 pi, Double64: max |error| in units of B_meas / median ratio error/B_SALI | 0.01961 / 0 | reported | INFO
+AC7 | K = 2 pi, Double64: floor control, handoffs with SALI_ref < B_meas (1953) where SALI_T > 2 B_meas; resolved handoffs exist | 0, true | 0, true | PASS
+AC8 | (a) K = 2 pi, Double64, tau = 1: max |L - L_ref| / B_L (realized ratio R4), 2000 points | 0.02578 | <= 1 | PASS
+AC8 | (c) K = 2 pi, Double64, tau = 1: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 45 resolved points | 0.002627 | <= 1 | PASS
+AC8 | (d) K = 2 pi, Double64, tau = 1: negative control S_1 only, min |(-S_1) - L_ref| / (10 B_L) over n >= 50 (1920 points) | 5.813e+25 | > 1 | PASS
+AC8 | (a) K = 2 pi, Double64, tau = 4: max |L - L_ref| / B_L (realized ratio R4), 1000 points | 0.02552 | <= 1 | PASS
+AC8 | (c) K = 2 pi, Double64, tau = 4: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 21 resolved points | 0.003005 | <= 1 | PASS
+AC8 | (d) K = 2 pi, Double64, tau = 4: negative control S_1 only, min |(-S_1) - L_ref| / (10 B_L) over n >= 50 (960 points) | 5.949e+25 | > 1 | PASS
+AC7 | K = 10, Double64: rows (starts x checkpoints at every multiple of 10 up to 1000) | 2000 | 2000 | PASS
+AC7 | K = 10, Double64: max |SALI_T - SALI_ref| / B_SALI (realized ratio R4), 20 starts, n up to 1000 | 0.001905 | <= 1 | PASS
+AC7 | K = 10, Double64: max |error| in units of B_meas / median ratio error/B_SALI | 0.007471 / 0 | reported | INFO
+AC7 | K = 10, Double64: floor control, handoffs with SALI_ref < B_meas (1970) where SALI_T > 2 B_meas; resolved handoffs exist | 0, true | 0, true | PASS
+AC8 | (a) K = 10, Double64, tau = 1: max |L - L_ref| / B_L (realized ratio R4), 2000 points | 0.0167 | <= 1 | PASS
+AC8 | (c) K = 10, Double64, tau = 1: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 30 resolved points | 0.001855 | <= 1 | PASS
+AC8 | (d) K = 10, Double64, tau = 1: negative control S_1 only, min |(-S_1) - L_ref| / (10 B_L) over n >= 50 (1920 points) | 2.488e+26 | > 1 | PASS
+AC8 | (a) K = 10, Double64, tau = 4: max |L - L_ref| / B_L (realized ratio R4), 1000 points | 0.0167 | <= 1 | PASS
+AC8 | (c) K = 10, Double64, tau = 4: max |SALI_direct - sali_from_log(L)| / (B_SALI + 8 eps (Psi1 + Psi2) SALI_ref) over the 10 resolved points | 0.001196 | <= 1 | PASS
+AC8 | (d) K = 10, Double64, tau = 4: negative control S_1 only, min |(-S_1) - L_ref| / (10 B_L) over n >= 50 (960 points) | 2.488e+26 | > 1 | PASS
+AC8 | (b) K = 2 pi, Float64, 20 starts x 1000 handoffs: all L finite; min L (exp(min L) = 0.0) | -2460 | finite, < -745, exp = 0 | PASS
+# section AC7-8 took 27.0 s
+AC9 | (a) K = 0.5 regular: max |S_1 - n X_L1(first column)| / (2 B_S^Psi,1), 20 starts, n in {100,1e3,1e4} | 0 | <= 1 | PASS
+AC9 | (b) K = 0.5 regular: max |S_2 - n X_L1(second column)| / (2 B_S^Psi,2) | 0 | <= 1 | PASS
+AC9 | (c) K = 0.5 regular: max |L + n (X1 + X2)| / (2 B_L) | 0.0003814 | <= 1 | PASS
+AC9 | K = 0.5 regular: |ln(norm w2/norm w1)|/2 at n = 1e4 (A8, of order 1): median; max | 0.3291; 2.525 | reported | INFO
+AC9 | (a) K = 2 pi: max |S_1 - n X_L1(first column)| / (2 B_S^Psi,1), 20 starts, n in {100,1e3,1e4} | 0 | <= 1 | PASS
+AC9 | (b) K = 2 pi: max |S_2 - n X_L1(second column)| / (2 B_S^Psi,2) | 0 | <= 1 | PASS
+AC9 | (c) K = 2 pi: max |L + n (X1 + X2)| / (2 B_L) | 0.02403 | <= 1 | PASS
+AC9 | K = 2 pi: |ln(norm w2/norm w1)|/2 at n = 1e4 (A8, of order 1): median; max | 0.3558; 2.788 | reported | INFO
+AC9 | (a) K = 10: max |S_1 - n X_L1(first column)| / (2 B_S^Psi,1), 20 starts, n in {100,1e3,1e4} | 0 | <= 1 | PASS
+AC9 | (b) K = 10: max |S_2 - n X_L1(second column)| / (2 B_S^Psi,2) | 0 | <= 1 | PASS
+AC9 | (c) K = 10: max |L + n (X1 + X2)| / (2 B_L) | 0.04624 | <= 1 | PASS
+AC9 | K = 10: |ln(norm w2/norm w1)|/2 at n = 1e4 (A8, of order 1): median; max | 0.414; 1.554 | reported | INFO
+# section AC9 took 0.2 s
+AC10 | K = 2 pi, 1000 starts: |mean(m/2) - mean(X(1e4))| / (4 combined SE + 2/180); mean m/2 = 1.165, mean X = 1.166, sd of m/2 = 0.1274 | 0.0465 | <= 1 | PASS
+AC10 | K = 2 pi: realized |difference| of the means; combined SE; |difference| / SE (finite-window allowance of the spec: 0.01111) | 0.001414; 0.004822; 0.2932 | reported | INFO
+AC10 | K = 2 pi: Chirikov sanity rate 2 ln(K/2) (loose, K18) against mean(m) | 2.289 vs 2.329 | reported | INFO
+AC10 | K = 5.0, 1000 starts: |mean(m/2) - mean(X(1e4))| / (4 combined SE + 2/180); mean m/2 = 0.9616, mean X = 0.9572, sd of m/2 = 0.1789 | 0.1114 | <= 1 | PASS
+AC10 | K = 5.0: realized |difference| of the means; combined SE; |difference| / SE (finite-window allowance of the spec: 0.01111) | 0.004392; 0.007076; 0.6206 | reported | INFO
+AC10 | K = 5.0: Chirikov sanity rate 2 ln(K/2) (loose, K18) against mean(m) | 1.833 vs 1.923 | reported | INFO
+AC10 | K = 10.0, 1000 starts: |mean(m/2) - mean(X(1e4))| / (4 combined SE + 2/180); mean m/2 = 1.624, mean X = 1.62, sd of m/2 = 0.07942 | 0.2069 | <= 1 | PASS
+AC10 | K = 10.0: realized |difference| of the means; combined SE; |difference| / SE (finite-window allowance of the spec: 0.01111) | 0.004394; 0.00253; 1.736 | reported | INFO
+AC10 | K = 10.0: Chirikov sanity rate 2 ln(K/2) (loose, K18) against mean(m) | 3.219 vs 3.248 | reported | INFO
+AC11 | starts with a LS slope of L against ln n over [1e4,1e6] in [-2.4,-1.6] (of 20; slopes: min -2.185, median -1.99, max -1.9) | 20 | >= 16 | PASS
+AC11 | starts in the transient at n = 1e4 (SALI > 1e-2) | 0 | <= 4 | PASS
+AC11 | R2: n^2 SALI at n = 1e4 (min; median; max) | 0.1721; 4.251; 2724 | reported | INFO
+AC11 | R2: n^2 SALI at n = 1e6 (min; median; max) | 0.377; 3.785; 2.752e+04 | reported | INFO
+# section AC10-11 took 3.2 s
+AC12 | (a) K = 5.0, 100 starts, n = 150: median n_floor(Double64) / n_floor(Float64) over the 98 starts that reach the floor in both types (never reaching it within 150 steps: Float64 2, Double64 2, regular islands) | 1.882 | [1.5, 2.4], >= 80 starts | PASS
+AC12 | R1 K = 5.0: n_floor over the 98 starts reaching the floor: Float64 (min; median; max) | Double64 (min; median; max) | A14 loose n_res Float64, Double64, BigFloat | 12; 17.0; 45 | 24; 34.0; 65 | (18, 36, 94) | reported | INFO
+AC12 | (a) K = 2 pi, 100 starts, n = 150: median n_floor(Double64) / n_floor(Float64) over the 100 starts that reach the floor in both types (never reaching it within 150 steps: Float64 0, Double64 0, regular islands) | 1.879 | [1.5, 2.4], >= 80 starts | PASS
+AC12 | R1 K = 2 pi: n_floor over the 100 starts reaching the floor: Float64 (min; median; max) | Double64 (min; median; max) | A14 loose n_res Float64, Double64, BigFloat | 11; 15.0; 26 | 22; 29.0; 42 | (14, 28, 74) | reported | INFO
+AC12 | R1 K = 10.0: n_floor over the 100 starts reaching the floor: Float64 (min; median; max) | Double64 (min; median; max) | A14 loose n_res Float64, Double64, BigFloat | 9; 11.0; 19 | 17; 21.0; 32 | (10, 20, 54) | reported | INFO
+AC12 | (b) BigFloat(256), K = 2 pi, 50 starts, n in {10,20,40,60}: max |SALI - SALI_ref(512 bits)| / B_SALI (own eps 1.727e-77); 200 points resolved | 0.08369 | <= 1 | PASS
+AC12 | (b) resolved points exist | 200 | > 0 | PASS
+AC12 | (c) K = 2 pi, 1000 starts, n = 1e3: |mean(-L/(2n)) Float64 - Double64| / (4 combined SE); means 1.168 and 1.166, z = 0.3732 | 0.09329 | <= 1 | PASS
+AC12 | (c) K = 5, 1000 starts, n = 1e3: |mean(-L/(2n)) Float64 - Double64| / (4 combined SE); means 0.9539 and 0.9537, z = 0.01827 | 0.004568 | <= 1 | PASS
+AC12 | (c) K = 2 pi, 100 starts, n = 300: BigFloat(256) vs Double64 |difference of means| / (4 combined SE); means 1.17 and 1.178, z = 1.102 | 0.2756 | <= 1 | PASS
+AC12 | (c) K = 5, 100 starts, n = 300: BigFloat(256) vs Double64 |difference of means| / (4 combined SE); means 0.9649 and 0.9665, z = 0.07612 | 0.01903 | <= 1 | PASS
+# section AC12 took 5.5 s
+AC13 | (a) zero tangent on a flagged orbit (propagate chunk 2 and Double64 per-orbit): kind deviation matrix, orbit, step, backend cpu, column 1 (2 for diag(1,0)), value 0, nothing stored, lowest id first; k = 1 ArgumentError | true | true | PASS
+AC13 | (b) NaN in the tangent: kind deviation matrix, column 0, threshold Inf, orbit 3, step 5 (not masked), propagate and Double64 per-orbit | true | true | PASS
+AC13 | (c) Float64: dependent frames and SALI(0) = 5 B_meas rejected (kind initial frame, step 0, orbit); SALI(0) = 20 B_meas accepted and returned | true | true | PASS
+AC13 | (c) Float64: seeded frame accepted for all ids 1..10000; min SALI(0) / (10 B_meas) | 1.592e+14 | >= 1 | PASS
+AC13 | (c) Double64: dependent frames and SALI(0) = 5 B_meas rejected (kind initial frame, step 0, orbit); SALI(0) = 20 B_meas accepted and returned | true | true | PASS
+AC13 | (c) Double64: seeded frame accepted for all ids 1..1000; min SALI(0) / (10 B_meas) | 4.482e+28 | >= 1 | PASS
+AC13 | (c) caller-side frame check rejects the dependent frame before any map call (sl_Boom throws if called); an accepted frame reaches the map (Amendment D67 item 1) | true | true | PASS
+AC13 | (d) A = diag(e^3, e^-3), Float64: tau = 200 no error at n = 200; tau = 300 error at handoff 300 | true | true | PASS
+AC13 | (e) run record: indicator, k, tau, precision; floor B_meas(T) = 4 eps in the final (Float64 8.882e-16, Double64 3.155e-30) | true | true | PASS
+# section AC13 took 0.2 s
+AC14 | (a) orbit points at every handoff differ across the chains {}, {L1} (k=1), {SALI} (k=2), {} (k=2); cases = (5 starts x tau in {1,4}) | 0 | 0 of 10 | PASS
+AC14 | (b) propagate equals the serial map of propagate_orbit bitwise (x, W, finals), 4096 orbits, K = 2 pi, n = 1e3, tau = 1, chunk = 64 | true | true | PASS
+AC14 | (b) propagate equals the serial map of propagate_orbit bitwise (x, W, finals), 4096 orbits, K = 2 pi, n = 1e3, tau = 1, chunk = 1000 | true | true | PASS
+AC14 | (b) propagate equals the serial map of propagate_orbit bitwise (x, W, finals), 4096 orbits, K = 2 pi, n = 1e3, tau = 4, chunk = 64 | true | true | PASS
+AC14 | (b) propagate equals the serial map of propagate_orbit bitwise (x, W, finals), 4096 orbits, K = 2 pi, n = 1e3, tau = 4, chunk = 1000 | true | true | PASS
+AC14 | (b) x, W, SALI, L, sums and compensations bitwise identical for thread counts [1, 2, 4] (hashes of all outputs, tau in {1,4}, separate processes) | true | true | PASS
+AC14 | (c) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 1, Float64 | 0 | 0 | PASS
+AC14 | (c) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 4, Float64 | 0 | 0 | PASS
+AC14 | (c) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 1, Double64 | 0 | 0 | PASS
+AC14 | (c) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 4, Double64 | 0 | 0 | PASS
+AC14 | (d) absorbing zero, K = 2 pi, Float64, 1000 starts, n = 1e3: starts that reach exactly 0 (995); starts with a nonzero value afterwards | 0 | 0 | PASS
+# section AC14 took 4.5 s
+AC15 | (a) K = 0, dyadic starts: starts (of 2 x 50, tau in {1,3}, all handoffs to 300) whose SALI, L, sums, compensations differ between wrapped and lifted | 0 | 0 | PASS
+AC15 | (b) K = 0.5 regular class, n = 10, 50 starts: max |L_wrapped - L_lifted| / (64 K M_state n^2 eps (rho1 + rho2)); max |difference| 4.086e-14; excluded (rho > 50) 0 | 0.0003118 | <= 1 | PASS
+AC15 | (b) n = 10: excluded starts (of 50) | 0 | <= 5 | PASS
+AC15 | (b) K = 0.5 regular class, n = 100, 50 starts: max |L_wrapped - L_lifted| / (64 K M_state n^2 eps (rho1 + rho2)); max |difference| 1.435e-11; excluded (rho > 50) 1 | 0.0002983 | <= 1 | PASS
+AC15 | (b) n = 100: excluded starts (of 50) | 1 | <= 5 | PASS
+# section AC15 took 0.1 s
+AC16 | (P8-1) K = 5, 200 starts, 100 steps requested: gali with the default threshold 1e-12 stops early for 195 of 200 starts (steps at stop: min; median of those; the others are regular islands that run the full 100); threshold = 0 gives the full length for all | 9; 14 | [100] | >= 180 stop early | 100 | PASS
+AC16 | (P8-2) prescribed frame: stored deviations == W0 after reinit! (of 200: 200); max |g_oracle(1) - exp(L(1))| = 6.661e-16; starts where the identity frame gives g(1) differing by > 1e-3 from the prescribed frame: 200 | 6.661e-16 | <= 4 eps, 200 stored, > 100 differ | PASS
+AC16 | (c) K = 0.5: oracle orbit vs forward(StandardMap) over 20 starts x 10000 steps: steps with a bitwise difference; largest coordinate difference 0 | 0 | 0 of 200000 (else add the orbit divergence term) | PASS
+AC16 | (c) K = 6.283185307179586: oracle orbit vs forward(StandardMap) over 100 starts x 12 steps: steps with a bitwise difference; largest coordinate difference 0 | 0 | 0 of 1200 (else add the orbit divergence term) | PASS
+AC16 | (c) K = 5.0: oracle orbit vs forward(StandardMap) over 100 starts x 12 steps: steps with a bitwise difference; largest coordinate difference 0 | 0 | 0 of 1200 (else add the orbit divergence term) | PASS
+AC16 | (a) K = 0.5 regular, 20 starts, n in {10,100,1e3,1e4}: max |g(SALI by A4) - g_oracle| / (B_SALI + B_oracle); max absolute difference 3.567e-14 | 0.008317 | <= 1 | PASS
+AC16 | (a) same with g = exp(L) (the floor-free form) | 0.008094 | <= 1 | PASS
+AC16 | (b) K = 6.283, 1000 starts, resolved handoffs n in {2,5,8,12}: max |g(SALI by A4) - g_oracle| / (B_SALI + B_oracle) | 0.1098 | <= 1 | PASS
+AC16 | (b) K = 6.283: same with g = exp(L) | 0.1017 | <= 1 | PASS
+AC16 | (b) K = 6.283: pairs excluded as unresolved (222 of 4000) | 0.0555 | <= 0.10 | PASS
+AC16 | (b) K = 5, 1000 starts, resolved handoffs n in {2,5,8,12}: max |g(SALI by A4) - g_oracle| / (B_SALI + B_oracle) | 0.09739 | <= 1 | PASS
+AC16 | (b) K = 5: same with g = exp(L) | 0.09476 | <= 1 | PASS
+AC16 | (b) K = 5: pairs excluded as unresolved (56 of 4000) | 0.014 | <= 0.10 | PASS
+AC16 | K = 5, n = 30, 100 starts: oracle value (min; median; max) while our exp(L) is ~1e-25: the oracle floor (information) | 0; 1.11e-16; 0.2061 | reported | INFO
+# section AC16 took 1.3 s
+AC17 | K = 5.0, 200 starts, n = 1e4: |mean(-L/(2n)) Float64 - Double64| / (4 combined SE); means 0.9719 (SE 0.005028) and 0.9714 (SE 0.005054); z = 0.05844 | 0.01461 | <= 1 | PASS
+AC17 | K = 5.0: Chirikov rate ln(K/2) (loose) against mean(-L/(2n)) | 0.9163 vs 0.9714 | reported | INFO
+AC17 | K = 10.0, 200 starts, n = 1e4: |mean(-L/(2n)) Float64 - Double64| / (4 combined SE); means 1.62 (SE 0.0006961) and 1.621 (SE 0.0006717); z = 0.9913 | 0.2478 | <= 1 | PASS
+AC17 | K = 10.0: Chirikov rate ln(K/2) (loose) against mean(-L/(2n)) | 1.609 vs 1.621 | reported | INFO
+# section AC17 took 7.8 s
+# figure saved: sali-decay-laws.png
+# figure saved: sali-chaostools.png
+# section figure took 15.6 s
+# verdicts: 185 PASS, 0 FAIL, 30 other
+# total wall time 168.4 s

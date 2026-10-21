@@ -749,6 +749,220 @@ if want("tc")
     ac12a(4 * 10^4)
 end
 
+# ------------------------------------------------------------------------------------------------ AC18 (sali), tag "sali"
+# Spec criterion 18 as amended by D68 (the same-orbit bound applies per backend, not across backends: the GPU and the CPU do not produce the
+# same orbit). SALI reducer (k = 2), lifted, tau = 1; Float64 on the GPU (a FALLBACK with its reason is the pass for Double64, where the kernel
+# does not compile). Classes: regular K = 0.5 (S7 screening, regular_starts), 1024 orbits, n = 4e4; chaotic K = 10, 1024 orbits, n = 8 (inside
+# the resolved window; direct SALI is gated only where SALI_ref >= 10 B_meas). (a) each backend against a BigFloat(256) reference formed at its
+# own realized orbit points (L1 S3): max |L_b - L_ref,b| / (8 eps (Psi1 + Psi2)) <= 1 and max |SALI_b - SALI_ref,b| / B_SALI <= 1. (b) CPU-GPU
+# gap only on the orbits whose final states agree to 1e-9 in every coordinate: max |L_cpu - L_gpu| / (16 eps (Psi1 + Psi2)) <= 1 and
+# max |SALI_cpu - SALI_gpu| / (2 B_SALI) <= 1; their number is reported. (c) K = 10, n = 1e4, tau = 2: tangent-core AC12(c) tolerances on -L/(2n).
+# Reported, not gated: orbits with final states apart by more than 1e-9 (CPU vs GPU, CPU Float64 vs Double64 CPU).
+# Chaotic class of (b), owner addition 2026-10-22 (sali-spec.md, Amendment D68, "Addition to part (b) for the chaotic class"): the orbits do not
+# agree there, so the gap gets the orbit-divergence term D_orb(n) (d68_orb below) and the 1e-9 final-state selection is replaced by the item 4
+# horizon 16 eps M_n Gamma_n <= 1e-4 (precision-spec Equations 3, 4). Gates: |L_cpu - L_gpu| <= 16 eps (Psi1 + Psi2) + D_orb and, in the resolved
+# window, |SALI_cpu - SALI_gpu| <= 2 B_SALI + SALI_ref D_orb; the item 4 bound itself is checked on the device orbit (a FAIL there voids the term).
+# All 1024 orbits get a reference for both backends (no subsample). The GPU's own orbit is read with a trace kernel that runs the same
+# `forward` on the device (the run itself keeps no orbit); its final state is checked bitwise against the propagate result.
+MODTAG[] = "sali: "
+want("sali") && include(joinpath(ROOT, "test", "sali", "sl_helpers.jl"))   # sl_*: B_SALI, B_L, BigFloat reference, Psi_n
+sali_est(sys, x0, N, tau, b) = propagate(sys, x0, N; k = 2, tau = tau, seed = SEED, reducers = (SALI(),), backend = b)
+
+# Device orbit trace: D[j, i] = point of orbit j before step i (the point where the step-i tangent is evaluated), X[j] advanced.
+function gpu_trace_kernel!(D, X, sys, steps)
+    j = (blockIdx().x - 1) * blockDim().x + threadIdx().x
+    if j <= length(X)
+        x = X[j]
+        for i in 1:steps
+            D[j, i] = x
+            x = forward(sys, x)
+        end
+        X[j] = x
+    end
+    return nothing
+end
+function gpu_trace(sys, x0::Vector{SVector{2,Float64}}, N; chunk = 5000)
+    m = length(x0)
+    X = CuArray(x0)
+    P = Matrix{SVector{2,Float64}}(undef, m, N)   # P[j, i]: orbit j before step i, on the host
+    for s0 in 0:chunk:N-1
+        s1 = min(s0 + chunk, N)
+        D = CuArray{SVector{2,Float64}}(undef, m, s1 - s0)
+        @cuda threads = 256 blocks = cld(m, 256) gpu_trace_kernel!(D, X, sys, s1 - s0)
+        P[:, s0+1:s1] = Array(D)
+        CUDA.unsafe_free!(D)
+    end
+    return P, Array(X)
+end
+
+# BigFloat(256) reference of orbit j at the points `pts` of backend result `res`: ratios to the single-backend bounds and the scales.
+function d68_one(res, pts, Kt, sysT, j, N, T, epsT)
+    W0 = sl_frame(SEED, j, T)
+    ref = sl_ref(sl_mats_std(Kt, pts), W0, N; keep = [N])
+    Ms = [SMatrix{2,2,Float64}(map(Float64, tangent(sysT, pt))) for pt in pts]
+    p1, p2 = sl_psis(Ms, W0, [N])[1]
+    at = sl_at(ref, N)
+    sref = Float64(at.S)
+    BS = sl_BSALI(epsT, sl_Lambda(ref.lnsali, N), sref, p1, p2)
+    f = res.finals[j][1]
+    return (rL = sl_err(f.L, at.L) / sl_BL(epsT, p1, p2), rS = sl_err(f.sali, at.S) / BS, resolved = sref >= 10 * 4 * epsT,
+            BS = BS, bnd16 = 16 * epsT * (p1 + p2), Lref = Float64(at.L), Sref = sref)
+end
+
+# Largest singular value of a 2 x 2 matrix: sqrt of the larger root of s^2 - tr(A'A) s + det(A)^2.
+function d68_sig2(A)
+    t, d = sum(abs2, A), det(A)^2
+    return sqrt((t + sqrt(max(t^2 - 4d, zero(t)))) / 2)
+end
+
+# D_orb(n) of sali-spec.md, Amendment D68, "Addition to part (b) for the chaotic class" (the one place the formula lives), in BigFloat(256) on the
+# CPU reference orbit: pts[i] = z_{i-1} (i = 1..n), zN = z_n, W0 the seeded frame (w_1, w_2). With A_k = DT(z_k), P_{<k} = A_{k-1} ... A_0,
+# P_{>k} = A_{n-1} ... A_{k+1}, bnd_k = 16 eps M_k Gamma_k (precision-spec Equations 3, 4: M_k = max(1, max_{j<=k} |x_j|, |p_j|),
+# Gamma_k = sum_{j<k} norm(A_{k-1} ... A_{j+1})_2, empty product = identity, Gamma_0 = 0):
+#   D_orb = sqrt 2 |K| sum_{i=1,2} sum_{k<n} norm(P_{>k})_2 bnd_k norm(P_{<k} w_i) / norm(P w_i).
+# Returns D_orb, the item 4 bounds bnd_k for k = 0..n (the horizon test is bnd_n <= 1e-4), all as Float64.
+function d68_orb(Kt, pts, zN, W0, epsT)
+    return setprecision(BigFloat, 256) do
+        n = length(pts)
+        mats = sl_mats_std(Kt, pts)
+        A = [(m = mats(k + 1); SMatrix{2,2,BigFloat}(m[1], m[3], m[2], m[4])) for k in 0:n-1]   # A[k+1] = DT(z_k)
+        zs = vcat(pts, [zN])                                                                    # zs[k+1] = z_k
+        Mk = accumulate(max, [max(one(BigFloat), abs(BigFloat(z[1])), abs(BigFloat(z[2]))) for z in zs])
+        Gam = map(0:n) do k
+            Q, g = SMatrix{2,2,BigFloat}(1, 0, 0, 1), zero(BigFloat)
+            for j in k-1:-1:0            # Q = A_{k-1} ... A_{j+1}
+                g += d68_sig2(Q)
+                Q = Q * A[j+1]
+            end
+            g
+        end
+        bnd = [16 * BigFloat(epsT) * Mk[k+1] * Gam[k+1] for k in 0:n]
+        Pgt = Vector{SMatrix{2,2,BigFloat,4}}(undef, n)   # Pgt[k+1] = P_{>k}
+        Pgt[n] = SMatrix{2,2,BigFloat}(1, 0, 0, 1)
+        for k in n-1:-1:1
+            Pgt[k] = Pgt[k+1] * A[k+1]
+        end
+        D = zero(BigFloat)
+        for i in 1:2
+            v = [SVector{2,BigFloat}(W0[1, i], W0[2, i])]
+            for k in 0:n-1
+                push!(v, A[k+1] * v[end])
+            end
+            nv = norm.(v)
+            D += sum(d68_sig2(Pgt[k+1]) * bnd[k+1] * nv[k+1] / nv[n+1] for k in 0:n-1)
+        end
+        (D = Float64(sqrt(BigFloat(2)) * abs(BigFloat(Kt)) * D), bnd = Float64.(bnd))
+    end
+end
+
+# Chaotic class of part (b) (Amendment D68, addition of 2026-10-22). Entering orbits: 16 eps M_n Gamma_n <= 1e-4 (item 4 horizon). Gates:
+# |L_cpu - L_gpu| <= 16 eps (Psi1 + Psi2) + D_orb and |SALI_cpu - SALI_gpu| <= 2 B_SALI + SALI_ref D_orb (resolved orbits); item 4 check on the
+# device: max_k |e_k|_inf / (16 eps M_k Gamma_k) <= 1 (what D_orb uses) and max_k |e_k|_inf / (16 eps M_n Gamma_n) <= 1 (the literal n bound).
+function d68_chaotic_b(lab, cpu, gpu, rc, rg, orb, m)
+    enter = findall(j -> orb[j].hor <= 1e-4, 1:m)
+    rest = setdiff(1:m, enter)
+    row("AC18b", "$lab: orbits that enter part (b): 16 eps M_n Gamma_n <= 1e-4 (horizon max over all orbits $(fmt(maximum(o.hor for o in orb))); reported only: $(length(rest)))", length(enter), "reported", "INFO")
+    gap(j) = abs(Float64(cpu.finals[j][1].L) - Float64(gpu.finals[j][1].L))
+    gapS(j) = abs(Float64(cpu.finals[j][1].sali) - Float64(gpu.finals[j][1].sali))
+    rL(j) = gap(j) / (rc[j].bnd16 + orb[j].D)
+    rS(j) = gapS(j) / (2 * rc[j].BS + rc[j].Sref * orb[j].D)
+    res(js) = [j for j in js if rc[j].resolved && rg[j].resolved]
+    entS = res(enter)
+    gL, gS = [rL(j) for j in enter], [rS(j) for j in entS]
+    row("AC18b", "$lab: entering orbits: max |L_cpu - L_gpu| / (16 eps (Psi1 + Psi2) + D_orb(n)) over $(length(enter)) orbits", isempty(gL) ? NaN : maximum(gL), "<= 1", pf(!isempty(gL) && maximum(gL) <= 1))
+    row("AC18b", "$lab: entering orbits: max |SALI_cpu - SALI_gpu| / (2 B_SALI(n) + SALI_ref(n) D_orb(n)) over the $(length(entS)) resolved ones", isempty(gS) ? NaN : maximum(gS), "<= 1", pf(!isempty(gS) && maximum(gS) <= 1))
+    med(v) = isempty(v) ? NaN : sort(v)[max(end ÷ 2, 1)]
+    q = [gap(j) / orb[j].D for j in enter]
+    nz = filter(>(0), q)
+    row("AC18b", "$lab: entering orbits: gap / D_orb(n) = |L_cpu - L_gpu| / D_orb(n), median / max (D_orb median $(fmt(med([orb[j].D for j in enter]))), max $(fmt(maximum(orb[j].D for j in enter)))); nonzero gaps: $(length(nz)) of $(length(q)), median among them $(fmt(med(nz)))",
+        "$(fmt(med(q))) / $(fmt(maximum(q)))", "reported (how loose the term is)", "INFO")
+    row("AC18b", "$lab: entering orbits: max |L_cpu - L_gpu| / (16 eps (Psi1 + Psi2)) without the D_orb term (what the first D68 run gated), $(count(j -> gap(j) > rc[j].bnd16, enter)) of $(length(enter)) above 1",
+        maximum(gap(j) / rc[j].bnd16 for j in enter), "reported", "INFO")
+    pk, lt = maximum(orb[j].perk for j in enter), maximum(orb[j].lit for j in enter)
+    row("AC18b", "$lab: item 4 check on the device, entering orbits: max over orbits and k = 1..n of |z_k^cpu - z_k^gpu|_inf / (16 eps M_k Gamma_k); same against the literal 16 eps M_n Gamma_n (orbits above 1: $(count(j -> orb[j].perk > 1, enter)) / $(count(j -> orb[j].lit > 1, enter)))",
+        "$(fmt(pk)); $(fmt(lt))", "<= 1; <= 1", pf(pk <= 1 && lt <= 1))
+    if !isempty(rest)
+        row("AC18b", "$lab: reported-only orbits ($(length(rest))): max gap ratios (L; SALI over $(length(res(rest))) resolved); item 4 per-k ratio max", "$(fmt(maximum(rL, rest))); $(isempty(res(rest)) ? NaN : fmt(maximum(rS, res(rest)))); $(fmt(maximum(orb[j].perk for j in rest)))", "reported", "INFO")
+    end
+end
+
+function sali_d68(tag, T, Kt, xT, N; chaotic = false)
+    sysT = StandardMap(Kt)
+    m = length(xT)
+    lab = "$tag, $T, $m orbits, n=$(fmt(N)), tau=1"
+    gpu = sali_est(sysT, xT, N, 1, :gpu)
+    why = gpu_why(gpu)
+    why === nothing || return row("AC18a", "$lab: each backend against its own BigFloat reference", "-", "<= 1", fb(why))
+    cpu = sali_est(sysT, xT, N, 1, :cpu)
+    epsT = Float64(effective_eps(T))
+    P, XN = gpu_trace(sysT, xT, N)
+    rc = Vector{NamedTuple}(undef, m); rg = Vector{NamedTuple}(undef, m)
+    same_c = zeros(Bool, m)
+    stepdiff = zeros(m)   # largest CPU-GPU difference of the orbit points over the steps (diagnostic)
+    orb = Vector{Any}(undef, m)   # chaotic class: d68_orb result and the realized orbit differences e_k, k = 1..N (inf norm)
+    Threads.@threads :dynamic for j in 1:m
+        ptsc, zc = lb_pts(sysT, xT[j], N)
+        same_c[j] = zc == cpu.x[j]
+        stepdiff[j] = maximum(maximum(abs.(ptsc[i] - P[j, i])) for i in 1:N)
+        rc[j] = d68_one(cpu, ptsc, Kt, sysT, j, N, T, epsT)
+        rg[j] = d68_one(gpu, P[j, :], Kt, sysT, j, N, T, epsT)
+        if chaotic
+            od = d68_orb(Kt, ptsc, zc, sl_frame(SEED, j, T), epsT)
+            e = [i < N ? maximum(abs.(ptsc[i+1] - P[j, i+1])) : maximum(abs.(zc - XN[j])) for i in 1:N]   # e_k = |z_k^cpu - z_k^gpu|_inf
+            orb[j] = (D = od.D, hor = od.bnd[end], perk = maximum(e ./ od.bnd[2:end]), lit = maximum(e) / od.bnd[end])
+        end
+    end
+    same_g = [XN[j] == gpu.x[j] for j in 1:m]
+    row("AC18a", "$lab: the reference orbit reproduces the backend's final state bitwise, CPU / GPU (GPU orbit from the device trace kernel)", "$(count(same_c)) / $(count(same_g)) of $m", "$m / $m", "INFO")
+    for (nm, R, res) in (("cpu", rc, cpu), ("gpu", rg, gpu))
+        rL = [r.rL for r in R]
+        rS = [r.rS for r in R if r.resolved]
+        nres = length(rS)
+        notgated = count(i -> R[i].bnd16 / 2 > abs(R[i].Lref), 1:m)
+        row("AC18a", "$lab: backend $nm (provenance $(res.provenance.backend)): max |L - L_ref| / (8 eps (Psi1 + Psi2)) over $m orbits (median $(fmt(sort(rL)[end ÷ 2])); orbits with the bound above |L|: $notgated, reported)",
+            maximum(rL), "<= 1", pf(maximum(rL) <= 1))
+        row("AC18a", "$lab: backend $nm: max |SALI - SALI_ref| / B_SALI(n) over the $nres of $m resolved orbits (median $(fmt(sort(rS)[max(end ÷ 2, 1)])))",
+            maximum(rS), "<= 1", pf(nres > 0 && maximum(rS) <= 1))
+    end
+    dx = [maximum(abs.(cpu.x[j] - gpu.x[j])) for j in 1:m]
+    agree = findall(<=(1e-9), dx)
+    row("AC18b", "$lab: orbits with final states apart by more than 1e-9, CPU vs GPU (bitwise equal: $(count(==(0), dx)); median |dx| $(fmt(sort(dx)[end ÷ 2])), max $(fmt(maximum(dx))))", count(>(1e-9), dx), "reported", "INFO")
+    Kd = exact(Double64, Kt)
+    ref64 = sali_est(StandardMap(Kd), [SVector{2,Double64}(z) for z in xT], N, 1, :cpu)
+    dd = [Float64(maximum(abs.(SVector{2,Double64}(cpu.x[j]) - ref64.x[j]))) for j in 1:m]
+    row("AC18b", "$lab: orbits with final states apart by more than 1e-9, CPU Float64 vs Double64 CPU (max $(fmt(maximum(dd))))", count(>(1e-9), dd), "reported", "INFO")
+    if chaotic
+        row("AC18b", "$lab: orbits with final states within 1e-9 in every coordinate (the selection of the first D68 run; no longer the entering rule for this class)", length(agree), "reported", "INFO")
+        return d68_chaotic_b(lab, cpu, gpu, rc, rg, orb, m)
+    end
+    row("AC18b", "$lab: orbits that enter part (b) (final states within 1e-9 in every coordinate)", length(agree), "reported", "INFO")
+    gL = [abs(Float64(cpu.finals[j][1].L) - Float64(gpu.finals[j][1].L)) / rc[j].bnd16 for j in agree]
+    gS = [abs(Float64(cpu.finals[j][1].sali) - Float64(gpu.finals[j][1].sali)) / (2 * rc[j].BS) for j in agree if rc[j].resolved && rg[j].resolved]
+    row("AC18b", "$lab: orbits that agree: max |L_cpu - L_gpu| / (16 eps (Psi1 + Psi2)) over $(length(agree)) orbits", isempty(gL) ? NaN : maximum(gL), "<= 1", pf(!isempty(gL) && maximum(gL) <= 1))
+    row("AC18b", "$lab: orbits that agree: max |SALI_cpu - SALI_gpu| / (2 B_SALI(n)) over the $(length(gS)) resolved ones", isempty(gS) ? NaN : maximum(gS), "<= 1", pf(!isempty(gS) && maximum(gS) <= 1))
+    sd = stepdiff[agree]
+    row("AC18b", "$lab: diagnostic on the orbits that agree: largest CPU-GPU orbit-point difference over all steps, median / max (the final-state threshold 1e-9 does not bound it); orbits with the L ratio above 1: $(count(>(1), gL)), with the SALI ratio above 1: $(count(>(1), gS))", isempty(sd) ? "-" : "$(fmt(sort(sd)[max(end ÷ 2, 1)])) / $(fmt(maximum(sd)))", "reported", "INFO")
+end
+
+want("sali") && let
+    x0, ncand, nrep = regular_starts(1024)
+    N = 4 * 10^4
+    for T in (Float64, Double64)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC18a", "K=0.5 regular class, $T, n=$(fmt(N)): each backend against its own BigFloat reference", "-", "<= 1", fb(reason)); continue)
+        xT = [SVector{2,T}(T(z[1]), T(z[2])) for z in x0]
+        sali_d68("K=0.5 regular class (S7: $(length(x0)) of $ncand candidates regular, $nrep replaced)", T, exact(T, 0.5), xT, N)
+    end
+    for T in (Float64, Double64)
+        ac12_chaotic("AC18c", "SALI, -L/(2n)", sali_est, f -> SVector(-f.L / (2 * 10^4)), 1, T)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC18a", "K=10 chaotic class, $T, n=8: each backend against its own BigFloat reference", "-", "<= 1", fb(reason)); continue)
+        rng = StableRNG(SEED + 50000 + 1003)
+        xT = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:1024]
+        sali_d68("K=10 chaotic class", T, exact(T, 10), xT, 8; chaotic = true)
+    end
+end
+
 counts = Dict{String,Int}()
 for (_, v) in ROWS
     k = startswith(v, "FALLBACK") ? "FALLBACK" : v

@@ -1,0 +1,25 @@
+# gpu verification, julia 1.13.2, threads 4, cpu arrowlake-s, base seed 20261012
+# device type ChaoslabCUDAExt.CUDADevice, name 'NVIDIA GeForce RTX 5060 Laptop GPU'
+# CUDA.jl 6.4.2, runtime 13.4.0, driver 13.4.0, capability 12.0.0, free memory 6925.0 MiB, stack limit 4096 B (extension minimum D40)
+# Windows TDR registry values (GraphicsDrivers): TdrDelay    REG_DWORD    0x8; TdrDDIDelay    REG_DWORD    0xa; TdrLevel    REG_DWORD    0x3
+# record file: C:\Users\tesse\Documents\Vibe Coding\Chaos\data\gpu-benchmark.toml (exists at start)
+# probe Float64: (loadable = true, functional = true, device = "NVIDIA GeForce RTX 5060 Laptop GPU", compiles = true, gpu_faster = true)
+# probe Double64: (loadable = true, functional = true, device = "NVIDIA GeForce RTX 5060 Laptop GPU", compiles = false, gpu_faster = false)
+# format: AC<n> | quantity | value | bound | verdict
+# after the record: resolve_backend(:auto, Float64) = BackendChoice(:gpu, "NVIDIA GeForce RTX 5060 Laptop GPU", ""); (:auto, Double64) = BackendChoice(:cpu, "cpu", "kernel does not compile for the element type")
+AC18 | sali: (a) K=0.5 regular class (S7: 1024 of 3072 candidates regular, 17 replaced), Float64, lifted, n=40000, tau=1, 1024 orbits: max over the 1024 gated orbits of |L_cpu - L_gpu| / (16 eps (Psi1 + Psi2)); not gated (bound > |L|): 0, their max ratio 0; max |L_cpu - L_gpu| over all 2.849; median ratio 1.525 (provenance backend gpu) | 1.758e+06 | <= 1 | FAIL
+AC18 | sali: (a) Float64: the CPU and GPU orbits differ: final x bitwise equal for 0 of 1024 orbits, median |dx| 1.171e-06, max 0.00261 (the gate above compares different orbits, no orbit-divergence term in the spec bound) | 0.00261 | reported | INFO
+AC18 | sali: (a) Float64: same ratio restricted to the 3 orbits whose final x agrees within 1e-12 (same-orbit regime): max |L_cpu - L_gpu| / (16 eps (Psi1 + Psi2)) | 0.001102 | <= 1 | PASS
+AC18 | sali: (a) Float64: same ratio restricted to the 144 orbits whose final x agrees within 1e-09 (same-orbit regime): max |L_cpu - L_gpu| / (16 eps (Psi1 + Psi2)) | 0.0143 | <= 1 | PASS
+AC18 | sali: (a) Float64, tangent-core D33 form on L (information): orbits with |L - L_Double64 CPU| > 1e-6, CPU / GPU; max CPU-GPU gap over the 242 orbits where both agree with the reference | 653 / 625 (diff 28); 1.845e-06 | count diff <= 3; gap <= 2e-6 (tangent-core AC12a) | INFO
+AC18 | sali: (a) K=0.5 regular, Float64, 64 orbits, n=40000, tau=1: direct SALI inside the resolved window (64 of 64 resolved): max |SALI_cpu - SALI_gpu| / (2 B_SALI) (provenance backend gpu) | 0.176 | <= 1 | PASS
+AC18 | sali: (a) K=0.5 regular, Float64: the CPU and GPU orbits differ (the gate above compares different orbits): final x bitwise equal for 0 of 64 orbits, max |dx| 1.316e-05 | 1.316e-05 | reported | INFO
+AC18 | sali: (a) K=0.5 regular class, Double64, n=40000: L_cpu vs L_gpu | - | <= 1 | FALLBACK(kernel does not compile for the element type)
+AC18 | sali: (c) K=10, Float64, 1024 orbits, n=1e4, tau=2, SALI, -L/(2n) lambda_1: max per-orbit |cpu - gpu| / sigma_FT (sigma_FT=0.009471); |difference of means| / SE; means cpu 1.62 gpu 1.62 | 4.991; 0.6085 | 6; 4 | PASS
+AC18 | sali: (b) K=10 chaotic, Float64, 1024 orbits, n=8, tau=1: direct SALI inside the resolved window (953 of 1024 resolved): max |SALI_cpu - SALI_gpu| / (2 B_SALI) (provenance backend gpu) | 3.595 | <= 1 | FAIL
+AC18 | sali: (b) K=10 chaotic, Float64: the CPU and GPU orbits differ (the gate above compares different orbits): final x bitwise equal for 174 of 1024 orbits, max |dx| 1.499e-08 | 1.499e-08 | reported | INFO
+AC18 | sali: (b) K=10 chaotic, Float64: GPU direct SALI against the BigFloat reference on the GPU's own orbit (953 resolved orbits): max |SALI_gpu - SALI_ref| / B_SALI (the single-backend bound) | 0.07712 | <= 1 | PASS
+AC18 | sali: (c) K=10 chaotic ensemble, Double64: SALI, -L/(2n), 6 sigma_FT per orbit and 4 SE for the means | - | 6 sigma; 4 SE | FALLBACK(kernel does not compile for the element type)
+┌ Warning: linking module flags 'Dwarf Version': IDs have conflicting values ('i32 4' from globals with 'i32 2' from start)
+└ @ LLVM C:\Users\tesse\.julia\packages\LLVM\tiRVR\src\core\context.jl:209
+# SUMMARY FAIL=2, FALLBACK=2, INFO=4, PASS=5 (13 lines)

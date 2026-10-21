@@ -4,6 +4,8 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 ## Unreleased
 
+## 0.1.0 (2026-10-21)
+
 ### Added (M0 bootstrap)
 
 - ICM workspace: four workspaces, 19 stage contracts, `_config/` references, run-store schema v1, setup questionnaire.
@@ -74,6 +76,17 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 - Corrections of the specification found by the real store: oracle O1 does not hold for L9 (it has its own singular-value closed form); items of the tau sweep with a breakdown hold NaN rows; the Y5 control has no `K`; the ladder needs one common half point for the three precisions.
 - Layering: `Analysis` added to the layer list of `test/layering.jl`; `_config/architecture.md` and `_config/build-order.md` list the module (D60).
 
+### Fixed (CI, before v0.1.0)
+
+- Julia floor raised from 1.10 to 1.11 (D62): `Manifest.toml` is now the Julia 1.11 manifest and the CI matrix tests 1.11 and the current release. The old 1.10 manifest lacked the dependencies added in M3 (JSON, HDF5), so the LTS jobs failed at build.
+- `write_chunk`: the file descriptor is converted to `RawFD` before `fsync`/`_commit` (Julia 1.11 returns an `Int`).
+- Experiments tests: the campaign helper uses a zero-cost clock when a test injects none, so the first-chunk cost cap cannot pause arms on a slow CI host; the cap itself stays tested with injected clocks. The CLI run test sets `--cap-override` for the same reason; the outside-repository path test uses an absolute path of the host platform (Ubuntu).
+
+### M3 exit (D61)
+
+- Modules `experiments` (D49) and `analysis` (D60) verified (stages 01 to 05); study p1-le-benchmark accepted (stages 01 to 05, results document); risk K20 closed, K13 and K18 updated.
+- `CITATION.cff` added; first tag `v0.1.0`, archived by the GitHub-Zenodo integration.
+
 ### Deferred, with reason
 
 - `bin/chaoslab.jl`, `python/nbody/`: no caller before M3 (D16).
@@ -81,4 +94,3 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 - Step-chunked GPU relaunch (state carried between launches): a named run before M2 exit (D33).
 - lyap-two-trajectory criterion 13 (external two-trajectory oracle): sent back to stage 01, open before M2 exit (D43).
 - Fallback reason for a lost device (error 700 is reported as "launch exceeds the display watchdog"): with the step-chunked relaunch (D33, D43).
-- `CITATION.cff` and Zenodo: after `setup` fills the author data, before the first tag `v0.1.0` (M3).

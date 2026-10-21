@@ -397,7 +397,8 @@ end
     root = normpath(joinpath(@__DIR__, "..", ".."))
     @test EX._repo_path(joinpath(root, "workspaces", "study", "x.md"), root) == "workspaces/study/x.md"
     @test EX._repo_path(b.prereg, root) == p
-    @test !occursin(':', EX._repo_path("C:\\Users\\someone\\secret\\prereg.md", root))
+    outside = Sys.iswindows() ? "C:\\Users\\someone\\secret\\prereg.md" : "/home/someone/secret/prereg.md"   # an absolute path of this platform
+    @test !occursin(':', EX._repo_path(outside, root)) && !occursin("someone", EX._repo_path(outside, root))
     # D52 (L8): a refusal names the K index
     pre = ex_prereg_for(Dict{String, Any}("delta_dup" => 0.5))
     @test ex_rejects(() -> EX.build_panel(pre; out = ex_path("refuse-panel.toml")), ["K index 2"])

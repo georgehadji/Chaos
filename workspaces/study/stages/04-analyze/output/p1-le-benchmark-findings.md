@@ -215,7 +215,7 @@ Readings
 5. H5a is read from the per-precision labels before the ladder test acts; H5 is supported only if H5a, H5b and H5c all pass (P6). Affects the H5a value (1.0 while 35 labels are forced, D3) and the H5 verdict rule.
 6. Percentile bootstrap, orbits resampled with replacement, W and S resampled independently, streams keyed by seed and label (P7). Affects the intervals of H2 and H3.
 7. F1 shows the first drawn orbit of each cell, F3 empirical distribution functions, F4 shares per test, F5 quantiles, F7 paired differences (P8). Affects the figures only.
-8. S is the class C orbits at K = 2 pi and K = 10 without a label condition; W takes class C at 0 < K <= K_c; E_ch takes class C at K > 0. Fixes the membership of S (80 orbits), W (355) and E_ch (209).
+8. S is the class C orbits at K = 2 pi and K = 10 without a label condition; W takes class C at 0 < K <= K_c; E_ch takes class C at K > 0. Fixes the membership of S (80 orbits), W (355) and E_ch (209). Correction: the program's phrase for W is a shortened form and is not the frozen definition. W is the set of the preregistration, H2 (labelled orbits of the classes sticky or near-separatrix at any K > 0, plus chaotic-sea orbits at K <= K_c); the 355 orbits are class C at K index 2 and 3, S at 2 to 5 and X at 2 to 6 (T3).
 9. Periodic points are the controls of kind fixed or newton; kind y5 is not periodic. Affects how the controls are labelled.
 10. The ladder compares the three precisions with one common half point: the recorded step nearest N_B/2 that all three items have. Affects the ladder test and its share in F4.
 11. Diagnostics exceeded is read on the L5 item at N_1 and on the L5 item at the label horizon. Affects the diagnostics test (0 forced).

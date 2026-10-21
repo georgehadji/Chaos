@@ -166,7 +166,9 @@ end
     io = IOBuffer()
     common = ["--code-version", EX_CODE, "--threads", "4", "--thread-override", "--allow-dirty", "--capacity", "64"]
     args(f, store) = vcat(["run", f.prereg, f.panel, "--store", store, "--manifest", store * "-manifest.json"], common)
-    @test EX.cli(args(fx, ex_store("u-run")); io = io) == 0
+    # every arm under cap override: a real-clock first chunk on a slow host must not pause an arm here (the pause is tested below)
+    arms = join([a["name"] for a in ex_plan(fx).block.raw["arm"]], ",")
+    @test EX.cli(vcat(args(fx, ex_store("u-run")), ["--cap-override", arms]); io = io) == 0
     @test length(ex_chunk_files(ex_path("u-run"))) == ex_plan(fx).counts.chunks
     # a stop status gives a nonzero exit: wall cap 1e-12 h stops after the first launch group; cost factor 1e-9 pauses an arm
     cap = ex_fix_with(ex_rb_with(ex_rb(:small), ("health", "wall_cap_hours") => 1e-12), "u-cap")

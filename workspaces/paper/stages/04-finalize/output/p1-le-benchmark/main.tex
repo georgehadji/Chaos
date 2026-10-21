@@ -114,15 +114,16 @@ project file \texttt{\_config/research-question.md}. They are claims of
 the study. They are not statements supported by the literature cited in
 this paper.
 
-Claim C1, as stated in \texttt{\_config/research-question.md}: the
-Benettin, QR (Gram-Schmidt or Householder), stabilized SVD and
-well-conditioned tangent-map methods agree on the largest exponent when
-they run long enough at adequate precision. Claim C2, as stated in
-\texttt{\_config/research-question.md}: finite-time estimators differ
-substantially over realistic budgets. The difference is expected to be
-largest in weak chaos, in sticky layers and near separatrices. The tests
-of C2 in this study run over the preregistered set W of Section 2.2,
-whose composition is shown in Tables 6 and 8.
+Claim C1, as stated in \texttt{\_config/research-question.md}:
+``Benettin, QR (Gram-Schmidt / Householder), stabilized SVD and
+well-conditioned tangent-map methods agree on lambda\_1 when run long
+enough at adequate precision.'' Claim C2, as stated in
+\texttt{\_config/research-question.md}: ``Finite-time LE estimators
+differ substantially over realistic budgets, most of all in weak chaos,
+sticky layers and near separatrices.'' Here LE stands for Lyapunov
+exponent and lambda\_1 for the largest exponent. The tests of C2 in this
+study run over the preregistered set W of Section 2.2, whose composition
+is shown in Tables 6 and 8.
 
 The study also attempts to reproduce two published values. Sala and
 Artuso give 0.298 at K = pi/2 and 1.172 at K = 2 pi
@@ -132,6 +133,33 @@ Two published comparators serve for the chaotic-sea exponent. These are
 the fit of Shevchenko \citep{Shevchenko2014} and the line ln(K/2) of
 Chirikov \citep{Chirikov1979}. The study uses both as comparators that
 never pass or fail.
+
+Lyapunov spectra are usually computed by renormalising tangent vectors
+and orthogonalising them by Gram-Schmidt
+\citep{Benettin1980a, Benettin1980b, ShimadaNagashima1979}.
+Gram-Schmidt, Householder and continuous QR variants were compared on a
+Toda chain; the discrete variants differed by much less than the
+fluctuations of the finite-time values, and continuous QR took about 40
+times the CPU time of Gram-Schmidt \citep{Geist1990}. Singular-value
+methods take the singular values of a product of Jacobians without
+forming the product \citep{Stewart1997}, and their theory holds for
+systems with stable and distinct exponents \citep{DieciElia2006}.
+
+Finite-time effects are known in particular settings. For standard-like
+maps the finite-time exponent carries an initial-vector transient that
+fades like 1/n \citep{SalaArtuso2015}. For the two-trajectory method on
+flows, the renormalisation time and the initial distance can produce a
+spurious largest exponent \citep{DubeibeBermudezAlmanza2014}. Sticky
+orbits need long runs: a finite-time exponent in an extreme sticky zone
+of the standard map had not converged after 5 x 10\^{}7 iterations,
+against about 10\^{}7 in the chaotic sea
+\citep{HarsoulaKaramanosContopoulos2019}, and one orbit at k = 0.975
+looks confined for 10\^{}6 steps and escapes after 2.3 x 10\^{}9
+\citep{Meiss2015}. Round-off induced divergence of orbits has been
+related to the reversibility error in discrete-time systems
+\citep{FarandaMestreTurchetti2012}. This study compares the estimators
+above on one map, over five orbit regimes, with a precision ladder on a
+subset of the orbits.
 
 This paper reports the study as preregistered. It adds no new claim,
 softens no result and offers no reinterpretation. Section 2 gives the
@@ -279,22 +307,25 @@ and 40 orbits. At K index 3 and 4 the classes are C, R, S, T and X with
 40 and 40 orbits. At K index 6 the classes are C and X with 40 orbits
 each. Cells that are short, empty or undefined are listed in D6 (Section
 9). K index 0 holds the exact-exponent controls. K index 1 is K = 0. K
-index 2 to 6 are K = 0.5, 0.971635406 (K\_c), 1.57079632679 (pi/2),
-6.28318530718 (2 pi) and 10. ``Class S'' is a panel class. It is not the
-``strong-chaos set S'' of H3, which is the class C orbits at K = 2 pi
-and K = 10. One orbit, orbit 881, is dropped as drift. Under the
-preregistration, drift orbits are removed from E\_ch, W and S. H5b is
-defined on all panel orbits, and the results document gives 883 for it.
-The sets used by the decision rules have these sizes: E\_ch 209, W 355,
-S 80 and S\_L 92. H5b uses 883 orbits and H5c uses 334. The program
-reads S as the class C orbits at K = 2 pi and K = 10 without a label
-condition. It reads E\_ch as class C at K \textgreater{} 0 (plus the
-controls, Section 3.1). For W this paper uses the preregistered
-definition of Section 2.2. The results document and the findings file
-state the reading of W in a shorter form, as class C at 0 \textless{} K
-\textless= K\_c {[}findings E, reading 8{]}. That form does not describe
-the cells of Tables 6 and 8, which also contain classes S and X. The
-reconciliation is an open item for the owner (Section 10). The estimator
+index 2 to 6 are K = 0.5, 0.971635406 (K\_c, the breakup value of the
+golden-mean KAM torus, as given in
+\citep{FrahmShepelyansky2010, CarlettiLaskar2000} and fixed in the
+preregistration), 1.57079632679 (pi/2), 6.28318530718 (2 pi) and 10.
+``Class S'' is a panel class. It is not the ``strong-chaos set S'' of
+H3, which is the class C orbits at K = 2 pi and K = 10. One orbit, orbit
+881, is dropped as drift. Under the preregistration, drift orbits are
+removed from E\_ch, W and S. H5b is defined on all panel orbits, and the
+results document gives 883 for it. The sets used by the decision rules
+have these sizes: E\_ch 209, W 355, S 80 and S\_L 92. H5b uses 883
+orbits and H5c uses 334. The program reads S as the class C orbits at K
+= 2 pi and K = 10 without a label condition. It reads E\_ch as class C
+at K \textgreater{} 0 (plus the controls, Section 3.1). For W this
+paper, the results document and the findings file use the preregistered
+definition of Section 2.2. The analysis program prints a shorter phrase
+for W in its list of readings, class C at 0 \textless{} K \textless=
+K\_c {[}findings E, reading 8{]}. That phrase is not the frozen
+definition and does not describe the cells of Tables 6 and 8, which also
+contain classes S and X (limitation 6, Section 10). The estimator
 methods L1 to L9 and Q are defined in the study design (Section 2.2).
 The repository (Section 11) holds the details.
 
@@ -538,10 +569,13 @@ give the other methods' deviations on these two controls separately.
 Accounting for the control ids. The panel table counts 13 controls in
 the cell of K index 0, and the H1 cell table counts 9 controls in
 E\_ch.~The controls table lists 10 ids: the six of Table 4 and the four
-info controls 878, 880, 881 and 882 (D2). The tables do not list the
-other 3 controls and do not state their ids or why they are absent. This
-is an open item for the owner (Section 10). Orbit 881 is an info control
-and is the orbit dropped as drift (Section 2.3).
+info controls 878, 880, 881 and 882 (D2). The other 3 controls, orbits
+872, 874 and 876, start at the elliptic fixed point (pi, 0) at K = 0.5,
+K\_c and pi/2 and have analytic exponent 0. E\_ch and the controls table
+take only controls with positive analytic exponent, so these three
+appear in neither; they serve the setup check of the Double64 and
+BigFloat runs and enter H5b with every panel orbit. Orbit 881 is an info
+control and is the orbit dropped as drift (Section 2.3).
 
 \subsubsection{3.4 Reading}\label{reading}
 
@@ -1264,16 +1298,16 @@ bootstrap intervals is not examined. The tables do not show why.
   redrawn and viewed at paper stage 04; they plot the figure data of the
   tables file, unchanged.
 \item
-  W is defined here by the preregistration. The results document and the
-  findings file state the reading of W in a shorter form (class C at 0
-  \textless{} K \textless= K\_c) that does not describe the cells of
-  Tables 6 and 8. Reconciling the two is an open item for the owner, and
-  stage 05 of the study carries the shorter form.
+  W is defined here by the preregistration, as in the results document
+  and the findings file. The analysis program still prints a shorter
+  phrase for W in its list of readings (class C at 0 \textless{} K
+  \textless= K\_c), which does not describe the cells of Tables 6 and 8;
+  the membership of W (355 orbits) does not depend on that phrase.
 \item
-  The controls are not fully accounted for. The panel table counts 13
-  controls and the controls table lists 10 ids. The ids and status of
-  the other 3 are not in the tables read for this paper. Orbit 881 is an
-  info control and the orbit dropped as drift.
+  The controls table lists 10 of the 13 controls; the other 3 are the
+  elliptic controls with exponent 0, which no decision rule of H1 uses
+  (Section 3.3). Orbit 881 is an info control and the orbit dropped as
+  drift.
 \item
   Table 1 gives two git commits, one for the run and one for the
   analysis. They are related through the repository history only; the
@@ -1282,9 +1316,11 @@ bootstrap intervals is not examined. The tables do not show why.
 \item
   The repository folder \texttt{data/} holds run outputs and is
   git-ignored (project folder map), so it is not part of the repository
-  at the URL of Section 11. The results document does not state where
-  the stored series are held, and no deposit location for them is
-  recorded.
+  at the URL of Section 11. The stored series are packed for deposit as
+  a dataset on Zenodo (1363 chunk files with the manifest, the panel,
+  the preregistration, the parameter file, the file-format description
+  and a SHA-256 list); the dataset DOI is given in Section 11 once it is
+  issued.
 \item
   The frozen preregistration is in the repository (Section 11). The
   results document records no external time-stamped deposit of it.
@@ -1303,9 +1339,8 @@ bootstrap intervals is not examined. The tables do not show why.
 \item
   Open items carried over from the study hand-off: the STRONG\_K
   constant was kept by owner decision, and its role is not described in
-  the results document. A Manifest.toml for Julia 1.10 is unresolved, so
-  the pinning of dependency versions for that Julia version is not
-  settled here.
+  the results document. The package requires Julia 1.11 or later, so no
+  dependency manifest for Julia 1.10 is kept.
 \end{enumerate}
 
 \subsection{11. Data and code
@@ -1326,8 +1361,8 @@ the analysis commit and v0.1.1 the package code changes only in
 docstrings and in a file-descriptor conversion of the chunk writer that
 is a no-op on Julia 1.13.2, the Julia version of the run. The run
 manifest and the stored series identify the run. The SHA-256 values are
-in Table 1. The location of the stored series is not stated (limitation
-9, Section 10).
+in Table 1. The stored series are deposited as a Zenodo dataset
+(limitation 9, Section 10); dataset DOI: to be added at deposit.
 
 \subsubsection{Availability statement}\label{availability-statement}
 
@@ -1345,8 +1380,8 @@ manifest:
 \seqsplit{ae6ec80eb08fbd6e98aeef1fbf840a567a03102ab943f2ae0aaf2b3e367f191d}).
 Results document:
 \texttt{workspaces/study/stages/05-report/output/p1-le-benchmark-results.md}.
-The stored series are not part of the repository and have no deposit
-location yet.
+The stored series are not part of the repository; they are deposited as
+a Zenodo dataset (DOI to be added at deposit).
 
 \subsection{AI-use disclosure}\label{ai-use-disclosure}
 

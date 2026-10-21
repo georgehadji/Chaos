@@ -4,6 +4,10 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 ## Unreleased
 
+### Added
+
+- `Chaoslab.Indicators` layer with the `SALI` reducer (Smaller Alignment Index and its log form for `k = 2`), `alignment_indices`, `sali_pair`, `sali_from_log`, `sali_floor` and `check_frame`.
+
 ## 0.1.2 (2026-10-21)
 
 First release archived on Zenodo (D64). The computing code is unchanged since 0.1.0.

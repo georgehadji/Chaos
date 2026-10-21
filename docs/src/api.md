@@ -51,6 +51,15 @@ Modules = [Chaoslab.Lyapunov]
 Private = false
 ```
 
+## Indicators
+
+Chaos indicators as reducers: the Smaller Alignment Index SALI, its pure functions and the frame check.
+
+```@autodocs
+Modules = [Chaoslab.Indicators]
+Private = false
+```
+
 ## Experiments
 
 Preregistered campaigns: orbit panels, chunked resumable runs, the HDF5 run store and manifests.

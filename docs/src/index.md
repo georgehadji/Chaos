@@ -45,6 +45,7 @@ res.finals[1][1].lambda
 | `Tangent` | the propagation kernel and the reducer protocol |
 | `Diagnostics` | reducers that check a run |
 | `Lyapunov` | the exponent estimators |
+| `Indicators` | chaos indicators as reducers (SALI) |
 | `Experiments` | preregistered campaigns and the HDF5 run store |
 | `Analysis` | analysis of a finished study run |
 

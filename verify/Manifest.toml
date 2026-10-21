@@ -396,7 +396,7 @@ version = "3.5.4"
 deps = ["Dates", "DoubleFloats", "HDF5", "JSON", "KernelAbstractions", "LinearAlgebra", "PrecompileTools", "SHA", "StableRNGs", "StaticArrays", "TOML"]
 path = ".."
 uuid = "1d9ee621-a3a2-43c0-acfa-d3a4a467f53c"
-version = "0.1.1"
+version = "0.1.2"
 weakdeps = ["CUDA", "CairoMakie"]
 
     [deps.Chaoslab.extensions]

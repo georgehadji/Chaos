@@ -28,7 +28,7 @@ Run identity. All numbers in this document come from one fully automatic analysi
 | Bootstrap seed | 20261012 | [findings A, table], [params: bootstrap seed in Header] |
 | Run status | complete, 1363 chunks, all with status ok | [manifest: status], [manifest: plan_counts.chunks], [manifest: chunks[].status] |
 
-The findings file gives the first git commit above [findings A, table] and the manifest records the second [manifest: git.sha]. The findings file does not relate the two values, and this document does not either.
+The findings file gives the first git commit above [findings A, table] and the manifest records the second [manifest: git.sha]. The findings file does not relate the two values. They are related in the repository history [git: merge-base and diff of 3e405f3 and d31b655]: the manifest commit 3e405f3 is an ancestor of the analysis commit d31b655, and between them only `src/Analysis/`, `src/Chaoslab.jl` (the include and export of Analysis), `ext/ChaoslabCairoMakieExt.jl`, `ext/CONTEXT.md`, `bin/chaoslab.jl` and `Project.toml` change. The code that computed the stored series is the same at both commits; the series come from the run at 3e405f3 and the tables and figures from the analysis at d31b655.
 
 What the study tested. Study p1-le-benchmark belongs to paper P1 and tests claims C1 and C2 [findings A]. It compares estimators of the largest Lyapunov exponent on a panel of 883 orbits [T1] at five nonzero values of the kick parameter K, plus exact-exponent controls [findings A]. The preregistered value types were FALSIFIES (C1, C2), REPRODUCES (SalaArtuso2015), TOOL and NEGATIVE allowed [findings A]. The decision rules were frozen on 2026-10-17, before any data existed, with Amendments A1 to A6 all frozen before the first study data file [findings A]. The rules are applied here without change. Claim C3 is out of scope (paper P2) [findings A].
 
@@ -269,7 +269,7 @@ Deviations from the frozen text, as the program states them [findings E, Deviati
 
 Readings where the frozen text is silent are listed in [findings E, Readings 1 to 14] and in the tables file, section Readings. Two readings bear directly on the verdicts above: H5a is read from the per-precision labels before the ladder test acts, and H5 is supported only if H5a, H5b and H5c all pass [findings E, reading 5]; and S is the class C orbits at K = 2 pi and K = 10 without a label condition, and E_ch takes class C at K > 0 [findings E, reading 8]. W is the set defined in the preregistration: "orbits with instability label "positive growth supported" (D37) in the design classes sticky or near-separatrix at any K > 0, plus chaotic-sea orbits at K <= K_c" [preregistration, H2]. The shortened form "class C at 0 < K <= K_c" of [findings E, reading 8] is not that definition and is not used here.
 
-Package version. The TOOL value type names the tagged release v0.1.0, which is cut at milestone M3 exit. This run was made with package version 0.0.1, at the commit given in the header, before the tag [findings E, Note; manifest: versions.module].
+Package version. The TOOL value type names the tagged release v0.1.0, which is cut at milestone M3 exit. This run was made with package version 0.0.1, at the commit given in the header, before the tag [findings E, Note; manifest: versions.module]. The tag v0.1.0 was cut on 2026-10-21 at commit 238e96b, a descendant of both commits of the header [git: tag v0.1.0].
 
 ## Limitations
 

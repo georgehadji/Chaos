@@ -20,8 +20,8 @@ const CLASS_COLORS = Dict("C" => :red, "R" => :blue, "S" => :green, "T" => :oran
 const K_STYLES = Dict(1 => (:dash, :loose), 2 => :solid, 3 => :dash, 4 => :dot, 5 => :dashdot, 6 => :dashdotdot)
 const PREC_COLORS = [:steelblue, :darkorange, :seagreen, :purple]   # F6: by order of first appearance of the precision label
 
-method_legend(fig, pos; extra = Pair[]) = Legend(fig[pos...], vcat([LineElement(color = COLORS[m]) for m in vcat(VM, "L2")], first.(extra)),
-                                                 vcat(vcat(VM, "L2"), last.(extra)), "method"; labelsize = 12, framevisible = false)
+method_legend(fig, pos; extra = Pair[], labelsize = 12) = Legend(fig[pos...], vcat([LineElement(color = COLORS[m]) for m in vcat(VM, "L2")], first.(extra)),
+                                                 vcat(vcat(VM, "L2"), last.(extra)), "method"; labelsize = labelsize, framevisible = false)
 
 col(t, name) = (j = findfirst(==(name), t.columns); [r[j] for r in t.rows])
 
@@ -41,10 +41,17 @@ function grid(n; cols = 4)
     return (cols = min(n, cols), rows = cld(n, cols))
 end
 
-function f1(t, out, study)
-    gs = groups(t, "class", "k_index")
+# F1 and F2 are also drawn in two halves (K index 1 to 3, and 4 to 6 with the pooled W panel) with a larger font, so that at
+# journal width (two columns, about 504 pt) the text stays at or above 8 pt; the full figures are drawn unchanged.
+const HALVES = (("a", k -> 1 <= k <= 3), ("b", k -> k == 0 || 4 <= k <= 6))
+const HALF_FONT = 21          # 21 pt at 1220 px width scales to about 8.6 pt at 504 pt
+const HALF_PANEL = (260, 250)
+const HALF_LEGEND_W = 260
+
+function f1(t, out, study; id = "F1", keep = k -> true, fontsize = 14, panel = (320, 260), legend_w = 0)
+    gs = [(key, ix) for (key, ix) in groups(t, "class", "k_index") if keep(key[2])]
     g = grid(length(gs))
-    fig = Figure(size = (320 * g.cols, 260 * g.rows))
+    fig = Figure(size = (panel[1] * g.cols + legend_w, panel[2] * g.rows); fontsize = fontsize)
     for (i, (key, ix)) in enumerate(gs)
         ax = Axis(fig[fld(i - 1, g.cols) + 1, mod(i - 1, g.cols) + 1]; title = "class $(key[1]), K index $(key[2])", xscale = log10, LOGN..., xlabel = "n", ylabel = "lambda_1(n)")
         n = col(t, "n")[ix]
@@ -55,14 +62,14 @@ function f1(t, out, study)
             lines!(ax, n, col(t, m)[ix]; color = COLORS[m], label = m)
         end
     end
-    method_legend(fig, (1:g.rows, g.cols + 1); extra = [PolyElement(color = (:gray, 0.3)) => "Delta_V band (L2 excluded)"])
-    return savefig(fig, out, study, "F1")
+    method_legend(fig, (1:g.rows, g.cols + 1); extra = [PolyElement(color = (:gray, 0.3)) => "Delta_V band (L2 excluded)"], labelsize = fontsize)
+    return savefig(fig, out, study, id)
 end
 
-function f2(t, out, study)
-    gs = groups(t, "class", "k_index")
+function f2(t, out, study; id = "F2", keep = k -> true, fontsize = 14, panel = (320, 260), legend_w = 0)
+    gs = [(key, ix) for (key, ix) in groups(t, "class", "k_index") if keep(key[2])]
     g = grid(length(gs))
-    fig = Figure(size = (320 * g.cols, 260 * g.rows))
+    fig = Figure(size = (panel[1] * g.cols + legend_w, panel[2] * g.rows); fontsize = fontsize)
     for (i, (key, ix)) in enumerate(gs)
         title = key[1] == "W" ? "set W of H2, pooled" : "class $(key[1]), K index $(key[2])"
         ax = Axis(fig[fld(i - 1, g.cols) + 1, mod(i - 1, g.cols) + 1]; title = title, xscale = log10, LOGN..., xlabel = "n", ylabel = "R(n)")
@@ -71,8 +78,8 @@ function f2(t, out, study)
         lines!(ax, n, col(t, "median")[ix]; color = :blue)
     end
     Legend(fig[1:g.rows, g.cols + 1], [LineElement(color = :blue), PolyElement(color = (:blue, 0.25))],
-           ["median over the orbits", "95 percent bootstrap band"]; labelsize = 12, framevisible = false)
-    return savefig(fig, out, study, "F2")
+           ["median over the orbits", "95 percent bootstrap band"]; labelsize = fontsize, framevisible = false)
+    return savefig(fig, out, study, id)
 end
 
 function f3(t, out, study)
@@ -157,6 +164,9 @@ function draw_figures(res, out)
     f = res.figures
     paths = [f1(f["F1"], out, res.study), f2(f["F2"], out, res.study), f3(f["F3"], out, res.study), f4(f["F4"], out, res.study),
              f5(f["F5"], out, res.study), f6(f["F6"], out, res.study), f7(f["F7"], out, res.study)]
+    for (h, keep) in HALVES, (fk, id) in ((f1, "F1"), (f2, "F2"))
+        push!(paths, fk(f[id], out, res.study; id = id * h, keep = keep, fontsize = HALF_FONT, panel = HALF_PANEL, legend_w = HALF_LEGEND_W))
+    end
     return paths
 end
 

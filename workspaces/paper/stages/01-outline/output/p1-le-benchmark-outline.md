@@ -115,10 +115,12 @@ This paper reports one preregistered numerical study of largest-Lyapunov-exponen
 
 ### 11. Data and code availability
 
-- Claim 11.1: Repository https://github.com/georgehadji/Chaos (GPL-3.0-or-later). The tagged release v0.1.0 is NOT yet cut (cut at milestone M3 exit). The run used package version 0.0.1 at the commit given in the run-identity table, before the tag.
+- Claim 11.1: Repository https://github.com/georgehadji/Chaos (GPL-3.0-or-later). The tagged release v0.1.0 was cut at milestone M3 exit (commit 238e96b). The run used package version 0.0.1 at the commits given in the run-identity table, before the tag; the run commit is an ancestor of the analysis commit with the same series code.
   - Evidence: `_config/publication.md` (repository); RD, Deviations and readings, "Package version" ([findings E, Note], [manifest: versions.module]).
 - Claim 11.2: The run manifest and the stored series identify the run, with the SHA-256 values in the run-identity table.
   - Evidence: RD, Header run-identity table.
+- Claim 11.3 (TOOL): Chaoslab v0.1.1 (commit efeac86) is a tagged, documented release of the code the run used; every method of the run is `verified`, and the package code differs from the analysis commit only in docstrings and a file-descriptor conversion that is a no-op on Julia 1.13.2.
+  - Evidence: preregistration, Methods ("All methods ... are `verified`"); RD, Deviations and readings, "Package version" ([git: tag v0.1.1], [git: diff d31b655 v0.1.1], [manifest: versions.language]); `_config/value-types.md` (TOOL).
 
 ### 12. Conclusion
 
@@ -159,6 +161,7 @@ This paper reports one preregistered numerical study of largest-Lyapunov-exponen
 | 10.1 to 10.5 | 10 | RD Limitations, Deviations 1 | traced |
 | 11.1 | 11 | `_config/publication.md`; RD "Package version" | traced |
 | 11.2 | 11 | RD Header run-identity table | traced |
+| 11.3 | 2.1, 11, 12 | preregistration Methods; RD "Package version"; `_config/value-types.md` | traced (added at stage 04, D63) |
 | 12.1 | 12 | RD "Claims C1 and C2", H1 to H5 | traced |
 
 No claim has status "uncited".
@@ -173,9 +176,9 @@ These may appear in the Methods text only as "defined in the study design" with 
 ## Open items for the human
 
 1. Target journal: to be decided; `_config/publication.md` defers the decision to this stage.
-2. Tagged release v0.1.0 is not cut (milestone M3 exit); the run used package version 0.0.1, so TOOL cannot be claimed as delivered.
-3. The results header lists two git SHAs (d31b655d0c33e2f2f1a67bbbdeba9c8c8a3fd036 from the tables header and findings, 3e405f3324f8d25162580d3380db26c877d7ca63 from [manifest: git.sha]). The study does not relate them.
+2. Tagged release v0.1.0 is not cut (milestone M3 exit); the run used package version 0.0.1, so TOOL cannot be claimed as delivered. Resolved 2026-10-21: v0.1.0 cut at M3 exit (D61); TOOL claimed for the documented release v0.1.1 (D63, claim 11.3).
+3. The results header lists two git SHAs (d31b655d0c33e2f2f1a67bbbdeba9c8c8a3fd036 from the tables header and findings, 3e405f3324f8d25162580d3380db26c877d7ca63 from [manifest: git.sha]). The study does not relate them. Resolved 2026-10-21: the results document relates them (the run commit is an ancestor of the analysis commit, same series code; review R20).
 4. K_c and the L1 to L9 and Q definitions have no citation key in `_config/bibliography/references.bib` as used by the results document.
 5. The STRONG_K constant was kept by owner decision.
-6. Manifest.toml for Julia 1.10 is unresolved.
+6. Manifest.toml for Julia 1.10 is unresolved. Resolved 2026-10-21: the Julia floor is 1.11 (D62).
 7. Figures F1 to F7 were checked only by file size and the `%PDF-` header, not visually.

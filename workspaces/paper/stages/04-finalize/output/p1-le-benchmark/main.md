@@ -516,12 +516,12 @@ TOOL: Chaoslab v0.1.1 is a tagged and documented release of the code the run use
 
 ## Figure list
 
-The figure files are in the `figures/` folder next to this manuscript (copies of the study output). No figure has been viewed. Figures were checked only by file size and the `%PDF-` header. In this manuscript an F-label always names a figure. Captions of F1, F2, F3 and F5 follow the results document. Captions of F4, F6 and F7 are inferred (marked below) from the section names of the tables file and are not traced to a figure caption. A visual check of all seven figures is still required before submission. The figures are listed here and not embedded.
+The figure files are in the `figures/` folder next to this manuscript. They were drawn from the figure data of the study's tables file by the figure extension of the repository at commit caaf95a; the figure data are those of the study output, unchanged. In this manuscript an F-label always names a figure. The figures are listed here and not embedded. The captions below describe what each figure draws.
 
-- Figure F1: `p1-le-benchmark-fig-F1.pdf`. The lambda_m(n) curves.
-- Figure F2: `p1-le-benchmark-fig-F2.pdf`. R(n) by class and K, with the pooled series over W.
-- Figure F3: `p1-le-benchmark-fig-F3.pdf`. The n_conv distributions.
-- Figure F4: `p1-le-benchmark-fig-F4.pdf`. The label tests (forced and unresolved counts, as read in D3). Caption inferred.
-- Figure F5: `p1-le-benchmark-fig-F5.pdf`. The symplectic residuals eps_pair(n) and eps_det(n).
-- Figure F6: `p1-le-benchmark-fig-F6.pdf`. Cost per orbit-step. Caption inferred.
-- Figure F7: `p1-le-benchmark-fig-F7.pdf`. Sensitivity. Caption inferred.
+- Figure F1: `p1-le-benchmark-fig-F1.pdf`. lambda_1(n) of the nine methods for the first drawn orbit of each populated cell (design class and K index), with the band between the smallest and the largest of the eight methods of V (L2 excluded).
+- Figure F2: `p1-le-benchmark-fig-F2.pdf`. Median of R(n) over the orbits of each cell and over the pooled set W, with the 95 percent bootstrap band.
+- Figure F3: `p1-le-benchmark-fig-F3.pdf`. Empirical distribution functions of n_conv per cell; colour by design class, line style by K index.
+- Figure F4: `p1-le-benchmark-fig-F4.pdf`. Share of orbits forced to unresolved by each label test, among the orbits the test applies to, and the share of all orbits unresolved before and after the tests.
+- Figure F5: `p1-le-benchmark-fig-F5.pdf`. Largest running maximum over the orbits of each stored diagnostic (det, symp, orth, pair, sum) per method, with the median threshold over the orbits; each orbit is tested against its own threshold.
+- Figure F6: `p1-le-benchmark-fig-F6.pdf`. Thread nanoseconds per orbit-step by method and precision.
+- Figure F7: `p1-le-benchmark-fig-F7.pdf`. Median paired difference of lambda(n_H2) from the primary item for the levels of tau, eps, initial direction and coordinate mode, over the kept S_D orbits.

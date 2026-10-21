@@ -1385,38 +1385,44 @@ release of the code the run used; every method of the run is
 \subsection{Figure list}\label{figure-list}
 
 The figure files are in the \texttt{figures/} folder next to this
-manuscript (copies of the study output). No figure has been viewed.
-Figures were checked only by file size and the \texttt{\%PDF-} header.
-In this manuscript an F-label always names a figure. Captions of F1, F2,
-F3 and F5 follow the results document. Captions of F4, F6 and F7 are
-inferred (marked below) from the section names of the tables file and
-are not traced to a figure caption. A visual check of all seven figures
-is still required before submission. The figures are listed here and not
-embedded.
+manuscript. They were drawn from the figure data of the study's tables
+file by the figure extension of the repository at commit caaf95a; the
+figure data are those of the study output, unchanged. In this manuscript
+an F-label always names a figure. The figures are listed here and not
+embedded. The captions below describe what each figure draws.
 
 \begin{itemize}
 \tightlist
 \item
-  Figure F1: \texttt{p1-le-benchmark-fig-F1.pdf}. The lambda\_m(n)
-  curves.
+  Figure F1: \texttt{p1-le-benchmark-fig-F1.pdf}. lambda\_1(n) of the
+  nine methods for the first drawn orbit of each populated cell (design
+  class and K index), with the band between the smallest and the largest
+  of the eight methods of V (L2 excluded).
 \item
-  Figure F2: \texttt{p1-le-benchmark-fig-F2.pdf}. R(n) by class and K,
-  with the pooled series over W.
+  Figure F2: \texttt{p1-le-benchmark-fig-F2.pdf}. Median of R(n) over
+  the orbits of each cell and over the pooled set W, with the 95 percent
+  bootstrap band.
 \item
-  Figure F3: \texttt{p1-le-benchmark-fig-F3.pdf}. The n\_conv
-  distributions.
+  Figure F3: \texttt{p1-le-benchmark-fig-F3.pdf}. Empirical distribution
+  functions of n\_conv per cell; colour by design class, line style by K
+  index.
 \item
-  Figure F4: \texttt{p1-le-benchmark-fig-F4.pdf}. The label tests
-  (forced and unresolved counts, as read in D3). Caption inferred.
+  Figure F4: \texttt{p1-le-benchmark-fig-F4.pdf}. Share of orbits forced
+  to unresolved by each label test, among the orbits the test applies
+  to, and the share of all orbits unresolved before and after the tests.
 \item
-  Figure F5: \texttt{p1-le-benchmark-fig-F5.pdf}. The symplectic
-  residuals eps\_pair(n) and eps\_det(n).
+  Figure F5: \texttt{p1-le-benchmark-fig-F5.pdf}. Largest running
+  maximum over the orbits of each stored diagnostic (det, symp, orth,
+  pair, sum) per method, with the median threshold over the orbits; each
+  orbit is tested against its own threshold.
 \item
-  Figure F6: \texttt{p1-le-benchmark-fig-F6.pdf}. Cost per orbit-step.
-  Caption inferred.
+  Figure F6: \texttt{p1-le-benchmark-fig-F6.pdf}. Thread nanoseconds per
+  orbit-step by method and precision.
 \item
-  Figure F7: \texttt{p1-le-benchmark-fig-F7.pdf}. Sensitivity. Caption
-  inferred.
+  Figure F7: \texttt{p1-le-benchmark-fig-F7.pdf}. Median paired
+  difference of lambda(n\_H2) from the primary item for the levels of
+  tau, eps, initial direction and coordinate mode, over the kept S\_D
+  orbits.
 \end{itemize}
 
 \bibliography{refs.bib}

@@ -6,7 +6,11 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 ### Added
 
-- `Chaoslab.Indicators` layer with the `SALI` reducer (Smaller Alignment Index and its log form for `k = 2`), `alignment_indices`, `sali_pair`, `sali_from_log`, `sali_floor` and `check_frame`.
+- `Chaoslab.Indicators` layer with the `SALI` reducer (Smaller Alignment Index and its log form for `k = 2`), `alignment_indices`, `sali_pair`, `sali_from_log`, `sali_floor` and `check_frame`. Verified at module-build stage 04 against closed forms, the Lyapunov L1 estimator on the identical orbit, ChaosTools GALI_2 and the local GPU (catalog row I2 `verified`; decisions D66, D67, D68).
+
+### Changed (catalog and benchmarks)
+
+- Catalog row I2 and the benchmarks rows for SALI: for 2D maps SALI tends to zero for regular orbits too, by a power law, so a fixed threshold gives a horizon-dependent label.
 
 ## 0.1.2 (2026-10-21)
 

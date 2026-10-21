@@ -2,7 +2,7 @@
 
 Chaos indicators as reducers of the tangent stream and the pure functions behind them. Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer), so it carries its own scaled norm. Built by the sali run (catalog I2); gali (I3), fli-ofli and megno follow in M4.
 
-Spec: `workspaces/module-build/stages/01-spec/output/sali-spec.md` (A1 to A16, criteria 1 to 18; decisions D66 and Amendment D67). Test plan: `stages/02-tests/output/sali-test-plan.md`. Notes: `stages/03-implement/output/sali-impl-notes.md`.
+Spec: `workspaces/module-build/stages/01-spec/output/sali-spec.md` (A1 to A16, criteria 1 to 18; decision D66, Amendments D67 and D68). Verified: `stages/04-verify/output/sali-verification.md`. Test plan: `stages/02-tests/output/sali-test-plan.md`. Notes: `stages/03-implement/output/sali-impl-notes.md`.
 
 ## Files
 
@@ -47,3 +47,10 @@ Spec: `workspaces/module-build/stages/01-spec/output/sali-spec.md` (A1 to A16, c
 | GPU run (kernel path is isbits and compiles on the CPU; CUDA run is AC18, stage 04) | sali spec criterion 18 |
 | Catalog row I2 and benchmarks row "SALI, regular orbit" wording for 2D maps | sali spec P3, stage 05 |
 | GALI_k with k > 2, FLI/OFLI, MEGNO | later M4 modules |
+
+## Limits
+
+- Callers that supply an initial frame must run `check_frame` on it before the stream (D67); the stream does not, and a dependent frame would read as SALI = 0.
+- `sali_from_log` loses accuracy near SALI = sqrt 2 (condition number about 1 / cos(phi), spec Amendment D68, R1); use the direct form there.
+- The computed SALI lies in [0, sqrt 2 (1 + 2 eps)] (R2). For BigFloat the floor follows the default precision at call time.
+- `scaled_norm` repeats `Lyapunov.safe_norm` because peers may not import each other; move both to a lower layer when gali or megno need it too.

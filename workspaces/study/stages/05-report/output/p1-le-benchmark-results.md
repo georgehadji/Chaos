@@ -34,7 +34,7 @@ What the study tested. Study p1-le-benchmark belongs to paper P1 and tests claim
 
 Reading key. K index 0 holds the exact-exponent controls. K index 1 is K = 0. K index 2 to 6 are K = 0.5, 0.971635406 (K_c), 1.57079632679 (pi/2), 6.28318530718 (2 pi) and 10 [T5, rows K index 2 to 6]. Design classes are T (KAM torus), R (resonant), C (chaotic sea), S (sticky) and X (near a separatrix or a hyperbolic fixed point) [findings A]. "Class S" is a panel class. It is not the "strong-chaos set S" of H3, which is the class C orbits at K = 2 pi and K = 10 [findings A]. Counts that print as `166.0` or `2.0` in the tables are formatting only [findings A].
 
-Panel and sets. The panel has 883 orbits and one, orbit 881, is dropped as drift [T1, last line]. The sets used below have these sizes: E_ch 209, W 355, S 80 [findings E, reading 8], S_L 92 [T7, row H5a], 883 for H5b and 334 for H5c [T7, rows H5b, H5c].
+Panel and sets. The panel has 883 orbits and one, orbit 881, is dropped as drift [T1, last line]. The sets used below have these sizes: E_ch 209, W 355, S 80 [findings E, reading 8], S_L 92 [T7, row H5a], 883 for H5b and 334 for H5c [T7, rows H5b, H5c]. Three of the 13 controls, orbits 872, 874 and 876, start at the elliptic fixed point (pi, 0) at K = 0.5, K_c and pi/2 and have analytic exponent 0 [panel: orbits 872, 874, 876, fields stability and exponent]. E_ch and the controls table of H1 take only the controls with positive analytic exponent [prereg: Eligible sets; analysis spec E9], so these three appear in neither; the preregistration uses the elliptic controls in the setup check of the Double64 and BigFloat runs [prereg: Amendment A4, item 1], and they enter H5b with every panel orbit.
 
 ## Confirmatory results
 

@@ -4,7 +4,7 @@ Layer 3, canonical. Filled once by `setup`.
 
 ## Author
 
-- Name: georgehadji
+- Name: Georgios-Chrysovalantis Chatzivantsidis (GitHub: georgehadji)
 - Affiliation: Independent researcher
 - ORCID: none yet
 

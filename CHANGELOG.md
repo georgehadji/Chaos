@@ -80,7 +80,7 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 - Julia floor raised from 1.10 to 1.11 (D62): `Manifest.toml` is now the Julia 1.11 manifest and the CI matrix tests 1.11 and the current release. The old 1.10 manifest lacked the dependencies added in M3 (JSON, HDF5), so the LTS jobs failed at build.
 - `write_chunk`: the file descriptor is converted to `RawFD` before `fsync`/`_commit` (Julia 1.11 returns an `Int`).
-- Experiments tests: the campaign helper uses a zero-cost clock when a test injects none, so the first-chunk cost cap cannot pause arms on a slow CI host; the cap itself stays tested with injected clocks.
+- Experiments tests: the campaign helper uses a zero-cost clock when a test injects none, so the first-chunk cost cap cannot pause arms on a slow CI host; the cap itself stays tested with injected clocks. The CLI run test sets `--cap-override` for the same reason; the outside-repository path test uses an absolute path of the host platform (Ubuntu).
 
 ### M3 exit (D61)
 

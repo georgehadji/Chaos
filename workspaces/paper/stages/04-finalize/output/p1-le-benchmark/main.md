@@ -14,7 +14,7 @@ The regime dependence of the convergence time (H3) was supported, with a ratio o
 The reproduction of the reference values of Sala and Artuso [@SalaArtuso2015] (H4) did not reproduce at K = pi/2, where we obtained 0.256066843848 against 0.298. It passed at K = 2 pi, where we obtained 1.17018723872 against 1.172. 
 The label rule H5 was supported under its three sub-rules (H5a, H5b, H5c). The ladder test forced 35 of the 92 ladder-subset labels to unresolved; this is reported as exploratory item D3. 
 Cost and sensitivity are reported without a decision rule. 
-The run used package version 0.0.1, before the tagged release v0.1.0. The code is released as Chaoslab v0.1.1 (TOOL), a tagged and documented release with the same computing code (Section 11). 
+The run used package version 0.0.1, before the tagged release v0.1.0. The code is released as Chaoslab v0.1.2 (TOOL), a tagged and documented release with the same computing code (Section 11). 
 
 ## 1. Introduction
 
@@ -42,7 +42,7 @@ The decision rules were frozen on 2026-10-17, before any data existed. Amendment
 The rules are applied as frozen, with the deviations listed in Section 2.5. The results document also lists 14 readings where the frozen text is silent (Section 2.5). 
 Amendments A1 to A4 are described here by pointer to the frozen text. A1 sets the hash rule, the T predicate, the screening direction, the windowed estimate, the Newton periodic-point search, the subset caps and the machine-readable panel inputs [prereg: Amendment A1, items 1 to 7]. A2 handles a ghost pair of periodic points at K = 2 pi and is superseded by A3 [prereg: Amendment A2, Amendment A3]. A3 sets the acceptance test of the periodic-point search [prereg: Amendment A3]. A4 adds the machine-readable run block, the setup check, the cost cap and pilot, the backend agreement and the scope of the control bound [prereg: Amendment A4, items 1 to 5]. The content of A5 and A6 is given in Section 2.5. 
 The preregistered value types were FALSIFIES (C1, C2), REPRODUCES ([@SalaArtuso2015]), TOOL and NEGATIVE allowed. Claim C3 is out of scope. 
-TOOL claim: the library Chaoslab, release v0.1.1. Every method the run used has catalog status `verified` (preregistration, Methods). Release v0.1.1 is tagged and carries user documentation, and its package code differs from the analysis commit only in docstrings and in a file-descriptor conversion that is a no-op on Julia 1.13.2, the Julia version of the run (Section 11). 
+TOOL claim: the library Chaoslab, release v0.1.2. Every method the run used has catalog status `verified` (preregistration, Methods). Release v0.1.2 is tagged, carries user documentation and is archived on Zenodo; its package code differs from the analysis commit only in docstrings, in a file-descriptor conversion that is a no-op on Julia 1.13.2 (the Julia version of the run) and in the figure drawing (Section 11). 
 The preregistration header is identified by the SHA-256 value in Table 1. The location of the frozen text is given in Section 11. 
 
 ### 2.2 Notation and definitions
@@ -497,12 +497,12 @@ The tables do not show why.
 
 The repository is https://github.com/georgehadji/Chaos (GPL-3.0-or-later). 
 The frozen preregistration is `workspaces/study/stages/01-design/output/p1-le-benchmark-preregistration.md` in the repository. Its header SHA-256 is in Table 1. The git SHA at freeze recorded in its header is 1e760e229eabf9d8323ad4d8097cc1dbd017f845, the parent commit of the freeze commit. Amendments A1 to A6 are in the same file and in its amendment log. 
-The tagged release v0.1.0 was cut at milestone M3 exit, at commit 238e96b, a descendant of both commits of Table 1. The run used package version 0.0.1 at those commits, before the tag. The tagged release v0.1.1, at commit efeac86, adds the user documentation; between the analysis commit and v0.1.1 the package code changes only in docstrings and in a file-descriptor conversion of the chunk writer that is a no-op on Julia 1.13.2, the Julia version of the run. 
+The tagged release v0.1.0 was cut at milestone M3 exit, at commit 238e96b, a descendant of both commits of Table 1. The run used package version 0.0.1 at those commits, before the tag. The tagged release v0.1.1, at commit efeac86, adds the user documentation; between the analysis commit and v0.1.1 the package code changes only in docstrings and in a file-descriptor conversion of the chunk writer that is a no-op on Julia 1.13.2, the Julia version of the run. The tagged release v0.1.2, at commit 664866e, changes only the figure drawing (F1 to F7 redrawn, F1 and F2 also drawn in two halves) and the author metadata, and is archived on Zenodo. 
 The run manifest and the stored series identify the run. The SHA-256 values are in Table 1. The stored series are deposited as a Zenodo dataset (limitation 9, Section 10); dataset DOI: [10.5281/zenodo.23534755](https://doi.org/10.5281/zenodo.23534755). 
 
 ### Availability statement
 
-Repository: <https://github.com/georgehadji/Chaos> (GPL-3.0-or-later). The numbers in this paper come from one analysis run at commit d31b655d0c33e2f2f1a67bbbdeba9c8c8a3fd036. The stored series come from the run at commit 3e405f3324f8d25162580d3380db26c877d7ca63, an ancestor of the analysis commit with the same series code (Section 2.4). The tagged release v0.1.0 is at commit 238e96b; the run used package version 0.0.1, before the tag. The release to cite for the code is v0.1.1 (commit efeac86), archived with `CITATION.cff`. Study manifest: `workspaces/study/stages/03-run/output/p1-le-benchmark-manifest.json` (SHA-256 ae6ec80eb08fbd6e98aeef1fbf840a567a03102ab943f2ae0aaf2b3e367f191d). Results document: `workspaces/study/stages/05-report/output/p1-le-benchmark-results.md`. The stored series are not part of the repository; they are deposited as a Zenodo dataset (DOI 10.5281/zenodo.23534755).
+Repository: <https://github.com/georgehadji/Chaos> (GPL-3.0-or-later). The numbers in this paper come from one analysis run at commit d31b655d0c33e2f2f1a67bbbdeba9c8c8a3fd036. The stored series come from the run at commit 3e405f3324f8d25162580d3380db26c877d7ca63, an ancestor of the analysis commit with the same series code (Section 2.4). The tagged release v0.1.0 is at commit 238e96b; the run used package version 0.0.1, before the tag. The release to cite for the code is v0.1.2 (commit 664866e), archived on Zenodo with DOI [10.5281/zenodo.23535223](https://doi.org/10.5281/zenodo.23535223) and described by `CITATION.cff`. Study manifest: `workspaces/study/stages/03-run/output/p1-le-benchmark-manifest.json` (SHA-256 ae6ec80eb08fbd6e98aeef1fbf840a567a03102ab943f2ae0aaf2b3e367f191d). Results document: `workspaces/study/stages/05-report/output/p1-le-benchmark-results.md`. The stored series are not part of the repository; they are deposited as a Zenodo dataset (DOI 10.5281/zenodo.23534755).
 
 ## AI-use disclosure
 
@@ -516,7 +516,7 @@ Claim C2 has two preregistered tests with different verdicts. H2 (claim C2) is n
 H4 did not reproduce the published value at K = pi/2 and passed at K = 2 pi. 
 H5 is supported under its three sub-rules (H5a, H5b, H5c). The ladder test forced 35 of the 92 ladder-subset labels to unresolved (exploratory item D3). 
 H4 and H5 are not tied to C1 or C2 in the findings file. 
-TOOL: Chaoslab v0.1.1 is a tagged and documented release of the code the run used; every method of the run is `verified` (Section 2.1, Section 11). 
+TOOL: Chaoslab v0.1.2 is a tagged and documented release of the code the run used; every method of the run is `verified` (Section 2.1, Section 11). 
 
 ## Figure list
 

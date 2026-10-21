@@ -101,7 +101,7 @@ under its three sub-rules (H5a, H5b, H5c). The ladder test forced 35 of
 the 92 ladder-subset labels to unresolved; this is reported as
 exploratory item D3. Cost and sensitivity are reported without a
 decision rule. The run used package version 0.0.1, before the tagged
-release v0.1.0. The code is released as Chaoslab v0.1.1 (TOOL), a tagged
+release v0.1.0. The code is released as Chaoslab v0.1.2 (TOOL), a tagged
 and documented release with the same computing code (Section 11).
 
 \subsection{1. Introduction}\label{introduction}
@@ -192,14 +192,15 @@ and the scope of the control bound {[}prereg: Amendment A4, items 1 to
 5{]}. The content of A5 and A6 is given in Section 2.5. The
 preregistered value types were FALSIFIES (C1, C2), REPRODUCES
 (\citep{SalaArtuso2015}), TOOL and NEGATIVE allowed. Claim C3 is out of
-scope. TOOL claim: the library Chaoslab, release v0.1.1. Every method
+scope. TOOL claim: the library Chaoslab, release v0.1.2. Every method
 the run used has catalog status \texttt{verified} (preregistration,
-Methods). Release v0.1.1 is tagged and carries user documentation, and
-its package code differs from the analysis commit only in docstrings and
-in a file-descriptor conversion that is a no-op on Julia 1.13.2, the
-Julia version of the run (Section 11). The preregistration header is
-identified by the SHA-256 value in Table 1. The location of the frozen
-text is given in Section 11.
+Methods). Release v0.1.2 is tagged, carries user documentation and is
+archived on Zenodo; its package code differs from the analysis commit
+only in docstrings, in a file-descriptor conversion that is a no-op on
+Julia 1.13.2 (the Julia version of the run) and in the figure drawing
+(Section 11). The preregistration header is identified by the SHA-256
+value in Table 1. The location of the frozen text is given in Section
+11.
 
 \subsubsection{2.2 Notation and
 definitions}\label{notation-and-definitions}
@@ -1358,10 +1359,13 @@ package version 0.0.1 at those commits, before the tag. The tagged
 release v0.1.1, at commit efeac86, adds the user documentation; between
 the analysis commit and v0.1.1 the package code changes only in
 docstrings and in a file-descriptor conversion of the chunk writer that
-is a no-op on Julia 1.13.2, the Julia version of the run. The run
-manifest and the stored series identify the run. The SHA-256 values are
-in Table 1. The stored series are deposited as a Zenodo dataset
-(limitation 9, Section 10); dataset DOI:
+is a no-op on Julia 1.13.2, the Julia version of the run. The tagged
+release v0.1.2, at commit 664866e, changes only the figure drawing (F1
+to F7 redrawn, F1 and F2 also drawn in two halves) and the author
+metadata, and is archived on Zenodo. The run manifest and the stored
+series identify the run. The SHA-256 values are in Table 1. The stored
+series are deposited as a Zenodo dataset (limitation 9, Section 10);
+dataset DOI:
 \href{https://doi.org/10.5281/zenodo.23534755}{10.5281/zenodo.23534755}.
 
 \subsubsection{Availability statement}\label{availability-statement}
@@ -1373,8 +1377,9 @@ come from the run at commit \seqsplit{3e405f3324f8d25162580d3380db26c877d7ca63},
 ancestor of the analysis commit with the same series code (Section 2.4).
 The tagged release v0.1.0 is at commit 238e96b; the run used package
 version 0.0.1, before the tag. The release to cite for the code is
-v0.1.1 (commit efeac86), archived with \texttt{CITATION.cff}. Study
-manifest:
+v0.1.2 (commit 664866e), archived on Zenodo with DOI
+\href{https://doi.org/10.5281/zenodo.23535223}{10.5281/zenodo.23535223}
+and described by \texttt{CITATION.cff}. Study manifest:
 \texttt{workspaces/study/stages/03-run/output/p1-le-benchmark-manifest.json}
 (SHA-256
 \seqsplit{ae6ec80eb08fbd6e98aeef1fbf840a567a03102ab943f2ae0aaf2b3e367f191d}).
@@ -1413,7 +1418,7 @@ verdict on C2. H4 did not reproduce the published value at K = pi/2 and
 passed at K = 2 pi. H5 is supported under its three sub-rules (H5a, H5b,
 H5c). The ladder test forced 35 of the 92 ladder-subset labels to
 unresolved (exploratory item D3). H4 and H5 are not tied to C1 or C2 in
-the findings file. TOOL: Chaoslab v0.1.1 is a tagged and documented
+the findings file. TOOL: Chaoslab v0.1.2 is a tagged and documented
 release of the code the run used; every method of the run is
 \texttt{verified} (Section 2.1, Section 11).
 

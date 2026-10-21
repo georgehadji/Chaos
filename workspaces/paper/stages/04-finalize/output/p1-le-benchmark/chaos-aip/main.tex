@@ -35,7 +35,7 @@ It passed at $K=2\pi$, where we obtained 1.17018723872 against 1.172.
 The label rule H5 was supported under its three sub-rules (H5a, H5b, H5c).
 The ladder test forced 35 of the 92 ladder-subset labels to unresolved (exploratory item E3).
 Cost and sensitivity are reported without a decision rule.
-The code is released as Chaoslab v0.1.1 (TOOL), a tagged and documented release with the same computing code.
+The code is released as Chaoslab v0.1.2 (TOOL), a tagged and documented release with the same computing code.
 \end{abstract}
 
 \maketitle
@@ -122,9 +122,9 @@ The content of A5 and A6 is given in \Sec{sub:dev}.
 The preregistered value types were FALSIFIES (C1, C2), REPRODUCES \cite{SalaArtuso2015}, TOOL and NEGATIVE allowed.
 Claim C3 is out of scope.
 
-TOOL claim: the library Chaoslab, release v0.1.1.
+TOOL claim: the library Chaoslab, release v0.1.2.
 Every method the run used has catalog status \texttt{verified}, as stated in the preregistration.
-Release v0.1.1 is tagged and carries user documentation, and its package code differs from the analysis commit only in docstrings and in a file-descriptor conversion that is a no-op on Julia 1.13.2, the Julia version of the run (see Data availability).
+Release v0.1.2 is tagged, carries user documentation and is archived on Zenodo; its package code differs from the analysis commit only in docstrings, in a file-descriptor conversion that is a no-op on Julia 1.13.2 (the Julia version of the run) and in the figure drawing (see Data availability).
 
 The preregistration header is identified by the SHA-256 value in Table~\ref{tab:run}.
 The location of the frozen text is given in the Data availability section.
@@ -991,7 +991,7 @@ H5 is supported under its three sub-rules (H5a, H5b, H5c).
 The ladder test forced 35 of the 92 ladder-subset labels to unresolved (exploratory item E3).
 H4 and H5 are not tied to C1 or C2.
 
-TOOL: Chaoslab v0.1.1 is a tagged and documented release of the code the run used; every method of the run is \texttt{verified} (\Sec{sub:prereg} and the Data availability section).
+TOOL: Chaoslab v0.1.2 is a tagged and documented release of the code the run used; every method of the run is \texttt{verified} (\Sec{sub:prereg} and the Data availability section).
 
 \begin{acknowledgments}
 Drafting, adversarial review and revision of this manuscript, and the analysis code, were done with Claude models (Anthropic, Claude Sonnet 5.5) operated through Claude Code under the direction of the author.
@@ -1026,8 +1026,9 @@ The study manifest has SHA-256 \hash{ae6ec80eb08fbd6e98aeef1fbf840a567a03102ab94
 
 The tagged release v0.1.0 was cut at milestone M3 exit, at commit 238e96b, a descendant of both commits of Table~\ref{tab:run}.
 The run used package version 0.0.1 at those commits, before the tag.
-The release to cite for the code is v0.1.1 (commit efeac86), archived with \texttt{CITATION.cff}.
-It adds the user documentation; between the analysis commit and v0.1.1 the package code changes only in docstrings and in a file-descriptor conversion of the chunk writer that is a no-op on Julia 1.13.2, the Julia version of the run.
+The release to cite for the code is v0.1.2 (commit 664866e), archived on Zenodo with DOI \url{https://doi.org/10.5281/zenodo.23535223} and described by \texttt{CITATION.cff}.
+The tagged release v0.1.1 (commit efeac86) adds the user documentation; between the analysis commit and v0.1.1 the package code changes only in docstrings and in a file-descriptor conversion of the chunk writer that is a no-op on Julia 1.13.2, the Julia version of the run.
+The tagged release v0.1.2, at commit 664866e, changes only the figure drawing (F1 to F7 redrawn, F1 and F2 also drawn in two halves) and the author metadata, and is archived on Zenodo.
 
 The stored series are not part of the repository.
 They are deposited as a Zenodo dataset (limitation~9, \Sec{sec:lim}); dataset DOI: \url{https://doi.org/10.5281/zenodo.23534755}.

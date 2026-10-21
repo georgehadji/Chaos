@@ -100,8 +100,8 @@ we obtained 1.17018723872 against 1.172. The label rule H5 was supported
 under its three sub-rules (H5a, H5b, H5c). The ladder test forced 35 of
 the 92 ladder-subset labels to unresolved; this is reported as
 exploratory item D3. Cost and sensitivity are reported without a
-decision rule. The run used package version 0.0.1. The tagged release
-v0.1.0 has not been cut.
+decision rule. The run used package version 0.0.1, before the tagged
+release v0.1.0.
 
 \subsection{1. Introduction}\label{introduction}
 
@@ -346,10 +346,12 @@ chunks{[}{]}.status{]} \\
 }
 
 The tables header and the findings file give the first git commit. The
-run manifest records the second. The study does not relate the two
-values, and neither does this paper. This paper does not settle which of
-the two commits holds the code that produced the numbers (limitation 8,
-Section 10).
+run manifest records the second. The run commit is an ancestor of the
+analysis commit, and between them only the analysis code, its figure
+extension, the command-line entry point and the project file change. The
+stored series therefore come from the run commit and the tables and
+figures from the analysis commit, with the same series code at both
+(limitation 8, Section 10).
 
 \subsubsection{2.5 Deviations from the frozen text and
 readings}\label{deviations-from-the-frozen-text-and-readings}
@@ -1268,9 +1270,10 @@ bootstrap intervals is not examined. The tables do not show why.
   the other 3 are not in the tables read for this paper. Orbit 881 is an
   info control and the orbit dropped as drift.
 \item
-  Table 1 gives two different git commits, and the study does not relate
-  them. Which commit holds the code that produced the numbers is not
-  settled here. The two commits must be reconciled before submission.
+  Table 1 gives two git commits, one for the run and one for the
+  analysis. They are related through the repository history only; the
+  study manifests record each commit separately and no single run record
+  names both.
 \item
   The repository folder \texttt{data/} holds run outputs and is
   git-ignored (project folder map), so it is not part of the repository
@@ -1310,21 +1313,22 @@ in the repository. Its header SHA-256 is in Table 1. The git SHA at
 freeze recorded in its header is
 \seqsplit{1e760e229eabf9d8323ad4d8097cc1dbd017f845}, the parent commit of the
 freeze commit. Amendments A1 to A6 are in the same file and in its
-amendment log. The tagged release v0.1.0 is not yet cut. It is cut at
-milestone M3 exit. The run used package version 0.0.1 at the commits
-given in Table 1, before the tag. The run manifest and the stored series
-identify the run. The SHA-256 values are in Table 1. The location of the
-stored series is not stated (limitation 9, Section 10).
+amendment log. The tagged release v0.1.0 was cut at milestone M3 exit,
+at commit 238e96b, a descendant of both commits of Table 1. The run used
+package version 0.0.1 at those commits, before the tag. The run manifest
+and the stored series identify the run. The SHA-256 values are in Table
+1. The location of the stored series is not stated (limitation 9,
+Section 10).
 
 \subsubsection{Availability statement}\label{availability-statement}
 
 Repository: \url{https://github.com/georgehadji/Chaos}
 (GPL-3.0-or-later). The numbers in this paper come from one analysis run
-at commit \seqsplit{d31b655d0c33e2f2f1a67bbbdeba9c8c8a3fd036}. The run manifest
-records a different commit, \seqsplit{3e405f3324f8d25162580d3380db26c877d7ca63}.
-The study does not relate the two commits, and this is an open item. The
-tagged release v0.1.0 is not yet cut, and the run used package version
-0.0.1. Study manifest:
+at commit \seqsplit{d31b655d0c33e2f2f1a67bbbdeba9c8c8a3fd036}. The stored series
+come from the run at commit \seqsplit{3e405f3324f8d25162580d3380db26c877d7ca63}, an
+ancestor of the analysis commit with the same series code (Section 2.4).
+The tagged release v0.1.0 is at commit 238e96b; the run used package
+version 0.0.1, before the tag. Study manifest:
 \texttt{workspaces/study/stages/03-run/output/p1-le-benchmark-manifest.json}
 (SHA-256
 \seqsplit{ae6ec80eb08fbd6e98aeef1fbf840a567a03102ab943f2ae0aaf2b3e367f191d}).

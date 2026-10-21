@@ -14,7 +14,7 @@ The regime dependence of the convergence time (H3) was supported, with a ratio o
 The reproduction of the reference values of Sala and Artuso [@SalaArtuso2015] (H4) did not reproduce at K = pi/2, where we obtained 0.256066843848 against 0.298. It passed at K = 2 pi, where we obtained 1.17018723872 against 1.172. 
 The label rule H5 was supported under its three sub-rules (H5a, H5b, H5c). The ladder test forced 35 of the 92 ladder-subset labels to unresolved; this is reported as exploratory item D3. 
 Cost and sensitivity are reported without a decision rule. 
-The run used package version 0.0.1. The tagged release v0.1.0 has not been cut. 
+The run used package version 0.0.1, before the tagged release v0.1.0. 
 
 ## 1. Introduction
 
@@ -93,7 +93,7 @@ Table 1. Run identity.
 
 
 
-The tables header and the findings file give the first git commit. The run manifest records the second. The study does not relate the two values, and neither does this paper. This paper does not settle which of the two commits holds the code that produced the numbers (limitation 8, Section 10). 
+The tables header and the findings file give the first git commit. The run manifest records the second. The run commit is an ancestor of the analysis commit, and between them only the analysis code, its figure extension, the command-line entry point and the project file change. The stored series therefore come from the run commit and the tables and figures from the analysis commit, with the same series code at both (limitation 8, Section 10). 
 
 ### 2.5 Deviations from the frozen text and readings
 
@@ -481,7 +481,7 @@ The tables do not show why.
 5. The numbers were checked against the tables file of the run. The analysis program was verified against an independent recomputation (`analysis-verification.md`). The numbers were not recomputed from the stored series for the results document. Figures F1 to F7 were checked only by file size and the `%PDF-` header, not visually. A visual check of F1 to F7 is required before stage 04. 
 6. W is defined here by the preregistration. The results document and the findings file state the reading of W in a shorter form (class C at 0 < K <= K_c) that does not describe the cells of Tables 6 and 8. Reconciling the two is an open item for the owner, and stage 05 of the study carries the shorter form. 
 7. The controls are not fully accounted for. The panel table counts 13 controls and the controls table lists 10 ids. The ids and status of the other 3 are not in the tables read for this paper. Orbit 881 is an info control and the orbit dropped as drift. 
-8. Table 1 gives two different git commits, and the study does not relate them. Which commit holds the code that produced the numbers is not settled here. The two commits must be reconciled before submission. 
+8. Table 1 gives two git commits, one for the run and one for the analysis. They are related through the repository history only; the study manifests record each commit separately and no single run record names both. 
 9. The repository folder `data/` holds run outputs and is git-ignored (project folder map), so it is not part of the repository at the URL of Section 11. The results document does not state where the stored series are held, and no deposit location for them is recorded. 
 10. The frozen preregistration is in the repository (Section 11). The results document records no external time-stamped deposit of it. 
 11. Cost values come from a single run in which 23 of 23 available threads were used, with no repeated timing reported. The item sets differ between rows, and the Double64 and BigFloat rows have 186 and 92 items. The cost ratios are therefore not controlled comparisons. 
@@ -493,12 +493,12 @@ The tables do not show why.
 
 The repository is https://github.com/georgehadji/Chaos (GPL-3.0-or-later). 
 The frozen preregistration is `workspaces/study/stages/01-design/output/p1-le-benchmark-preregistration.md` in the repository. Its header SHA-256 is in Table 1. The git SHA at freeze recorded in its header is 1e760e229eabf9d8323ad4d8097cc1dbd017f845, the parent commit of the freeze commit. Amendments A1 to A6 are in the same file and in its amendment log. 
-The tagged release v0.1.0 is not yet cut. It is cut at milestone M3 exit. The run used package version 0.0.1 at the commits given in Table 1, before the tag. 
+The tagged release v0.1.0 was cut at milestone M3 exit, at commit 238e96b, a descendant of both commits of Table 1. The run used package version 0.0.1 at those commits, before the tag. 
 The run manifest and the stored series identify the run. The SHA-256 values are in Table 1. The location of the stored series is not stated (limitation 9, Section 10). 
 
 ### Availability statement
 
-Repository: <https://github.com/georgehadji/Chaos> (GPL-3.0-or-later). The numbers in this paper come from one analysis run at commit d31b655d0c33e2f2f1a67bbbdeba9c8c8a3fd036. The run manifest records a different commit, 3e405f3324f8d25162580d3380db26c877d7ca63. The study does not relate the two commits, and this is an open item. The tagged release v0.1.0 is not yet cut, and the run used package version 0.0.1. Study manifest: `workspaces/study/stages/03-run/output/p1-le-benchmark-manifest.json` (SHA-256 ae6ec80eb08fbd6e98aeef1fbf840a567a03102ab943f2ae0aaf2b3e367f191d). Results document: `workspaces/study/stages/05-report/output/p1-le-benchmark-results.md`. The stored series are not part of the repository and have no deposit location yet.
+Repository: <https://github.com/georgehadji/Chaos> (GPL-3.0-or-later). The numbers in this paper come from one analysis run at commit d31b655d0c33e2f2f1a67bbbdeba9c8c8a3fd036. The stored series come from the run at commit 3e405f3324f8d25162580d3380db26c877d7ca63, an ancestor of the analysis commit with the same series code (Section 2.4). The tagged release v0.1.0 is at commit 238e96b; the run used package version 0.0.1, before the tag. Study manifest: `workspaces/study/stages/03-run/output/p1-le-benchmark-manifest.json` (SHA-256 ae6ec80eb08fbd6e98aeef1fbf840a567a03102ab943f2ae0aaf2b3e367f191d). Results document: `workspaces/study/stages/05-report/output/p1-le-benchmark-results.md`. The stored series are not part of the repository and have no deposit location yet.
 
 ## AI-use disclosure
 

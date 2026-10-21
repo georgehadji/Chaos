@@ -4,4 +4,4 @@ Merged keys: Zou2007a, Zou2007b, Baptista2010, Santos2018, SimileBaroni2019, Kov
 UNVERIFIED items: 0
 Benchmark rows: 0
 Catalog keys resolved: 0
-Commit: record the SHA after committing.
+Commit: ca5c08d (promotion, with the section-file annotations).

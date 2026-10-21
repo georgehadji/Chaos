@@ -4,4 +4,4 @@ Merged keys: Das2016, SanderMeiss2020, DuignanMeiss2023, RuthBindel2024, DasYork
 UNVERIFIED items: 0
 Benchmark rows: 0
 Catalog keys resolved: 0
-Commit: record the SHA after committing.
+Commit: ca5c08d (promotion, with the section-file annotations).

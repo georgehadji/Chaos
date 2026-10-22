@@ -130,3 +130,14 @@ Recorded lines (no threshold): R1. The 2D map of SandorMaffione2016 Eq. (2) at n
 - Not obtained: Sandor2004 (F4, P9). Items listed in `unverified.md` are not cited.
 - Layer 3: `_config/catalogs/indicators.md` row I9 and sections C, D; `_config/research-question.md` (claim C3, P2); `_config/numerics-policy.md`; `_config/architecture.md` ("Module map" row Indicators, "Layering", "Compute"); `_config/build-order.md` row M4; decisions D17, D21, D24, D25, D27, D28, D30, D33, D34, D35, D44, D54, D65 to D72; risks K15, K16, K18; `src/Indicators/CONTEXT.md` (the reducer protocol and the one-replacer rule).
 - Derived here, not cited: RL5 to RL13, the closed forms of RL9, the bounds and tolerances of criteria 1 to 15, the equivalence F7. The constants 8, 4, 20, 0.1, 0.99 to 1.01, the allowance of criterion 5 and the 18-of-20 rule of criterion 7 are proposals.
+
+## Amendment D76 (2026-10-22)
+
+Approved by the owner at the stage 02 checkpoint (test plan `../../02-tests/output/rli-test-plan.md`, "Deviations", items 1 to 12; the measured numbers are there).
+
+1. Criterion 7(a): the two components of the minimal-image difference of the stored initial points equal the BigFloat differences exactly (tolerance 0); Dx_r equals their norm within 4 eps.
+2. Criterion 7(b): the example is replaced by Dx = 4.5e-16 along u = (0.2, sqrt(0.96)) from (x, p) = (0.1, 5.0), where the p component is lost and Dx_r = 9e-17 < Dx/2. The zero case (Dx = 1e-18 at |x| near 3) is kept.
+3. Criterion 4: the pair test is replaced by an O(Dx) law (the deviation of rho = RLI / Dx_r from its smallest-Dx value satisfies dev_i <= 2 (Dx_i / Dx_{i+1}) dev_{i+1}), with the realized coefficient reported; the slope in [0.99, 1.01] is kept. In Double64 the test is the slope plus rho within 1e-3 of the BigFloat rho. The coefficient 20 failed for 6 of 20 regular starts (up to 5.9e3 near a resonance).
+4. P11 and Algorithm item 1: Systems holds only the product map (pure). The pair start with its rejection, and the minimal-image pair distance, live in Indicators next to the reducer, because Systems imports nothing from Foundation (D23).
+5. P1(c): the pair tangent action must act block by block. A dense action through the zero blocks breaks the bitwise equality of block B with the single-orbit run in Double64 (criteria 2, 9(a), RL5(d)). The cost note "a dense one costs four times" is struck.
+6. Readings and sizes as in the test plan items 6 to 11: the empty chains of criterion 8(a) run 300 steps; criterion 11(e) splits the record between the stream and the pair start, with the direction rule, seed, frame source and chain recorded by Experiments; D38 reductions with a full-run flag; the API details pinned by the tests; criterion 12 thread counts in child processes at stage 04.

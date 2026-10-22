@@ -1,0 +1,314 @@
+# fli-ofli verification, julia 1.13.2, threads 2, base seed 20261012 (verify offset 58000), time 1.792661055e9 (unix)
+# timings in this log were taken on a machine that was not otherwise idle
+SUITE | package suite at full size (FL_FULL_RUN), assertions passed (fail + error = 0); wall time 143.8 s | 1229773 | 0 fail, 0 error | PASS
+# section suite took 143.8 s
+AC1 | max |FLI_1, FLI_B - exact running maxima (BigFloat of the stored c_m)| / B_S(j), maps (i), (ii), (iii), 40 handoffs, Float64 | 0.03176 | <= 1 | PASS
+AC1 | FLI_1, FLI_B equal the running maxima of the reducer's own S_1, max(S_1, S_2) with the 0, bitwise: failures over 3 maps, Float64 | 0 | 0 | PASS
+AC1 | nondecreasing at every handoff: failures over 3 maps, Float64 | 0 | 0 | PASS
+AC1 | column exchange: FLI_B bitwise unchanged, FLI_1 = running maximum of the other sum: failures, Float64 | 0 | 0 | PASS
+AC1 | sign change of a column: both forms bitwise unchanged: failures, Float64 | 0 | 0 | PASS
+AC1 | printed values of the spec (FLI_B = 3 from j = 10 to 22, FLI_1 = 0 to j = 15 and 0.5 at j = 17, FLI_1 = 0 and FLI_B = 0.2 j for (ii), FLI_1 asymmetric), Float64; worst FLI_1 / B_S there 0.009094 | true | true | PASS
+AC1 | negative controls (no memory, no j = 0 term, no log) that wrongly satisfy the predicate (of 6), Float64 | 0 | 0 | PASS
+AC1 | max |FLI_1, FLI_B - exact running maxima (BigFloat of the stored c_m)| / B_S(j), maps (i), (ii), (iii), 40 handoffs, Double64 | 0.003547 | <= 1 | PASS
+AC1 | FLI_1, FLI_B equal the running maxima of the reducer's own S_1, max(S_1, S_2) with the 0, bitwise: failures over 3 maps, Double64 | 0 | 0 | PASS
+AC1 | nondecreasing at every handoff: failures over 3 maps, Double64 | 0 | 0 | PASS
+AC1 | column exchange: FLI_B bitwise unchanged, FLI_1 = running maximum of the other sum: failures, Double64 | 0 | 0 | PASS
+AC1 | sign change of a column: both forms bitwise unchanged: failures, Double64 | 0 | 0 | PASS
+AC1 | printed values of the spec (FLI_B = 3 from j = 10 to 22, FLI_1 = 0 to j = 15 and 0.5 at j = 17, FLI_1 = 0 and FLI_B = 0.2 j for (ii), FLI_1 asymmetric), Double64; worst FLI_1 / B_S there 0.0003593 | true | true | PASS
+AC1 | negative controls (no memory, no j = 0 term, no log) that wrongly satisfy the predicate (of 6), Double64 | 0 | 0 | PASS
+# section AC1 took 0.7 s
+AC2 | K = 0 shear, seeded frame and W0 = I, tau in {1,10}, n in {10,100,1e4,1e6}: max |FLI_1 - FLI_cf| / B_S(n), Float64 | 0.0198 | <= 1 | PASS
+AC2 | same, max |FLI_B - FLI_cf| / B_S(n), Float64 | 0.0198 | <= 1 | PASS
+AC2 | W0 = I: FLI_1 != 0 (tolerance 0) over 8 handoff values, Float64 | 0 | 0 | PASS
+AC2 | W0 = I: max |FLI_B - (1/2) ln(n^2 + 1)| / B_S(n), Float64 | 0.01429 | <= 1 | PASS
+AC2 | K = 0 shear, seeded frame and W0 = I, tau in {1,10}, n in {10,100,1e4}: max |FLI_1 - FLI_cf| / B_S(n), Double64 | 0.0009059 | <= 1 | PASS
+AC2 | same, max |FLI_B - FLI_cf| / B_S(n), Double64 | 0.0008205 | <= 1 | PASS
+AC2 | W0 = I: FLI_1 != 0 (tolerance 0) over 6 handoff values, Double64 | 0 | 0 | PASS
+AC2 | W0 = I: max |FLI_B - (1/2) ln(n^2 + 1)| / B_S(n), Double64 | 0.0006769 | <= 1 | PASS
+# section AC2 took 1.1 s
+AC3 | linear hyperbolic map Y5: ids with |c_1| < 0.05 excluded (of 100), supplied frames |c_1| = 1e-3, 1e-6 as intended, BigFloat product against A^8 (max relative difference 0), Float64 | 2 | <= 10 | PASS
+AC3 | (a) seeded ids, tau in {1,5}, n in {1,..,200}: max |FLI - FLI_cf| / B_S(n), both forms, Float64 | 0.04349 | <= 1 | PASS
+AC3 | (a) supplied frame |c_1| = 1e-3: same over max(B_S, 8 eps Psi_n) (D72 item 2), Float64 | 0.007136 | <= 1 | PASS
+AC3 | (a) supplied frame |c_1| = 1e-6: same over max(B_S, 8 eps Psi_n) (D72 item 2), Float64 | 0.01425 | <= 1 | PASS
+AC3 | (a) supplied frame |c_1| = 1e-6: the same errors over the plain B_S (above 1 is why D72 item 2 was needed), Float64 | 21.1 | reported | INFO
+AC3 | (b) |c_1| = 1e-3, n = 4, tau = 1: FLI_1 == 0 exactly (exact reference 0) and FLI_B > 0.5, Float64 | true | true | PASS
+AC3 | (c) rate at n in {20,100}: max |FLI_B - (n ln mu + ln |c_max|)| / (B + mu^(-4n) (1 + 1/c_max^2)), Float64 | 0.04349 | <= 1 | PASS
+AC3 | linear hyperbolic map Y5: ids with |c_1| < 0.05 excluded (of 100), supplied frames |c_1| = 1e-3, 1e-6 as intended, BigFloat product against A^8 (max relative difference 0), Double64 | 2 | <= 10 | PASS
+AC3 | (a) seeded ids, tau in {1,5}, n in {1,..,200}: max |FLI - FLI_cf| / B_S(n), both forms, Double64 | 0.001669 | <= 1 | PASS
+AC3 | (a) supplied frame |c_1| = 1e-3: same over max(B_S, 8 eps Psi_n) (D72 item 2), Double64 | 0.0001563 | <= 1 | PASS
+AC3 | (a) supplied frame |c_1| = 1e-6: same over max(B_S, 8 eps Psi_n) (D72 item 2), Double64 | 0.0001952 | <= 1 | PASS
+AC3 | (a) supplied frame |c_1| = 1e-6: the same errors over the plain B_S (above 1 is why D72 item 2 was needed), Double64 | 6.625 | reported | INFO
+AC3 | (b) |c_1| = 1e-3, n = 4, tau = 1: FLI_1 == 0 exactly (exact reference 0) and FLI_B > 0.5, Double64 | true | true | PASS
+AC3 | (c) rate at n in {20,100}: max |FLI_B - (n ln mu + ln |c_max|)| / (B + mu^(-4n) (1 + 1/c_max^2)), Double64 | 0.001668 | <= 1 | PASS
+AC4 | hyperbolic fixed point K = 1, 100 ids, tau in {1,5}, n in {1,..,200}: max |FLI - FLI_cf| / B_S(n), both forms (BigFloat product against the matrix power: 0), Float64 | 0.04601 | <= 1 | PASS
+AC4 | hyperbolic fixed point K = 2, 100 ids, tau in {1,5}, n in {1,..,200}: max |FLI - FLI_cf| / B_S(n), both forms (BigFloat product against the matrix power: 0), Float64 | 0.08559 | <= 1 | PASS
+AC4 | hyperbolic fixed point K = 6, 100 ids, tau in {1,5}, n in {1,..,200}: max |FLI - FLI_cf| / B_S(n), both forms (BigFloat product against the matrix power: 0), Float64 | 0.08527 | <= 1 | PASS
+AC4 | hyperbolic fixed point K = 1, 100 ids, tau in {1,5}, n in {1,..,200}: max |FLI - FLI_cf| / B_S(n), both forms (BigFloat product against the matrix power: 0), Double64 | 0.001297 | <= 1 | PASS
+AC4 | hyperbolic fixed point K = 2, 100 ids, tau in {1,5}, n in {1,..,200}: max |FLI - FLI_cf| / B_S(n), both forms (BigFloat product against the matrix power: 0), Double64 | 0.003236 | <= 1 | PASS
+AC4 | hyperbolic fixed point K = 6, 100 ids, tau in {1,5}, n in {1,..,200}: max |FLI - FLI_cf| / B_S(n), both forms (BigFloat product against the matrix power: 0), Double64 | 0.001057 | <= 1 | PASS
+AC5 | (a) order-4 rotation, W0 = I, n to 1e4, tau in {1,3}: handoffs with FLI != 0 (of 13333), Float64 | 0 | 0 | PASS
+AC5 | (b) K = -2 at (0,0), 100 ids, tau = 1, every n in 1..1000: max |FLI_1 - max(0, ln norm(M w_1))| / B_S(n), Float64 (helper against closed form: 0) | 0.06195 | <= 1 | PASS
+AC5 | (b) max |FLI_B - closed form| / B_S(n), Float64 | 0.06195 | <= 1 | PASS
+AC5 | (b) max (FLI_B - ln((3 + sqrt 5)/2))_+ / B_S(n), Float64 | 0 | <= 1 | PASS
+AC5 | (c) tau = 2: max FLI / B_S(n) (0 <= FLI <= B_S, nonnegative: true), Float64 | 0.04167 | <= 1 | PASS
+AC5 | (a) order-4 rotation, W0 = I, n to 1e4, tau in {1,3}: handoffs with FLI != 0 (of 13333), Double64 | 0 | 0 | PASS
+AC5 | (b) K = -2 at (0,0), 100 ids, tau = 1, every n in 1..1000: max |FLI_1 - max(0, ln norm(M w_1))| / B_S(n), Double64 (helper against closed form: 0) | 0.001942 | <= 1 | PASS
+AC5 | (b) max |FLI_B - closed form| / B_S(n), Double64 | 0.001942 | <= 1 | PASS
+AC5 | (b) max (FLI_B - ln((3 + sqrt 5)/2))_+ / B_S(n), Double64 | 0 | <= 1 | PASS
+AC5 | (c) tau = 2: max FLI / B_S(n) (0 <= FLI <= B_S, nonnegative: true), Double64 | 0.001953 | <= 1 | PASS
+# section AC3-5 took 7.5 s
+AC6 | K = 0.5 regular class, Float64, tau = 1: rows (starts x checkpoints at every multiple of 10 up to 10000) | 20000 | 20000 | PASS
+AC6 | K = 0.5 regular class, Float64, tau = 1: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.01537 | <= 1 | PASS
+AC6 | K = 0.5 regular class, Float64, tau = 1: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.02477 | <= 1 | PASS
+AC6 | K = 0.5 regular class, Float64, tau = 1: pairs with a differing maximiser (of 20000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 0.5 regular class, Float64, tau = 1: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 3.874e+05 / 0.0003315 | reported | INFO
+AC6 | K = 0.5 regular class, Float64, tau = 4: rows (starts x checkpoints at every multiple of 10 up to 10000) | 10000 | 10000 | PASS
+AC6 | K = 0.5 regular class, Float64, tau = 4: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.00788 | <= 1 | PASS
+AC6 | K = 0.5 regular class, Float64, tau = 4: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.01052 | <= 1 | PASS
+AC6 | K = 0.5 regular class, Float64, tau = 4: pairs with a differing maximiser (of 10000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 0.5 regular class, Float64, tau = 4: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 2.398e+05 / 0.0002128 | reported | INFO
+AC7 | K = 0.5 regular class, Float64: max (FLI_B - F_*)_+ / B_FLI (sandwich upper) | 0 | <= 1 | PASS
+AC7 | K = 0.5 regular class, Float64: max (F_* - ln sqrt 2 - FLI_B)_+ / B_FLI (sandwich lower) | 0 | <= 1 | PASS
+AC7 | K = 0.5 regular class, Float64: max (FLI_1 - F_*)_+ / B_FLI | 0 | <= 1 | PASS
+AC7 | K = 0.5 regular class, Float64: (F_* - FLI_B) / ln sqrt 2 (min; median; max) and F_* - FLI_1 (min; median; max) | 7.053e-11; 0.1938; 0.9437 and 2.445e-11; 0.489; 2.267 | reported | INFO
+AC6 | K = 2 pi, Float64, tau = 1: rows (starts x checkpoints at every multiple of 10 up to 10000) | 20000 | 20000 | PASS
+AC6 | K = 2 pi, Float64, tau = 1: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.05476 | <= 1 | PASS
+AC6 | K = 2 pi, Float64, tau = 1: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.05476 | <= 1 | PASS
+AC6 | K = 2 pi, Float64, tau = 1: pairs with a differing maximiser (of 20000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 2 pi, Float64, tau = 1: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 8.328e+04 / 0.009629 | reported | INFO
+AC6 | K = 2 pi, Float64, tau = 4: rows (starts x checkpoints at every multiple of 10 up to 10000) | 10000 | 10000 | PASS
+AC6 | K = 2 pi, Float64, tau = 4: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.04788 | <= 1 | PASS
+AC6 | K = 2 pi, Float64, tau = 4: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.05146 | <= 1 | PASS
+AC6 | K = 2 pi, Float64, tau = 4: pairs with a differing maximiser (of 10000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 2 pi, Float64, tau = 4: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 3.192e+04 / 0.008495 | reported | INFO
+AC6 | K = 2 pi: negative control, Float32 accumulator at n = 1e3, min |FLI_B(Float32) - ref| / B_FLI over 3 starts | 6.18e+06 | > 1 | PASS
+AC7 | K = 2 pi, Float64: max (FLI_B - F_*)_+ / B_FLI (sandwich upper) | 0 | <= 1 | PASS
+AC7 | K = 2 pi, Float64: max (F_* - ln sqrt 2 - FLI_B)_+ / B_FLI (sandwich lower) | 0 | <= 1 | PASS
+AC7 | K = 2 pi, Float64: max (FLI_1 - F_*)_+ / B_FLI | 0 | <= 1 | PASS
+AC7 | K = 2 pi, Float64: (F_* - FLI_B) / ln sqrt 2 (min; median; max) and F_* - FLI_1 (min; median; max) | 7.544e-05; 0.4215; 0.9464 and 0.01199; 0.4525; 4.929 | reported | INFO
+AC6 | K = 10, Float64, tau = 1: rows (starts x checkpoints at every multiple of 10 up to 10000) | 20000 | 20000 | PASS
+AC6 | K = 10, Float64, tau = 1: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.07044 | <= 1 | PASS
+AC6 | K = 10, Float64, tau = 1: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.07234 | <= 1 | PASS
+AC6 | K = 10, Float64, tau = 1: pairs with a differing maximiser (of 20000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 10, Float64, tau = 1: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 9263 / 0.01239 | reported | INFO
+AC6 | K = 10, Float64, tau = 4: rows (starts x checkpoints at every multiple of 10 up to 10000) | 10000 | 10000 | PASS
+AC6 | K = 10, Float64, tau = 4: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.08268 | <= 1 | PASS
+AC6 | K = 10, Float64, tau = 4: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.08268 | <= 1 | PASS
+AC6 | K = 10, Float64, tau = 4: pairs with a differing maximiser (of 10000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 10, Float64, tau = 4: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 8469 / 0.01197 | reported | INFO
+AC6 | K = 10: negative control, Float32 accumulator at n = 1e3, min |FLI_B(Float32) - ref| / B_FLI over 3 starts | 2.51e+07 | > 1 | PASS
+AC7 | K = 10, Float64: max (FLI_B - F_*)_+ / B_FLI (sandwich upper) | 0 | <= 1 | PASS
+AC7 | K = 10, Float64: max (F_* - ln sqrt 2 - FLI_B)_+ / B_FLI (sandwich lower) | 0 | <= 1 | PASS
+AC7 | K = 10, Float64: max (FLI_1 - F_*)_+ / B_FLI | 0 | <= 1 | PASS
+AC7 | K = 10, Float64: (F_* - FLI_B) / ln sqrt 2 (min; median; max) and F_* - FLI_1 (min; median; max) | 0.01181; 0.192; 0.9966 and 0.004092; 0.1645; 2.199 | reported | INFO
+AC6 | K = 0.5 regular class, Double64, tau = 1: rows (starts x checkpoints at every multiple of 10 up to 10000) | 20000 | 20000 | PASS
+AC6 | K = 0.5 regular class, Double64, tau = 1: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.0007481 | <= 1 | PASS
+AC6 | K = 0.5 regular class, Double64, tau = 1: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.0006607 | <= 1 | PASS
+AC6 | K = 0.5 regular class, Double64, tau = 1: pairs with a differing maximiser (of 20000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 0.5 regular class, Double64, tau = 1: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 7.404e+04 / 2.299e-05 | reported | INFO
+AC6 | K = 0.5 regular class, Double64, tau = 4: rows (starts x checkpoints at every multiple of 10 up to 10000) | 10000 | 10000 | PASS
+AC6 | K = 0.5 regular class, Double64, tau = 4: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.0003695 | <= 1 | PASS
+AC6 | K = 0.5 regular class, Double64, tau = 4: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.0002763 | <= 1 | PASS
+AC6 | K = 0.5 regular class, Double64, tau = 4: pairs with a differing maximiser (of 10000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 0.5 regular class, Double64, tau = 4: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 5.793e+04 / 1.809e-05 | reported | INFO
+AC7 | K = 0.5 regular class, Double64: max (FLI_B - F_*)_+ / B_FLI (sandwich upper) | 0 | <= 1 | PASS
+AC7 | K = 0.5 regular class, Double64: max (F_* - ln sqrt 2 - FLI_B)_+ / B_FLI (sandwich lower) | 0 | <= 1 | PASS
+AC7 | K = 0.5 regular class, Double64: max (FLI_1 - F_*)_+ / B_FLI | 0 | <= 1 | PASS
+AC7 | K = 0.5 regular class, Double64: (F_* - FLI_B) / ln sqrt 2 (min; median; max) and F_* - FLI_1 (min; median; max) | 7.032e-11; 0.1938; 0.9437 and 2.437e-11; 0.489; 2.267 | reported | INFO
+AC6 | K = 2 pi, Double64, tau = 1: rows (starts x checkpoints at every multiple of 10 up to 10000) | 20000 | 20000 | PASS
+AC6 | K = 2 pi, Double64, tau = 1: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.3831 | <= 1 | PASS
+AC6 | K = 2 pi, Double64, tau = 1: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.3831 | <= 1 | PASS
+AC6 | K = 2 pi, Double64, tau = 1: pairs with a differing maximiser (of 20000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 2 pi, Double64, tau = 1: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 4.262e+04 / 0.00291 | reported | INFO
+AC6 | K = 2 pi, Double64, tau = 4: rows (starts x checkpoints at every multiple of 10 up to 10000) | 10000 | 10000 | PASS
+AC6 | K = 2 pi, Double64, tau = 4: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.3832 | <= 1 | PASS
+AC6 | K = 2 pi, Double64, tau = 4: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.3832 | <= 1 | PASS
+AC6 | K = 2 pi, Double64, tau = 4: pairs with a differing maximiser (of 10000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 2 pi, Double64, tau = 4: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 4.264e+04 / 0.002876 | reported | INFO
+AC7 | K = 2 pi, Double64: max (FLI_B - F_*)_+ / B_FLI (sandwich upper) | 0 | <= 1 | PASS
+AC7 | K = 2 pi, Double64: max (F_* - ln sqrt 2 - FLI_B)_+ / B_FLI (sandwich lower) | 0 | <= 1 | PASS
+AC7 | K = 2 pi, Double64: max (FLI_1 - F_*)_+ / B_FLI | 0 | <= 1 | PASS
+AC7 | K = 2 pi, Double64: (F_* - FLI_B) / ln sqrt 2 (min; median; max) and F_* - FLI_1 (min; median; max) | 7.544e-05; 0.4215; 0.9464 and 0.01199; 0.4525; 4.929 | reported | INFO
+AC6 | K = 10, Double64, tau = 1: rows (starts x checkpoints at every multiple of 10 up to 10000) | 20000 | 20000 | PASS
+AC6 | K = 10, Double64, tau = 1: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.2968 | <= 1 | PASS
+AC6 | K = 10, Double64, tau = 1: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.2968 | <= 1 | PASS
+AC6 | K = 10, Double64, tau = 1: pairs with a differing maximiser (of 20000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 10, Double64, tau = 1: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 6.196e+04 / 0.003228 | reported | INFO
+AC6 | K = 10, Double64, tau = 4: rows (starts x checkpoints at every multiple of 10 up to 10000) | 10000 | 10000 | PASS
+AC6 | K = 10, Double64, tau = 4: max |FLI_1 - FLI_ref,1| / B_FLI (realized ratio R2), 20 starts, n up to 10000 | 0.2967 | <= 1 | PASS
+AC6 | K = 10, Double64, tau = 4: max |FLI_B - FLI_ref,B| / B_FLI (realized ratio R2) | 0.2967 | <= 1 | PASS
+AC6 | K = 10, Double64, tau = 4: pairs with a differing maximiser (of 10000); at the final checkpoint (of 20) | 0; 0 | reported | INFO
+AC6 | K = 10, Double64, tau = 4: max |error| in units of eps / median ratio error/B_FLI (FLI_B) | 6.2e+04 / 0.003124 | reported | INFO
+AC7 | K = 10, Double64: max (FLI_B - F_*)_+ / B_FLI (sandwich upper) | 0 | <= 1 | PASS
+AC7 | K = 10, Double64: max (F_* - ln sqrt 2 - FLI_B)_+ / B_FLI (sandwich lower) | 0 | <= 1 | PASS
+AC7 | K = 10, Double64: max (FLI_1 - F_*)_+ / B_FLI | 0 | <= 1 | PASS
+AC7 | K = 10, Double64: (F_* - FLI_B) / ln sqrt 2 (min; median; max) and F_* - FLI_1 (min; median; max) | 0.01181; 0.192; 0.9966 and 0.004092; 0.1645; 2.199 | reported | INFO
+# section AC6-7 took 51.6 s
+AC8 | (a) K = 0.5 regular class, Float64, 20 starts x 1000 checkpoints: S_1, S_2 of the FLI reducer not bitwise equal to the sali sums (sum and comp separately): 0; not bitwise equal to the L1 sums of k = 1 runs from column 1 and 2: 0 | 0 | 0 | PASS
+AC8 | (b) K = 0.5 regular class: max |FLI_1(n) - running max of n X_L1| / (4 eps max(1, FLI_1)), 20000 points | 0.2277 | <= 1 | PASS
+AC8 | (c) K = 0.5 regular class: max (max over handoffs of (-L/2) - FLI_B)_+ / (B_L/2) | 0 | <= 1 | PASS
+AC8 | (c) K = 0.5 regular class: max |max(S_1, S_2) - (-L/2 + |S_1 - S_2|/2)| / B_L | 0.006 | <= 1 | PASS
+AC8 | R1 K = 0.5 regular class, n = 100: drawdown D = FLI_1 - n X_L1 (min; median; max) and FLI_B - FLI_1 (median; max) | 0; 0.2847; 1.048 and 0.2463; 1.709 | reported | INFO
+AC8 | R1 K = 0.5 regular class, n = 1000: drawdown D = FLI_1 - n X_L1 (min; median; max) and FLI_B - FLI_1 (median; max) | 0; 0.5409; 2.804 and 0.3303; 1.864 | reported | INFO
+AC8 | R1 K = 0.5 regular class, n = 10000: drawdown D = FLI_1 - n X_L1 (min; median; max) and FLI_B - FLI_1 (median; max) | 0.1297; 0.3094; 3.127 and 0.3291; 1.881 | reported | INFO
+AC8 | (a) K = 2 pi, Float64, 20 starts x 1000 checkpoints: S_1, S_2 of the FLI reducer not bitwise equal to the sali sums (sum and comp separately): 0; not bitwise equal to the L1 sums of k = 1 runs from column 1 and 2: 0 | 0 | 0 | PASS
+AC8 | (b) K = 2 pi: max |FLI_1(n) - running max of n X_L1| / (4 eps max(1, FLI_1)), 20000 points | 0.2248 | <= 1 | PASS
+AC8 | (c) K = 2 pi: max (max over handoffs of (-L/2) - FLI_B)_+ / (B_L/2) | 0 | <= 1 | PASS
+AC8 | (c) K = 2 pi: max |max(S_1, S_2) - (-L/2 + |S_1 - S_2|/2)| / B_L | 0.04725 | <= 1 | PASS
+AC8 | R1 K = 2 pi, n = 100: drawdown D = FLI_1 - n X_L1 (min; median; max) and FLI_B - FLI_1 (median; max) | -1.421e-14; 0; 0.6067 and 0.1902; 4.929 | reported | INFO
+AC8 | R1 K = 2 pi, n = 1000: drawdown D = FLI_1 - n X_L1 (min; median; max) and FLI_B - FLI_1 (median; max) | 0; 0; 0.8861 and 0.1902; 4.929 | reported | INFO
+AC8 | R1 K = 2 pi, n = 10000: drawdown D = FLI_1 - n X_L1 (min; median; max) and FLI_B - FLI_1 (median; max) | -1.819e-12; 0; 1.965 and 0.1902; 4.929 | reported | INFO
+AC8 | R1 K = 2 pi, n = 1e3: orbits (of 20) with the label FLI_B > ln n / n X_L1 > ln n: 20 / 20; labels differ | 0 | reported | INFO
+AC8 | (a) K = 10, Float64, 20 starts x 1000 checkpoints: S_1, S_2 of the FLI reducer not bitwise equal to the sali sums (sum and comp separately): 0; not bitwise equal to the L1 sums of k = 1 runs from column 1 and 2: 0 | 0 | 0 | PASS
+AC8 | (b) K = 10: max |FLI_1(n) - running max of n X_L1| / (4 eps max(1, FLI_1)), 20000 points | 0.1771 | <= 1 | PASS
+AC8 | (c) K = 10: max (max over handoffs of (-L/2) - FLI_B)_+ / (B_L/2) | 0 | <= 1 | PASS
+AC8 | (c) K = 10: max |max(S_1, S_2) - (-L/2 + |S_1 - S_2|/2)| / B_L | 0.06887 | <= 1 | PASS
+AC8 | R1 K = 10, n = 100: drawdown D = FLI_1 - n X_L1 (min; median; max) and FLI_B - FLI_1 (median; max) | 0; 0; 0 and 0; 2.192 | reported | INFO
+AC8 | R1 K = 10, n = 1000: drawdown D = FLI_1 - n X_L1 (min; median; max) and FLI_B - FLI_1 (median; max) | 0; 0; 0 and 0; 2.192 | reported | INFO
+AC8 | R1 K = 10, n = 10000: drawdown D = FLI_1 - n X_L1 (min; median; max) and FLI_B - FLI_1 (median; max) | -1.819e-12; 0; 0.1946 and 0; 2.192 | reported | INFO
+AC8 | R1 K = 10, n = 1e3: orbits (of 20) with the label FLI_B > ln n / n X_L1 > ln n: 20 / 20; labels differ | 0 | reported | INFO
+AC8 | R1 K = 0.5 regular class, n = 1e3: orbits (of 20) with FLI_B > ln n / n X_L1 > ln n: 13 / 5; labels differ | 8 | reported | INFO
+# section AC8 took 35.1 s
+AC9 | (a) regular class K = 0.5, 20 starts, n in [1e4,1e6]: starts with the LS slope of FLI_B against ln n in [0.7,1.3] (slopes: min 0.9974, median 1.001, max 1.014) | 20 | >= 16 | PASS
+AC9 | (a) starts in the transient (slope over [1e4,1e5] outside [0.7,1.3], D72 item 3) | 0 | <= 4 | PASS
+AC9 | (a) reported: starts with FLI_B below ln n at n = 1e4 (the detector of the spec before D72), and FLI_B - ln n averaged over [1e4,1e6] per start (min; median; max) | 7 and -2.409; 0.3797; 2.675 | reported | INFO
+AC9 | (b) K = 2 pi, 1000 starts: |mean(slope of FLI_B over n in [20,200]) - mean(X(1e4))| / (4 combined SE + 4/180); mean slope 1.169, mean X 1.17 | 0.02892 | <= 1 | PASS
+AC9 | (b) K = 2 pi: realized |difference| of the means; combined SE; z = difference / SE (allowance of the spec 4/180 = 0.02222; the sali form 2/180 = 0.01111) | 0.001093; 0.003895; 0.2807 | reported | INFO
+AC9 | (b) K = 2 pi: R3 sanity rate (Chirikov ln(K/2); K = 2 pi: the benchmarks row 1.172, loose, K18) against mean slope | 1.172 vs 1.169 | reported | INFO
+AC9 | R4 K = 2 pi: first handoff at which FLI_B reaches ln 1e20 = 46.05 (min; median; max), and starts that never reach it within n = 1e3 | 29; 39; 1000 and 3 | reported | INFO
+AC9 | (b) K = 5, 1000 starts: |mean(slope of FLI_B over n in [20,200]) - mean(X(1e4))| / (4 combined SE + 4/180); mean slope 0.9645, mean X 0.9536 | 0.212 | <= 1 | PASS
+AC9 | (b) K = 5: realized |difference| of the means; combined SE; z = difference / SE (allowance of the spec 4/180 = 0.02222; the sali form 2/180 = 0.01111) | 0.01096; 0.007371; 1.487 | reported | INFO
+AC9 | (b) K = 5: R3 sanity rate (Chirikov ln(K/2); K = 2 pi: the benchmarks row 1.172, loose, K18) against mean slope | 0.9163 vs 0.9645 | reported | INFO
+AC9 | (c) K = 5: |mean(FLI_1(1e3)/1e3) - mean(X(1e4))| / (4 combined SE + 4/n); means 0.9548 and 0.9536 | 0.04026 | <= 1 | PASS
+AC9 | (c) K = 5: |mean(FLI_B(1e3)/1e3) - mean(X(1e4))| / (4 combined SE + 4/n); means 0.9554 and 0.9536 | 0.05967 | <= 1 | PASS
+AC9 | R4 K = 5: first handoff at which FLI_B reaches ln 1e20 = 46.05 (min; median; max), and starts that never reach it within n = 1e3 | 33; 46; 1000 and 23 | reported | INFO
+AC9 | (b) K = 10, 1000 starts: |mean(slope of FLI_B over n in [20,200]) - mean(X(1e4))| / (4 combined SE + 4/180); mean slope 1.62, mean X 1.62 | 0.01822 | <= 1 | PASS
+AC9 | (b) K = 10: realized |difference| of the means; combined SE; z = difference / SE (allowance of the spec 4/180 = 0.02222; the sali form 2/180 = 0.01111) | 0.0005944; 0.002602; 0.2284 | reported | INFO
+AC9 | (b) K = 10: R3 sanity rate (Chirikov ln(K/2); K = 2 pi: the benchmarks row 1.172, loose, K18) against mean slope | 1.609 vs 1.62 | reported | INFO
+AC9 | (c) K = 10: |mean(FLI_1(1e3)/1e3) - mean(X(1e4))| / (4 combined SE + 4/n); means 1.62 and 1.62 | 0.08256 | <= 1 | PASS
+AC9 | (c) K = 10: |mean(FLI_B(1e3)/1e3) - mean(X(1e4))| / (4 combined SE + 4/n); means 1.621 and 1.62 | 0.1516 | <= 1 | PASS
+AC9 | R4 K = 10: first handoff at which FLI_B reaches ln 1e20 = 46.05 (min; median; max), and starts that never reach it within n = 1e3 | 22; 29.0; 43 and 0 | reported | INFO
+# section AC9 took 2.6 s
+AC10 | K = 0.5 regular class, Float64, tau = 2: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 0.5 regular class, Float64, tau = 2: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.003 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Float64, tau = 2: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 0.002318 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Float64, tau = 2: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 0.5 regular class, Float64, tau = 2: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 0.7253 (max) | 0.01989; 0.2488 and 0.343 | reported | INFO
+AC10 | K = 0.5 regular class, Float64, tau = 5: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 0.5 regular class, Float64, tau = 5: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.003358 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Float64, tau = 5: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 0.002062 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Float64, tau = 5: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 0.5 regular class, Float64, tau = 5: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 1.451 (max) | 0.05728; 0.678 and 0.4674 | reported | INFO
+AC10 | K = 0.5 regular class, Float64, tau = 10: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 0.5 regular class, Float64, tau = 10: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.004511 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Float64, tau = 10: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 0.001058 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Float64, tau = 10: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 0.5 regular class, Float64, tau = 10: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 3.626 (max) | 0.1227; 0.7107 and 0.196 | reported | INFO
+AC10 | K = 2 pi, Float64, tau = 2: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 2 pi, Float64, tau = 2: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.02329 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Float64, tau = 2: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 0.02162 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Float64, tau = 2: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 2 pi, Float64, tau = 2: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 2.274 (max) | 0; 0.8861 and 0.3896 | reported | INFO
+AC10 | K = 2 pi, Float64, tau = 5: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 2 pi, Float64, tau = 5: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.02329 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Float64, tau = 5: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 0.01871 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Float64, tau = 5: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 2 pi, Float64, tau = 5: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 4.549 (max) | 0; 0.8861 and 0.1948 | reported | INFO
+AC10 | K = 2 pi, Float64, tau = 10: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 2 pi, Float64, tau = 10: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.02329 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Float64, tau = 10: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 0.01871 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Float64, tau = 10: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 2 pi, Float64, tau = 10: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 11.37 (max) | 0; 0.8861 and 0.07792 | reported | INFO
+AC10 | K = 0.5 regular class, Double64, tau = 2: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 0.5 regular class, Double64, tau = 2: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.0001299 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Double64, tau = 2: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 7.757e-05 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Double64, tau = 2: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 0.5 regular class, Double64, tau = 2: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 0.7253 (max) | 0.01989; 0.2488 and 0.343 | reported | INFO
+AC10 | K = 0.5 regular class, Double64, tau = 5: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 0.5 regular class, Double64, tau = 5: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.0001084 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Double64, tau = 5: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 0.0001123 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Double64, tau = 5: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 0.5 regular class, Double64, tau = 5: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 1.451 (max) | 0.05728; 0.678 and 0.4674 | reported | INFO
+AC10 | K = 0.5 regular class, Double64, tau = 10: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 0.5 regular class, Double64, tau = 10: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.0001109 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Double64, tau = 10: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 3.025e-05 | <= 1 | PASS
+AC10 | (b) K = 0.5 regular class, Double64, tau = 10: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 0.5 regular class, Double64, tau = 10: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 3.626 (max) | 0.1227; 0.7107 and 0.196 | reported | INFO
+AC10 | K = 2 pi, Double64, tau = 2: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 2 pi, Double64, tau = 2: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.0009507 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Double64, tau = 2: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 0.0009507 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Double64, tau = 2: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 2 pi, Double64, tau = 2: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 2.274 (max) | 0; 0.8263 and 0.3633 | reported | INFO
+AC10 | K = 2 pi, Double64, tau = 5: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 2 pi, Double64, tau = 5: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.0007308 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Double64, tau = 5: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 0.0007144 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Double64, tau = 5: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 2 pi, Double64, tau = 5: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 4.549 (max) | 0; 0.8263 and 0.1817 | reported | INFO
+AC10 | K = 2 pi, Double64, tau = 10: rows (n in {100,1e3}, 20 starts) | 40 | 40 | PASS
+AC10 | (a) K = 2 pi, Double64, tau = 10: max |S_i^tau - S_i^1| / (16 eps Psi_n^(i)) | 0.0007714 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Double64, tau = 10: max (FLI_tau - FLI_1)_+ / (B^tau + B^1), both forms | 0.0007419 | <= 1 | PASS
+AC10 | (b) K = 2 pi, Double64, tau = 10: max (FLI_1 - FLI_tau - floor(tau/2) ln sigma(K))_+ / (B^tau + B^1), both forms | 0 | <= 1 | PASS
+AC10 | K = 2 pi, Double64, tau = 10: FLI_1 - FLI_tau (median; max) and the same over the bound floor(tau/2) ln sigma = 11.37 (max) | 0; 0.8263 and 0.07266 | reported | INFO
+# section AC10 took 10.2 s
+AC11 | (a) K = 2 pi, 1000 starts, n = 1e3: |mean(FLI_B/n) Float64 - Double64| / (4 combined SE); means 1.17 and 1.172, z = 1.002 | 0.2504 | <= 1 | PASS
+AC11 | (a) K = 5, 1000 starts, n = 1e3: |mean(FLI_B/n) Float64 - Double64| / (4 combined SE); means 0.9623 and 0.9635, z = 0.2305 | 0.05761 | <= 1 | PASS
+AC11 | (a) K = 5, 200 starts, n = 1e4: same; means 0.9751 and 0.9756, z = 0.2556 | 0.0639 | <= 1 | PASS
+AC11 | (a) K = 10, 200 starts, n = 1e4: same; means 1.619 and 1.619, z = 0.214 | 0.0535 | <= 1 | PASS
+AC11 | (b) BigFloat(256), K = 2 pi, 50 starts, n in {10,..,60}: rows | 300 | 300 | PASS
+AC11 | (b) max |FLI_1 - FLI_ref(512 bits)| / B_FLI (own eps 1.727e-77) | 0.099 | <= 1 | PASS
+AC11 | (b) max |FLI_B - FLI_ref(512 bits)| / B_FLI | 0.099 | <= 1 | PASS
+AC11 | (c) K = 2 pi, 100 starts, n = 300: BigFloat(256) vs Double64 |difference of means| / (4 combined SE); means 1.178 and 1.173, z = 0.5487 | 0.1372 | <= 1 | PASS
+AC11 | (c) K = 5, 100 starts, n = 300: BigFloat(256) vs Double64 |difference of means| / (4 combined SE); means 0.9852 and 0.9744, z = 0.6012 | 0.1503 | <= 1 | PASS
+AC11 | (d) K = 10, n = 1e4, Float64, 5 starts: FLI_B finite and above 709.78 (range 1.596e+04 to 1.636e+04), not clipped, fli_unlogged == nothing (display reports the overflow) | true | true | PASS
+AC11 | (d) max |FLI_B - FLI_ref| / B_FLI at n = 1e4, K = 10 | 0.02207 | <= 1 | PASS
+AC11 | (d) fli_unlogged on small values returns exp(F); above 709.78 returns nothing, never Inf | true | true | PASS
+# section AC11 took 12.2 s
+AC12 | (a) zero tangent on a flagged orbit (propagate chunk 2, chains {FLI} and {FLI(replace = false), SALI}; Double64 per-orbit): kind deviation matrix, orbit, step 3, backend cpu, column 1 (2 for diag(1,0)), value 0, nothing stored, lowest id first; k = 1 ArgumentError | true | true | PASS
+AC12 | (b) NaN in the tangent: kind deviation matrix, column 0, threshold Inf, orbit 3, step 5 (not masked), both chains and Double64 per-orbit | true | true | PASS
+AC12 | (c) Float64: columns of norm 2, 3, 0, 1 + 1000 eps rejected (kind initial frame, step 0, orbit, column); unit, dependent and 1 + eps columns accepted (largest defect 1 eps; threshold 8 eps); 2-column ArgumentError | true | true | PASS
+AC12 | (c) Float64: seeded frame accepted for all ids 1..10000; largest norm defect in units of eps (threshold 8) | 2 | <= 8, 0 rejected | PASS
+AC12 | (c) Double64: columns of norm 2, 3, 0, 1 + 1000 eps rejected (kind initial frame, step 0, orbit, column); unit, dependent and 1 + eps columns accepted (largest defect 1 eps; threshold 8 eps); 2-column ArgumentError | true | true | PASS
+AC12 | (c) Double64: seeded frame accepted for all ids 1..1000; largest norm defect in units of eps (threshold 8) | 0.0625 | <= 8, 0 rejected | PASS
+AC12 | (c) caller-side frame check rejects the non-unit frame before any map call (fl_Boom throws if called); an accepted frame reaches the map (D67 form) | true | true | PASS
+AC12 | (d) A = diag(e^3, e^-3), Float64, both chains: tau = 200 no error at n = 200 (FLI_B = 599.8, 599.8); tau = 300 error at handoff 300 | true | true | PASS
+AC12 | (e) run record on {FLI} alone: indicator fli, k, tau, precision; final field types (the chain position and frame source are recorded by Experiments, D72 item 1) | true | true | PASS
+# section AC12 took 0.1 s
+AC13 | (a) orbit points at every handoff differ across the chains {}, {L1} (k=1), {FLI}, {FLI(replace=false), SALI}, {SALI}, {} (k=2); cases = (5 starts x tau in {1,4}) | 0 | 0 of 10 | PASS
+AC13 | (b) in {FLI(replace=false), SALI}: FLI outputs differ from the stand-alone {FLI}, or SALI outputs from the stand-alone {SALI}, or final W differs among the chains with a replacer | 0 | 0 of 10 | PASS
+AC13 | (b) propagate equals the serial map of propagate_orbit bitwise (x, W, finals), chain {FLI(replace=false), SALI}, 4096 orbits, K = 2 pi, n = 1e3, tau = 1, chunk = 64 | true | true | PASS
+AC13 | (b) propagate equals the serial map of propagate_orbit bitwise (x, W, finals), chain {FLI(replace=false), SALI}, 4096 orbits, K = 2 pi, n = 1e3, tau = 1, chunk = 1000 | true | true | PASS
+AC13 | (b) propagate equals the serial map of propagate_orbit bitwise (x, W, finals), chain {FLI(replace=false), SALI}, 4096 orbits, K = 2 pi, n = 1e3, tau = 4, chunk = 64 | true | true | PASS
+AC13 | (b) propagate equals the serial map of propagate_orbit bitwise (x, W, finals), chain {FLI(replace=false), SALI}, 4096 orbits, K = 2 pi, n = 1e3, tau = 4, chunk = 1000 | true | true | PASS
+AC13 | (b) propagate equals the serial map of propagate_orbit bitwise (x, W, finals), chain {FLI}, 4096 orbits, K = 2 pi, n = 1e3, tau = 4, chunk = 64 | true | true | PASS
+AC13 | (b) propagate equals the serial map of propagate_orbit bitwise (x, W, finals), chain {FLI}, 4096 orbits, K = 2 pi, n = 1e3, tau = 4, chunk = 1000 | true | true | PASS
+AC13 | (c) x, W and every final (FLI, FLI_1, sums, compensations, maximisers, SALI) bitwise identical for thread counts [1, 2, 4] (hashes in separate processes) and chunk sizes 64 and 1000: 8 cases (chains {FLI}, {FLI(false), SALI} x tau in {1,4} x chunk), 4096 orbits, K = 2 pi, n = 1e3; example hash 1366526537119377012 | true | true | PASS
+AC13 | (d) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 1, chain length 1, Float64 | 0 | 0 | PASS
+AC13 | (d) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 1, chain length 2, Float64 | 0 | 0 | PASS
+AC13 | (d) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 4, chain length 1, Float64 | 0 | 0 | PASS
+AC13 | (d) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 4, chain length 2, Float64 | 0 | 0 | PASS
+AC13 | (d) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 1, chain length 1, Double64 | 0 | 0 | PASS
+AC13 | (d) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 1, chain length 2, Double64 | 0 | 0 | PASS
+AC13 | (d) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 4, chain length 1, Double64 | 0 | 0 | PASS
+AC13 | (d) bytes allocated by propagate_orbit after warm-up, n = 1e4, tau = 4, chain length 2, Double64 | 0 | 0 | PASS
+AC13 | (e) exchange of the two columns: FLI_B and the exchanged sums not bitwise equal, or FLI_1 != running max of the other sum: 0 of 40; sign change of either column changing anything: 0 of 80 (K = 2 pi, 0.5; Float64, Double64; tau in {1,4}; 5 starts; 400 steps, every handoff) | 0 | 0 | PASS
+# section AC13 took 8.7 s
+AC14 | (a) K = 0, dyadic starts: starts (of 2 x 50, tau in {1,3}, all handoffs to 300) whose FLI, sums, compensations, maximisers differ between wrapped and lifted | 0 | 0 | PASS
+AC14 | (b) K = 0.5 regular class, n = 10, 50 starts, both forms: max |FLI_w - FLI_l| / (64 K M_state j^2 eps (rho1 + rho2)) at the larger maximiser bound; max |difference| 1.243e-14; excluded (max rho > 50) 1 of 100 | 0.0001744 | <= 1 | PASS
+AC14 | (b) n = 10: excluded comparisons (of 100) | 1 | <= 10 | PASS
+AC14 | (b) K = 0.5 regular class, n = 100, 50 starts, both forms: max |FLI_w - FLI_l| / (64 K M_state j^2 eps (rho1 + rho2)) at the larger maximiser bound; max |difference| 4.272e-12; excluded (max rho > 50) 2 of 100 | 0.0004367 | <= 1 | PASS
+AC14 | (b) n = 100: excluded comparisons (of 100) | 2 | <= 10 | PASS
+# section AC14 took 0.5 s
+AC15 | (c) K = 0.5: oracle orbit vs forward(StandardMap) over 20 starts x 10000 steps: steps with a bitwise difference; largest coordinate difference 0 | 0 | 0 of 200000 (else add the orbit divergence term) | PASS
+AC15 | (c) K = 6.283185307179586: oracle orbit vs forward(StandardMap) over 100 starts x 12 steps: steps with a bitwise difference; largest coordinate difference 0 | 0 | 0 of 1200 (else add the orbit divergence term) | PASS
+AC15 | (c) K = 5.0: oracle orbit vs forward(StandardMap) over 100 starts x 12 steps: steps with a bitwise difference; largest coordinate difference 0 | 0 | 0 of 1200 (else add the orbit divergence term) | PASS
+AC15 | (a) K = 0.5 regular, 20 starts, n in {10,100,1e3,1e4}, 80 pairs: max (-ln g_oracle/2 - FLI_B) / (B_FLI + B_oracle/(2 g_oracle)) (one-sided; negative means FLI_B above the oracle value); min (FLI_B - (-ln g_oracle/2)) = 0.0527; pairs with FLI_B below the oracle value: 0 | -207.7 | <= 1 | PASS
+AC15 | (b) K = 6.283, 1000 starts, resolved handoffs n in {2,5,8,12}, 3765 pairs: max (-ln g_oracle/2 - FLI_B) / (B_FLI + B_oracle/(2 g_oracle)); min (FLI_B - (-ln g_oracle/2)) = -0.0004139 (at g_oracle = 7.35e-14); pairs with FLI_B below the oracle value: 1 | 0.02188 | <= 1 | PASS
+AC15 | (b) K = 6.283: pairs excluded as unresolved (235 of 4000) | 0.05875 | <= 0.10 | PASS
+AC15 | (b) K = 5, 1000 starts, resolved handoffs n in {2,5,8,12}, 3946 pairs: max (-ln g_oracle/2 - FLI_B) / (B_FLI + B_oracle/(2 g_oracle)); min (FLI_B - (-ln g_oracle/2)) = 0.0002777 (at g_oracle = 2.726e-06); pairs with FLI_B below the oracle value: 0 | -0.1067 | <= 1 | PASS
+AC15 | (b) K = 5: pairs excluded as unresolved (54 of 4000) | 0.0135 | <= 0.10 | PASS
+# section AC15 took 3.8 s
+# figure saved: fli-growth-laws.png (panel 3 worst ratio 0.2369)
+# figure saved: fli-chaostools.png
+# section figure took 12.8 s
+# verdicts: 228 PASS, 0 FAIL, 66 other
+# total wall time 297.0 s

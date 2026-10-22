@@ -963,6 +963,193 @@ want("sali") && let
     end
 end
 
+# ------------------------------------------------------------------------------------------------ AC16 (fli-ofli), tag "fli"
+# Spec criterion 16 of fli-ofli-spec.md, the D68 form from the start (the same-orbit bound B_FLI applies per backend; the GPU and the CPU do not produce
+# the same orbit). FLI reducer (k = 2, chain {FLI()}), lifted, tau = 1; Float64 on the GPU (a FALLBACK with its reason is the pass for Double64 if the kernel
+# does not compile). Classes: regular K = 0.5 (S7 screening, regular_starts), 1024 orbits, n = 4e4; chaotic K = 10, 1024 orbits, n = 8 and n = 10 (FLI has no
+# floor, so n is not limited by a resolved window; the perturbative horizon 16 eps M_n Gamma_n <= 1e-4 of the D68 term decides which orbits are gated).
+# (a) each backend against a BigFloat(256) reference formed at its own realized orbit points: |FLI_b - FLI_ref,b| <= B_FLI,b (two-point rule of Q11, Psi from
+# the backend's own tangents) for FLI_B and FLI_1. (b) CPU-GPU gap: regular class, on the orbits whose final states differ by at most 1e-9 in every
+# coordinate, |FLI_cpu - FLI_gpu| <= B_FLI,cpu + B_FLI,gpu; chaotic class, + max(D_orb^(i_a)(j_a), D_orb^(i_b)(j_b)), D_orb^(i)(j) the first line of the D68
+# term per column (the sum over i dropped) at the computed maximiser pairs of the two backends (the finals stepB, colB, step1 come back from the device). The
+# gap in units of the bound is reported. (c) K = 10, n = 1e4, tau = 2: tangent-core AC12(c) tolerances on FLI_B/n and FLI_1/n.
+# The GPU orbit is read with the trace kernel of the sali section (the run keeps no orbit); its final state is checked bitwise against the propagate result.
+MODTAG[] = "fli: "
+want("fli") && include(joinpath(ROOT, "test", "fli-ofli", "fl_helpers.jl"))   # fl_*: B_FLI, BigFloat reference, Psi_n, fl_Orbit
+fli_est(sys, x0, N, tau, b) = propagate(sys, x0, N; k = 2, tau = tau, seed = SEED, reducers = (FLI(),), backend = b)
+d16_rat(x, B) = x <= 0 ? 0.0 : (B == 0 ? Inf : x / B)
+
+# BigFloat(256) reference of orbit j at the points `pts` of backend result `res`: errors, two-point bounds and the reference values for both forms.
+function d16_one(res, pts, Kt, sysT, j, N, T, epsT)
+    W0 = fl_frame(SEED, j, T)
+    R = fl_ref_steps(fl_mats_std(Kt, pts), W0, N)
+    Ms = [SMatrix{2,2,Float64}(map(Float64, tangent(sysT, pt))) for pt in pts]
+    o = fl_Orbit(R.q1, R.q2, R.G, Ms, W0, Dict{Tuple{Int,Int},Float64}(), Dict{Int,Vector{NamedTuple}}())
+    r = only(fl_ref_at(R, 1, [N]))
+    f = res.finals[j][1]
+    B1 = fl_BFLI(epsT, o, 1, f.step1, 1, r.j1)
+    BB = fl_BFLI(epsT, o, f.colB, f.stepB, r.cB, r.jB)
+    e1, eB = fl_err(f.fli1, r.F1), fl_err(f.fli, r.FB)
+    return (r1 = d16_rat(e1, B1), rB = d16_rat(eB, BB), B1 = B1, BB = BB, e1 = e1, eB = eB, F1 = Float64(r.F1), FB = Float64(r.FB), j1 = r.j1, jB = r.jB, cB = r.cB)
+end
+
+# D_orb^(i)(j) of fli-ofli-spec.md criterion 16 (first line of the D68 term of sali-spec.md, Amendment D68, per column) in BigFloat(256) on the CPU reference
+# orbit, for every j = 0..n and i = 1, 2: with A_k = DT(z_k), P_{<k} = A_{k-1} ... A_0, P^(j)_{>k} = A_{j-1} ... A_{k+1}, bnd_k = 16 eps M_k Gamma_k
+# (precision-spec Equations 3, 4; the same as d68_orb of the sali section):
+#   D_orb^(i)(j) = sqrt 2 |K| sum_{k<j} norm(P^(j)_{>k})_2 bnd_k norm(P_{<k} w_i) / norm(P_j w_i),  D_orb^(i)(0) = 0 (the s = 0 term is exact).
+# Returns Dij (2 x (n+1), Float64), the item 4 bounds bnd_k for k = 0..n.
+function d16_orb(Kt, pts, zN, W0, epsT)
+    return setprecision(BigFloat, 256) do
+        n = length(pts)
+        mats = fl_mats_std(Kt, pts)
+        A = [(m = mats(k + 1); SMatrix{2,2,BigFloat}(m[1], m[3], m[2], m[4])) for k in 0:n-1]   # A[k+1] = DT(z_k)
+        zs = vcat(pts, [zN])
+        Mk = accumulate(max, [max(one(BigFloat), abs(BigFloat(z[1])), abs(BigFloat(z[2]))) for z in zs])
+        Gam = map(0:n) do k
+            Q, g = SMatrix{2,2,BigFloat}(1, 0, 0, 1), zero(BigFloat)
+            for j in k-1:-1:0            # Q = A_{k-1} ... A_{j+1}
+                g += d68_sig2(Q)
+                Q = Q * A[j+1]
+            end
+            g
+        end
+        bnd = [16 * BigFloat(epsT) * Mk[k+1] * Gam[k+1] for k in 0:n]
+        v = [[SVector{2,BigFloat}(W0[1, i], W0[2, i])] for i in 1:2]
+        for i in 1:2, k in 0:n-1
+            push!(v[i], A[k+1] * v[i][end])           # v[i][k+1] = P_{<k} w_i
+        end
+        nv = [norm.(v[i]) for i in 1:2]
+        Dij = zeros(2, n + 1)
+        for j in 1:n
+            Pg = Vector{SMatrix{2,2,BigFloat,4}}(undef, j)     # Pg[k+1] = P^(j)_{>k}, k = 0..j-1
+            Pg[j] = SMatrix{2,2,BigFloat}(1, 0, 0, 1)
+            for k in j-1:-1:1
+                Pg[k] = Pg[k+1] * A[k+1]
+            end
+            for i in 1:2
+                Dij[i, j+1] = Float64(sqrt(BigFloat(2)) * abs(BigFloat(Kt)) * sum(d68_sig2(Pg[k+1]) * bnd[k+1] * nv[i][k+1] / nv[i][j+1] for k in 0:j-1))
+            end
+        end
+        (Dij = Dij, bnd = Float64.(bnd))
+    end
+end
+
+# Chaotic class of part (b). Entering orbits: 16 eps M_n Gamma_n <= 1e-4. Gate: |FLI_cpu - FLI_gpu| <= B_FLI,cpu + B_FLI,gpu + max(D_orb^(i_a)(j_a), D_orb^(i_b)(j_b)).
+function d16_chaotic_b(lab, cpu, gpu, rc, rg, orb, m)
+    enter = findall(j -> orb[j].hor <= 1e-4, 1:m)
+    rest = setdiff(1:m, enter)
+    row("AC16b", "$lab: orbits that enter part (b): 16 eps M_n Gamma_n <= 1e-4 (horizon max over all orbits $(fmt(maximum(o.hor for o in orb))); reported only: $(length(rest)))", length(enter), "reported", "INFO")
+    isempty(enter) && return
+    Dat(j, i, s) = s == 0 ? 0.0 : orb[j].Dij[i, s+1]
+    fc(j) = cpu.finals[j][1]
+    fg(j) = gpu.finals[j][1]
+    termB(j) = max(Dat(j, max(fc(j).colB, 1), fc(j).stepB), Dat(j, max(fg(j).colB, 1), fg(j).stepB))
+    term1(j) = max(Dat(j, 1, fc(j).step1), Dat(j, 1, fg(j).step1))
+    gapB(j) = abs(Float64(fc(j).fli) - Float64(fg(j).fli))
+    gap1(j) = abs(Float64(fc(j).fli1) - Float64(fg(j).fli1))
+    ratB(j) = gapB(j) / (rc[j].BB + rg[j].BB + termB(j))
+    rat1(j) = gap1(j) / (rc[j].B1 + rg[j].B1 + term1(j))
+    row("AC16b", "$lab: entering orbits: max |FLI_B,cpu - FLI_B,gpu| / (B_FLI,cpu + B_FLI,gpu + max(D_orb^(i_a)(j_a), D_orb^(i_b)(j_b))) over $(length(enter)) orbits", maximum(ratB(j) for j in enter), "<= 1", pf(maximum(ratB(j) for j in enter) <= 1))
+    row("AC16b", "$lab: entering orbits: same for FLI_1 (column 1 at step1 of each backend)", maximum(rat1(j) for j in enter), "<= 1", pf(maximum(rat1(j) for j in enter) <= 1))
+    med(v) = isempty(v) ? NaN : sort(v)[max(end ÷ 2, 1)]
+    q = [gapB(j) / max(termB(j), eps()) for j in enter]
+    nz = [gapB(j) for j in enter if gapB(j) > 0]
+    row("AC16b", "$lab: entering orbits: FLI_B gap / D_orb term, median / max (D_orb term median $(fmt(med([termB(j) for j in enter]))), max $(fmt(maximum(termB(j) for j in enter)))); nonzero gaps: $(length(nz)) of $(length(enter)), median among them $(fmt(med(nz)))",
+        "$(fmt(med(q))) / $(fmt(maximum(q)))", "reported (how loose the term is)", "INFO")
+    row("AC16b", "$lab: entering orbits: FLI_B gap over (B_FLI,cpu + B_FLI,gpu) without the D_orb term, max ($(count(j -> gapB(j) > rc[j].BB + rg[j].BB, enter)) of $(length(enter)) above 1); realized |FLI_ref,cpu - FLI_ref,gpu| (BigFloat series on the two orbits) over the full bound, max",
+        "$(fmt(maximum(gapB(j) / (rc[j].BB + rg[j].BB) for j in enter))); $(fmt(maximum(abs(rc[j].FB - rg[j].FB) / (rc[j].BB + rg[j].BB + termB(j)) for j in enter)))", "reported", "INFO")
+    rref(j) = gapB(j) / (rc[j].BB + rg[j].BB + max(Dat(j, max(rc[j].cB, 1), rc[j].jB), Dat(j, max(rg[j].cB, 1), rg[j].jB)))
+    row("AC16b", "$lab: entering orbits: same ratio with the maximisers of the BigFloat series (jB, cB of each backend's reference) in the D_orb term, max", maximum(rref(j) for j in enter), "reported", "INFO")
+    nmd = count(j -> (fc(j).stepB, fc(j).colB) != (rc[j].jB, rc[j].cB) || (fg(j).stepB, fg(j).colB) != (rg[j].jB, rg[j].cB), enter)
+    row("AC16b", "$lab: entering orbits: orbits whose computed maximiser (stepB, colB) differs from the reference maximiser on either backend; orbits whose CPU and GPU maximisers differ", "$nmd; $(count(j -> (fc(j).stepB, fc(j).colB) != (fg(j).stepB, fg(j).colB), enter))", "reported", "INFO")
+    pk, lt = maximum(orb[j].perk for j in enter), maximum(orb[j].lit for j in enter)
+    row("AC16b", "$lab: item 4 check on the device, entering orbits: max over orbits and k = 1..n of |z_k^cpu - z_k^gpu|_inf / (16 eps M_k Gamma_k); same against the literal 16 eps M_n Gamma_n (orbits above 1: $(count(j -> orb[j].perk > 1, enter)) / $(count(j -> orb[j].lit > 1, enter)))",
+        "$(fmt(pk)); $(fmt(lt))", "<= 1; <= 1", pf(pk <= 1 && lt <= 1))
+    if !isempty(rest)
+        row("AC16b", "$lab: reported-only orbits ($(length(rest))): max gap ratios (FLI_B; FLI_1) over the full bound; item 4 per-k ratio max", "$(fmt(maximum(ratB, rest))); $(fmt(maximum(rat1, rest))); $(fmt(maximum(orb[j].perk for j in rest)))", "reported", "INFO")
+    end
+end
+
+function fli_d16(tag, T, Kt, xT, N; chaotic = false)
+    sysT = StandardMap(Kt)
+    m = length(xT)
+    lab = "$tag, $T, $m orbits, n=$(fmt(N)), tau=1"
+    gpu = fli_est(sysT, xT, N, 1, :gpu)
+    why = gpu_why(gpu)
+    why === nothing || return row("AC16a", "$lab: each backend against its own BigFloat reference", "-", "<= 1", fb(why))
+    cpu = fli_est(sysT, xT, N, 1, :cpu)
+    epsT = Float64(effective_eps(T))
+    P, XN = gpu_trace(sysT, xT, N)
+    rc = Vector{NamedTuple}(undef, m); rg = Vector{NamedTuple}(undef, m)
+    same_c = zeros(Bool, m)
+    stepdiff = zeros(m)
+    orb = Vector{Any}(undef, m)
+    Threads.@threads :dynamic for j in 1:m
+        ptsc = fl_pts(sysT, xT[j], N)
+        zc = forward(sysT, ptsc[end])
+        same_c[j] = zc == cpu.x[j]
+        stepdiff[j] = maximum(maximum(abs.(ptsc[i] - P[j, i])) for i in 1:N)
+        rc[j] = d16_one(cpu, ptsc, Kt, sysT, j, N, T, epsT)
+        rg[j] = d16_one(gpu, P[j, :], Kt, sysT, j, N, T, epsT)
+        if chaotic
+            od = d16_orb(Kt, ptsc, zc, fl_frame(SEED, j, T), epsT)
+            e = [i < N ? maximum(abs.(ptsc[i+1] - P[j, i+1])) : maximum(abs.(zc - XN[j])) for i in 1:N]   # e_k = |z_k^cpu - z_k^gpu|_inf
+            orb[j] = (Dij = od.Dij, hor = od.bnd[end], perk = maximum(e ./ od.bnd[2:end]), lit = maximum(e) / od.bnd[end])
+        end
+    end
+    same_g = [XN[j] == gpu.x[j] for j in 1:m]
+    row("AC16a", "$lab: the reference orbit reproduces the backend's final state bitwise, CPU / GPU (GPU orbit from the device trace kernel)", "$(count(same_c)) / $(count(same_g)) of $m", "$m / $m", "INFO")
+    for (nm, R, res) in (("cpu", rc, cpu), ("gpu", rg, gpu))
+        for (form, key) in (("FLI_B", :rB), ("FLI_1", :r1))
+            r = [getproperty(x, key) for x in R]
+            row("AC16a", "$lab: backend $nm (provenance $(res.provenance.backend)): max |$form - $form,ref| / B_FLI over $m orbits (median $(fmt(sort(r)[end ÷ 2])))", maximum(r), "<= 1", pf(maximum(r) <= 1))
+        end
+        nmd = count(j -> (res.finals[j][1].stepB, res.finals[j][1].colB) != (R[j].jB, R[j].cB), 1:m)
+        row("AC16a", "$lab: backend $nm: orbits whose computed FLI_B maximiser (stepB, colB) differs from the BigFloat series' (reported); largest FLI_B $(fmt(maximum(R[j].FB for j in 1:m)))", nmd, "reported", "INFO")
+    end
+    dx = [maximum(abs.(cpu.x[j] - gpu.x[j])) for j in 1:m]
+    agree = findall(<=(1e-9), dx)
+    row("AC16b", "$lab: orbits with final states apart by more than 1e-9, CPU vs GPU (bitwise equal: $(count(==(0), dx)); median |dx| $(fmt(sort(dx)[end ÷ 2])), max $(fmt(maximum(dx))))", count(>(1e-9), dx), "reported", "INFO")
+    Kd = exact(Double64, Kt)
+    ref64 = fli_est(StandardMap(Kd), [SVector{2,Double64}(z) for z in xT], N, 1, :cpu)
+    dd = [Float64(maximum(abs.(SVector{2,Double64}(cpu.x[j]) - ref64.x[j]))) for j in 1:m]
+    row("AC16b", "$lab: orbits with final states apart by more than 1e-9, CPU Float64 vs Double64 CPU (max $(fmt(maximum(dd))))", count(>(1e-9), dd), "reported", "INFO")
+    if chaotic
+        row("AC16b", "$lab: orbits with final states within 1e-9 in every coordinate (the regular-class selection; not the entering rule for this class)", length(agree), "reported", "INFO")
+        return d16_chaotic_b(lab, cpu, gpu, rc, rg, orb, m)
+    end
+    row("AC16b", "$lab: orbits that enter part (b) (final states within 1e-9 in every coordinate)", length(agree), "reported", "INFO")
+    gB = [abs(Float64(cpu.finals[j][1].fli) - Float64(gpu.finals[j][1].fli)) / (rc[j].BB + rg[j].BB) for j in agree]
+    g1 = [abs(Float64(cpu.finals[j][1].fli1) - Float64(gpu.finals[j][1].fli1)) / (rc[j].B1 + rg[j].B1) for j in agree]
+    row("AC16b", "$lab: orbits that agree: max |FLI_B,cpu - FLI_B,gpu| / (B_FLI,cpu + B_FLI,gpu) over $(length(agree)) orbits", isempty(gB) ? NaN : maximum(gB), "<= 1", pf(!isempty(gB) && maximum(gB) <= 1))
+    row("AC16b", "$lab: orbits that agree: max |FLI_1,cpu - FLI_1,gpu| / (B_FLI,cpu + B_FLI,gpu)", isempty(g1) ? NaN : maximum(g1), "<= 1", pf(!isempty(g1) && maximum(g1) <= 1))
+    sd = stepdiff[agree]
+    neq = count(j -> (cpu.finals[j][1].stepB, cpu.finals[j][1].colB) == (gpu.finals[j][1].stepB, gpu.finals[j][1].colB), agree)
+    row("AC16b", "$lab: diagnostic on the orbits that agree: largest CPU-GPU orbit-point difference over all steps, median / max (the final-state threshold 1e-9 does not bound it); orbits with the FLI_B ratio above 1: $(count(>(1), gB)), FLI_1: $(count(>(1), g1)); maximiser (stepB, colB) equal on CPU and GPU for $neq of $(length(agree))",
+        isempty(sd) ? "-" : "$(fmt(sort(sd)[max(end ÷ 2, 1)])) / $(fmt(maximum(sd)))", "reported", "INFO")
+end
+
+want("fli") && let
+    x0, ncand, nrep = regular_starts(1024)
+    N = 4 * 10^4
+    for T in (Float64, Double64)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC16a", "K=0.5 regular class, $T, n=$(fmt(N)): each backend against its own BigFloat reference", "-", "<= 1", fb(reason)); continue)
+        xT = [SVector{2,T}(T(z[1]), T(z[2])) for z in x0]
+        fli_d16("K=0.5 regular class (S7: $(length(x0)) of $ncand candidates regular, $nrep replaced)", T, exact(T, 0.5), xT, N)
+    end
+    for T in (Float64, Double64)
+        ac12_chaotic("AC16c", "FLI_B/n, FLI_1/n", fli_est, f -> SVector(f.fli / 10^4, f.fli1 / 10^4), 2, T)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC16a", "K=10 chaotic class, $T: each backend against its own BigFloat reference", "-", "<= 1", fb(reason)); continue)
+        rng = StableRNG(SEED + 50000 + 1003)
+        xT = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:1024]
+        for nch in (8, 10)
+            fli_d16("K=10 chaotic class", T, exact(T, 10), xT, nch; chaotic = true)
+        end
+    end
+end
+
 counts = Dict{String,Int}()
 for (_, v) in ROWS
     k = startswith(v, "FALLBACK") ? "FALLBACK" : v

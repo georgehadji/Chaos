@@ -53,7 +53,7 @@ Private = false
 
 ## Indicators
 
-Chaos indicators as reducers: the Smaller Alignment Index SALI, its pure functions and the frame check.
+Chaos indicators as reducers: the Smaller Alignment Index SALI and the Fast Lyapunov Indicator FLI, their pure functions and the frame checks.
 
 ```@autodocs
 Modules = [Chaoslab.Indicators]

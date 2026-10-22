@@ -16,6 +16,8 @@ using DoubleFloats: Double64
             propagate(sm, x0, 8; k = 1, tau = 2, seed = 1, reducers = (Benettin(),), backend = :cpu)
             propagate(sm, x0, 8; k = 2, tau = 2, seed = 1, reducers = (SVDSpectrum(),), backend = :cpu)
             propagate(sm, x0, 8; k = 2, tau = 2, seed = 1, reducers = (SALI(),), backend = :cpu)
+            propagate(sm, x0, 8; k = 2, tau = 2, seed = 1, reducers = (FLI(replace = false), SALI()), backend = :cpu)
+            propagate(sm, x0, 8; k = 2, tau = 2, seed = 1, reducers = (FLI(),), backend = :cpu)
             for alg in qrs, k in (1, 2)
                 propagate(sm, x0, 8; k = k, tau = 2, seed = 1, reducers = (QRSpectrum(alg),), backend = :cpu)
             end

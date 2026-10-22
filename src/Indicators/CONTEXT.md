@@ -62,7 +62,6 @@ MEGNO spec: `workspaces/module-build/stages/01-spec/output/megno-spec.md` (M1 to
 | Item | Where |
 |------|-------|
 | GALI_k (D70), OFLI (flows, D71) | M5 |
-| MEGNO stage 04 (ChaosTools one-column tangent line, CPU vs GPU) | `megno` run, stage 04 |
 
 ## Limits
 
@@ -71,3 +70,4 @@ MEGNO spec: `workspaces/module-build/stages/01-spec/output/megno-spec.md` (M1 to
 - The computed SALI lies in [0, sqrt 2 (1 + 2 eps)] (R2). For BigFloat the floor follows the default precision at call time.
 - One replacer per chain, placed last (D71): `FLI(replace = false)` and `MEGNO(replace = false)` before `SALI`; `FLI()` or `MEGNO()` alone. A wrong position gives wrong numbers without an error (fli review R2), and the run record does not show `replace` or the chain (R1). Experiments must build and record chains under this rule.
 - MEGNO needs a supplied frame to be unit-length (`check_frame(MEGNO(), W0)` before the stream), else `s(0) = 0` is wrong. The regular level 2 (0.5 for `Ybar20`) needs a deviation with a component across the invariant curve (spec F3, M9); `Y` of a vector along it is 0. Level and growth laws are approached slowly (O(ln K / K)); thresholds are pre-registered per study, the module never stops an orbit.
+- MEGNO in Double64 over long lifted orbits: the log sums inherit the Double64 sin and cos floor at large lifted arguments from L1 (a factor 1.64 over 8 eps Psi_n at |x| near 1e6, K = 10); use the wrapped state there. For bounded or regular orbits Y carries about n eps / 10 absolute from the products of the weights and the increments (megno spec, stage 04 notes, R3).

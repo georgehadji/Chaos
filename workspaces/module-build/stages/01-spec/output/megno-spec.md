@@ -143,3 +143,12 @@ Approved by the owner at the stage 02 checkpoint (test plan `../../02-tests/outp
 7. Double64 at K = 10: the log sums exceed the borrowed 8 eps Psi_max by a factor 1.63 on the 10-per-decade grid while the three series stay at 0.45 of B_M; reported, not asserted, and checked at stage 04.
 8. Criterion 12(c): the 1 versus N threads comparison in child processes is a stage 04 check.
 9. Criterion 13: the wrapped versus lifted exclusion counts (3 and 6 of 10 allowed at n = 10 and 100) are within the limit as written.
+
+## Stage 04 notes (2026-10-22)
+
+Accepted with the verification report (`../../04-verify/output/megno-verification.md`).
+
+- D74 item 7: in Double64 at K = 10 the log sums exceed the borrowed 8 eps Psi_n by a factor 1.64 (1.635 with Psi on the full handoff set, so not a grid effect) on a start whose lifted coordinate reaches about 1e6; below 1e3 the ratio is under 0.005. The cause is the Double64 sin and cos floor at large lifted arguments, inherited from L1 (the MEGNO log sums are bitwise the Benettin sums; see the lyap-benettin verification). A log-sum bound in Double64 at large lifted arguments needs the trig floor term of the precision spec; the three MEGNO series stay within B_M (criterion 6 worst 0.545). Runs that need Double64 accuracy over long lifted orbits should use the wrapped state.
+- R1: tau is derived as n / K by integer division; n = K tau is a protocol invariant of the stream, so this is exact for every stream run (a comment in the code says so).
+- R3: for bounded or regular orbits the products of the step and the log increment carry a rounding the compensated add does not repair, about n eps / 10 absolute on Y (1.0e-13 at n = 1e6 for alternating increments); within B_M in every run; an exact-product correction is not applied.
+- R4: the reducer state is 200 bytes in Float64 and 368 in Double64 (not the proposed 168 and 328); chunk sizing reads the real state size.

@@ -97,6 +97,7 @@ end
 function megno_series(m::MegnoSums{T}, n::Int, K::Int) where {T}
     K == 0 && return zero(T), zero(T), zero(T)
     tn = T(n)
+    # n = K tau is a protocol invariant of the stream (handoffs at multiples of tau), so n ÷ K is tau exactly (review R1)
     return 2 * total(m.R1) / tn, total(m.Q) / T(K), T(n ÷ K) * total(m.Q2) / tn^3
 end
 

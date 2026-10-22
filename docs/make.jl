@@ -6,4 +6,6 @@ const LAYERS = [Chaoslab.Foundation, Chaoslab.Systems, Chaoslab.Tangent, Chaosla
 
 makedocs(; sitename = "Chaoslab", modules = [Chaoslab; LAYERS], checkdocs = :exports,
          format = Documenter.HTML(; prettyurls = false), repo = Remotes.GitHub("georgehadji", "Chaos"),
-         pages = ["Home" => "index.md", "API" => "api.md"])
+         pages = ["Home" => "index.md",
+                  "API" => ["Overview" => "api.md",
+                            ["$(nameof(m))" => "api/$(lowercase(string(nameof(m)))).md" for m in LAYERS]...]])

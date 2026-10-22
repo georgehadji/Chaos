@@ -33,7 +33,7 @@ end
 function reducer_step(::SALI, st::SALIState{T}, n::Int, x::SVector, W::SMatrix) where {T}
     st.code == 0 || return st, W
     c1, c2 = W[:, 1], W[:, 2]
-    a1, a2 = scaled_norm(c1), scaled_norm(c2)
+    a1, a2 = safe_norm(c1), safe_norm(c2)
     ok1, ok2 = isfinite(a1) && a1 > 0, isfinite(a2) && a2 > 0
     if !(ok1 && ok2)
         column, value = ok1 ? (Int8(2), a2) : (Int8(1), a1)

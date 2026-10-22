@@ -7,16 +7,8 @@ Measurement floor `B_meas(T) = 4 effective_eps(T)` of the direct form of SALI (s
 """
 sali_floor(::Type{T}) where {T} = 4 * effective_eps(T)
 
-# Euclidean norm scaled by the largest absolute entry, so it neither overflows nor underflows; zero for a zero vector,
-# NaN and Inf propagate (the same rule as `Lyapunov.safe_norm`, which this layer may not import).
-function scaled_norm(v::AbstractVector)
-    m = maximum(abs, v)
-    (isfinite(m) && m > 0) || return m
-    return m * sqrt(sum(abs2, v ./ m))
-end
-
 # d_- and d_+ of two vectors that are already unit vectors (A2), each evaluated scaled.
-@inline unit_indices(u, v) = (scaled_norm(u - v), scaled_norm(u + v))
+@inline unit_indices(u, v) = (safe_norm(u - v), safe_norm(u + v))
 
 """
     alignment_indices(a, b) -> (d_minus, d_plus)
@@ -26,7 +18,7 @@ its scaled norm, then `d_minus = norm(u_a - u_b)` and `d_plus = norm(u_a + u_b)`
 `d_minus^2 + d_plus^2 = 4` up to rounding.
 """
 function alignment_indices(a::AbstractVector, b::AbstractVector)
-    return unit_indices(a / scaled_norm(a), b / scaled_norm(b))
+    return unit_indices(a / safe_norm(a), b / safe_norm(b))
 end
 
 """
@@ -51,7 +43,7 @@ end
 
 # SALI(0) of a d x 2 frame: 0 when a column has a zero or non-finite norm.
 function frame_sali(W::AbstractMatrix{T}) where {T}
-    a1, a2 = scaled_norm(W[:, 1]), scaled_norm(W[:, 2])
+    a1, a2 = safe_norm(W[:, 1]), safe_norm(W[:, 2])
     (isfinite(a1) && a1 > 0 && isfinite(a2) && a2 > 0) || return zero(T)
     return min(unit_indices(W[:, 1] / a1, W[:, 2] / a2)...)
 end

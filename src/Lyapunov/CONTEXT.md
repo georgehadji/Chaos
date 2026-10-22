@@ -9,7 +9,6 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 | File | Holds |
 |------|-------|
 | `Lyapunov.jl` | module, exports, include order |
-| `norm.jl` | `safe_norm`, the norm of every kernel-path estimator |
 | `benettin.jl` | `Benettin` reducer and its isbits state (`k = 1`) |
 | `orthonormalize.jl` | `Orthonormalizer` types `CGS`, `MGS`, `RGS`, status codes, `orthonormalize` for them, `window_Gw`, `window_G`, `orthogonality_threshold` |
 | `qr_spectrum.jl` | `QRSpectrum` reducer, its isbits state, the shared handoff step `_qr_step` |
@@ -23,7 +22,6 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 
 | Name | What it does |
 |------|--------------|
-| `safe_norm(v)` | scaled Euclidean norm; no overflow or underflow, zero for a zero vector, NaN and Inf propagate |
 | `Benettin()` | reducer for `k = 1`: adds `log` of the deviation norm to a compensated sum, renormalises; final `(n, sum, comp, lambda)` |
 | `QRSpectrum(alg; orthogonality_tol)` | reducer for `k >= 1`: factors `W = Q R` at each handoff, sums `log R_ii`, replaces `W` by `Q`; owns the orthogonality and conditioning checks |
 | `CGS`, `MGS`, `RGS` | Gram-Schmidt `Orthonormalizer` strategies (classical, modified, repeated with a pass cap) |
@@ -43,7 +41,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 | Invariant | Guaranteed by |
 |-----------|---------------|
 | `orthonormalize` returns `Q'Q = I`, `R` upper triangular with exact zeros below and `R_ii > 0`; a zero or non-finite pivot gives `QR_PIVOT` with the pivot in `R[column, column]` | lyap-gram-schmidt spec G-items, lyap-householder-qr spec E5 |
-| Every kernel-path estimator takes norms through `safe_norm` (LapackQR uses the norms inside LAPACK) | lyap-benettin spec Algorithm 1, AC8 |
+| Every kernel-path estimator takes norms through `safe_norm` (Foundation, D69) (LapackQR uses the norms inside LAPACK) | lyap-benettin spec Algorithm 1, AC8 |
 | Sums are compensated; `reducer_final` gives `lambda = (sum + comp) / n` | lyap-benettin spec E3 |
 | A zero or non-finite norm, pivot, state or separation is recorded in the state and raised as `NumericalHealthError` with orbit, step and backend, never thrown inside a kernel | D30, `Tangent` failure path |
 | `SVDSpectrum` reuses the RGS step unchanged: its `lambda_qr` equals that of `QRSpectrum(RGS())` bitwise | lyap-svd-stabilized spec AC3a |

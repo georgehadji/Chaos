@@ -10,7 +10,7 @@ using StaticArrays
 using LinearAlgebra
 
 export NumericalHealthError, CompensatedSum, add, total, FALLBACK_REASONS, BackendChoice,
-       resolve_backend, precision_label, parse_precision, exact, Double64, effective_eps
+       resolve_backend, precision_label, parse_precision, exact, Double64, effective_eps, safe_norm
 
 """
 Thrown when a numerical health check fails (non-finite value or residual above its threshold). `column` is the
@@ -154,5 +154,7 @@ exact(::Type{T}, x::Union{AbstractFloat,Irrational}) where {T} = T(x)
 exact(::Type{T}, x::Integer) where {T} = T(BigFloat(x; precision = max(64, ndigits(x; base = 2) + 1)))
 exact(::Type{T}, x::Rational) where {T} = exact(T, numerator(x)) / exact(T, denominator(x))
 exact(::Type{T}, s::String) where {T} = parse(T, s)
+
+include("norm.jl")
 
 end

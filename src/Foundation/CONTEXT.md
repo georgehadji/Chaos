@@ -8,7 +8,8 @@ Specs: `workspaces/module-build/stages/01-spec/output/tangent-core-spec.md` (T-)
 
 | File | Holds |
 |------|-------|
-| `Foundation.jl` | the whole module: error type, sums, device hooks, `resolve_backend`, precision functions |
+| `Foundation.jl` | the module: error type, sums, device hooks, `resolve_backend`, precision functions |
+| `norm.jl` | `safe_norm`, the one norm of every estimator and indicator (moved from Lyapunov, D69) |
 
 ## Exports
 
@@ -21,6 +22,7 @@ Specs: `workspaces/module-build/stages/01-spec/output/tangent-core-spec.md` (T-)
 | `precision_label`, `parse_precision` | `"Float64"`, `"Double64"`, `"BigFloat(bits)"` and back; bits are read when the label is built |
 | `exact` | build a `T` from an integer, float, irrational, rational or decimal string without a Float64 detour |
 | `Double64` | re-export of the extended type (D20) |
+| `safe_norm(v)` | scaled Euclidean norm; no overflow or underflow, zero for a zero vector, NaN and Inf propagate |
 
 Not exported, for extensions and tests: `AbstractDevice`, `NoDevice`, `DEVICE`, `probe`, `free_memory`, `is_oom`, `is_compile_error`, `is_device_lost`, `gpu_step_ns`. `ext/CONTEXT.md` says which of them the CUDA extension fills.
 

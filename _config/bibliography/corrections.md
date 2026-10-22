@@ -20,3 +20,4 @@ Layer 3, canonical. Annotated entries; records in `references.bib`.
 - Catalog lyapunov.md L5b: Geist1990 Eqs. (17), (18) p.6 name H1 and H2 as the treppen and diagonal iteration paths of the same Householder reduction; the augmented form (A-4), (A-5) p.18 returns Q explicitly, so "H2 avoids forming Q" was wrong (lyap-householder-qr spec, 2026-10-13).
 - Catalog lyapunov.md L6: Geist1990 has no Givens method; Givens rotations are in Householder1958 p.2 and DanielGragg1976 Sect. 3 (lyap-householder-qr spec, 2026-10-13).
 - Catalog lyapunov.md L8: the Toda chain in Geist1990 p.10 is 29-dimensional, not 31 (Batch B spec review, 2026-10-13).
+- Daquin & Kovacs arXiv:2510.19042 (DaquinKovacs2025) = Eur. Phys. J. Spec. Top. (online 2026-02-14), doi:10.1140/epjs/s11734-026-02183-4; Crossref has no volume or pages yet; the key keeps its arXiv year (owner, 2026-10-22).

@@ -151,3 +151,13 @@ Approved by the owner at the stage 04 checkpoint (verification report `../../04-
 3. Pairing check (review R1): at every handoff the reducer requires the off-block entries of the arriving frame (rows of block B in column 1, rows of block A in column 2) to be exactly 0, which the block action keeps exactly; otherwise it records a health failure of kind "pairing" with the column and the largest off-block magnitude, checked after the norm check. A run on a non-pair stream, or on a pair stream without the block frame, fails at the first handoff instead of returning a number. Mismatched xi_0 between the blocks keeps the off-block zeros and remains the caller's frame check (Algorithm item 1).
 4. DL is formed from the split compensated difference (s_B - s_A) + (c_B - c_A) (review R2); the recorded sums and compensation terms are unchanged.
 5. The pair start converts the direction u to the element type of x0 (review R3); a pair state of odd length is rejected (review R4); in lifted mode the separation is the minimal image modulo 2 pi, so a lifted gap of exactly a multiple of 2 pi reads as 0 and is rejected (review R5, the L2 precedent), documented.
+
+## Stage 04 notes (2026-10-22)
+
+Accepted with the verification report (`../../04-verify/output/rli-verification.md`), Amendment D77 included.
+
+- R1: the chaotic / ordered gap at n = 1e4 is 12.0, 10.5 and 8.9 orders for Dx = 1e-14, 1e-12, 1e-10 (printed 9 to 10 in SandorMaffione2016, separation not stated); it grows as Dx shrinks because the ordered RLI scales with Dx and the chaotic one does not.
+- R4: at K = 0.5 the RLI labels 15 percent of the panel chaotic, between L1 (20 percent) and MEGNO (1 percent); FLI_B 62 percent at the ln n threshold. A measurement for P2, not a pass criterion.
+- R6 and F5: the worst-case floor of RL11 is pessimistic; at Dx = 1e-12, n = 2e4 the Float64 RLI is within 3.7e-5 (relative) of BigFloat where the first-order resolution number says unresolved; at Dx = 1e-14 the error reaches 1.6e-2. The default Dx of P10 stays 1e-12 for Float64.
+- R8: lifted against wrapped at n = 1e4 on a rotational start, 92 percent of the handoffs have a coordinate ulp above Dx_r / 8 in lifted mode and rho differs by a factor 2.8; the wrapped default (P5) is required, not a sensitivity.
+- Cost (R7): the pair costs 2.2 times L1 and 1.25 times MEGNO per orbit-step on the CPU; the Double64 GPU kernel does not compile (allowed fallback, F-C). Reducer state 88 bytes in Float64, 144 in Double64.

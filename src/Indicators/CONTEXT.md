@@ -5,7 +5,7 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 - Spec: `workspaces/module-build/stages/01-spec/output/sali-spec.md` (A1 to A16, criteria 1 to 18; decision D66, Amendments D67 and D68). Verified: `stages/04-verify/output/sali-verification.md`. Test plan: `stages/02-tests/output/sali-test-plan.md`. Notes: `stages/03-implement/output/sali-impl-notes.md`.
 - FLI spec: `workspaces/module-build/stages/01-spec/output/fli-ofli-spec.md` (Q1 to Q13, criteria 1 to 16; decisions D71, D72). Test plan: `stages/02-tests/output/fli-ofli-test-plan.md`. Notes: `stages/03-implement/output/fli-ofli-impl-notes.md`.
 - MEGNO spec: `workspaces/module-build/stages/01-spec/output/megno-spec.md` (M1 to M13, criteria 1 to 15; decisions D73, D74). Test plan: `stages/02-tests/output/megno-test-plan.md`. Notes: `stages/03-implement/output/megno-impl-notes.md`.
-- RLI spec: `workspaces/module-build/stages/01-spec/output/rli-spec.md` (RL1 to RL13, criteria 1 to 15; decisions D75, D76). Test plan: `stages/02-tests/output/rli-test-plan.md`. Notes: `stages/03-implement/output/rli-impl-notes.md`.
+- RLI spec: `workspaces/module-build/stages/01-spec/output/rli-spec.md` (RL1 to RL13, criteria 1 to 15; decisions D75, D76, D77). Test plan: `stages/02-tests/output/rli-test-plan.md`. Notes: `stages/03-implement/output/rli-impl-notes.md`.
 
 ## Files
 
@@ -58,7 +58,7 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 
 ## Tests and verification
 
-- Package: `test/sali/` (23 testsets, AC1 to AC15 and the API); `test/fli-ofli/` (27 testsets); `test/megno/` (26 testsets); `test/rli/` (33 testsets).
+- Package: `test/sali/` (23 testsets, AC1 to AC15 and the API); `test/fli-ofli/` (27 testsets); `test/megno/` (26 testsets); `test/rli/` (34 testsets).
 - Stage 04: `verify/sali.jl` (ChaosTools GALI_2 oracle, AC16 and AC17) and `verify/gpu.jl` (AC18).
 - Bench: `bench/sali.jl`, `bench/fli.jl`, `bench/megno.jl`, `bench/rli.jl`.
 
@@ -76,4 +76,4 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 - One replacer per chain, placed last (D71): `FLI(replace = false)` and `MEGNO(replace = false)` before `SALI`; `FLI()` or `MEGNO()` alone. A wrong position gives wrong numbers without an error (fli review R2), and the run record does not show `replace` or the chain (R1). Experiments must build and record chains under this rule.
 - MEGNO needs a supplied frame to be unit-length (`check_frame(MEGNO(), W0)` before the stream), else `s(0) = 0` is wrong. The regular level 2 (0.5 for `Ybar20`) needs a deviation with a component across the invariant curve (spec F3, M9); `Y` of a vector along it is 0. Level and growth laws are approached slowly (O(ln K / K)); thresholds are pre-registered per study, the module never stops an orbit.
 - MEGNO in Double64 over long lifted orbits: the log sums inherit the Double64 sin and cos floor at large lifted arguments from L1 (a factor 1.64 over 8 eps Psi_n at |x| near 1e6, K = 10); use the wrapped state there. For bounded or regular orbits Y carries about n eps / 10 absolute from the products of the weights and the increments (megno spec, stage 04 notes, R3).
-- RLI needs the caller to build the pair (`pair_start`), the block frame (column 1 = `(xi_0, 0)`, column 2 = `(0, xi_0)`) and to run `check_frame(RLI(), W0)` before the stream; the stream does not. `RLI(replace = false)` before `MEGNO()` or `RLI()` alone, same chain rule as above. The direction rule, seed, frame source and chain are recorded by Experiments (D76 item 6).
+- RLI needs the caller to build the pair (`pair_start`), the block frame (column 1 = `(xi_0, 0)`, column 2 = `(0, xi_0)`) and to run `check_frame(RLI(), W0)` before the stream: only it sees a mismatched `xi_0` between the blocks. The reducer checks the pairing at every handoff (off-block entries exactly 0, else health error "pairing", D77), so a non-pair stream or a missing block frame fails at the first handoff. Use the wrapped state (lifted Float64 loses Dx = 1e-12 near |x| = 1e4, rli R8) and Dx = 1e-12 in Float64 (rli R6). `RLI(replace = false)` before `MEGNO()` or `RLI()` alone, same chain rule as above. The direction rule, seed, frame source and chain are recorded by Experiments (D76 item 6).

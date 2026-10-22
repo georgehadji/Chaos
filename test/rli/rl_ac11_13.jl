@@ -133,6 +133,32 @@ end
     @test_throws ErrorException propagate_orbit(PairMap(rl_Boom()), z0, good, 4, 2, (RLI(),))
 end
 
+@testset "AC11f pairing check (D77)" begin
+    _ = (RLI, PairMap, pair_start)
+    # D77 item 3 (review R1): at every handoff the off-block entries of the arriving frame must be exactly 0 (the block action keeps them exactly 0); otherwise a health failure
+    # of kind "pairing" at the first handoff, after the norm check. (a) A pair stream without the block frame (the seeded 4 x 2 frame): error. (b) RLI on a plain standard map
+    # with the identity frame (two one-row "blocks"): error. (c) The block frame on the pair stream, Float64 and Double64, wrapped and lifted, both chain positions: no error,
+    # the final of the replacer equals the non-replacing reader before MEGNO bitwise. (d) A pair state of odd length is rejected (D77 item 5, review R4).
+    seed = rl_seed(11, 6)
+    for T in (Float64, Double64), wrapped in (false, true)
+        sys = rl_sys(exact(T, 6.0), wrapped)
+        z = pair_start(sys, SVector{2, T}(exact(T, 1.0), exact(T, 2.0)), rl_xi0(seed, 1, T), exact(T, 1e-10); orbit = 3).z
+        res = nothing
+        err = rl_health_error(() -> (res = propagate(PairMap(sys), [z], 12; k = 2, tau = 3, seed = seed, reducers = (RLI(),), backend = :cpu)))
+        @test err isa NumericalHealthError && err.what == "pairing" && err.step == 3 && err.orbit == 1 && err.column in (1, 2) && err.value > 0 && res === nothing
+        W0 = rl_frame(rl_xi0(seed, 1, T))
+        _, _, sa = propagate_orbit(PairMap(sys), z, W0, 12, 3, (RLI(),))
+        _, _, sb = propagate_orbit(PairMap(sys), z, W0, 12, 3, (RLI(replace = false), MEGNO()))
+        fa, fb = reducer_final(RLI(), sa[1]), reducer_final(RLI(replace = false), sb[1])
+        @test fa.handoffs == 4 && fa == fb
+    end
+    I2 = SMatrix{2, 2, Float64}(1, 0, 0, 1)
+    err = rl_health_error(() -> propagate_orbit(StandardMap(6.0), SVector(1.0, 2.0), I2, 12, 3, (RLI(),); orbit = 2))
+    @test err isa NumericalHealthError && err.what == "pairing" && err.step == 3 && err.orbit == 2 && err.value > 0
+    @test_throws DimensionMismatch forward(PairMap(StandardMap(6.0)), SVector(1.0, 2.0, 3.0))
+    @test_throws DimensionMismatch tangent(PairMap(StandardMap(6.0)), SVector(1.0, 2.0, 3.0))
+end
+
 @testset "AC11d overflow" begin
     _ = (RLI, PairMap)
     # A = diag(mu, 1/mu), mu = e^3, Float64, chains {RLI} and {RLI (non-replacing), MEGNO}: tau = 200 raises no error at n = 200 (the columns arrive at e^600 and RLI reads them before

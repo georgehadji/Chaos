@@ -1,0 +1,219 @@
+# rli verification, julia 1.13.2, threads 2, base seed 20261012 (verify offset 59000), time 1.79269802e9 (unix)
+# timings in this log were taken on a machine that was not otherwise idle
+SUITE | AC1 realized ratio max |error| / B_R^lin (R2) [worst] T = Float64 | 0.01657 | <= 1.0 | PASS
+SUITE | AC1 realized ratio max |error| / B_R^lin (R2) [worst] T = Double64 | 0.002316 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = half; Dx = 1e-06; tau = 1 | 0.002477 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = half; Dx = 1e-06; tau = 1 | 0.01758 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = half; Dx = 1e-06; tau = 4 | 0.003282 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = half; Dx = 1e-06; tau = 4 | 0.007071 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = half; Dx = 1e-12; tau = 1 | 0.002759 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = half; Dx = 1e-12; tau = 1 | 0.01303 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = half; Dx = 1e-12; tau = 4 | 0.002591 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = half; Dx = 1e-12; tau = 4 | 0.007732 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = two_pi; Dx = 1e-06; tau = 1 | 0.006706 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = two_pi; Dx = 1e-06; tau = 1 | 0.04567 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = two_pi; Dx = 1e-06; tau = 4 | 0.009281 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = two_pi; Dx = 1e-06; tau = 4 | 0.04113 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = two_pi; Dx = 1e-12; tau = 1 | 0.005863 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = two_pi; Dx = 1e-12; tau = 1 | 0.04689 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = two_pi; Dx = 1e-12; tau = 4 | 0.008263 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = two_pi; Dx = 1e-12; tau = 4 | 0.03941 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = ten; Dx = 1e-06; tau = 1 | 0.01854 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = ten; Dx = 1e-06; tau = 1 | 0.05266 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = ten; Dx = 1e-06; tau = 4 | 0.01586 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = ten; Dx = 1e-06; tau = 4 | 0.03897 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = ten; Dx = 1e-12; tau = 1 | 0.01222 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = ten; Dx = 1e-12; tau = 1 | 0.05477 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Float64; N = 10000; label = ten; Dx = 1e-12; tau = 4 | 0.009749 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Float64; N = 10000; label = ten; Dx = 1e-12; tau = 4 | 0.03856 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = half; Dx = 1e-06; tau = 1 | 0.0001058 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = half; Dx = 1e-06; tau = 1 | 0.0004211 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = half; Dx = 1e-06; tau = 4 | 0.0001282 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = half; Dx = 1e-06; tau = 4 | 0.000198 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = half; Dx = 1e-12; tau = 1 | 0.0001833 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = half; Dx = 1e-12; tau = 1 | 0.0003929 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = half; Dx = 1e-12; tau = 4 | 6.041e-05 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = half; Dx = 1e-12; tau = 4 | 0.0001909 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = two_pi; Dx = 1e-06; tau = 1 | 0.0002102 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = two_pi; Dx = 1e-06; tau = 1 | 0.001137 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = two_pi; Dx = 1e-06; tau = 4 | 0.0003108 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = two_pi; Dx = 1e-06; tau = 4 | 0.001263 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = two_pi; Dx = 1e-12; tau = 1 | 0.0003392 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = two_pi; Dx = 1e-12; tau = 1 | 0.001769 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = two_pi; Dx = 1e-12; tau = 4 | 0.0003691 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = two_pi; Dx = 1e-12; tau = 4 | 0.002577 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = ten; Dx = 1e-06; tau = 1 | 0.000345 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = ten; Dx = 1e-06; tau = 1 | 0.0008898 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = ten; Dx = 1e-06; tau = 4 | 0.0008173 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = ten; Dx = 1e-06; tau = 4 | 0.0009622 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = ten; Dx = 1e-12; tau = 1 | 0.0002565 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = ten; Dx = 1e-12; tau = 1 | 0.002011 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worst] T = Double64; N = 10000; label = ten; Dx = 1e-12; tau = 4 | 0.0003529 | <= 1.0 | PASS
+SUITE | AC3 realized ratio max |error| / B_R (R2) [worstD] T = Double64; N = 10000; label = ten; Dx = 1e-12; tau = 4 | 0.001324 | <= 1.0 | PASS
+SUITE | AC4(a) O(Dx) law (reported, D77 item 1): cases below it law_off = 1; cases = 60 | - | reported | INFO
+SUITE | AC4(a) realized second-order coefficient max |rho_i / rho_1 - 1| / Dx_i over the starts (the spec's proposal: 20) worst_coeff = 5884 | - | reported | INFO
+SUITE | AC4(b) worst relative gap of rho, Double64 against BigFloat [worst]  | 9.487e-10 | <= 0.001 | PASS
+SUITE | AC4(c) ratio rho(u = xi_0) / rho(u = xi_2) at Dx = 1e-12 (reported, P3) extrema(Float64.(ratios)) = (0.05570980291791027, 13.379062771279694) | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 1000; diff = -0.0002772; label = two_pi; Dx2 = 1e-10; allow = 0.005034 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 1000; diff = -0.003462; label = two_pi; Dx2 = 1e-08; allow = 0.005648 | - | reported | INFO
+SUITE | AC5 ensemble mean RLI at Dx = 1e-12, 1e-10, 1e-8 and the ratio to the regular class (R3) n = 1000; label = two_pi; rl_mean(rli[1.0e-10]) = 0.05129; ratio = 6.649e+10; rl_mean(rli[1.0e-8]) = 0.05447; rl_mean(rli[1.0e-12]) = 0.05101 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 1000; diff = -3.306e-05; label = five; Dx2 = 1e-10; allow = 0.00666 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 1000; diff = -0.004474; label = five; Dx2 = 1e-08; allow = 0.007107 | - | reported | INFO
+SUITE | AC5 ensemble mean RLI at Dx = 1e-12, 1e-10, 1e-8 and the ratio to the regular class (R3) n = 1000; label = five; rl_mean(rli[1.0e-10]) = 0.06811; ratio = 8.874e+10; rl_mean(rli[1.0e-8]) = 0.07255; rl_mean(rli[1.0e-12]) = 0.06808 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 1000; diff = -0.002044; label = ten; Dx2 = 1e-10; allow = 0.004288 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 1000; diff = -0.001302; label = ten; Dx2 = 1e-08; allow = 0.00464 | - | reported | INFO
+SUITE | AC5 ensemble mean RLI at Dx = 1e-12, 1e-10, 1e-8 and the ratio to the regular class (R3) n = 1000; label = ten; rl_mean(rli[1.0e-10]) = 0.05868; ratio = 7.382e+10; rl_mean(rli[1.0e-8]) = 0.05794; rl_mean(rli[1.0e-12]) = 0.05664 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 10000; diff = -6.014e-05; label = two_pi; Dx2 = 1e-10; allow = 0.002152 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 10000; diff = -0.001052; label = two_pi; Dx2 = 1e-08; allow = 0.002641 | - | reported | INFO
+SUITE | AC5 ensemble mean RLI at Dx = 1e-12, 1e-10, 1e-8 and the ratio to the regular class (R3) n = 10000; label = two_pi; rl_mean(rli[1.0e-10]) = 0.0214; ratio = 4.173e+10; rl_mean(rli[1.0e-8]) = 0.02239; rl_mean(rli[1.0e-12]) = 0.02134 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 10000; diff = -0.0003204; label = five; Dx2 = 1e-10; allow = 0.00303 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 10000; diff = -0.000354; label = five; Dx2 = 1e-08; allow = 0.002829 | - | reported | INFO
+SUITE | AC5 ensemble mean RLI at Dx = 1e-12, 1e-10, 1e-8 and the ratio to the regular class (R3) n = 10000; label = five; rl_mean(rli[1.0e-10]) = 0.03298; ratio = 6.389e+10; rl_mean(rli[1.0e-8]) = 0.03302; rl_mean(rli[1.0e-12]) = 0.03266 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 10000; diff = -0.0003319; label = ten; Dx2 = 1e-10; allow = 0.001448 | - | reported | INFO
+SUITE | AC5 paired difference of the means against the allowance m = 1000; n = 10000; diff = -0.000135; label = ten; Dx2 = 1e-08; allow = 0.001431 | - | reported | INFO
+SUITE | AC5 ensemble mean RLI at Dx = 1e-12, 1e-10, 1e-8 and the ratio to the regular class (R3) n = 10000; label = ten; rl_mean(rli[1.0e-10]) = 0.02098; ratio = 4.039e+10; rl_mean(rli[1.0e-8]) = 0.02078; rl_mean(rli[1.0e-12]) = 0.02065 | - | reported | INFO
+SUITE | AC6 ratio RLI_tau / RLI_1, regular class (reported) T = Float64; Dx = 1e-08; extrema(ratios) = (0.7275803728472009, 2.3654620380643423) | - | reported | INFO
+SUITE | AC6 ratio RLI_tau / RLI_1, regular class (reported) T = Float64; Dx = 1e-12; extrema(ratios) = (0.7276269319399081, 2.366177965955593) | - | reported | INFO
+SUITE | AC6 ratio RLI_tau / RLI_1, regular class (reported) T = Double64; Dx = 1e-08; extrema(ratios) = (0.7275803741826331, 2.365462070172627) | - | reported | INFO
+SUITE | AC6 ratio RLI_tau / RLI_1, regular class (reported) T = Double64; Dx = 1e-12; extrema(ratios) = (0.727580386608252, 2.3655746683569383) | - | reported | INFO
+SUITE | AC7c realized ratio |RLI_F64 / RLI_BF - 1| (R2) and Theta_n (reported) max_ratio = 0.005239; n = 100; max_rel = 1.252; Dx = 1e-14; median_theta = 62.33 | - | reported | INFO
+SUITE | AC7c realized ratio |RLI_F64 / RLI_BF - 1| (R2) and Theta_n (reported) max_ratio = 0.002296; n = 1000; max_rel = 10.34; Dx = 1e-14; median_theta = 527.4 | - | reported | INFO
+SUITE | AC7c realized ratio |RLI_F64 / RLI_BF - 1| (R2) and Theta_n (reported) max_ratio = 0.005929; n = 100; max_rel = 0.007035; Dx = 1e-12; median_theta = 0.6224 | - | reported | INFO
+SUITE | AC7c realized ratio |RLI_F64 / RLI_BF - 1| (R2) and Theta_n (reported) max_ratio = 0.00218; n = 1000; max_rel = 0.08307; Dx = 1e-12; median_theta = 5.267 | - | reported | INFO
+SUITE | AC7c realized ratio |RLI_F64 / RLI_BF - 1| (R2) and Theta_n (reported) max_ratio = 0.007418; n = 100; max_rel = 0.000191; Dx = 1e-10; median_theta = 0.006224 | - | reported | INFO
+SUITE | AC7c realized ratio |RLI_F64 / RLI_BF - 1| (R2) and Theta_n (reported) max_ratio = 0.003455; n = 1000; max_rel = 0.001576; Dx = 1e-10; median_theta = 0.05267 | - | reported | INFO
+SUITE | AC7c realized ratio |RLI_F64 / RLI_BF - 1| (R2) and Theta_n (reported) max_ratio = 0.006709; n = 100; max_rel = 1.219e-06; Dx = 1e-08; median_theta = 6.224e-05 | - | reported | INFO
+SUITE | AC7c realized ratio |RLI_F64 / RLI_BF - 1| (R2) and Theta_n (reported) max_ratio = 0.001673; n = 1000; max_rel = 4.426e-06; Dx = 1e-08; median_theta = 0.0005267 | - | reported | INFO
+SUITE | AC7d R8 rho = RLI / Dx_r (wrapped, lifted) and the fraction of handoffs with ulp > Dx_r / 8 in lifted mode rho_lifted = 1.196; coarse_fraction = 0.924; rho_wrapped = 0.4281 | - | reported | INFO
+SUITE | AC8(c) realized ratio error / tolerance (R2) [worstD] label = half | 0.1229 | <= 1.0 | PASS
+SUITE | AC8(c) realized ratio error / tolerance (R2) [worstR] label = half | 0.005153 | <= 1.0 | PASS
+SUITE | AC8(c) realized ratio error / tolerance (R2) [worstD] label = two_pi | 0.1247 | <= 1.0 | PASS
+SUITE | AC8(c) realized ratio error / tolerance (R2) [worstR] label = two_pi | 0.004963 | <= 1.0 | PASS
+SUITE | AC8(c) realized ratio error / tolerance (R2) [worstD] label = ten | 0.08653 | <= 1.0 | PASS
+SUITE | AC8(c) realized ratio error / tolerance (R2) [worstR] label = ten | 0.004365 | <= 1.0 | PASS
+SUITE | AC10(a) ensemble means of RLI, Float64 and Double64 m = 1000; rl_mean(ens[Double64]) = 0.05104; n = 1000; rl_mean(ens[Float64]) = 0.05101; label = two_pi | - | reported | INFO
+SUITE | AC10(a) ensemble means of RLI, Float64 and Double64 m = 1000; rl_mean(ens[Double64]) = 0.06976; n = 1000; rl_mean(ens[Float64]) = 0.06808; label = five | - | reported | INFO
+SUITE | AC10(a) ensemble means of RLI, Float64 and Double64 m = 200; rl_mean(ens[Double64]) = 0.03152; n = 10000; rl_mean(ens[Float64]) = 0.03125; label = five | - | reported | INFO
+SUITE | AC10(a) ensemble means of RLI, Float64 and Double64 m = 200; rl_mean(ens[Double64]) = 0.02131; n = 10000; rl_mean(ens[Float64]) = 0.02033; label = ten | - | reported | INFO
+SUITE | AC10(b) realized ratio max error / B_R, BigFloat against 512 bits (R2) [worst]  | 0.005462 | <= 1.0 | PASS
+SUITE | AC10(d) K = 10, n = 1e4: RLI values rli = [0.016347038794633638, 0.02347548791964051, 0.012112771839884056, 0.02352150311013169, 0.01699432261101418, 0.031707731010871334, 0.014867863203151114, 0.0072674293885150705, 0.015755291013600715, 0.015900672393280534, 0.009807450757799482, 0.015225342661685445, 0.02012292933132077, 0.0111250948027931, 0.01670421407125163, 0.01383457602199451, 0.009215527904845748, 0.020702328846040143, 0.03620211448743459, 0.010633205671656834] | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 2.263; n = 100; ordered = 2.021e-15; Dx = 1e-14; chaotic = 3.701e-13 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 12.05; n = 1000; ordered = 6.33e-15; Dx = 1e-14; chaotic = 0.007029 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 12.02; n = 10000; ordered = 1.998e-14; Dx = 1e-14; chaotic = 0.0211 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 11.61; n = 20000; ordered = 2.986e-14; Dx = 1e-14; chaotic = 0.01227 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 2.934; n = 100; ordered = 1.334e-13; Dx = 1e-12; chaotic = 1.147e-10 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 9.917; n = 1000; ordered = 3.581e-13; Dx = 1e-12; chaotic = 0.002955 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 10.54; n = 10000; ordered = 3.688e-13; Dx = 1e-12; chaotic = 0.01282 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 10.36; n = 20000; ordered = 3.472e-13; Dx = 1e-12; chaotic = 0.007898 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 2.94; n = 100; ordered = 1.334e-11; Dx = 1e-10; chaotic = 1.162e-08 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 8.504; n = 1000; ordered = 3.558e-11; Dx = 1e-10; chaotic = 0.01135 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 8.946; n = 10000; ordered = 3.708e-11; Dx = 1e-10; chaotic = 0.03272 | - | reported | INFO
+SUITE | R1 RLI(n) at nu = 0.5: ordered (2, 0), chaotic (3, 0), orders of magnitude between them orders = 8.693; n = 20000; ordered = 3.708e-11; Dx = 1e-10; chaotic = 0.0183 | - | reported | INFO
+SUITE | R5 distribution of RLI / Dx_r at n = 1e3 (regular class, random vectors and directions) extrema(rhos) = (0.005058728968249379, 3.017185070759199); median = 0.2838 | - | reported | INFO
+SUITE | testset 'AC1 algebra of the definition': assertions passed (fail + error = 0) | 490 | reported | INFO
+SUITE | testset 'AC2 constant tangent gives exactly zero': assertions passed (fail + error = 0) | 18 | reported | INFO
+SUITE | testset 'AC3 same-orbit reference': assertions passed (fail + error = 0) | 72 | reported | INFO
+SUITE | testset 'AC4 regular law': assertions passed (fail + error = 0) | 300 | reported | INFO
+SUITE | testset 'AC5 chaotic independence of the separation': assertions passed (fail + error = 0) | 12 | reported | INFO
+SUITE | testset 'AC6 tau dependence': assertions passed (fail + error = 0) | 2880 | reported | INFO
+SUITE | testset 'AC7a realized separation and the pair start': assertions passed (fail + error = 0) | 61 | reported | INFO
+SUITE | testset 'AC7b rejection of a separation that is not realized': assertions passed (fail + error = 0) | 24 | reported | INFO
+SUITE | testset 'AC7c Float64 against BigFloat own orbits': assertions passed (fail + error = 0) | 6 | reported | INFO
+SUITE | testset 'AC7d lifted against wrapped (R8)': assertions passed (fail + error = 0) | 1 | reported | INFO
+SUITE | testset 'AC8 cross-check with the single-orbit stream and L1': assertions passed (fail + error = 0) | 60600 | reported | INFO
+SUITE | testset 'AC9 symmetry and column independence': assertions passed (fail + error = 0) | 162 | reported | INFO
+SUITE | testset 'AC10 precision ladder and representation': assertions passed (fail + error = 0) | 9 | reported | INFO
+SUITE | testset 'AC11a zero tangent, column and pair id of the health error': assertions passed (fail + error = 0) | 26 | reported | INFO
+SUITE | testset 'AC11b non-finite state or deviation matrix is not masked': assertions passed (fail + error = 0) | 7 | reported | INFO
+SUITE | testset 'AC11c supplied frame check': assertions passed (fail + error = 0) | 62 | reported | INFO
+SUITE | testset 'AC11c rejection before any work': assertions passed (fail + error = 0) | 4 | reported | INFO
+SUITE | testset 'AC11f pairing check (D77)': assertions passed (fail + error = 0) | 11 | reported | INFO
+SUITE | testset 'AC11d overflow': assertions passed (fail + error = 0) | 10 | reported | INFO
+SUITE | testset 'AC11e run record': assertions passed (fail + error = 0) | 15 | reported | INFO
+SUITE | testset 'AC12a orbit and chain invariance': assertions passed (fail + error = 0) | 70 | reported | INFO
+SUITE | testset 'AC12b propagate equals the serial per-pair body': assertions passed (fail + error = 0) | 18 | reported | INFO
+SUITE | testset 'AC12c allocation': assertions passed (fail + error = 0) | 8 | reported | INFO
+SUITE | testset 'AC12d position in the ensemble': assertions passed (fail + error = 0) | 2 | reported | INFO
+SUITE | testset 'AC13 wrapped versus lifted state': assertions passed (fail + error = 0) | 8 | reported | INFO
+SUITE | testset 'PAIR product map protocol': assertions passed (fail + error = 0) | 32 | reported | INFO
+SUITE | testset 'PAIR block action of the tangent': assertions passed (fail + error = 0) | 4 | reported | INFO
+SUITE | testset 'PAIR start and distance for other maps': assertions passed (fail + error = 0) | 14 | reported | INFO
+SUITE | testset 'API reducer protocol': assertions passed (fail + error = 0) | 200 | reported | INFO
+SUITE | testset 'API memory of the mean and the range': assertions passed (fail + error = 0) | 6 | reported | INFO
+SUITE | testset 'API final fields against the sums on real orbits': assertions passed (fail + error = 0) | 80 | reported | INFO
+SUITE | testset 'API prefix invariance': assertions passed (fail + error = 0) | 120 | reported | INFO
+SUITE | testset 'R1 the map of SandorMaffione2016 Eq. (2) and the identity F7': assertions passed (fail + error = 0) | 8 | reported | INFO
+SUITE | testset 'R5 sensitivity to the vector and the direction': assertions passed (fail + error = 0) | 250 | reported | INFO
+SUITE | package suite at full size (RL_FULL_RUN), assertions passed (fail + error = 0); wall time 349.4 s | 65590 | 0 fail, 0 error | PASS
+# section suite took 349.4 s
+AC4diag | law test dev_i <= 2 (Dx_i / Dx_{i+1}) dev_{i+1} FAILS at start 2, n = 10000: dev at Dx = 1e-12, 1e-10, 1e-8, 1e-6 = 7.046e-12, 7.115e-10, 6.948e-08, 2.398e-06; slope 1; max dev_i / Dx_i = 7.115; rho at Dx = 1e-14 = 0.1677 | - | reported | INFO
+AC4diag | law test dev_i <= 2 (Dx_i / Dx_{i+1}) dev_{i+1} FAILS at start 10, n = 10000: dev at Dx = 1e-12, 1e-10, 1e-8, 1e-6 = 1.008e-11, 1.018e-09, 9.803e-08, 2.466e-06; slope 1; max dev_i / Dx_i = 10.18; rho at Dx = 1e-14 = 0.269 | - | reported | INFO
+AC4diag | law test dev_i <= 2 (Dx_i / Dx_{i+1}) dev_{i+1} FAILS at start 17, n = 10000: dev at Dx = 1e-12, 1e-10, 1e-8, 1e-6 = 4.381e-12, 4.39e-10, 8.825e-09, 5.841e-05; slope 1; max dev_i / Dx_i = 58.41; rho at Dx = 1e-14 = 0.7579 | - | reported | INFO
+AC4diag | law test dev_i <= 2 (Dx_i / Dx_{i+1}) dev_{i+1} FAILS at start 19, n = 10000: dev at Dx = 1e-12, 1e-10, 1e-8, 1e-6 = 2.568e-09, 2.594e-07, 2.551e-05, 0.0001548; slope 1; max dev_i / Dx_i = 2594; rho at Dx = 1e-14 = 2.444 | - | reported | INFO
+AC4diag | AC4(a), 20 starts x n in {100, 1e3, 1e4} = 60 cases: slope tests failing 0 (slope min 0.9998, max 1); O(Dx) law tests failing 4 | 0; 4 | reported | INFO
+# section AC4diag took 39.7 s
+AC14 | K = 0.5 (half): oracle orbits (base and shadow) vs forward(StandardMap) over 20 pairs x 10000 steps x 2 orbits: steps with a bitwise difference; pairs with both oracle orbits fully bitwise | 0; 20 of 20 | 0 (else excluded, reported) | PASS
+AC14 | K = 0.5 (half), 20 pairs, n in [10, 100, 1000, 10000]: max |RLI_Chaoslab - RLI_oracle| / (B_R + B_oracle), 80 comparisons; median ratio 9.11e-06 | 0.001623 | <= 1 | PASS
+AC14 | K = 0.5 (half): same for DL_n over (B_DL + B_oracle) | 0.005977 | <= 1 | PASS
+AC14 | K = 0.5 (half): comparisons excluded (oracle orbit not bitwise equal) | 0 | <= 0.10 | PASS
+AC14 | K = 6.283185307179586 (two_pi): oracle orbits (base and shadow) vs forward(StandardMap) over 1000 pairs x 1000 steps x 2 orbits: steps with a bitwise difference; pairs with both oracle orbits fully bitwise | 0; 1000 of 1000 | 0 (else excluded, reported) | PASS
+AC14 | K = 6.283185307179586 (two_pi), 1000 pairs, n in [10, 100, 1000]: max |RLI_Chaoslab - RLI_oracle| / (B_R + B_oracle), 3000 comparisons; median ratio 0.000166 | 0.01041 | <= 1 | PASS
+AC14 | K = 6.283185307179586 (two_pi): same for DL_n over (B_DL + B_oracle) | 0.05026 | <= 1 | PASS
+AC14 | K = 6.283185307179586 (two_pi): comparisons excluded (oracle orbit not bitwise equal) | 0 | <= 0.10 | PASS
+AC14 | K = 5.0 (five): oracle orbits (base and shadow) vs forward(StandardMap) over 1000 pairs x 1000 steps x 2 orbits: steps with a bitwise difference; pairs with both oracle orbits fully bitwise | 0; 1000 of 1000 | 0 (else excluded, reported) | PASS
+AC14 | K = 5.0 (five), 1000 pairs, n in [10, 100, 1000]: max |RLI_Chaoslab - RLI_oracle| / (B_R + B_oracle), 3000 comparisons; median ratio 0.0001708 | 0.005559 | <= 1 | PASS
+AC14 | K = 5.0 (five): same for DL_n over (B_DL + B_oracle) | 0.02872 | <= 1 | PASS
+AC14 | K = 5.0 (five): comparisons excluded (oracle orbit not bitwise equal) | 0 | <= 0.10 | PASS
+# section AC14 took 25.4 s
+AC12 | (b) x, W and every final bitwise identical for thread counts [1, 2, 4] (hashes from separate processes) and chunk sizes 64 and 1000: 8 cases (chains {RLI}, {RLI(f),MEGNO} x tau in {1,4} x chunk), 4096 pairs, K = 2 pi, wrapped, Dx = 1e-9, n = 1e3; example hash 17626750354492514569 | true | true | PASS
+# section AC12 took 9.2 s
+R4 | K = 0.5, 500 uniform starts, n = 1000, Dx = 1e-12: fraction labelled chaotic by RLI (rho = RLI / Dx_r > 1, i.e. RLI above 1e-12 scaled), L1 (n X > ln n), FLI_B (> ln n), MEGNO (Ybar_1 > 3); disagreements of RLI with L1 / FLI / MEGNO | 0.164, 0.18, 0.61, 0.01; 100 / 259 / 77; rho median 0.1585, max 2.662e+10 | reported | INFO
+R4 | K = 0.5, 500 uniform starts, n = 10000, Dx = 1e-12: fraction labelled chaotic by RLI (rho = RLI / Dx_r > 1, i.e. RLI above 1e-12 scaled), L1 (n X > ln n), FLI_B (> ln n), MEGNO (Ybar_1 > 3); disagreements of RLI with L1 / FLI / MEGNO | 0.15, 0.198, 0.616, 0.01; 94 / 259 / 70; rho median 0.14, max 4.927e+10 | reported | INFO
+R4 | K = 0.5, 500 uniform starts, n = 100000, Dx = 1e-12: fraction labelled chaotic by RLI (rho = RLI / Dx_r > 1, i.e. RLI above 1e-12 scaled), L1 (n X > ln n), FLI_B (> ln n), MEGNO (Ybar_1 > 3); disagreements of RLI with L1 / FLI / MEGNO | 0.152, 0.202, 0.618, 0.01; 101 / 257 / 71; rho median 0.1375, max 4.892e+10 | reported | INFO
+R4 | K = 6.283, 500 uniform starts, n = 1000, Dx = 1e-12: fraction labelled chaotic by RLI (rho = RLI / Dx_r > 1, i.e. RLI above 1e-12 scaled), L1 (n X > ln n), FLI_B (> ln n), MEGNO (Ybar_1 > 3); disagreements of RLI with L1 / FLI / MEGNO | 1, 0.996, 0.996, 0.996; 2 / 2 / 2; rho median 4.379e+10, max 3.923e+11 | reported | INFO
+R4 | K = 6.283, 500 uniform starts, n = 10000, Dx = 1e-12: fraction labelled chaotic by RLI (rho = RLI / Dx_r > 1, i.e. RLI above 1e-12 scaled), L1 (n X > ln n), FLI_B (> ln n), MEGNO (Ybar_1 > 3); disagreements of RLI with L1 / FLI / MEGNO | 0.996, 0.996, 0.996, 0.996; 0 / 0 / 0; rho median 1.777e+10, max 2.581e+11 | reported | INFO
+R4 | K = 6.283, 500 uniform starts, n = 100000, Dx = 1e-12: fraction labelled chaotic by RLI (rho = RLI / Dx_r > 1, i.e. RLI above 1e-12 scaled), L1 (n X > ln n), FLI_B (> ln n), MEGNO (Ybar_1 > 3); disagreements of RLI with L1 / FLI / MEGNO | 0.996, 0.996, 0.996, 0.996; 0 / 0 / 0; rho median 6.611e+09, max 8.301e+10 | reported | INFO
+R4 | K = 10, 500 uniform starts, n = 1000, Dx = 1e-12: fraction labelled chaotic by RLI (rho = RLI / Dx_r > 1, i.e. RLI above 1e-12 scaled), L1 (n X > ln n), FLI_B (> ln n), MEGNO (Ybar_1 > 3); disagreements of RLI with L1 / FLI / MEGNO | 1, 1, 1, 1; 0 / 0 / 0; rho median 5.164e+10, max 1.728e+11 | reported | INFO
+R4 | K = 10, 500 uniform starts, n = 10000, Dx = 1e-12: fraction labelled chaotic by RLI (rho = RLI / Dx_r > 1, i.e. RLI above 1e-12 scaled), L1 (n X > ln n), FLI_B (> ln n), MEGNO (Ybar_1 > 3); disagreements of RLI with L1 / FLI / MEGNO | 1, 1, 1, 1; 0 / 0 / 0; rho median 1.867e+10, max 6.12e+10 | reported | INFO
+R4 | K = 10, 500 uniform starts, n = 100000, Dx = 1e-12: fraction labelled chaotic by RLI (rho = RLI / Dx_r > 1, i.e. RLI above 1e-12 scaled), L1 (n X > ln n), FLI_B (> ln n), MEGNO (Ybar_1 > 3); disagreements of RLI with L1 / FLI / MEGNO | 1, 1, 1, 1; 0 / 0 / 0; rho median 6.149e+09, max 2.143e+10 | reported | INFO
+# section R4 took 22.0 s
+R5 | frames rejected by check_frame (of 8000) | 0 | 0 | PASS
+R5 | n = 1000, 20 starts x 20 xi_0 x 20 directions (8000 pairs): rho = RLI / Dx_r min / median / max over all; per-start max/min ratio (median; max over starts); finite and nonnegative all | 0.00116 / 0.2339 / 25.2; 103.6; 1507; true | reported | INFO
+R5 | n = 10000, 20 starts x 20 xi_0 x 20 directions (8000 pairs): rho = RLI / Dx_r min / median / max over all; per-start max/min ratio (median; max over starts); finite and nonnegative all | 0.0002032 / 0.2274 / 17.93; 225.5; 840.1; true | reported | INFO
+# section R5 took 4.2 s
+R6 | ordered start (2, 0) of R1, nu = 0.5, Dx = 1.0e-14 (Dx_r = 1e-14): first n (multiples of 10) with RLI(n) > 10 x the RL11 floor 8 eps (Psi_max^A + Psi_max^B) H_K / n; RLI(2e4) = 2.986e-14, BigFloat 2.939e-14, relative error 0.01567 | never within 2e4 | reported | INFO
+R6 | same start and Dx = 1.0e-14: first n (multiples of 10) with the measured Float64 relative error |RLI - RLI_BigFloat| / RLI_BigFloat above 0.1 (the empirical resolution horizon; the worst-case floor above is pessimistic, F5) | never within 2e4 | reported | INFO
+R6 | ordered start (2, 0) of R1, nu = 0.5, Dx = 1.0e-12 (Dx_r = 1e-12): first n (multiples of 10) with RLI(n) > 10 x the RL11 floor 8 eps (Psi_max^A + Psi_max^B) H_K / n; RLI(2e4) = 3.472e-13, BigFloat 3.472e-13, relative error 3.698e-05 | never within 2e4 | reported | INFO
+R6 | same start and Dx = 1.0e-12: first n (multiples of 10) with the measured Float64 relative error |RLI - RLI_BigFloat| / RLI_BigFloat above 0.1 (the empirical resolution horizon; the worst-case floor above is pessimistic, F5) | never within 2e4 | reported | INFO
+R6 | ordered start (2, 0) of R1, nu = 0.5, Dx = 1.0e-10 (Dx_r = 1e-10): first n (multiples of 10) with RLI(n) > 10 x the RL11 floor 8 eps (Psi_max^A + Psi_max^B) H_K / n; RLI(2e4) = 3.708e-11, BigFloat 3.708e-11, relative error 8.035e-08 | 10 | reported | INFO
+R6 | same start and Dx = 1.0e-10: first n (multiples of 10) with the measured Float64 relative error |RLI - RLI_BigFloat| / RLI_BigFloat above 0.1 (the empirical resolution horizon; the worst-case floor above is pessimistic, F5) | never within 2e4 | reported | INFO
+# section R6 took 1.9 s
+R7 | CPU (2 threads), 20000 orbits x 1000 steps, K = 2 pi, wrapped, tau = 1: pair RLI (k = 2, d = 4) 35.09 ns/orbit-step; single L1 (k = 1) 16.16; single MEGNO (k = 2) 27.96; ratio pair / L1 2.172, pair / MEGNO 1.255 | - | reported | INFO
+# section R7 took 6.9 s
+# figure saved: rli-growth-laws.png (panel 3: Float64 least-squares slope of log RLI against log Dx_r over Dx 1e-12..1e-6, regular class, 8 starts: min 0.9967, max 1)
+figure | ordered start (2,0), nu = 0.5: rho = RLI / Dx_r at n = 2e4 for Dx = 1e-12, 1e-10, 1e-8; chaotic (3,0): RLI(2e4) for the same Dx | 0.3472, 0.3708, 0.3706; 0.007898, 0.0183, 0.01442 | reported | INFO
+# figure saved: rli-chaostools.png
+# section figure took 11.3 s
+# verdicts: 73 PASS, 0 FAIL, 110 other
+# total wall time 472.8 s
+eements of RLI with L1 / FLI / MEGNO | 1, 1, 1, 1; 0 / 0 / 0; rho median 6.149e+09, max 2.143e+10 | reported | INFO
+# section R4 took 22.0 s
+R5 | frames rejected by check_frame (of 8000) | 0 | 0 | PASS
+R5 | n = 1000, 20 starts x 20 xi_0 x 20 directions (8000 pairs): rho = RLI / Dx_r min / median / max over all; per-start max/min ratio (median; max over starts); finite and nonnegative all | 0.00116 / 0.2339 / 25.2; 103.6; 1507; true | reported | INFO
+R5 | n = 10000, 20 starts x 20 xi_0 x 20 directions (8000 pairs): rho = RLI / Dx_r min / median / max over all; per-start max/min ratio (median; max over starts); finite and nonnegative all | 0.0002032 / 0.2274 / 17.93; 225.5; 840.1; true | reported | INFO
+# section R5 took 4.2 s
+R6 | ordered start (2, 0) of R1, nu = 0.5, Dx = 1.0e-14 (Dx_r = 1e-14): first n (multiples of 10) with RLI(n) > 10 x the RL11 floor 8 eps (Psi_max^A + Psi_max^B) H_K / n; RLI(2e4) = 2.986e-14, BigFloat 2.939e-14, relative error 0.01567 | never within 2e4 | reported | INFO
+R6 | same start and Dx = 1.0e-14: first n (multiples of 10) with the measured Float64 relative error |RLI - RLI_BigFloat| / RLI_BigFloat above 0.1 (the empirical resolution horizon; the worst-case floor above is pessimistic, F5) | never within 2e4 | reported | INFO
+R6 | ordered start (2, 0) of R1, nu = 0.5, Dx = 1.0e-12 (Dx_r = 1e-12): first n (multiples of 10) with RLI(n) > 10 x the RL11 floor 8 eps (Psi_max^A + Psi_max^B) H_K / n; RLI(2e4) = 3.472e-13, BigFloat 3.472e-13, relative error 3.698e-05 | never within 2e4 | reported | INFO
+R6 | same start and Dx = 1.0e-12: first n (multiples of 10) with the measured Float64 relative error |RLI - RLI_BigFloat| / RLI_BigFloat above 0.1 (the empirical resolution horizon; the worst-case floor above is pessimistic, F5) | never within 2e4 | reported | INFO
+R6 | ordered start (2, 0) of R1, nu = 0.5, Dx = 1.0e-10 (Dx_r = 1e-10): first n (multiples of 10) with RLI(n) > 10 x the RL11 floor 8 eps (Psi_max^A + Psi_max^B) H_K / n; RLI(2e4) = 3.708e-11, BigFloat 3.708e-11, relative error 8.035e-08 | 10 | reported | INFO
+R6 | same start and Dx = 1.0e-10: first n (multiples of 10) with the measured Float64 relative error |RLI - RLI_BigFloat| / RLI_BigFloat above 0.1 (the empirical resolution horizon; the worst-case floor above is pessimistic, F5) | never within 2e4 | reported | INFO
+# section R6 took 1.9 s
+R7 | CPU (2 threads), 20000 orbits x 1000 steps, K = 2 pi, wrapped, tau = 1: pair RLI (k = 2, d = 4) 35.09 ns/orbit-step; single L1 (k = 1) 16.16; single MEGNO (k = 2) 27.96; ratio pair / L1 2.172, pair / MEGNO 1.255 | - | reported | INFO
+# section R7 took 6.9 s
+# figure saved: rli-growth-laws.png (panel 3: Float64 least-squares slope of log RLI against log Dx_r over Dx 1e-12..1e-6, regular class, 8 starts: min 0.9967, max 1)
+figure | ordered start (2,0), nu = 0.5: rho = RLI / Dx_r at n = 2e4 for Dx = 1e-12, 1e-10, 1e-8; chaotic (3,0): RLI(2e4) for the same Dx | 0.3472, 0.3708, 0.3706; 0.007898, 0.0183, 0.01442 | reported | INFO
+# figure saved: rli-chaostools.png
+# section figure took 11.3 s
+# verdicts: 73 PASS, 0 FAIL, 110 other
+# total wall time 472.8 s

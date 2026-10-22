@@ -13,7 +13,7 @@ CHILD || @eval using CUDA
 
 const SEED = 20261012
 const ROOT = normpath(joinpath(@__DIR__, ".."))
-# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c) runs only those sections; the
+# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli) runs only those sections; the
 # default runs everything. Skipping "record" needs an existing data/gpu-benchmark.toml for the launch budget.
 const ONLY = get(ENV, "GPU_ONLY", "")
 want(tag) = isempty(ONLY) || tag in strip.(split(ONLY, ','))
@@ -1341,6 +1341,276 @@ want("megno") && let
         for nch in (8, 10)
             megno_d15("K=10 chaotic class", T, exact(T, 10), xT, nch; chaotic = true)
         end
+    end
+end
+
+# ------------------------------------------------------------------------------------------------ AC15 (rli), tag "rli"
+# Spec criterion 15 of rli-spec.md, the D68 form (the bound B_R applies per backend; the GPU and the CPU do not produce the same orbit, so each backend is compared with a BigFloat(256)
+# reference formed at its own realized points of BOTH orbits of the pair). RLI reducer (k = 2, d = 4, chain {RLI()}, the replacer) on PairMap(WrappedStandardMap), supplied block
+# frame, Dx = 1e-12 along xi_0, tau = 1; Float64 on the GPU (a FALLBACK with its reason is the pass for Double64 if the kernel does not compile). Classes: regular K = 0.5 (S7
+# screening, regular_starts), 1024 pairs, n = 4e4; chaotic K = 10, 1024 pairs, n = 8 and n = 10 (part (b) with the orbit-divergence term) and n = 100 (part (a) only).
+# (a) each backend against its own reference: |RLI_b - RLI_ref,b| <= B_R,b(g) = 8 eps (Psi_max^A + Psi_max^B) H_g / g + 4 eps RLI_ref (RL11, Psi_max over the 65-handoff grid
+# g_k = round(n k / 64), k = 1..64, and g = 1, from the backend's own tangents) at EVERY grid handoff g (one propagate call per g, the orbit is a prefix), and
+# |DL_b - DL_ref,b| <= 8 eps (Psi_g^A + Psi_g^B) / g + 4 eps DL_ref. (b) CPU-GPU gap: regular class, on the pairs whose final states differ by at most 1e-9 in every coordinate (all 8
+# components), |RLI_cpu - RLI_gpu| <= B_R,cpu + B_R,gpu; chaotic class (D68 term of the sali Amendment D68, first line, per orbit via d16_orb) + (1/n) sum_{k<=n} (D_orb^A(k) + D_orb^B(k)) / k,
+# the mean of the s-gap over the orbit divergence of both orbits, on the pairs that enter by the item 4 horizon 16 eps M_n Gamma_n <= 1e-4 for both orbits. Spec 15(b) as written is
+# statistical (reported, not gated): the distribution of RLI_cpu / RLI_gpu, the count of pairs with final states apart by more than 1e-9, and for K = 10, n = 1e4,
+# tau = 2 the tangent-core AC12(c) tolerances (6 sigma per pair, 4 SE for the means). The GPU orbit is read with a trace kernel that runs the same `forward` on the device (the run keeps
+# no orbit); its final state is checked bitwise against the propagate result. Each trace is of one orbit of the pair (the base map's wrapped forward on the device).
+MODTAG[] = "rli: "
+want("rli") && include(joinpath(ROOT, "test", "rli", "rl_helpers.jl"))   # rl_*: BigFloat step tangent rl_mats_std, RL11 bounds rl_BR, rl_BDL, rl_frame, Psi_n (lb_Psi)
+r15_x(z) = z[1]
+r15_id(z) = z
+function r15_trace_kernel!(D, X, sys, steps, proj)
+    j = (blockIdx().x - 1) * blockDim().x + threadIdx().x
+    if j <= length(X)
+        x = X[j]
+        for i in 1:steps
+            D[j, i] = proj(x)
+            x = forward(sys, x)
+        end
+        X[j] = x
+    end
+    return nothing
+end
+# D[j, i] = proj(state of orbit j before step i), X advanced; chunked along the steps as gpu_trace.
+function r15_trace(sys, x0::Vector{S}, N, proj; chunk = 5000) where {S}
+    R = typeof(proj(x0[1]))
+    m = length(x0)
+    X = CuArray(x0)
+    P = Matrix{R}(undef, m, N)
+    for s0 in 0:chunk:N-1
+        s1 = min(s0 + chunk, N)
+        D = CuArray{R}(undef, m, s1 - s0)
+        @cuda threads = 256 blocks = cld(m, 256) r15_trace_kernel!(D, X, sys, s1 - s0, proj)
+        P[:, s0+1:s1] = Array(D)
+        CUDA.unsafe_free!(D)
+    end
+    return P, Array(X)
+end
+
+# The pair ensemble of the class: base map, pair states, block frames, shared xi_0.
+function r15_setup(T, Kt, x0, Dx)
+    base = WrappedStandardMap(Kt)
+    xis = [SVector{2,T}(initial_deviations(SEED, j, Val(2), Val(1), T)[:, 1]) for j in eachindex(x0)]
+    ps = [pair_start(base, x0[j], xis[j], T(Dx); orbit = j) for j in eachindex(x0)]
+    return (base = base, P = PairMap(base), xis = xis, z0 = [p.z for p in ps], W0 = [rl_frame(x) for x in xis], Dxr = [p.Dx_r for p in ps])
+end
+rli_est(S, N, tau, b; chunk = nothing) = propagate(S.P, S.z0, N; k = 2, tau = tau, seed = SEED, reducers = (RLI(),), W0 = S.W0, backend = b, chunk = chunk)
+
+# Streaming BigFloat(256) reference of a pair: DL_k and RLI_k (RL4, tau = 1) at the handoffs in `grid`, from the step tangents of both orbits and the shared xi_0.
+function r15_ref(matsA, matsB, xi0, N, grid)
+    return setprecision(BigFloat, 256) do
+        w = [(rl_big(xi0[1]), rl_big(xi0[2])) for _ in 1:2]
+        l0 = log(w[1][1]^2 + w[1][2]^2) / 2
+        s = [zero(BigFloat), zero(BigFloat)]
+        Q = zero(BigFloat)
+        gset = Set(grid)
+        out = Dict{Int,NamedTuple}()
+        for k in 1:N
+            for (i, mats) in ((1, matsA), (2, matsB))
+                ma, mb, mc, md = mats(k)
+                w[i] = (ma * w[i][1] + mb * w[i][2], mc * w[i][1] + md * w[i][2])
+                s[i] = log(w[i][1]^2 + w[i][2]^2) / 2 - l0
+            end
+            DL = abs(s[2] - s[1]) / k
+            Q += DL
+            k in gset && (out[k] = (RLI = Q / k, DL = DL))
+        end
+        out
+    end
+end
+r15_Ms(Kt, xs) = [(c = Kt * cos(x); SMatrix{2,2,Float64}(1 + c, c, 1, 1)) for x in xs]    # Float64 step tangents (for Psi) from the x coordinates
+mi2pi(u) = u - 2pi * round(u / 2pi)
+rmed(v) = isempty(v) ? NaN : sort(v)[max((length(v) + 1) ÷ 2, 1)]
+
+# Per backend: reference, bounds and ratios of pair j. xsA, xsB: the x coordinates of the realized orbits (steps 1..N), res_g: g -> result of the prefix run.
+function r15_one(res_g, grid, j, xsA, xsB, xi0, Kt, epsT)
+    ref = r15_ref(rl_mats_std(Kt, xsA), rl_mats_std(Kt, xsB), xi0, length(xsA), grid)
+    MsA, MsB = r15_Ms(Kt, xsA), r15_Ms(Kt, xsB)
+    psiA = [lb_Psi(view(MsA, 1:g), xi0) for g in grid]
+    psiB = [lb_Psi(view(MsB, 1:g), xi0) for g in grid]
+    pA, pB = accumulate(max, psiA), accumulate(max, psiB)
+    rR = rD = 0.0
+    BR = 0.0
+    rat(e, B) = B == 0 ? (e == 0 ? 0.0 : Inf) : e / B
+    for (q, g) in enumerate(grid)
+        f = res_g[g].finals[j][1]
+        rr = ref[g]
+        BR = rl_BR(epsT, pA[q], pB[q], g, g, Float64(rr.RLI))
+        BD = rl_BDL(epsT, psiA[q], psiB[q], g, Float64(rr.DL))
+        rR = max(rR, rat(rl_err(f.RLI, rr.RLI), BR))
+        rD = max(rD, rat(rl_err(f.DL, rr.DL), BD))
+    end
+    return (rR = rR, rD = rD, BR = BR, RLIref = Float64(ref[last(grid)].RLI))
+end
+
+function rli_chaotic_b(lab, cpu, gpu, rc, rg, orb, m)
+    enter = findall(j -> orb[j].hor <= 1e-4, 1:m)
+    rest = setdiff(1:m, enter)
+    row("AC15b", "$lab: pairs that enter part (b): 16 eps M_n Gamma_n <= 1e-4 for both orbits (horizon max over all pairs $(fmt(maximum(o.hor for o in orb))); reported only: $(length(rest)))", length(enter), "reported", "INFO")
+    isempty(enter) && return
+    fc(j) = cpu.finals[j][1]
+    fg(j) = gpu.finals[j][1]
+    gapr(j, withD) = abs(Float64(fc(j).RLI) - Float64(fg(j).RLI)) / (rc[j].BR + rg[j].BR + (withD ? orb[j].Dterm : 0.0))
+    r = [gapr(j, true) for j in enter]
+    row("AC15b", "$lab: entering pairs: max |RLI,cpu - RLI,gpu| / (B_R,cpu + B_R,gpu + (1/n) sum_k (D_orb^A(k) + D_orb^B(k))/k) over $(length(enter)) pairs", maximum(r), "<= 1", pf(maximum(r) <= 1))
+    plain = [gapr(j, false) for j in enter]
+    row("AC15b", "$lab: entering pairs: gap over (B_R,cpu + B_R,gpu) without the D_orb term, max ($(count(>(1), plain)) of $(length(enter)) above 1); D_orb term median / max",
+        "$(fmt(maximum(plain))); $(fmt(rmed([orb[j].Dterm for j in enter]))) / $(fmt(maximum(orb[j].Dterm for j in enter)))", "reported (how loose the term is)", "INFO")
+    pk, lt = maximum(orb[j].perk for j in enter), maximum(orb[j].lit for j in enter)
+    row("AC15b", "$lab: item 4 check on the device, entering pairs: max over pairs, both orbits and k = 1..n of |z_k^cpu - z_k^gpu|_inf / (16 eps M_k Gamma_k); same against the literal 16 eps M_n Gamma_n (pairs above 1: $(count(j -> orb[j].perk > 1, enter)) / $(count(j -> orb[j].lit > 1, enter)))",
+        "$(fmt(pk)); $(fmt(lt))", "<= 1; <= 1", pf(pk <= 1 && lt <= 1))
+    if !isempty(rest)
+        row("AC15b", "$lab: reported-only pairs ($(length(rest))): max gap ratio over the full bound; item 4 per-k ratio max", "$(fmt(maximum(gapr(j, true) for j in rest))); $(fmt(maximum(orb[j].perk for j in rest)))", "reported", "INFO")
+    end
+end
+
+function rli_d15(tag, T, Kt, xT, N; chaotic = false, partb = true)
+    m = length(xT)
+    lab = "$tag, $T, $m pairs, n=$(fmt(N)), tau=1, Dx=1e-12"
+    S = r15_setup(T, Kt, xT, 1e-12)
+    grid = m15_grid(N)
+    gres = Dict{Int,Any}()
+    gres[N] = rli_est(S, N, 1, :gpu; chunk = AC13_GPU_CHUNK)
+    why = gpu_why(gres[N])
+    why === nothing || return row("AC15a", "$lab: each backend against its own BigFloat reference", "-", "<= 1", fb(why))
+    gpu = gres[N]
+    cpu = rli_est(S, N, 1, :cpu)
+    cres = Dict{Int,Any}(N => cpu)
+    for g in grid
+        g == N && continue
+        gres[g] = rli_est(S, g, 1, :gpu; chunk = AC13_GPU_CHUNK)
+        cres[g] = rli_est(S, g, 1, :cpu)
+    end
+    epsT = Float64(effective_eps(T))
+    base = S.base
+    zA(z) = rl_half(z, 1); zB(z) = rl_half(z, 2)
+    proj = chaotic ? r15_id : r15_x
+    PA, XNA = r15_trace(base, [zA(z) for z in S.z0], N, proj)
+    PB, XNB = r15_trace(base, [zB(z) for z in S.z0], N, proj)
+    xof(v) = chaotic ? v[1] : v
+    rc = Vector{NamedTuple}(undef, m); rg = Vector{NamedTuple}(undef, m)
+    same_c = zeros(Bool, m)
+    orb = Vector{Any}(undef, m)
+    Threads.@threads :dynamic for j in 1:m
+        ptsA, ptsB = rl_pts(base, zA(S.z0[j]), N), rl_pts(base, zB(S.z0[j]), N)
+        zcA, zcB = forward(base, ptsA[end]), forward(base, ptsB[end])
+        same_c[j] = vcat(zcA, zcB) == cpu.x[j]
+        rc[j] = r15_one(cres, grid, j, [p[1] for p in ptsA], [p[1] for p in ptsB], S.xis[j], Kt, epsT)
+        rg[j] = r15_one(gres, grid, j, [xof(P) for P in PA[j, :]], [xof(P) for P in PB[j, :]], S.xis[j], Kt, epsT)
+        if chaotic
+            W2 = SMatrix{2,2,T}(S.xis[j][1], S.xis[j][2], S.xis[j][1], S.xis[j][2])
+            oA = d16_orb(Kt, ptsA, zcA, W2, epsT; matsf = rl_mats_std)
+            oB = d16_orb(Kt, ptsB, zcB, W2, epsT; matsf = rl_mats_std)
+            ek(P, pts, zc, XN) = [i < N ? maximum(abs.(mi2pi.(pts[i+1][1:2] - P[j, i+1][1:2]))) : maximum(abs.(mi2pi.(zc[1:2] - XN[j][1:2]))) for i in 1:N]
+            eA, eB = ek(PA, ptsA, zcA, XNA), ek(PB, ptsB, zcB, XNB)
+            Dterm = sum((oA.Dij[1, k+1] + oB.Dij[1, k+1]) / k for k in 1:N) / N
+            orb[j] = (Dterm = Dterm, hor = max(oA.bnd[end], oB.bnd[end]), perk = maximum(max.(eA ./ oA.bnd[2:end], eB ./ oB.bnd[2:end])), lit = max(maximum(eA) / oA.bnd[end], maximum(eB) / oB.bnd[end]))
+        end
+    end
+    same_g = [vcat(XNA[j], XNB[j]) == gpu.x[j] for j in 1:m]
+    row("AC15a", "$lab: the reference orbits (both of the pair) reproduce the backend's final state bitwise, CPU / GPU (GPU orbits from the device trace kernel)", "$(count(same_c)) / $(count(same_g)) of $m", "$m / $m", "INFO")
+    for (nm, R, res) in (("cpu", rc, cpu), ("gpu", rg, gpu))
+        row("AC15a", "$lab: backend $nm (provenance $(res.provenance.backend)): max |RLI - RLI,ref| / B_R over $m pairs and the $(length(grid)) grid handoffs (median over pairs $(fmt(rmed([x.rR for x in R]))))", maximum(x.rR for x in R), "<= 1", pf(maximum(x.rR for x in R) <= 1))
+        row("AC15a", "$lab: backend $nm: max |DL - DL,ref| / (8 eps (Psi_g^A + Psi_g^B)/g + 4 eps DL,ref) over $m pairs and the grid handoffs", maximum(x.rD for x in R), "<= 1", pf(maximum(x.rD for x in R) <= 1))
+        row("AC15a", "$lab: backend $nm: median RLI,ref(n); median B_R(n) (how far the worst-case bound is from the value)", "$(fmt(rmed([x.RLIref for x in R]))); $(fmt(rmed([x.BR for x in R])))", "reported", "INFO")
+    end
+    dx = [maximum(abs.(cpu.x[j] - gpu.x[j])) for j in 1:m]
+    agree = findall(<=(1e-9), dx)
+    row("AC15b", "$lab: pairs with final states apart by more than 1e-9 in some coordinate, CPU vs GPU (bitwise equal: $(count(==(0), dx)); median |dx| $(fmt(rmed(dx))), max $(fmt(maximum(dx))))", count(>(1e-9), dx), "reported", "INFO")
+    fc(j) = cpu.finals[j][1]
+    fg(j) = gpu.finals[j][1]
+    qr = sort([Float64(fc(j).RLI) / Float64(fg(j).RLI) for j in 1:m])
+    row("AC15b", "$lab: distribution of RLI_cpu / RLI_gpu over all $m pairs: min / 1% / median / 99% / max (spec 15(b), reported, not gated)", join(fmt.((qr[1], qr[max(1, round(Int, 0.01m))], rmed(qr), qr[round(Int, 0.99m)], qr[end])), " / "), "reported", "INFO")
+    if chaotic
+        partb || return
+        row("AC15b", "$lab: pairs with final states within 1e-9 in every coordinate (the regular-class selection; not the entering rule for this class)", length(agree), "reported", "INFO")
+        return rli_chaotic_b(lab, cpu, gpu, rc, rg, orb, m)
+    end
+    row("AC15b", "$lab: pairs that enter part (b) (final states within 1e-9 in every coordinate)", length(agree), "reported", "INFO")
+    g = [abs(Float64(fc(j).RLI) - Float64(fg(j).RLI)) / (rc[j].BR + rg[j].BR) for j in agree]
+    row("AC15b", "$lab: pairs that agree: max |RLI,cpu - RLI,gpu| / (B_R,cpu + B_R,gpu) over $(length(agree)) pairs (median $(fmt(rmed(g))))", isempty(g) ? NaN : maximum(g), "<= 1", pf(!isempty(g) && maximum(g) <= 1))
+    rel = [abs(Float64(fc(j).RLI) - Float64(fg(j).RLI)) / Float64(fc(j).RLI) for j in agree]
+    row("AC15b", "$lab: pairs that agree: relative gap |RLI,cpu - RLI,gpu| / RLI,cpu median / max (reported)", isempty(rel) ? "-" : "$(fmt(rmed(rel))) / $(fmt(maximum(rel)))", "reported", "INFO")
+end
+
+# 15(b) statistical form for the chaotic class: K = 10, n = 1e4, tau = 2, 1024 pairs, tangent-core AC12(c) tolerances on RLI(n).
+function rli_ac12c(T)
+    label = "(c) K=10 chaotic ensemble, $T: RLI(n), 6 sigma_FT per pair and 4 SE for the means"
+    reason = gpu_reason(T)
+    isempty(reason) || return row("AC15c", label, "-", "6 sigma; 4 SE", fb(reason))
+    rng = StableRNG(SEED + 50000 + 1003)
+    x0 = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:1024]
+    S = r15_setup(T, exact(T, 10), x0, 1e-12)
+    cpu = gpu = nothing
+    e = catchhe(() -> (cpu = rli_est(S, 10^4, 2, :cpu); gpu = rli_est(S, 10^4, 2, :gpu; chunk = AC13_GPU_CHUNK)))
+    e === nothing || return row("AC15c", "(c) K=10, $T, RLI: health error", sprint(showerror, e), "none", "FAIL")
+    why = gpu_why(gpu)
+    why === nothing || return row("AC15c", label, "-", "6 sigma; 4 SE", fb(why))
+    sc, sg = [Float64(f[1].RLI) for f in cpu.finals], [Float64(f[1].RLI) for f in gpu.finals]
+    sig = std(sc)
+    maxd = maximum(abs.(sc .- sg)) / sig
+    dm = abs(mean(sc) - mean(sg)) / sqrt((var(sc) + var(sg)) / length(sc))
+    row("AC15c", "(c) K=10, $T, 1024 pairs, n=1e4, tau=2, Dx=1e-12, RLI: max per-pair |cpu - gpu| / sigma_FT (sigma_FT=$(fmt(sig))); |difference of means| / SE; means cpu $(fmt(mean(sc))) gpu $(fmt(mean(sg)))", "$(fmt(maxd)); $(fmt(dm))", "6; 4", pf(maxd <= 6 && dm <= 4))
+end
+
+# Kernel compile record and R7 (GPU): time per orbit-step of the pair run against a single-orbit L1 (k = 1) and MEGNO (k = 2) run, K = 2 pi, wrapped, tau = 1.
+function rli_timing()
+    stsz(r, T, d) = sizeof(typeof(Chaoslab.reducer_init(r, T, Val(d), Val(2))))
+    row("AC15", "reducer state size in bytes: RLI Float64 / Double64 (d = 4, k = 2)", "$(stsz(RLI(), Float64, 4)) / $(stsz(RLI(), Double64, 4))", "reported", "INFO")
+    norb, N = 20_000, 1_000
+    rng = StableRNG(SEED + 15)
+    x0 = [SVector{2,Float64}(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:norb]
+    S = r15_setup(Float64, 2pi, x0, 1e-9)
+    xw = [torus_state(x) for x in x0]
+    cases = (("RLI pair (k = 2, d = 4)", (b, c) -> propagate(S.P, S.z0, N; k = 2, tau = 1, seed = SEED, reducers = (RLI(),), W0 = S.W0, backend = b, chunk = c)),
+             ("L1 single (k = 1)", (b, c) -> propagate(S.base, xw, N; k = 1, tau = 1, seed = SEED, reducers = (Benettin(),), backend = b, chunk = c)),
+             ("MEGNO single (k = 2)", (b, c) -> propagate(S.base, xw, N; k = 2, tau = 1, seed = SEED, reducers = (MEGNO(),), backend = b, chunk = c)))
+    for (nm, run) in cases
+        cpu_t = gpu_t = Inf
+        prov = nothing
+        try
+            run(:gpu, AC13_GPU_CHUNK)       # warm-up (compilation of the kernel on the full chunk shape)
+            for _ in 1:3
+                t = @elapsed res = run(:gpu, AC13_GPU_CHUNK)
+                prov = res.provenance
+                gpu_t = min(gpu_t, t)
+            end
+        catch e
+            row("AC15", "$nm kernel on the device: compile / run error", sprint(showerror, e)[1:min(end, 300)], "compiles", "FAIL")
+            continue
+        end
+        run(:cpu, nothing)
+        for _ in 1:2
+            cpu_t = min(cpu_t, @elapsed run(:cpu, nothing))
+        end
+        steps = norb * N
+        row("AC15", "$nm kernel (provenance backend $(prov.backend)); $norb orbits x $N steps, K = 2 pi, wrapped, tau = 1: GPU $(fmt(gpu_t / steps * 1e9)) ns/orbit-step, CPU ($(Threads.nthreads()) threads) $(fmt(cpu_t / steps * 1e9)) ns/orbit-step, speedup $(fmt(cpu_t / gpu_t))",
+            prov.backend === :gpu ? gpu_t / steps * 1e9 : NaN, "recorded", prov.backend === :gpu ? "INFO" : fb(prov.backend_fallback_reason))
+    end
+end
+
+want("rli") && let
+    rli_timing()
+    x0, ncand, nrep = regular_starts(1024)
+    N = 4 * 10^4
+    for T in (Float64, Double64)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC15a", "K=0.5 regular class, $T, n=$(fmt(N)): each backend against its own BigFloat reference", "-", "<= 1", fb(reason)); continue)
+        xT = [SVector{2,T}(T(z[1]), T(z[2])) for z in x0]
+        rli_d15("K=0.5 regular class (S7: $(length(x0)) of $ncand candidates regular, $nrep replaced)", T, exact(T, 0.5), xT, N)
+    end
+    for T in (Float64, Double64)
+        rli_ac12c(T)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC15a", "K=10 chaotic class, $T: each backend against its own BigFloat reference", "-", "<= 1", fb(reason)); continue)
+        rng = StableRNG(SEED + 50000 + 1003)
+        xT = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:1024]
+        for nch in (8, 10)
+            rli_d15("K=10 chaotic class", T, exact(T, 10), xT, nch; chaotic = true)
+        end
+        rli_d15("K=10 chaotic class", T, exact(T, 10), xT, 100; chaotic = true, partb = false)
     end
 end
 

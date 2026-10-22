@@ -22,14 +22,18 @@ by its column-normalised matrix; with `replace = false` the columns pass on unch
 `reducer_final` gives `(n, handoffs, DL, RLI, sum, comp, Q)`: `n` the last handoff (map step), `handoffs = K`, `DL` and `RLI`
 the series values at the last handoff, `sum` and `comp` the log sums with compensation terms as `SVector{2}` (A first), `Q`
 the total of the `DL` series. A zero or non-finite column norm is recorded as a health failure ("deviation matrix", the
-column) and leaves sums and `W` unchanged.
+column) and leaves sums and `W` unchanged. At every handoff the off-block entries of the arriving frame (block B rows of
+column 1, block A rows of column 2) must be exactly 0, as the block action of `PairMap` keeps them; otherwise the reducer
+records a failure "pairing" (the column, the largest off-block magnitude), so a run on a non-pair stream or without the
+block frame fails at the first handoff (spec Amendment D77 item 3). Mismatched `xi_0` between the blocks is not visible
+here: [`check_frame`](@ref) rejects it.
 """
 struct RLI
     replace::Bool
 end
 RLI(; replace::Bool = true) = RLI(replace)
 
-# `code` 0 = ok, 1 = zero or non-finite norm `value` of column `column` at handoff `step`; `n` is the last successful map step,
+# `code` 0 = ok, 1 = zero or non-finite norm `value` of column `column` at handoff `step`, 2 = nonzero off-block magnitude `value`; `n` is the last successful map step,
 # `K` the number of successful handoffs.
 struct RLIState{T}
     sA::CompensatedSum{T}
@@ -49,8 +53,19 @@ function reducer_init(::RLI, ::Type{T}, ::Val{d}, ::Val{k}) where {T, d, k}
     return RLIState{T}(CompensatedSum{T}(), CompensatedSum{T}(), CompensatedSum{T}(), zero(T), 0, 0, 0, Int8(0), Int8(0))
 end
 
-# DL at map step n from the two compensated log sums, correction terms included (spec RL4, F5).
-rli_dl(sA::CompensatedSum{T}, sB::CompensatedSum{T}, n::Int) where {T} = abs(total(sB) - total(sA)) / T(n)
+# DL at map step n from the two compensated log sums, correction terms included (spec RL4, F5); the split difference keeps
+# the cancellation of nearby orbits exact where the two sums are close (D77 item 4, review R2).
+rli_dl(sA::CompensatedSum{T}, sB::CompensatedSum{T}, n::Int) where {T} = abs((sB.s - sA.s) + (sB.c - sA.c)) / T(n)
+
+# Largest off-block magnitude of each column of a `2h x 2` frame (D77 item 3); the block action keeps both exactly 0.
+@inline function _offblock(W::SMatrix{D, 2, T}) where {D, T}
+    h = D ÷ 2
+    m1, m2 = zero(T), zero(T)
+    for i in 1:h
+        m1, m2 = max(m1, abs(W[h + i, 1])), max(m2, abs(W[i, 2]))
+    end
+    return m1, m2
+end
 
 function reducer_step(r::RLI, st::RLIState{T}, n::Int, x::SVector, W::SMatrix) where {T}
     st.code == 0 || return st, W
@@ -60,6 +75,11 @@ function reducer_step(r::RLI, st::RLIState{T}, n::Int, x::SVector, W::SMatrix) w
     if !(ok1 && ok2)
         column, value = ok1 ? (Int8(2), a2) : (Int8(1), a1)
         return RLIState{T}(st.sA, st.sB, st.Q, value, st.n, st.K, n, Int8(1), column), W
+    end
+    m1, m2 = _offblock(W)
+    if !(m1 == 0 && m2 == 0)
+        column, value = m1 == 0 ? (Int8(2), m2) : (Int8(1), m1)
+        return RLIState{T}(st.sA, st.sB, st.Q, value, st.n, st.K, n, Int8(2), column), W
     end
     sA, sB = add(st.sA, log(a1)), add(st.sB, log(a2))
     st1 = RLIState{T}(sA, sB, add(st.Q, rli_dl(sA, sB, n)), st.value, n, st.K + 1, st.step, st.code, st.column)
@@ -77,7 +97,8 @@ reducer_failed(::RLI, st::RLIState) = st.code != 0
 
 function reducer_error(::RLI, st::RLIState, orbit, backend)
     value = Float64(st.value)
-    return NumericalHealthError("deviation matrix", value, isfinite(value) ? 0.0 : Inf, st.step, orbit, backend, Int(st.column))
+    what = st.code == 2 ? "pairing" : "deviation matrix"
+    return NumericalHealthError(what, value, isfinite(value) ? 0.0 : Inf, st.step, orbit, backend, Int(st.column))
 end
 
 function reducer_final(::RLI, st::RLIState{T}) where {T}
@@ -164,14 +185,16 @@ Start of a pair on the base map `sys` (spec Algorithm 1, RL13): `z` the pair sta
 nominal separation in the element type of `x0` (an `ArgumentError` if it would be narrowed), `Dx_r` the realized one
 (`pair_distance` of `z`) and `mode` `"wrapped"` or `"lifted"`. A `Dx` that is not finite and positive, or a `Dx_r` that is
 zero, not finite or outside `[Dx/2, 2 Dx]`, throws `NumericalHealthError("separation", ...)` with the pair id `orbit`
-before any map call.
+before any map call. `u` is converted to the element type of `x0` (a direction rounded in a narrower type stays rounded).
+In lifted mode the separation is the minimal image modulo 2 pi (the L2 rule), so a lifted gap of a multiple of 2 pi reads as
+0 and is rejected (spec Amendment D77 item 5).
 """
 function pair_start(sys, x0::SVector{s, T}, u::SVector, Dx; orbit::Integer = 0) where {s, T}
     dx = _widen_dx(T, Dx)
     fail(value, thr) = throw(NumericalHealthError("separation", Float64(value), Float64(thr), 0, orbit, :cpu))
     (isfinite(dx) && dx > 0) || fail(dx, isfinite(dx) ? 0.0 : Inf)
     zA = sys isa WrappedStandardMap ? torus_state(x0) : x0
-    z = vcat(zA, _shadow(sys, zA, dx * u))
+    z = vcat(zA, _shadow(sys, zA, dx * SVector{length(u), T}(u)))
     dr = pair_distance(sys, z)
     (isfinite(dr) && dr > 0) || fail(dr, isfinite(dr) ? 0.0 : Inf)
     (dr >= dx / 2 && dr <= 2 * dx) || fail(dr, dx)

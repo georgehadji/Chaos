@@ -42,7 +42,10 @@ end
 dimension(P::PairMap) = 2 * dimension(P.sys)
 
 # The two halves of a pair state (any element type, any state length of the base map).
-@inline _halves(z::SVector{S, T}) where {S, T} = (SVector{S ÷ 2, T}(ntuple(i -> z[i], Val(S ÷ 2))), SVector{S ÷ 2, T}(ntuple(i -> z[S ÷ 2 + i], Val(S ÷ 2))))
+@inline function _halves(z::SVector{S, T}) where {S, T}
+    iseven(S) || throw(DimensionMismatch("a pair state needs an even length, got $S"))   # folds on S (D77 item 5)
+    return (SVector{S ÷ 2, T}(ntuple(i -> z[i], Val(S ÷ 2))), SVector{S ÷ 2, T}(ntuple(i -> z[S ÷ 2 + i], Val(S ÷ 2))))
+end
 
 function forward(P::PairMap, z::SVector)
     a, b = _halves(z)

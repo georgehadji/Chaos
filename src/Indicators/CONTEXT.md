@@ -2,13 +2,10 @@
 
 Chaos indicators as reducers of the tangent stream and the pure functions behind them. Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer), so the shared norm `safe_norm` comes from Foundation (D69). Built by the sali run (catalog I2) and the fli-ofli run (catalog I5, FLI only; OFLI deferred to M5); gali (I3) was deferred to M5 (D70); the megno run (catalog I8) added the MEGNO reducer; the rli run (catalog I9) added the RLI reducer, `pair_start` and `pair_distance`.
 
-Spec: `workspaces/module-build/stages/01-spec/output/sali-spec.md` (A1 to A16, criteria 1 to 18; decision D66, Amendments D67 and D68). Verified: `stages/04-verify/output/sali-verification.md`. Test plan: `stages/02-tests/output/sali-test-plan.md`. Notes: `stages/03-implement/output/sali-impl-notes.md`.
-
-FLI spec: `workspaces/module-build/stages/01-spec/output/fli-ofli-spec.md` (Q1 to Q13, criteria 1 to 16; decisions D71, D72). Test plan: `stages/02-tests/output/fli-ofli-test-plan.md`. Notes: `stages/03-implement/output/fli-ofli-impl-notes.md`.
-
-MEGNO spec: `workspaces/module-build/stages/01-spec/output/megno-spec.md` (M1 to M13, criteria 1 to 15; decisions D73, D74). Test plan: `stages/02-tests/output/megno-test-plan.md`. Notes: `stages/03-implement/output/megno-impl-notes.md`.
-
-RLI spec: `workspaces/module-build/stages/01-spec/output/rli-spec.md` (RL1 to RL13, criteria 1 to 15; decisions D75, D76). Test plan: `stages/02-tests/output/rli-test-plan.md`. Notes: `stages/03-implement/output/rli-impl-notes.md`.
+- Spec: `workspaces/module-build/stages/01-spec/output/sali-spec.md` (A1 to A16, criteria 1 to 18; decision D66, Amendments D67 and D68). Verified: `stages/04-verify/output/sali-verification.md`. Test plan: `stages/02-tests/output/sali-test-plan.md`. Notes: `stages/03-implement/output/sali-impl-notes.md`.
+- FLI spec: `workspaces/module-build/stages/01-spec/output/fli-ofli-spec.md` (Q1 to Q13, criteria 1 to 16; decisions D71, D72). Test plan: `stages/02-tests/output/fli-ofli-test-plan.md`. Notes: `stages/03-implement/output/fli-ofli-impl-notes.md`.
+- MEGNO spec: `workspaces/module-build/stages/01-spec/output/megno-spec.md` (M1 to M13, criteria 1 to 15; decisions D73, D74). Test plan: `stages/02-tests/output/megno-test-plan.md`. Notes: `stages/03-implement/output/megno-impl-notes.md`.
+- RLI spec: `workspaces/module-build/stages/01-spec/output/rli-spec.md` (RL1 to RL13, criteria 1 to 15; decisions D75, D76). Test plan: `stages/02-tests/output/rli-test-plan.md`. Notes: `stages/03-implement/output/rli-impl-notes.md`.
 
 ## Files
 

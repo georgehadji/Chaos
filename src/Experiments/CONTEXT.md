@@ -53,4 +53,4 @@ Runner: the stored datasets of a work item depend on its inputs and the code ver
 For the module run that wires indicators into studies (M4, P2):
 
 - Run `check_frame` on every supplied initial frame before the stream (D67); the stream does not.
-- Build indicator chains under the one-replacer rule (D71, D72): exactly one reducer replaces the columns and it is last, so `FLI(replace = false)` before `SALI`, and `FLI()` only when alone. Record the chain, its order and each reducer's options in the run record; the reducers cannot (fli-ofli review R1, R2).
+- Build indicator chains under the one-replacer rule (D71, D72): exactly one reducer replaces the columns and it is last, so `FLI(replace = false)` before `SALI`, and `FLI()` only when alone (likewise `MEGNO(replace = false)` and `MEGNO()`). Record the chain, its order and each reducer's options in the run record; the reducers cannot (fli-ofli review R1, R2).

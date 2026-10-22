@@ -136,3 +136,7 @@ Approved by the owner at the stage 02 checkpoint (test plan `../../02-tests/outp
 6. Criterion 13(c): the 1 versus N threads comparison in child processes is a stage 04 check; the package test compares the parallel path with the serial per-orbit body.
 7. Frame check: a supplied column is accepted as a unit vector when its norm defect is at most 8 eps.
 8. Criterion 9(b): the allowance 4/180 is kept; it is about ten times the realized difference and is recorded as loose.
+
+## Stage 04 notes (2026-10-22)
+
+Accepted with the verification report (`../../04-verify/output/fli-ofli-verification.md`). R6: the reducer state is 96 bytes in Float64 and 152 in Double64 (not the 64 proposed in Compute); chunk sizing reads the real state size. R7: the maximisers are reported as the map step n = j tau of the handoff, as in L1. R1, R2: the chain position and options are the caller's and are recorded by Experiments (D72).

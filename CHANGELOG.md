@@ -7,7 +7,7 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 ### Added
 
 - `Chaoslab.Indicators` layer with the `SALI` reducer (Smaller Alignment Index and its log form for `k = 2`), `alignment_indices`, `sali_pair`, `sali_from_log`, `sali_floor` and `check_frame`. Verified at module-build stage 04 against closed forms, the Lyapunov L1 estimator on the identical orbit, ChaosTools GALI_2 and the local GPU (catalog row I2 `verified`; decisions D66, D67, D68).
-- `FLI` reducer (Fast Lyapunov Indicator, log form, catalog row I5) in `Chaoslab.Indicators`: compensated log sums of both column lengths read before normalisation, running maxima of the basis (primary) and the first column, maximisers, `replace = false` position for a chain before `SALI` (one-replacer rule, D71, D72), `check_frame(FLI(), W0)` and `fli_unlogged`. OFLI (row I6) is deferred to M5.
+- `FLI` reducer (Fast Lyapunov Indicator, log form, catalog row I5) in `Chaoslab.Indicators`: compensated log sums of both column lengths read before normalisation, running maxima of the basis (primary) and the first column, maximisers, `replace = false` position for a chain before `SALI` (one-replacer rule, D71, D72), `check_frame(FLI(), W0)` and `fli_unlogged`. OFLI (row I6) is deferred to M5. Verified at module-build stage 04 against closed forms, a BigFloat reference, the L1 and SALI sums on the identical orbit (bitwise), ChaosTools GALI_2 (one-sided) and the local GPU in the D68 form (catalog row I5 `verified`).
 
 ### Changed (catalog and benchmarks)
 

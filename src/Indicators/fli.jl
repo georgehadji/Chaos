@@ -13,8 +13,13 @@ maxima that include the `s = 0` term 0: `FLI_B = max(0, S_1, S_2)` over all hand
 its column-normalised matrix; with `replace = false` the columns pass on unchanged, for a chain in which a later reducer
 (`SALI`) replaces them. The reducer cannot see the chain, so the flag is the caller's.
 
+!!! warning
+    A wrong position gives wrong numbers without an error: `FLI(replace = false)` alone sums unnormalised columns, and a
+    replacing `FLI()` before `SALI` leaves SALI with unit columns. Use exactly one replacer per chain, placed last (D71).
+    The run record does not show `replace` or the chain; the caller (Experiments) records the chain (D72, review R1, R2).
+
 `reducer_final` gives `(n, fli, fli1, sum, comp, stepB, colB, step1)`: `n` the last handoff, `fli = FLI_B(n)`,
-`fli1 = FLI_1(n)`, the sums and compensation terms, and the handoff step (0 is the `s = 0` term) and column at which each
+`fli1 = FLI_1(n)`, the sums and compensation terms, and the map step `n = j tau` of the handoff (0 is the `s = 0` term) and column at which each
 maximum last strictly increased. A zero or non-finite column norm is recorded as a health failure ("deviation matrix", the
 column) and leaves sums, maxima and `W` unchanged. The sources cap the unlogged value at `1e20`; no cap is applied here.
 """

@@ -2,7 +2,7 @@
     Indicators
 
 Chaos indicators as reducers of the tangent stream, and the pure functions behind them: the Smaller Alignment Index
-SALI (sali) and the Fast Lyapunov Indicator FLI (fli). Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer), so the scaled norm is its own.
+SALI (sali) and the Fast Lyapunov Indicator FLI (fli). Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer). The shared norm `safe_norm` is in Foundation (D69).
 """
 module Indicators
 

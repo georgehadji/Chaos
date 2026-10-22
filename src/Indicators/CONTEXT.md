@@ -53,12 +53,12 @@ FLI spec: `workspaces/module-build/stages/01-spec/output/fli-ofli-spec.md` (Q1 t
 
 | Item | Where |
 |------|-------|
-| GPU run (kernel path is isbits and compiles on the CPU; CUDA run is AC18, stage 04) | sali spec criterion 18 |
-| Catalog row I2 and benchmarks row "SALI, regular orbit" wording for 2D maps | sali spec P3, stage 05 |
-| GALI_k with k > 2, OFLI (flows), MEGNO | M5 and later M4 modules |
+| GALI_k (D70), OFLI (flows, D71) | M5 |
+| MEGNO | a later M4 module |
 
 ## Limits
 
 - Callers that supply an initial frame must run `check_frame` on it before the stream (D67); the stream does not, and a dependent frame would read as SALI = 0.
 - `sali_from_log` loses accuracy near SALI = sqrt 2 (condition number about 1 / cos(phi), spec Amendment D68, R1); use the direct form there.
 - The computed SALI lies in [0, sqrt 2 (1 + 2 eps)] (R2). For BigFloat the floor follows the default precision at call time.
+- One replacer per chain, placed last (D71): `FLI(replace = false)` before `SALI`; `FLI()` alone. A wrong position gives wrong numbers without an error (fli review R2), and the run record does not show `replace` or the chain (R1). Experiments must build and record chains under this rule.

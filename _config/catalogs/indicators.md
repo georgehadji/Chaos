@@ -11,7 +11,7 @@ Layer 3, canonical. `Status` is `planned` or `verified`; only module-build/05 wr
 | I3 | GALI_k (volume of k unit deviation vectors, product of singular values) | k = 2..2N | constant or power-law decay (torus dimension) | exponential decay with sum of exponent gaps | k > 2 needs dim >= 4; in 2D maps GALI_2 = exp(L) of the sali reducer (sali A4, A7), the same indicator as SALI, not a second one (D70) | Skokos2007, Skokos2008 | M5 | planned |
 | I4 | LGALI / GALI for local dynamics | k | see I3 | see I3 | | Skokos2008? (LGALI source not confirmed, resolve at 01-spec) | M5 | planned |
 | I5 | FLI (log of largest deviation norm up to time t) | 1 or full basis | linear growth in ln t | exponential growth | initial vector choice, saturation | Froeschle1997 | M4 | planned |
-| I6 | OFLI (orthogonal component to the flow) | 1 | distinguishes periodic vs quasi-periodic | as FLI | flows only (tangent to flow removed) | Fouchard2002 | M4 | planned |
+| I6 | OFLI (orthogonal component to the flow) | 1 | distinguishes periodic vs quasi-periodic | as FLI | flows only (tangent to flow removed); no map definition in the sources read (fli-ofli spec F, D71) | Fouchard2002 | M5 | planned |
 | I7 | OFLI2 (second-order variational) | 1 + 2nd order | sharper periodic detection | | needs 2nd variational equations | Barrio2005 | M5 (catalog only) | planned |
 | I8 | MEGNO Y(t) and mean <Y>(t) | 1 | <Y> -> 2 (quasi-periodic), 0 (stable periodic) | <Y> ~ lambda_1 t / 2 | transients; analytic link to FLI | CincottaSimo2000, Cincotta2003, Mestre2011 | M4 | planned |
 | I9 | RLI (difference of finite-time LEs of two very close orbits) | 1 per orbit | ~ 0 | grows | initial separation dependence | Sandor2004 | M4 | planned |

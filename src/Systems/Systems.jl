@@ -1,7 +1,7 @@
 """
     Systems
 
-Maps with analytic tangents: standard map, linear symplectic maps (standard-map).
+Maps with analytic tangents: standard map, linear symplectic maps (standard-map), the product of a map with itself (rli).
 """
 module Systems
 
@@ -11,6 +11,7 @@ using LinearAlgebra
 export AbstractMap, StandardMap, LinearSymplecticMap, WrappedStandardMap, torus_state, lift
 export rotation_block, hyperbolic_block, block_diagonal, conjugated
 export dimension, forward, inverse, tangent, inverse_tangent
+export PairMap, PairTangent
 export wrap, symplectic_form, det_residual, symplectic_residual
 
 "Supertype of the maps of this module; subtypes define `forward`, `inverse`, `tangent`, `inverse_tangent`, `dimension`."
@@ -54,6 +55,7 @@ function inverse_tangent end
 include("standard_map.jl")
 include("wrapped_standard_map.jl")
 include("linear_symplectic.jl")
+include("pair.jl")
 include("residuals.jl")
 
 end

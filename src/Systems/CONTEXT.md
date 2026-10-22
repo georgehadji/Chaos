@@ -2,7 +2,7 @@
 
 Maps with analytic one-step tangents. Imports nothing from Foundation (D23). Built by the standard-map run (catalog Y1 and Y5, `_config/catalogs/systems.md`).
 
-Spec: `workspaces/module-build/stages/01-spec/output/standard-map-spec.md` (SM-; items are its Equations numbers, W- its Amendment D28). Reports: `stages/04-verify/output/standard-map-verification.md`.
+Spec: `workspaces/module-build/stages/01-spec/output/standard-map-spec.md` (SM-; items are its Equations numbers, W- its Amendment D28). Reports: `stages/04-verify/output/standard-map-verification.md`. `PairMap`: `workspaces/module-build/stages/01-spec/output/rli-spec.md` (RL5, P1(c), Amendment D76); tests `test/rli/rl_pair.jl`.
 
 ## Files
 
@@ -12,6 +12,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/standard-map-spec.md` (SM-;
 | `standard_map.jl` | `StandardMap` (lifted), `wrap`, shared tangent formulas, non-finite guard |
 | `wrapped_standard_map.jl` | `WrappedStandardMap` (torus state with winding counts), `torus_state`, `lift` |
 | `linear_symplectic.jl` | `LinearSymplecticMap` and block builders for Y5 |
+| `pair.jl` | `PairMap` (product of a map with itself) and its block-diagonal `PairTangent` |
 | `residuals.jl` | `symplectic_form`, `det_residual`, `symplectic_residual` |
 
 ## Exports
@@ -25,6 +26,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/standard-map-spec.md` (SM-;
 | `wrap` | reduce to `[0, 2pi)` for display only |
 | `LinearSymplecticMap(A)` | `z' = A z`, stored inverse `Omega^-1 A' Omega` |
 | `rotation_block`, `hyperbolic_block`, `block_diagonal`, `conjugated` | build Y5 test maps, including the non-normal variant |
+| `PairMap(sys)`, `PairTangent` | state (A; B) of two states of `sys`, dimension `2 d`; `forward`, `inverse` act on each half, `tangent` is `diag(M(A), M(B))` whose product with a frame acts block by block (rli, D76) |
 | `symplectic_form(T, d)`, `det_residual(M)`, `symplectic_residual(M)` | `Omega`, `abs(det M - 1)`, max entry of `M' Omega M - Omega` |
 
 ## Invariants a caller can rely on

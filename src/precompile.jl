@@ -2,7 +2,7 @@
 # growing with distinct element type x (d, k) x variant specializations), so the hot paths are compiled once at package precompile.
 # Public API only, CPU backend only (never CUDA); BigFloat is left out (too many precision variants to cache usefully).
 using PrecompileTools
-using StaticArrays: SVector
+using StaticArrays: SVector, SMatrix
 using DoubleFloats: Double64
 
 @setup_workload begin
@@ -20,6 +20,12 @@ using DoubleFloats: Double64
             propagate(sm, x0, 8; k = 2, tau = 2, seed = 1, reducers = (FLI(),), backend = :cpu)
             propagate(sm, x0, 8; k = 2, tau = 2, seed = 1, reducers = (MEGNO(replace = false), SALI()), backend = :cpu)
             propagate(sm, x0, 8; k = 2, tau = 2, seed = 1, reducers = (MEGNO(),), backend = :cpu)
+            # rli: the orbit pair as one orbit of PairMap, block frame (xi_0, 0), (0, xi_0) (D75)
+            z0 = [SVector{4, T}(exact(T, 1.0), exact(T, 2.0), exact(T, 1.0 + 2.0^-30), exact(T, 2.0))]
+            o, l = one(T), zero(T)
+            Wp = [SMatrix{4, 2, T}(o, l, l, l, l, l, o, l)]
+            propagate(PairMap(sm), z0, 8; k = 2, tau = 2, seed = 1, reducers = (RLI(),), W0 = Wp, backend = :cpu)
+            propagate(PairMap(sm), z0, 8; k = 2, tau = 2, seed = 1, reducers = (RLI(replace = false), MEGNO()), W0 = Wp, backend = :cpu)
             for alg in qrs, k in (1, 2)
                 propagate(sm, x0, 8; k = k, tau = 2, seed = 1, reducers = (QRSpectrum(alg),), backend = :cpu)
             end

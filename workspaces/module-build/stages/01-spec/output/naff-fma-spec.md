@@ -382,3 +382,14 @@ Criterion 15(b) is the text above; criteria 1 to 14 and the rest of 15 are uncha
 ### Sources (amendment)
 
 None added. The numbers are measurements of this stage (`stages/04-verify/output/naff-fma-verify-log.txt`, `gpu-naff-verify-log.txt`).
+
+## Stage 04 notes (2026-10-27)
+
+Accepted with the verification report (`../../04-verify/output/naff-fma-verification.md`), Amendment D82 included.
+
+- R1: on the 2D panel the regular median of D is about 9 decades below the chaotic median at N = 1000 (E1 -9.83 against -0.56 to -0.61; E2 lifted -11.52 against -0.59 to -0.61) and 11.7 (E1) to 13.5 (E2, at the floor) at N = 4000; the regular quantiles move down with N (a fall of 2.3 to 2.4 decades per factor 4 in N), the chaotic mode stays near -0.6. At most 2.2 percent of chaotic starts fall below the regular median (the K = 5 class carries a few regular-island starts).
+- Criterion 14: (a) 6.8e-15 against the BigFloat(256) orbit; (b) ChaosTools period routine reported only (12 of 20 starts match the fundamental, 8 the second harmonic of cos q); (c) not run, no Python NAFF package installed.
+- Criterion 15: Float64 device kernel compiles and runs (GPU tag 12 PASS, 0 FAIL in the D82 form, 2 FALLBACK Double64); 15(b) in the form of D82.
+- Review: no CRITICAL or HIGH. M1 to M3 and the cheap LOW items fixed; M4 (provenance-key collision in chains) recorded as a cross-module limit. One regression from a review fix (string-building throw in `reducer_init` made the device kernel uncompilable) found by the GPU tag and fixed (D82 item 2, 3).
+- Limits carried: one-ulp-noise constant series are `:ok` under mean removal; a broad-band window with more than 64 near-top local maxima could miss the true maximum; the Experiments series feed (criterion 16) is in the study spec; the amplitude-error slope, the regular-orbit error law against a true frequency and the rest of R2, R8, R9 not run; R6 used the standard map's elliptic point (pi, 0), Y2 (Henon) is not available.
+- Sources not held: Laskar1990, LaskarFroeschleCelletti1992, Laskar1993, Laskar1999, Gomez2010b. I12c (power spectrum) is deferred to M6 (D80); its catalog source Simo2014 as held does not support a power-spectrum test.

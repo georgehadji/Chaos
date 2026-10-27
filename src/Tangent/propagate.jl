@@ -26,14 +26,21 @@ struct PropagationResult{X, M, F}
 end
 
 # One work item per orbit and one launch of `steps` steps from global step n0 (D44), in place on the carried buffers;
-# the body is the same `_orbit_body` as `propagate_orbit`. The first launch draws fresh reducer states; an orbit that
-# failed in an earlier launch keeps its status and failing step and is not advanced.
-@kernel function _orbit_kernel!(x, W, st, code, hstep, sys, n0, steps, N, tau, reducers)
+# the body is the same `_orbit_body` as `propagate_orbit`. The first launch draws fresh reducer states and zeroes the orbit's
+# workspace column `ws[:, i]` (an explicit loop: it must compile on the device); an orbit that failed in an earlier launch
+# keeps its status and failing step and is not advanced.
+@kernel function _orbit_kernel!(x, W, st, code, hstep, ws, sys, n0, steps, N, tau, reducers)
     i = @index(Global)
     if n0 == 0 || code[i] == STATUS_OK
         xi, Wi = x[i], W[i]
+        wi = view(ws, :, i)
+        if n0 == 0
+            for j in eachindex(wi)
+                wi[j] = 0x00000000
+            end
+        end
         s0 = n0 == 0 ? _init_states(reducers, eltype(xi), Val(size(Wi, 1)), Val(size(Wi, 2))) : st[i]
-        xn, Wn, sn, c, h = _orbit_body(sys, xi, Wi, s0, n0, steps, N, tau, reducers)
+        xn, Wn, sn, c, h = _orbit_body(sys, xi, Wi, s0, n0, steps, N, tau, reducers, wi)
         x[i] = xn
         W[i] = Wn
         st[i] = sn
@@ -64,26 +71,26 @@ end
 _host(a::Array) = a
 _host(a) = Array(a)
 
-# Five chunk buffers on `backend`, carried between launches (D44): points, deviation matrices, reducer states, status
-# codes, failing step.
-function _alloc_bufs(backend, ::Type{SVector{s, T}}, ::Val{d}, ::Val{k}, ::Type{S}, m) where {s, d, k, T, S}
+# Six chunk buffers on `backend`, carried between launches (D44): points, deviation matrices, reducer states, status
+# codes, failing step, reducer workspace (`mws` UInt32 rows per orbit, one row at least so the matrix is never empty).
+function _alloc_bufs(backend, ::Type{SVector{s, T}}, ::Val{d}, ::Val{k}, ::Type{S}, m, mws) where {s, d, k, T, S}
     A = KernelAbstractions.allocate
     return (A(backend, SVector{s, T}, m), A(backend, SMatrix{d, k, T, d * k}, m), A(backend, S, m), A(backend, Int8, m),
-            A(backend, Int, m))
+            A(backend, Int, m), A(backend, UInt32, max(mws, 1), m))
 end
 
 """
     _before_launch(device, chunk_index, launch, carried)
 
 Test hook (D44), called on the host before every device launch with the device chunk index, the launch index within the
-chunk and the live carried buffers (`(x, W, states)` for `propagate`, `(ends,)` for `propagate_shadow`). No-op by default.
+chunk and the live carried buffers (`(x, W, states, workspace)` for `propagate`, `(ends,)` for `propagate_shadow`). No-op by default.
 """
 _before_launch(::AbstractDevice, ::Int, ::Int, carried) = nothing
 
 # One chunk on `backend` in launches of `args.L` steps (the last may be shorter); `who` (:cpu or :gpu) goes into the
 # errors, `ci` is the device chunk index for the hook. Stores nothing in `out` when a status is not OK.
 function _run_chunk!(out, bufs, Wh, r, args, who::Symbol, backend, ci::Int = 0)
-    x, W, so, code, hstep = bufs
+    x, W, so, code, hstep, wsb = bufs
     len = length(r)
     copyto!(x, 1, args.x0, first(r), len)
     _fill_W!(Wh, r, args.seed, args.W0, args.dims..., args.T)
@@ -94,20 +101,20 @@ function _run_chunk!(out, bufs, Wh, r, args, who::Symbol, backend, ci::Int = 0)
     while n0 < args.N
         steps = min(args.L, args.N - n0)
         launch += 1
-        who === :gpu && _before_launch(DEVICE[], ci, launch, (x = x, W = W, states = so))
-        kernel(x, W, so, code, hstep, args.sys, n0, steps, args.N, args.tau, args.reducers; ndrange = len)
+        who === :gpu && _before_launch(DEVICE[], ci, launch, (x = x, W = W, states = so, workspace = wsb))
+        kernel(x, W, so, code, hstep, wsb, args.sys, n0, steps, args.N, args.tau, args.reducers; ndrange = len)
         KernelAbstractions.synchronize(backend)
         args.done[] = launch   # launches completed in this chunk, for the provenance after a failed first chunk
         n0 += steps
     end
-    code, so, xo, Wo, hstep = _host(code), _host(so), _host(x), _host(W), _host(hstep)
+    code, so, xo, Wo, hstep, wsh = _host(code), _host(so), _host(x), _host(W), _host(hstep), _host(wsb)
     i = findfirst(!=(STATUS_OK), view(code, 1:len))   # lowest orbit id first; a failed chunk stores nothing
     i === nothing || code[i] != STATUS_REDUCER || throw(_reducer_error(args.reducers, so[i], first(r) + i - 1, who))
     i === nothing || throw(_health_error(code[i], xo[i], Wo[i], hstep[i], first(r) + i - 1, who))
     copyto!(out.x, first(r), xo, 1, len)
     copyto!(out.W, first(r), Wo, 1, len)
     for i in 1:len
-        out.finals[first(r) + i - 1] = map(reducer_final, args.reducers, so[i])
+        out.finals[first(r) + i - 1] = map((rd, st) -> reducer_final(rd, st, view(wsh, :, i)), args.reducers, so[i])
     end
 end
 
@@ -188,11 +195,12 @@ _launches(N, L) = L == 0 ? 0 : cld(N, L)
 function _propagate(sys, x0::AbstractVector{SVector{s, T}}, N, tau, ::Val{d}, ::Val{k}, seed, reducers, backend, chunk, W0, forced) where {s, d, T, k}
     n = length(x0)
     s0 = _init_states(reducers, T, Val(d), Val(k))
-    rbytes = isbitstype(typeof(s0)) ? sizeof(s0) : 0
+    mws = _chain_workspace(reducers, T, Val(d), Val(k))   # before any work: at most one workspace reducer
+    rbytes = (isbitstype(typeof(s0)) ? sizeof(s0) : 0) + 4 * mws
     csize_for(free) = chunk !== nothing ? chunk :
                       chunk_size(free, Val(d), Val(k), T; f = CHUNK_HEADROOM, reducer_bytes = rbytes, s = s)
     # chunk buffers on `b` for chunks of `cs` orbits, and the host staging array of the initial deviations
-    alloc(b, cs) = (_alloc_bufs(b, SVector{s, T}, Val(d), Val(k), typeof(s0), min(cs, n)),
+    alloc(b, cs) = (_alloc_bufs(b, SVector{s, T}, Val(d), Val(k), typeof(s0), min(cs, n), mws),
                     Vector{SMatrix{d, k, T, d * k}}(undef, min(cs, n)))
     choice = resolve_backend(backend, T; cpu_only_reducer = !isbitstype(typeof(s0)))
     dev, csize, gpu_csize, gpu_chunks, bufs, Wh = CPU(), 0, 0, 0, nothing, nothing
@@ -222,7 +230,7 @@ function _propagate(sys, x0::AbstractVector{SVector{s, T}}, N, tau, ::Val{d}, ::
         dev, csize = CPU(), csize_for(Sys.free_memory())
         bufs, Wh = alloc(dev, csize)
     end
-    f0 = map(reducer_final, reducers, s0)
+    f0 = map((rd, st) -> reducer_final(rd, st, zeros(UInt32, max(mws, 1))), reducers, s0)   # typed from the workspace form
     out = (x = Vector{SVector{s, T}}(undef, n), W = Vector{SMatrix{d, k, T, d * k}}(undef, n),
            finals = Vector{typeof(f0)}(undef, n))
     args = (; sys, x0, seed, W0, N, tau, reducers, T, dims = (Val(d), Val(k)), L = choice.backend === :gpu ? Ldev : Lcpu, done = Ref(0))

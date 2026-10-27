@@ -1,42 +1,41 @@
 # Indicators
 
-Chaos indicators as reducers of the tangent stream and the pure functions behind them. Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer), so the shared norm `safe_norm` comes from Foundation (D69). Built by the sali run (catalog I2) and the fli-ofli run (catalog I5, FLI only; OFLI deferred to M5); gali (I3) was deferred to M5 (D70); the megno run (catalog I8) added the MEGNO reducer; the rli run (catalog I9) added the RLI reducer, `pair_start` and `pair_distance`.
+Chaos indicators as reducers of the tangent stream and the pure functions behind them. Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer), so the shared norm `safe_norm` comes from Foundation (D69). Built by the sali run (catalog I2) and the fli-ofli run (catalog I5, FLI only; OFLI deferred to M5); gali (I3) was deferred to M5 (D70); the megno run (catalog I8) added the MEGNO reducer; the rli run (catalog I9) added the RLI reducer, `pair_start` and `pair_distance`; the stretching-numbers run (catalog I10, L13 as the same histogram) added `StretchingNumbers` and, in Tangent, the reducer workspace.
 
 - Spec: `workspaces/module-build/stages/01-spec/output/sali-spec.md` (A1 to A16, criteria 1 to 18; decision D66, Amendments D67 and D68). Verified: `stages/04-verify/output/sali-verification.md`. Test plan: `stages/02-tests/output/sali-test-plan.md`. Notes: `stages/03-implement/output/sali-impl-notes.md`.
 - FLI spec: `workspaces/module-build/stages/01-spec/output/fli-ofli-spec.md` (Q1 to Q13, criteria 1 to 16; decisions D71, D72). Test plan: `stages/02-tests/output/fli-ofli-test-plan.md`. Notes: `stages/03-implement/output/fli-ofli-impl-notes.md`.
 - MEGNO spec: `workspaces/module-build/stages/01-spec/output/megno-spec.md` (M1 to M13, criteria 1 to 15; decisions D73, D74). Test plan: `stages/02-tests/output/megno-test-plan.md`. Notes: `stages/03-implement/output/megno-impl-notes.md`.
 - RLI spec: `workspaces/module-build/stages/01-spec/output/rli-spec.md` (RL1 to RL13, criteria 1 to 15; decisions D75, D76, D77). Test plan: `stages/02-tests/output/rli-test-plan.md`. Notes: `stages/03-implement/output/rli-impl-notes.md`.
+- Stretching-numbers spec: `workspaces/module-build/stages/01-spec/output/stretching-numbers-spec.md` (SN1 to SN17, criteria 1 to 16; decisions D78, D79). Test plan: `stages/02-tests/output/stretching-numbers-test-plan.md`. Notes: `stages/03-implement/output/stretching-numbers-impl-notes.md`.
 
 ## Files
 
 | File | Holds |
 |------|-------|
 | `Indicators.jl` | module, exports, include order |
-| `sali.jl` | `SALI` reducer and its isbits state `SALIState` (`k = 2`) |
-| `alignment.jl` | `alignment_indices`, `sali_pair`, `sali_from_log`, `sali_floor`, `check_frame` (SALI method) |
+| `sali.jl`, `alignment.jl` | `SALI` reducer and its isbits state `SALIState` (`k = 2`); `alignment_indices`, `sali_pair`, `sali_from_log`, `sali_floor`, `check_frame` (SALI method) |
 | `fli.jl` | `FLI` reducer and its isbits state `FLIState` (`k = 2`), `check_frame` (FLI method), `fli_unlogged` |
 | `megno.jl` | `MEGNO` reducer and its isbits state `MEGNOState` (`k = 2`, five compensated sums per column), `check_frame` (MEGNO method) |
 | `rli.jl` | `RLI` reducer and its isbits state `RLIState` (`k = 2`, pair frame), `check_frame` (RLI method), `pair_start`, `pair_distance` |
+| `stretching.jl` | `StretchingNumbers` and its isbits state `StretchState` (`k = 2`, counts in the Tangent workspace), `spectral_distance`, `spectrum_cell`, `spectrum_density`, `stretching_range`, `check_run`, `check_frame` (method) |
 
 ## Exports
 
 | Name | What it does |
 |------|--------------|
 | `SALI()` | reducer for `k = 2`: compensated `ln` of both column norms, columns renormalised, `SALI(n) = min(d_-, d_+)` from the stored unit columns; final `(n, sali, L, sum, comp, floor)` with `L = -(S_1 + S_2)` |
-| `alignment_indices(a, b)` | `(d_minus, d_plus)` of two nonzero vectors of any dimension |
-| `sali_pair(a, b)` | `min(alignment_indices(a, b)...)` |
-| `sali_from_log(L)` | SALI from `L = ln GALI_2` (spec A4), no cancellation |
-| `sali_floor(T)` | `4 effective_eps(T)`, the measurement floor of the direct form |
+| `alignment_indices(a, b)`, `sali_pair(a, b)`, `sali_from_log(L)`, `sali_floor(T)` | `(d_minus, d_plus)` of two nonzero vectors; their `min`; SALI from `L = ln GALI_2` without cancellation (spec A4); the floor `4 effective_eps(T)` |
 | `check_frame(SALI(), W0; orbit)` | `SALI(0)` of a supplied frame, or `NumericalHealthError("initial frame")` below `10 sali_floor(T)` |
 | `FLI(; replace = true)` | reducer for `k = 2`: compensated `ln` of both column lengths read before normalisation, running maxima `FLI_B` (basis, primary) and `FLI_1` (first column) including the `s = 0` term, maximisers; `replace = false` leaves `W` to a later reducer; final `(n, fli, fli1, sum, comp, stepB, colB, step1)` |
-| `check_frame(FLI(), W0; orbit)` | larger norm defect of a supplied frame, or `NumericalHealthError("initial frame")` above `8 eps` |
 | `MEGNO(; replace = true)` | reducer for `k = 2`: per column the compensated log sum (bitwise that of SALI, FLI, L1) and the weighted sums `R1 = sum n a`, `R2 = sum n^2 a`, `Q = sum Y`, `Q2 = sum 3 R2`; delivers `Y`, `Ybar` (standard (1,-1) form) and `Ybar20` (the (2,0) mean, regular level 1/2) per column, column 1 primary; `replace = false` leaves `W` to a later reducer; final `(n, handoffs, Y, Ybar, Ybar20, sum, comp, R1, R2, Q, Q2)`, the series `SVector{2}` |
-| `check_frame(MEGNO(), W0; orbit)` | larger norm defect of a supplied frame, or `NumericalHealthError("initial frame")` above `8 eps` |
+| `check_frame(FLI() or MEGNO(), W0; orbit)` | larger norm defect of a supplied frame, or `NumericalHealthError("initial frame")` above `8 eps` |
 | `RLI(; replace = true)` | reducer for `k = 2` on a `PairMap` (even `d`, block frame): per column the compensated log sum (bitwise L1), `DL = abs(S_B - S_A) / n` with the correction terms, `RLI = Q / K` the mean of `DL` over the handoffs; `replace = false` leaves `W` to a later reducer; final `(n, handoffs, DL, RLI, sum, comp, Q)` |
 | `check_frame(RLI(), W0; orbit)` | norm defect of a supplied block frame, or `NumericalHealthError("initial frame")` for a non-unit column, support outside its block, or unequal block vectors |
 | `pair_start(sys, x0, u, Dx; orbit)` | `(z, Dx, Dx_r, mode)`: pair state (A; B = A + `Dx u`, wrapped with the counts of A), realized separation, `"wrapped"` or `"lifted"`; `NumericalHealthError("separation")` for a `Dx_r` outside `[Dx/2, 2 Dx]`, `ArgumentError` for a narrowing `Dx` |
 | `pair_distance(sys, z)` | `safe_norm` of the minimal-image separation of a pair state (plain difference for other maps) |
 | `fli_unlogged(F)` | `exp(F)`, or `nothing` where the exponential overflows |
+| `StretchingNumbers(; range, bins, interval, min_per_cell, replace)` | reducer for `k = 2`: compensated log sums (bitwise L1) and of squares per column, a cumulative histogram of `z = ln(alpha)/tau` in `2 (bins + 2)` workspace counts (overflow cells never clipped); `reducer_final(r, st, ws)` adds `D`, `undersampled`, `counts`, `below`, `above` |
+| `spectral_distance`, `spectrum_cell`, `spectrum_density`, `stretching_range`, `check_run`, `check_frame(r, W0)` | D from two count vectors (exact `Int` sums); the cell rule; `N_c/(k h)`; the derived range padded by `8 eps` (standard maps, 2 x 2 linear); interval and 10^9-handoff check; unit and non-parallel columns |
 
 ## Invariants a caller can rely on
 
@@ -54,19 +53,18 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 | MEGNO is a linear functional of the log sums `s(0..K)` (Abel form, spec M6), not a function of `s(K)` alone; a constant added to `s` changes nothing; `Y`, `Ybar`, `Ybar20` are never clipped (Y is unbounded and may be negative) | spec I1, Representation, M7 |
 | MEGNO depends on `tau` (weights at the end of the window, mean over the handoffs `1..K`); the weights are formed in the element type, no 64-bit integer `n^3` | spec M12, criterion 1(v) |
 | RLI is the mean of `DL_k` over the handoffs `1..K` (not a function of `DL` at the last handoff), `0 <= DL <= 2 L_sigma`; `DL` and `RLI` are never clipped; constant tangents give exactly 0; it depends on `tau` | rli spec RL4, RL8, RL10, I1, I2 |
+| Stretching: counts sum to `k` in every column, D bitwise symmetric and in `[0, sqrt(2/h)]`, the log sums bitwise L1; a state of 104 (Float64) or 176 (Double64) bytes plus `4 (bins + 2)` per column; no allocation after warm-up; D depends on `tau`, bins and the column pair and has no threshold; at most one workspace reducer per chain | stretching spec SN4 to SN6, I1, I4, I8 |
 | MEGNO state is 200 bytes in Float64 and 368 in Double64 (reducer bytes for the tangent-core memory formula); a step-chunked relaunch carries it whole | spec P9 |
 
 ## Tests and verification
 
-- Package: `test/sali/` (23 testsets, AC1 to AC15 and the API); `test/fli-ofli/` (27 testsets); `test/megno/` (26 testsets); `test/rli/` (34 testsets).
+- Package: `test/sali/` (23 testsets, AC1 to AC15 and the API); `test/fli-ofli/` (27 testsets); `test/megno/` (26 testsets); `test/rli/` (34 testsets); `test/stretching/` (42 testsets).
 - Stage 04: `verify/sali.jl` (ChaosTools GALI_2 oracle, AC16 and AC17) and `verify/gpu.jl` (AC18).
-- Bench: `bench/sali.jl`, `bench/fli.jl`, `bench/megno.jl`, `bench/rli.jl`.
+- Bench: `bench/sali.jl`, `bench/fli.jl`, `bench/megno.jl`, `bench/rli.jl`, `bench/stretching.jl`.
 
 ## Deferred
 
-| Item | Where |
-|------|-------|
-| GALI_k (D70), OFLI (flows, D71) | M5 |
+GALI_k (D70) and OFLI (flows, D71) go to M5; L14 (FTLE grids) is an Experiments product (D78).
 
 ## Limits
 
@@ -77,3 +75,4 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 - MEGNO needs a supplied frame to be unit-length (`check_frame(MEGNO(), W0)` before the stream), else `s(0) = 0` is wrong. The regular level 2 (0.5 for `Ybar20`) needs a deviation with a component across the invariant curve (spec F3, M9); `Y` of a vector along it is 0. Level and growth laws are approached slowly (O(ln K / K)); thresholds are pre-registered per study, the module never stops an orbit.
 - MEGNO in Double64 over long lifted orbits: the log sums inherit the Double64 sin and cos floor at large lifted arguments from L1 (a factor 1.64 over 8 eps Psi_n at |x| near 1e6, K = 10); use the wrapped state there. For bounded or regular orbits Y carries about n eps / 10 absolute from the products of the weights and the increments (megno spec, stage 04 notes, R3).
 - RLI needs the caller to build the pair (`pair_start`), the block frame (column 1 = `(xi_0, 0)`, column 2 = `(0, xi_0)`) and to run `check_frame(RLI(), W0)` before the stream: only it sees a mismatched `xi_0` between the blocks. The reducer checks the pairing at every handoff (off-block entries exactly 0, else health error "pairing", D77), so a non-pair stream or a missing block frame fails at the first handoff. Use the wrapped state (lifted Float64 loses Dx = 1e-12 near |x| = 1e4, rli R8) and Dx = 1e-12 in Float64 (rli R6). `RLI(replace = false)` before `MEGNO()` or `RLI()` alone, same chain rule as above. The direction rule, seed, frame source and chain are recorded by Experiments (D76 item 6).
+- Stretching numbers: `range` is the caller's (`stretching_range(sys)` for the standard maps), the caller runs `check_run(r, tau, N)` and `check_frame(r, W0)` before the stream, and the series of D is read by calling `reducer_final(r, st, ws)` at the evaluation handoffs (no emission channel). The counts are 8 (bins + 2) bytes per orbit in every `propagate` final (8 kB at 1000 cells): the recorder must consume chunk by chunk. The 2D panel does not show the printed regular constant of D; it is not a chaos certificate (spec F5). GPU kernel compile of the workspace view is untested (no GPU here).

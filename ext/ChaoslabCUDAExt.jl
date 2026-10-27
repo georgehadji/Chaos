@@ -70,7 +70,8 @@ function compiles(::Type{T}) where {T}
                 A(x) = KernelAbstractions.allocate(b, typeof(x), 1)
                 x0, W0 = [SVector(T(1) / 3, T(0))], [SMatrix{2, 1, T}(1, 0)]
                 x, W, so, code, h = CuArray(x0), CuArray(W0), A(()), A(Int8(0)), A(0)
-                _orbit_kernel!(b, 1)(x, W, so, code, h, StandardMap(T(1)), 0, 1, 1, 1, (); ndrange = 1)
+                ws = KernelAbstractions.allocate(b, UInt32, 1, 1)   # workspace column of the orbit (one row: no workspace reducer here)
+                _orbit_kernel!(b, 1)(x, W, so, code, h, ws, StandardMap(T(1)), 0, 1, 1, 1, (); ndrange = 1)
                 KernelAbstractions.synchronize(b)
                 true
             catch e

@@ -2,13 +2,13 @@
 
 Propagation of orbit ensembles with deviation vectors: one KernelAbstractions kernel for CPU and GPU, a chain of reducers called every `tau` steps. Imports Foundation and Systems. Built by the tangent-core run (catalog L7 as a parameter, section D2).
 
-Spec: `workspaces/module-build/stages/01-spec/output/tangent-core-spec.md` (T-; amendments D28, D29, D33, D30). Reports: `stages/04-verify/output/tangent-core-verification.md`.
+Spec: `workspaces/module-build/stages/01-spec/output/tangent-core-spec.md` (T-; amendments D28, D29, D33, D30). Reducer workspace (additive, stretching-numbers run, D78 P1 (c)): `workspaces/module-build/stages/01-spec/output/stretching-numbers-spec.md` and its test plan, Surface 1. Reports: `stages/04-verify/output/tangent-core-verification.md`.
 
 ## Files
 
 | File | Holds |
 |------|-------|
-| `Tangent.jl` | module, exports, the reducer protocol (`reducer_init`, `reducer_update`, `reducer_final`, `reducer_step`, `reducer_failed`, `reducer_error`) |
+| `Tangent.jl` | module, exports, the reducer protocol (`reducer_init`, `reducer_update`, `reducer_final`, `reducer_step`, `reducer_failed`, `reducer_error`, and the workspace surface below) |
 | `initial.jl` | `initial_deviations`: seeded Haar frames keyed by (seed, orbit) |
 | `orbit.jl` | `_orbit_body` (the one per-step loop), `propagate_orbit`, health status codes |
 | `propagate.jl` | `propagate`, chunking, device fallback, launch budget, provenance, `chunk_size`, `bytes_per_orbit` |
@@ -24,6 +24,8 @@ Spec: `workspaces/module-build/stages/01-spec/output/tangent-core-spec.md` (T-; 
 | `reducer_init`, `reducer_update`, `reducer_final` | reducer protocol: isbits state, update at each handoff (may replace `W`), host summary |
 | `reducer_step`, `reducer_failed`, `reducer_error` | non-throwing failure path for kernels: record in state, host raises with the orbit id (D30 patch for diagnostics) |
 | `chunk_size`, `bytes_per_orbit` | memory formula and chunk from free bytes |
+| `reducer_workspace`, `reducer_bytes` | per-orbit `UInt32` workspace a reducer asks for (default 0) and the reducer bytes of the memory formula (state plus 4 per entry) |
+| six-argument `reducer_step`/`reducer_update`, three-argument `reducer_final`, `propagate_orbit(...; workspace)` | the workspace forms; defaults forward to the old signatures, so reducers without a workspace are unchanged |
 
 ## Invariants a caller can rely on
 
@@ -40,6 +42,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/tangent-core-spec.md` (T-; 
 | The hot loop allocates nothing after warm-up | T-I8, T-AC5 |
 | A device launch stays under the 1 s budget, or the run goes to the CPU with reason 8; a lost device or out-of-memory falls back with its reason; provenance names the backend that finished | D33 amendment, D33a to D33d |
 | Exactly one per-step update implementation exists | T-AC14 |
+| The workspace is allocated once per chunk, zeroed at `n0 == 0`, carried across relaunches like the state, read back with the final; at most one reducer of a chain requests one and every reducer of the chain receives it | stretching-numbers AC11, AC12 |
 
 ## Tests and verification
 

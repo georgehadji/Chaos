@@ -124,6 +124,24 @@ Recorded lines (no threshold, never a gate; method fixed here, values go to the 
 - Specs: naff-fma (NF4 to NF6, NF13, criteria 8, 10, 15, Amendments D81, D82, F5, P4, P8, P13), lyap-benettin (L1 S2, S7), standard-map (items 9, 10, W-E6), sali (Amendment D68), rli (D77), stretching-numbers (form of the open points), experiments and tangent-core (reducer protocol, capacity formula). Layer 3: `_config/catalogs/indicators.md` (row I13, header rule), `_config/research-ideas.md` row 25, `_config/research-question.md` (C1 to C3), `_config/numerics-policy.md`, `_config/architecture.md`, `_config/build-order.md` row M4, decisions D17, D21, D24, D25, D27, D28, D31, D68, D71, D72, D77, D80, D82; `src/Indicators/CONTEXT.md`, `src/Experiments/CONTEXT.md`.
 - Derived here, not cited: WB14 to WB18, F3 (the equivalence), F5 and F6 dry runs, the tolerances, the memory formulas, the constants 16, 32, c_p, 1e3, 1e-12.
 
-## Amendments
+## Amendment D84 (2026-10-27)
 
-None yet.
+Approved by the owner at the stage 02 checkpoint (decision D84): items 1 to 5 and 7 of "Items for the owner" in the test plan (`workspaces/module-build/stages/02-tests/output/weighted-birkhoff-test-plan.md`) become this amendment; items 6 and 8 to 17 stand as the plan states them (they change no text here); R4 (sticky orbits) goes to the study spec. "Item N" is the number in the plan's list.
+
+### Changes to the base spec
+
+1. Item 1, criterion 10. A chain takes the longest run its members need: the chains with E2 run 2N + 1 handoffs (naff-fma D81 item 1). The reader's completed horizons are frozen, so the extra handoff changes no field of this reader but its counters (I4); the host check stays exact (2 max(window) handoffs) for a stand-alone run.
+2. Item 2, P6 and criterion 9. The observables are a tuple of K scalar callables of the orbit point (the kinds of P6 and any caller callable), not one function returning K values: K is carried in the type, the host check names the failing observable, and the kernel compiles. A value that is not a finite real number is the argument error naming the parameter `observables`. A caller who has one function returning K values wraps it.
+3. Item 3, invariant I5. Replaced by: Delta unclipped; absdig never above -log10 phi; reldig never above -log10(phi / m); the flag holds exactly when |Delta| <= phi. (dig, the maximum of the two, can reach -log10(32 eps) = 14.15 when m is close to S; for S = 1000 and averages of 1000 the bound -log10 phi is 11.15.)
+4. Item 4, criterion 5(a). "within 2 eps relative" is replaced by "within 2 eps max(|value|, 1)": a logarithm of an argument within a few percent of 1 cannot be matched to 2 eps relative in the element type (the argument carries an absolute eps). Criterion 1(a) is unaffected.
+5. Item 5, criterion 5(c). For S = 0 the floor phi is 0 and |Delta| = 0 <= phi, so the flags "below floor" and "zero" are both set (the literal reading of WB15); the digits are undefined and Delta = 0.
+6. Item 7, criterion 2. The premise "limit 0" is exact only to a margin: at Double64, N = 1000, w^[1], theta_0 = 1/7, the exact average of window 2 is 2.1e-32 (0.027 eps_T; 4.9e-35 is the window-1 value). The test requires the exact average to be below a tenth of the bound and then gates the bound as worded (4 eps_T = 3.2e-30).
+
+### Recorded, not changed
+
+R4 (sticky orbits) has no panel or regular-range definition in this spec and is not written here; the study spec defines it. Criteria 12(a) and 12(b) run in the package suite (the Poisson sum by BigFloat trapezoid quadrature, agreement 1e-37 against the gate 1e-18); 12(c) has nothing to test; criterion 13 is skipped without a CUDA device and runs at stage 04. The p = 2 dry-run values of criterion 4 are 1.45 to 2.06 eps S (averages) and 2.87 (Delta), not the 7.2 and 8.2 first reported; the gates (c_p eps S, 2 c_p eps S) hold with a larger margin and are not tightened.
+
+### Acceptance criteria (amendment)
+
+Criteria 2, 5 and 10 and invariant I5 read as items 1, 3 to 6 above; all others unchanged. Stage stub dry run: 611 checks pass at default sizes, 579 at spec sizes (records excluded), 25 of 25 mutations caught.
+

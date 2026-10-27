@@ -149,3 +149,7 @@ weighted-birkhoff                             |   97     29    126  5.8s
 ```
 
 The same folder against the dry-run stub: 611 Pass, 1 Broken, 0 Fail, 0 Error, 30 testsets, 34 s (above). The whole `Pkg.test` run was not repeated here: the folder is registered by the existing loop of `test/runtests.jl`, the other suites are untouched, and the only interaction is the guarded `include` of `test/lyap-benettin/lb_helpers.jl`, which the folder sorts after.
+
+## Correction after the stage 03 report (2026-10-27, owner approved)
+
+The helper `wb_case` took the `:half` starts as the first m of `lb_regular()`, which holds 50, so the record testsets at spec size (1000 starts, `WB_FULL_RUN`) raised a BoundsError in R1, R3, R6, R7 and R8. Fixed in the helper only, no testset changed: `wb_regular(m)` extends the same candidate stream and screening (X(1e5) <= 5e-4) to m starts; its first 50 equal those of `lb_regular()` (checked, m = 60).

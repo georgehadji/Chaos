@@ -159,12 +159,33 @@ function wb_states_tau(sys, z0, n::Integer, tau::Integer)
     return out
 end
 
+# The regular class of L1 S7 (lb_regular) extended past its 50 starts: the same candidate stream, the same screening (X(1e5) <= 5e-4, Float64, tau = 1, batches of 60), the first m regular candidates; the first 50 are those of lb_regular.
+function wb_regular(m::Int)
+    m <= 50 && return lb_regular()
+    return get!(WB_CACHE, (:regular, m)) do
+        seed = LB_SEED + LB_OFF + 70
+        sys = StandardMap(0.5)
+        rng = StableRNG(seed)
+        cands = SVector{2, Float64}[]
+        ok = Int[]
+        while length(ok) < m
+            lo = length(cands) + 1
+            append!(cands, lb_starts(rng, 60))
+            W0 = [initial_deviations(seed, c, Val(2), Val(1), Float64) for c in lo:length(cands)]
+            res = lb_run(sys, cands[lo:end], 100_000; k = 1, tau = 1, seed = seed, W0 = W0)
+            append!(ok, (lo - 1) .+ findall(<=(5.0e-4), [f[1].lambda[1] for f in res.finals]))
+        end
+        keep = ok[1:m]
+        (ids = keep, starts = cands[keep], rejected = last(keep) - m, seed = seed)
+    end
+end
+
 # Regular-class and panel starts of the standard map, widened exactly into T with their wrapped state. Labels: :half (the regular class of L1 S7), :two_pi, :five, :ten, :nine, :zero.
 function wb_case(label::Symbol, ::Type{T}, m::Int, seedsub::Int) where {T}
     return get!(WB_CACHE, (:case, label, T, m, seedsub)) do
         sys = WrappedStandardMap(wb_K(T, label))
         if label === :half
-            r = lb_regular()
+            r = wb_regular(m)
             ids, starts, fseed = r.ids[1:m], r.starts[1:m], r.seed
         else
             fseed = wb_seed(0, seedsub)

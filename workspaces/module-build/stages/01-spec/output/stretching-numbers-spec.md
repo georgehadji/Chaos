@@ -155,3 +155,14 @@ Items 1 to 9 of "Items for the owner" in `stages/02-tests/output/stretching-numb
 - P9: `propagate` finals hold the count matrix (8 (B + 2) bytes per orbit); the Experiments recorder consumes chunk by chunk (obligation recorded in the Experiments CONTEXT at stage 05).
 
 Stage 03 hint (not a criterion): the cell index in the hot loop must not call `floor(Int, ...)` on a double-double value (it allocates).
+
+## Stage 04 notes (2026-10-27)
+
+Accepted with the verification report (`../../04-verify/output/stretching-numbers-verification.md`), Amendments D78 and D79 included.
+
+- R1 and F5: in 2D, D falls as 1/Z in all classes (log-log slope median -0.996 for the regular class, -1 for the chaotic ones); the classes differ by a level at equal Z, not by a limit. At n = 1e4, B = 1000: median D 0.0389 for K = 0.5 (regular class) against 0.00363, 0.00439 and 0.00272 for K = 2 pi, 5 and 10; the D times Z ranges (5 to 95 percent) 263 to 1635 against 27 to 73 do not overlap; 0 to 1.6 percent of chaotic orbits have D above the regular median.
+- R2: the regular to chaotic ratio of the median D is about one order of magnitude (5 to 21 over all variations of cells, tau and vector pair), not the two orders printed for the 4D map in Maffione2011a p.20; the interval changes no value (it fixes only the evaluation handoffs).
+- Criteria 14 and 15: the ChaosTools orbits are bitwise equal to the module's, the counts equal in every cell in all 4120 comparisons, D within 0.136 of the bound and the local growth line within 0.317.
+- Criterion 16: the Float64 device kernel with the workspace compiles and runs (12 PASS, 0 FAIL), 1.25 to 2 times faster than the 4-thread CPU; Double64 kernel does not compile (3 FALLBACK, allowed form).
+- Review: no CRITICAL or HIGH; finding 1 (4-byte count wrap past 10^9 handoffs) fixed in the reducer; limits recorded: edge ties follow the rounding of the cell width, the provenance cell width is in the range type, std resolves about sqrt(eps), and the Experiments paths do not allocate the workspace yet (obligation in `src/Experiments/CONTEXT.md`).
+- Sources not read: Voglis1994, Voglis1999, Contopoulos2002, PikovskyPoliti2016, Haller2001, Shadden2005 (P11: the owner may supply Voglis1999 and Voglis1994).

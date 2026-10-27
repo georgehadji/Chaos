@@ -38,7 +38,7 @@ Shared step: propagate k tangent vectors, every `tau` steps factor W = Q R, accu
 | L11 | Rangarajan-Habib-Ryne parametrization (no rescaling, no reorthonormalization) | full spectrum | parametrization singularities; derived ODEs per dimension | Rangarajan1998 | M5 (catalog only) | planned |
 | L12 | Covariant Lyapunov vectors (Ginelli forward QR + backward upper-triangular iteration) | CLVs, local exponents, tangencies | memory for stored R factors; checkpointing | Ginelli2007, WolfeSamelson2007, KuptsovParlitz2012 | M5 | planned |
 | L12b | Oseledets vectors via wedge-product SVD / dichotomy projectors (comparative study of CLV algorithms) | CLVs | cost, stability ranking per Froyland2013 | Froyland2013 | M5 (one variant as cross-check of L12) | planned |
-| L13 | Finite-time LE distributions / stretching numbers / local exponents | variability of local stretching | window length dependence | Voglis1994, PikovskyPoliti2016 | M4 | planned |
+| L13 | Finite-time LE distributions / stretching numbers / local exponents | variability of local stretching | window length dependence (tau sets the window; the mean of the stretching numbers is the L1 value for every tau, spectrum width grows as tau shrinks) | Voglis1994 (not read), PikovskyPoliti2016 (not read) | M4 | verified (distribution, mean and second moment of one orbit's stretching numbers, from the stretching-numbers reducer; no FTLE field, L14) |
 | L14 | FTLE fields (grid of finite-time lambda_1) | phase-space maps, transport barriers | horizon choice | Haller2001, Shadden2005 | M4 | planned |
 
 ## D. Data-driven (time series only, no tangent map)

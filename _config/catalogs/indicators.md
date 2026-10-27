@@ -30,7 +30,7 @@ Layer 3, canonical. `Status` is `planned` or `verified`; only module-build/05 wr
 | I14 | Reversibility error method (REM) | sensitivity via forward-backward error | precision-dependent by design | Panichi2017 | M4 | planned |
 | I15 | 0-1 test for chaos | K statistic -> 0 or 1 | sampling, regular orbits in conservative systems | GottwaldMelbourne2004 | M6 | planned |
 | I16 | Recurrence quantification (RQA) | recurrence structure | threshold epsilon | Marwan2007 | M6 (catalog only) | planned |
-| I17 | Lagrangian descriptors | phase-space structure | integration horizon | Mancho2013 | catalog only | planned |
+| I17 | Lagrangian descriptors | phase-space structure | integration horizon; candidate single-trajectory variant: time-averaged arclength Omega, no variational equations, finite-time fluctuation scaling tau^-1 (quasiperiodic) against tau^-1/2 (mixing chaos), flows only in the source, SALI as reference (not yet read in full) | Mancho2013, JimenezLopezGarciaGarrido2026b | catalog only | planned |
 | I18 | ML classifiers on short orbits | learned classification | data leakage, generalization | Celletti2022 | catalog only | planned |
 
 Implementation: NAFF, FMA (windows, D_T, grids) and time-frequency analysis are written in Julia (FFTW.jl) because the core is Julia. Oracles via HDF5 on the Python side: `nafflib` (xsuite / CERN, 2.1.1, Apache-2.0), `PyNAFF` (1.2.0) and REBOUND's `frequency_analysis` (MFT); celmech also ships an FMFT routine.

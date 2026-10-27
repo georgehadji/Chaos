@@ -13,7 +13,7 @@ CHILD || @eval using CUDA
 
 const SEED = 20261012
 const ROOT = normpath(joinpath(@__DIR__, ".."))
-# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli, stretching) runs only those sections; the
+# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli, stretching, naff) runs only those sections; the
 # default runs everything. Skipping "record" needs an existing data/gpu-benchmark.toml for the launch budget.
 const ONLY = get(ENV, "GPU_ONLY", "")
 want(tag) = isempty(ONLY) || tag in strip.(split(ONLY, ','))
@@ -1847,6 +1847,198 @@ want("stretching") && let
         xT = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:nreg]
         sn_d16("K=10 chaotic class", T, 10.0, xT, parse(Int, get(ENV, "GPU_SNC_N", string(10^4))); chaotic = true)
     end
+end
+
+# ------------------------------------------------------------------------------------------------ AC15 (naff-fma), tag "naff"
+# Spec criterion 15 of naff-fma-spec.md, the D68 form (the bound B_E2 of criterion 10(d) applies per backend; the GPU and the CPU do not produce the same orbit, so each backend is compared with a BigFloat
+# reference formed at its own realized samples). WeightedPhaseAdvance reader (E2: window N = 1000, LiftedAngleObservable(1, 3), exponential weight) chained before Benettin() (the replacer that renormalises
+# the one column; k = 1) on WrappedStandardMap, tau = 1, 2N + 1 = 2001 handoffs; Float64 on the GPU (a FALLBACK with its reason is the pass for Double64 if the kernel does not compile; a compiler error of
+# the Float64 kernel is a FAIL and a finding). Classes: regular K = 0.5 (S7 screening, regular_starts), 1024 orbits; chaotic K = 10, 1024 orbits. (a) each backend against NF6 evaluated at 512 bits at that
+# backend's own realized lifted increments (the GPU orbit is read with the trace kernel of the rli section, full state, its final state checked bitwise against the propagate result): every orbit's two
+# frequencies within B_E2 = 8 eps (1 + max |Delta_j| / (2 pi)). (b) CPU-GPU gap only on the orbits whose final states differ by at most 1e-9 in every coordinate: |nu_cpu - nu_gpu| <= B_cpu + B_gpu; their
+# number and the number of other orbits are reported. (c) The series path: the E1 transform (frequency_map, window order 1, exp(i q) with the window means removed in BigFloat and rounded once) applied to the
+# series recorded on the device (1024 regular-class orbits, N = 1000, Float64) against the BigFloat(256) stationary point of that same series (nf_compare_window: 16 eps; coarse bin or tie); the device series
+# against the CPU series is reported (bitwise equal orbits, orbits within 1e-9 at the last sample). GPU_NF_M, GPU_NF_N shrink the orbit count and N (debugging aid; the default is the spec size).
+MODTAG[] = "naff-fma: "
+want("naff") && include(joinpath(ROOT, "test", "naff-fma", "nf_helpers.jl"))   # nf_*: BigFloat reference nf_E2_ref / nf_stat_ref / nf_compare_window, nf_lifted_incr_big, nf_BE2
+naff_red(N) = WeightedPhaseAdvance(; window = N, observable = LiftedAngleObservable(1, 3))
+naff_est(sys, x0, N, b; chunk = nothing) = propagate(sys, x0, 2N + 1; k = 1, tau = 1, seed = SEED, reducers = (naff_red(N), Benettin()), backend = b, chunk = chunk)
+naff_cis(z) = complex(cos(z[1]), sin(z[1]))
+# Device states at the handoffs 1..n (after steps 1..n): the trace gives the state before step i, so handoff h is column h + 1 and the last one is the final state.
+function naff_dev_states(sys, x0, n)
+    P, XN = r15_trace(sys, x0, n, r15_id)
+    return [(v = P[j, 2:n]; push!(v, XN[j]); v) for j in eachindex(x0)], XN
+end
+
+function naff_d15(tag, T, Kt, xT, N)
+    m = length(xT)
+    n = 2N + 1
+    lab = "$tag, $T, $m orbits, N=$N ($n handoffs), tau=1"
+    sys = WrappedStandardMap(exact(T, Kt))
+    xW = [torus_state(x) for x in xT]
+    gpu = try
+        naff_est(sys, xW, N, :gpu; chunk = AC13_GPU_CHUNK)
+    catch e
+        return row("AC15a", "$lab: GPU kernel of the E2 reader chain compiles and runs", sprint(showerror, e)[1:min(end, 3000)], "compiles", "FAIL")
+    end
+    why = gpu_why(gpu)
+    why === nothing || return row("AC15a", "$lab: each backend against its own BigFloat reference", "-", "<= B_E2", fb(why))
+    cpu = naff_est(sys, xW, N, :cpu)
+    Sg, XN = naff_dev_states(sys, xW, n)
+    same_g = [XN[j] == gpu.x[j] for j in 1:m]
+    wh = setprecision(BigFloat, 512) do
+        w = [nf_wb(BigFloat(j) / N) for j in 0:(N - 1)]
+        w ./ sum(w)
+    end
+    function ref(states)
+        incr = nf_lifted_incr_big(states)
+        nus = setprecision(BigFloat, 512) do
+            tp = 2 * BigFloat(pi)
+            (sum(wh[k] * incr[k] for k in 1:N) / tp, sum(wh[k] * incr[N + k] for k in 1:N) / tp)
+        end
+        return nus, nf_BE2(T, incr)
+    end
+    rc = Vector{Any}(undef, m); rg = Vector{Any}(undef, m)
+    same_c = zeros(Bool, m)
+    Threads.@threads :dynamic for j in 1:m
+        sc = nf_states(sys, xW[j], n)
+        same_c[j] = sc[end] == cpu.x[j]
+        for (R, st, res) in ((rc, sc, cpu), (rg, Sg[j], gpu))
+            (rf, B) = ref(st)
+            f = res.finals[j][1]
+            nu = (nf_big(f.nu1[1]), nf_big(f.nu2[1]))
+            e = [Float64(abs(nu[1] - rf[1])), Float64(abs(nu[2] - rf[2]))]
+            R[j] = (e = e, B = B, nu = nu, ratio = maximum(e) / B)
+        end
+    end
+    row("AC15a", "$lab: the reference orbit reproduces the backend's final state bitwise, CPU / GPU (GPU orbit from the device trace kernel)", "$(count(same_c)) / $(count(same_g)) of $m", "$m / $m", "INFO")
+    for (nm, R, res) in (("cpu", rc, cpu), ("gpu", rg, gpu))
+        bad = count(x -> x.ratio > 1, R)
+        row("AC15a", "$lab: backend $nm (provenance $(res.provenance.backend)): orbits with a frequency (either window) outside B_E2 of its own BigFloat evaluation of NF6 at the backend's realized samples (of $m)", bad, "0", pf(bad == 0))
+        row("AC15a", "$lab: backend $nm: max |nu - nu_ref| / B_E2 over $m orbits and both windows (median over orbits $(fmt(rmed([x.ratio for x in R]))))", maximum(x.ratio for x in R), "<= 1", pf(maximum(x.ratio for x in R) <= 1))
+    end
+    dx = [maximum(abs.(cpu.x[j] - gpu.x[j])) for j in 1:m]
+    agree = findall(<=(1e-9), dx)
+    row("AC15b", "$lab: orbits with final states apart by more than 1e-9 in some coordinate, CPU vs GPU (bitwise equal: $(count(==(0), dx)); median |dx| $(fmt(rmed(dx))), max $(fmt(maximum(dx))))", count(>(1e-9), dx), "reported", "INFO")
+    row("AC15b", "$lab: orbits that enter part (b) (final states within 1e-9 in every coordinate)", length(agree), "reported", "INFO")
+    if !isempty(agree)
+        g = [maximum(Float64(abs(rc[j].nu[k] - rg[j].nu[k])) for k in 1:2) / (rc[j].B + rg[j].B) for j in agree]
+        row("AC15b", "$lab: orbits that agree: max |nu_cpu - nu_gpu| / (B_E2,cpu + B_E2,gpu) over both windows ($(length(agree)) orbits; median $(fmt(rmed(g))))", maximum(g), "<= 1", pf(maximum(g) <= 1))
+    end
+    allgap = [maximum(Float64(abs(rc[j].nu[k] - rg[j].nu[k])) for k in 1:2) for j in 1:m]
+    # diagnosis of the gap (reported): the two backends read different orbits (final states apart by dx), so the gap contains the frequency change between nearby orbits, which B_E2 does not bound;
+    # the algebra alone is gated on IDENTICAL samples: the device reducer against the pure function weighted_phase_frequency (CPU) on the device samples, |difference| <= B_E2,gpu + B_E2,pure.
+    if !isempty(agree)
+        gd = [allgap[j] / dx[j] for j in agree if dx[j] > 0]
+        tight = [j for j in agree if dx[j] <= 1e-11]
+        row("AC15b", "$lab: reported: max gap / final-state distance dx over the $(length(agree)) agreeing orbits (the frequency sensitivity to the orbit difference); orbits with dx <= 1e-11 and the max gap ratio to B_cpu + B_gpu among them", "$(fmt(maximum(gd))); $(length(tight)); $(isempty(tight) ? NaN : fmt(maximum(allgap[j] / (rc[j].B + rg[j].B) for j in tight)))", "reported", "INFO")
+    end
+    ss = Vector{Float64}(undef, m)
+    Threads.@threads :dynamic for j in 1:m
+        pure = weighted_phase_frequency(nf_lifted_incr(Sg[j]), N)
+        ss[j] = maximum(Float64(abs(nf_big(pure[k]) - rg[j].nu[k])) for k in 1:2) / (2 * rg[j].B)
+    end
+    row("AC15b", "$lab: same samples, algebra only: max over $m orbits and both windows of |nu_gpu reducer - nu_cpu pure function on the device samples| / (2 B_E2) (median $(fmt(rmed(ss))))", maximum(ss), "<= 1", pf(maximum(ss) <= 1))
+    row("AC15b", "$lab: reported, not gated: |nu_cpu - nu_gpu| over all orbits and both windows: median / max (cycles per sample)", "$(fmt(rmed(allgap))) / $(fmt(maximum(allgap)))", "reported", "INFO")
+end
+
+# (c) the series path on the device: E1 on the exp(i q) series recorded by the trace kernel (Float64, regular class).
+const NAFF_CNT_LOCK = ReentrantLock()
+function naff_e1_device(tag, xT, N)
+    m = length(xT)
+    lab = "$tag, Float64, $m orbits, N=$N, window order 1, exp(i q) with the window means removed"
+    sys = WrappedStandardMap(exact(Float64, 0.5))
+    xW = [torus_state(x) for x in xT]
+    Sg, XN = try
+        naff_dev_states(sys, xW, 2N)
+    catch e
+        return row("AC15c", "$lab: device trace kernel compiles and runs", sprint(showerror, e)[1:min(end, 3000)], "compiles", "FAIL")
+    end
+    cnt = Dict(:ok => 0, :tie => 0, :nonunique => 0, :binfail => 0, :nufail => 0)
+    errs = fill(NaN, m, 2)
+    same = zeros(Bool, m); near = zeros(Bool, m)
+    Threads.@threads :dynamic for j in 1:m
+        sc = nf_states(sys, xW[j], 2N)
+        same[j] = all(sc .== Sg[j]); near[j] = maximum(abs.(sc[end] - Sg[j][end])) <= 1e-9
+        zb = Complex{BigFloat}[nf_big(naff_cis(s)) for s in Sg[j]]
+        z = nf_series(Float64, nf_demean_big(zb, N))
+        fm = frequency_map(z, N)
+        for (k, (w, zw)) in enumerate(((fm.w1[1], z[1:N]), (fm.w2[1], z[(N + 1):(2N)])))
+            s, e = nf_compare_window(Float64, zw, w, 1, :half, 8)
+            errs[j, k] = e
+            lock(NAFF_CNT_LOCK) do
+                cnt[s] += 1
+            end
+        end
+    end
+    bad = cnt[:binfail] + cnt[:nufail]
+    row("AC15c", "$lab: windows by status against the BigFloat(256) stationary point of the same series (ok / tie within 64 eps of Float64 / non-unique reference, listed / bin fail / frequency fail)", "$(cnt[:ok]) / $(cnt[:tie]) / $(cnt[:nonunique]) / $(cnt[:binfail]) / $(cnt[:nufail]) of $(2m)", "0 fail", pf(bad == 0))
+    fin = filter(isfinite, vec(errs))
+    row("AC15c", "$lab: max frequency error against the stationary point / 16 eps (windows with a unique reference, $(length(fin)))", isempty(fin) ? NaN : maximum(fin) / (16 * epsf(Float64)), "<= 1", pf(isempty(fin) || maximum(fin) <= 16 * epsf(Float64)))
+    row("AC15c", "$lab: device series against the CPU series: orbits bitwise equal over all $(2N) samples / equal in the last sample within 1e-9 (reported, recorder agreement D54 not restated)", "$(count(same)) / $(count(near)) of $m", "reported", "INFO")
+end
+
+# R5 on the device: the E2 reader against the stream alone, and the orbit pass of the series path (device trace of exp(i q), read back to the host) per orbit, at N in {1e3, 1e4, 1e5}, K = 2 pi, wrapped.
+function naff_timing()
+    sys0 = WrappedStandardMap(2pi)
+    for (N, norb, ntr) in ((1000, 20_000, 1024), (10_000, 4_000, 512), (100_000, 400, 64))
+        n = 2N + 1
+        rng = StableRNG(SEED + 15)
+        xw = [torus_state(SVector{2,Float64}(2pi * rand(rng), 2pi * rand(rng))) for _ in 1:norb]
+        cases = (("stream alone (Benettin, k = 1)", (b, c) -> propagate(sys0, xw, n; k = 1, tau = 1, seed = SEED, reducers = (Benettin(),), backend = b, chunk = c)),
+                 ("E2 reader + Benettin (k = 1)", (b, c) -> propagate(sys0, xw, n; k = 1, tau = 1, seed = SEED, reducers = (naff_red(N), Benettin()), backend = b, chunk = c)))
+        for (nm, run) in cases
+            cpu_t = gpu_t = Inf
+            prov = nothing
+            try
+                run(:gpu, AC13_GPU_CHUNK)
+                for _ in 1:3
+                    t = @elapsed res = run(:gpu, AC13_GPU_CHUNK)
+                    prov = res.provenance
+                    gpu_t = min(gpu_t, t)
+                end
+            catch e
+                row("AC15", "$nm, N=$N: kernel on the device compile / run error", sprint(showerror, e)[1:min(end, 1500)], "compiles", "FAIL")
+                continue
+            end
+            run(:cpu, nothing)
+            for _ in 1:2
+                cpu_t = min(cpu_t, @elapsed run(:cpu, nothing))
+            end
+            steps = norb * n
+            row("AC15", "R5 $nm (provenance backend $(prov.backend)); N=$N, $norb orbits x $n steps, K = 2 pi, wrapped, tau = 1: GPU $(fmt(gpu_t / steps * 1e9)) ns/orbit-step ($(fmt(gpu_t / norb)) s per orbit), CPU ($(Threads.nthreads()) threads) $(fmt(cpu_t / steps * 1e9)) ns/orbit-step, speedup $(fmt(cpu_t / gpu_t))",
+                prov.backend === :gpu ? gpu_t / steps * 1e9 : NaN, "recorded", prov.backend === :gpu ? "INFO" : fb(prov.backend_fallback_reason))
+        end
+        xt = xw[1:ntr]
+        try
+            r15_trace(sys0, xt, 2N, naff_cis; chunk = 2000)
+            t = minimum(@elapsed(r15_trace(sys0, xt, 2N, naff_cis; chunk = 2000)) for _ in 1:2)
+            row("AC15", "R5 E1 orbit pass on the device (trace kernel writing exp(i q) at 2N = $(2N) handoffs, read back to the host): N=$N, $ntr orbits: seconds per orbit; ns per orbit-step", "$(fmt(t / ntr)); $(fmt(t / (ntr * 2N) * 1e9))", "recorded", "INFO")
+        catch e
+            row("AC15", "R5 E1 orbit pass on the device, N=$N: trace kernel error", sprint(showerror, e)[1:min(end, 1500)], "runs", "FAIL")
+        end
+    end
+end
+
+want("naff") && let
+    naff_timing()
+    nreg = parse(Int, get(ENV, "GPU_NF_M", "1024"))
+    x0, ncand, nrep = regular_starts(nreg)
+    N = parse(Int, get(ENV, "GPU_NF_N", "1000"))
+    for T in (Float64, Double64)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC15a", "K=0.5 regular class, $T, N=$N: each backend against its own BigFloat reference", "-", "<= B_E2", fb(reason)); continue)
+        xT = [SVector{2,T}(T(z[1]), T(z[2])) for z in x0]
+        naff_d15("K=0.5 regular class (S7: $(length(x0)) of $ncand candidates regular, $nrep replaced)", T, 0.5, xT, N)
+    end
+    for T in (Float64, Double64)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC15a", "K=10 chaotic class, $T, N=$N: each backend against its own BigFloat reference", "-", "<= B_E2", fb(reason)); continue)
+        rng = StableRNG(SEED + 50000 + 1003)
+        xT = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:nreg]
+        naff_d15("K=10 chaotic class", T, 10.0, xT, N)
+    end
+    naff_e1_device("K=0.5 regular class (S7)", [SVector{2,Float64}(z[1], z[2]) for z in x0], N)
 end
 
 counts = Dict{String,Int}()

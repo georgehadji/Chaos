@@ -91,27 +91,30 @@ function _sums(z::AbstractVector{Complex{T}}, chi::AbstractVector{T}, nu::T) whe
     return Complex(total(a0r), total(a0i)), Complex(total(a1r), total(a1i)), Complex(total(a2r), total(a2i))
 end
 
-# |phi| of the Float64 copies at nu, unnormalised: blocks of 64 samples, each restarted from the exactly reduced phase.
+# |phi| of the Float64 copies at nu, unnormalised: blocks of 32 samples, each restarted from the exactly reduced phase, the sum Neumaier-compensated
+# (a plain sum has a rounding noise above the tie tolerance from N of about 8000, so the tie of exactly symmetric spectra would be lost).
 function _abs_phi64(zf::Vector{ComplexF64}, chif::Vector{Float64}, nu::Float64)
     tp, n = 2 * pi, length(zf)
     w = cis(-tp * nu)
-    s = 0.0 + 0.0im
+    sr = si = CompensatedSum{Float64}()
     j = 0
     while j < n
-        jend = min(j + 63, n - 1)
+        jend = min(j + 31, n - 1)
         e = cis(-tp * _frac(nu, j))
         for jj in j:jend
-            s += chif[jj + 1] * zf[jj + 1] * e
+            t = chif[jj + 1] * zf[jj + 1] * e
+            sr, si = add(sr, real(t)), add(si, imag(t))
             e *= w
         end
         j = jend + 1
     end
-    return abs(s)
+    return hypot(total(sr), total(si))
 end
 
 # Coarse maximum of |phi| on the grid of M = pad N points: the transform of the zero-padded window (length the next power of two of at least
 # max(M, 8 N), so the bin spacing is at most 1/M and the scalloping loss of a peak is small) names the local maxima near the top, whose neighbouring grid points are evaluated by direct sums; the largest
-# decides, the lowest index among the values within NF_TIE_TOL wins and sets the tie flag (D81 item 7). Returns (bin, tie, spectrum).
+# decides, the lowest index among the values within NF_TIE_TOL wins and sets the tie flag (D81 item 7). Returns (bin, tie, spectrum), or `nothing`
+# if the transform is not finite.
 function _coarse(zf::Vector{ComplexF64}, chif::Vector{Float64}, pad::Int)
     N = length(zf)
     M = pad * N
@@ -122,6 +125,7 @@ function _coarse(zf::Vector{ComplexF64}, chif::Vector{Float64}, pad::Int)
     end
     spec = abs.(_fft!(a))
     top = maximum(spec)
+    (isfinite(top) && top > 0) || return nothing
     cand = [i for i in 1:L if spec[i] >= top * (1 - NF_CAND_REL) && spec[i] >= spec[mod1(i - 1, L)] && spec[i] >= spec[mod1(i + 1, L)]]
     sort!(cand; by = i -> -spec[i])
     grid = Int[]
@@ -158,8 +162,9 @@ function _second_peak(spec::Vector{Float64}, nu::Float64, excl::Float64)
     return sec
 end
 
-# Stationary point of |phi|^2 (Newton on its derivative, in the element type) within twice the bracket half-width of the coarse
-# value `nuc`; (nuc, false) if the second derivative is not negative, the iterate leaves the bracket or it does not converge (NF2).
+# Stationary point of |phi|^2 (Newton on its derivative, in the element type) in the bracket `nuc` +- h of the spec (NF2); iterates may wander to
+# twice the half-width on the way, the converged point must lie inside it. (nuc, false) if the second derivative is not negative, the iterate
+# leaves twice the bracket, the point is outside the bracket or it does not converge.
 function _stationary(z, chi, nuc::T, h::T) where {T}
     nu = nuc
     extra = -1
@@ -172,7 +177,7 @@ function _stationary(z, chi, nuc::T, h::T) where {T}
         nu -= dx
         abs(nu - nuc) > 2h && return nuc, false
         extra = extra < 0 ? (abs(dx) < 1e-9 ? 2 : -1) : extra - 1
-        extra == 0 && return nu, true
+        extra == 0 && return (abs(nu - nuc) <= h ? (nu, true) : (nuc, false))
     end
     return nuc, false
 end
@@ -203,7 +208,9 @@ function _window_result(z::Vector{Complex{T}}, p::Int, positions::Symbol, pad::I
     chi = window_weights(T, N; order = p, positions = positions)
     sumchi = _sum_weights(chi)
     zf = ComplexF64[ComplexF64(Float64(real(x)), Float64(imag(x))) for x in z]
-    bin, tie, spec = _coarse(zf, Float64.(chi), pad)
+    coarse = _coarse(zf, Float64.(chi), pad)
+    coarse === nothing && return _undefined_window(T, :failed)
+    bin, tie, spec = coarse
     nuc = -T(1) / 2 + T(bin) / T(M)
     nu, refined = _stationary(z, chi, nuc, one(T) / M)
     nu = _reduce_circle(nu)
@@ -215,6 +222,22 @@ function _window_result(z::Vector{Complex{T}}, p::Int, positions::Symbol, pad::I
     return WindowFrequency{T}(nu, amp, mamp, ratio, bin, tie, abs(nu) < (p + 1) / N, mamp > T(mirror_ratio) * amp, refined, :ok)
 end
 
+# The window scaled by an exact power of two so that its largest component lies in [1, 2) (frequency, ties and flags are scale-free; the
+# squares of the derivative sums cannot overflow or underflow); returns the scaled copy and the exponent `e` (the amplitudes scale by 2^e).
+function _rescale(z::AbstractVector{Complex{T}}) where {T}
+    m = zero(T)
+    for x in z
+        m = max(m, abs(real(x)), abs(imag(x)))
+    end
+    e = iszero(m) ? 0 : exponent(Float64(m))
+    e == 0 && return Vector{Complex{T}}(z), 0
+    return Complex{T}[Complex(ldexp(real(x), -e), ldexp(imag(x), -e)) for x in z], e
+end
+
+function _unscale(w::WindowFrequency{T}, e::Int) where {T}
+    return WindowFrequency{T}(w.nu, ldexp(w.amplitude, e), ldexp(w.mirror_amplitude, e), w.second_ratio, w.bin, w.tie, w.near_zero, w.mirror, w.refined, w.status)
+end
+
 """
     window_frequency(z; order = 1, positions = :half, pad = 8, mean_removal = false, mirror_ratio = 0.9) -> WindowFrequency
 
@@ -224,17 +247,21 @@ mean (compensated), the cosine window of order `order` ([`window_weights`](@ref)
 largest wins and sets `tie`), and the stationary point of `|phi|^2` in `[nu_c - 1/M, nu_c + 1/M]` by Newton's method in the element
 type with compensated sums and exactly reduced phases. A window that is constant after the optional mean removal and either has
 mean removal on or the constant 0 is `:degenerate` (D81 item 8); a non-finite sample gives `:failed`. Nothing is thrown for the data.
-`ArgumentError` naming `window` (fewer than `8 (order + 1)` samples), `order`, `positions`, `pad`, `mirror_ratio`, before any work.
+`ArgumentError` naming `window` (fewer than `8 (order + 1)` samples), `order`, `positions`, `pad` (below 2), `mirror_ratio`, before any work.
+The window is first scaled by an exact power of two, so samples of any finite magnitude are handled and nothing overflows; a non-finite transform
+(not reachable for finite data) gives `:failed`.
 """
 function window_frequency(z::AbstractVector{Complex{T}}; order::Integer = 1, positions::Symbol = :half, pad::Integer = 8,
                           mean_removal::Bool = false, mirror_ratio::Real = 0.9) where {T <: AbstractFloat}
     p = _check_order_positions(order, positions)
     N = length(z)
     N >= 8 * (p + 1) || throw(ArgumentError("window of $N samples is below the minimum window $(8 * (p + 1)) for order $p"))
-    pad >= 1 || throw(ArgumentError("pad must be positive, got $pad"))
+    pad >= 2 || throw(ArgumentError("pad must be at least 2 (the grid must be finer than the bin), got $pad"))
     0 < mirror_ratio <= 1 || throw(ArgumentError("mirror_ratio must be in (0, 1], got $mirror_ratio"))
     all(isfinite, z) || return _undefined_window(T, :failed)
-    zz = mean_removal ? _demean(z) : Vector{Complex{T}}(z)
+    zs, e = _rescale(z)
+    zz = mean_removal ? _demean(zs) : zs
     (mean_removal ? all(==(zz[1]), zz) : all(iszero, zz)) && return _undefined_window(T, :degenerate)
-    return _window_result(zz, p, positions, Int(pad), mirror_ratio)
+    w = _window_result(zz, p, positions, Int(pad), mirror_ratio)
+    return e == 0 ? w : _unscale(w, e)
 end

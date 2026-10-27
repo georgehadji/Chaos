@@ -349,3 +349,36 @@ Recorded lines extended or added (no threshold, never a gate; the D77 form):
 - Das2017, the published Nonlinearity 30, 4111 to 4140 (`data/literature/naff-fma/Nonlinearity-2017-30-4111_Das2017.*`): the passages of the table "Das2017: pages of the published paper", Sect. 1.1, 1.2, 2.2, 3.1 to 3.5, 3.7.1, 3.9; the rest not read. The reference list of the published paper identifies its [10] as LuqueVillanueva2014 and its [4] as Laskar1999.
 - Still not obtained, used only as reported by a held source, never by equation or page: Laskar1990, LaskarFroeschleCelletti1992, Laskar1993, Laskar1999, Gomez2010b, Simo2014, Chandre2003 (P14, S5). Items in `unverified.md` are not cited.
 - Derived here, not cited, in this amendment: the conversions of Bartolini's N samples to N increments, the cancellation of Gomez's constant against Laskar's, the leakage coefficients 12 and 192 (Eq. (63) at p = 1 converted to cycles per sample), the ranges of D81a and D81b and their tolerances, the drafting checks marked as such, the dry-run numbers of the test plan.
+
+## Amendment D82 (2026-10-27)
+
+Approved by the owner at the stage 04 checkpoint (decision D82, "yes" to the proposal in the stage 04 report `stages/04-verify/output/naff-fma-verification.md`). It restates criterion 15(b) in a form that can be gated and records the interface and practice changes of the stage 04 review fixes. Nothing else in the spec changes.
+
+### Criterion 15(b), restated
+
+As worded in the stage 04 instruction, 15(b) compared CPU and GPU frequencies on the orbits whose final states agree within 1e-9, with bound B_cpu + B_gpu. It failed on the regular class (largest ratio 17.6) because the gate has no orbit-divergence term: the two backends follow orbits that differ in state by up to 3.8e-10, and the frequency of a regular orbit moves with the orbit (shear times the action difference). Each backend alone passes B_E2 against its own BigFloat(256) evaluation (largest ratio 0.052, criterion 15 as written), so the algebra of the reducer is correct; the failure is in the formulation of the cross-backend gate. The failing row stays in the log.
+
+New 15(b), the gate: the device reducer against the CPU pure function `weighted_phase_frequency` evaluated on the same device samples (the same handoffs, read back), both windows, max over orbits of |difference| / (2 B_E2); pass if at most 1, in Float64 for both classes (K_std = 0.5 and 10, 1024 orbits, N = 1000). Measured: regular 0.033, chaotic 0.062. Implemented as the row `AC15b ... same samples, algebra only` of `verify/gpu.jl` (function `naff_d15`).
+
+Reported, not gated: the orbit-level CPU-GPU frequency gap on the orbits that agree to 1e-9 (precedent: rli D77 and the D68 form, each backend against its own reference). Double64 stays the recorded fallback (the kernel does not compile in Double64, FALLBACK rows).
+
+### Interface and practice changes (stage 04 review fixes M1 to M3 and LOW items)
+
+1. `reducer_final` of `WeightedPhaseAdvance` gives a ninth field `near_pi`: the number of planar increments that entered a window with |Delta| > 0.9 pi. The value of E2 is unchanged. Reason: a planar increment near pi is ambiguous in sign and the weighted mean then depends on the branch (spec NF4, reviewer finding M1). Lifted-angle observable: 0.
+2. `check_run(r, tau, N; d = d)` validates the observable indices against the state dimension `d` and raises an ArgumentError naming `observable`. The check is not in `reducer_init`, because a throw with string interpolation on a runtime branch makes the Float64 device kernel uncompilable (InvalidIRError). Caught by the GPU tag, not by the CPU suite.
+3. Verification practice, for every reducer that runs in a device kernel: no throw that builds a string or can allocate is reachable from `reducer_init`, `reducer_step` or `reducer_final`; argument checks live in `check_run` or in the constructor. A GPU tag rerun after each review fix is part of the stage 04 evidence.
+4. `pad >= 2` is enforced in the transform (the zero padding that the Newton bracket 1/M relies on); the bracket is 1/M.
+5. The window is scaled by an exact power of two in `window_frequency`, so the frequency is scale covariant for amplitudes from 1e-300 to 1e307; `_phase_inc` falls back to power-of-two normalised samples when the product leaves the safe range (exponent read from the bits, no `exponent` call that could throw). `_accumulate` skips a weight that is exactly 0. A non-finite transform gives `:failed`.
+6. Coarse search: compensated direct sums restarted every 32 samples. State size unchanged: 96 bytes Float64, 176 Double64 for one horizon, +64 and +128 per extra horizon.
+
+### Known limit recorded (review M4)
+
+Provenance keys collide in a chain whose members publish the same key (all reducers publish `indicator`). It is a cross-module limit of the reducer chain, not specific to this module; Experiments records the chain and its member order (obligation in `src/Experiments/CONTEXT.md`). No module change.
+
+### Acceptance criteria (amendment)
+
+Criterion 15(b) is the text above; criteria 1 to 14 and the rest of 15 are unchanged. Stage 04 evidence: folder suite 905 checks at spec sizes (895 at package sizes), package suite 1,397,452 pass, GPU tag 12 PASS, 0 FAIL after D82, 2 FALLBACK (Double64), `verify/naff-fma.jl` 14 PASS.
+
+### Sources (amendment)
+
+None added. The numbers are measurements of this stage (`stages/04-verify/output/naff-fma-verify-log.txt`, `gpu-naff-verify-log.txt`).

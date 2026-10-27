@@ -59,7 +59,7 @@ end
 
 function _check_map_args(N::Integer, p::Integer, pad::Integer, mirror_ratio::Real, floor_multiplier::Real)
     N >= 8 * (p + 1) || throw(ArgumentError("window length $N is below the minimum window $(8 * (p + 1)) for order $p"))
-    pad >= 1 || throw(ArgumentError("pad must be positive, got $pad"))
+    pad >= 2 || throw(ArgumentError("pad must be at least 2 (the grid must be finer than the bin), got $pad"))
     0 < mirror_ratio <= 1 || throw(ArgumentError("mirror_ratio must be in (0, 1], got $mirror_ratio"))
     floor_multiplier > 0 || throw(ArgumentError("floor_multiplier must be positive, got $floor_multiplier"))
     return nothing
@@ -73,7 +73,7 @@ of such series, one per plane): the [`window_frequency`](@ref) of each window, t
 `delta = sqrt(sum(dist.^2))` (NF1, unclipped) and `D = log10 max(delta, floor_multiplier eps)` with the `below_floor` flag (NF10). A series
 longer than `2N` uses its first `2N` samples. A plane with a failed or degenerate window gives no `delta` for the pair and the plane status
 names which; a non-finite sample is recorded in `failure` (the host raises, [`check_frequency_map`](@ref)). `ArgumentError` naming `window`,
-`series` (fewer than `2N` samples), `pad`, `order`, `positions`, `mirror_ratio` or `floor_multiplier`, before any work.
+`series` (fewer than `2N` samples), `pad` (below 2), `order`, `positions`, `mirror_ratio` or `floor_multiplier`, before any work.
 """
 function frequency_map(series::AbstractVector{<:AbstractVector{Complex{T}}}, N::Integer; order::Integer = 1, positions::Symbol = :half,
                        pad::Integer = 8, mean_removal::Bool = false, mirror_ratio::Real = 0.9, floor_multiplier::Real = 32) where {T <: AbstractFloat}

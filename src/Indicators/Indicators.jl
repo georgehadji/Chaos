@@ -2,7 +2,7 @@
     Indicators
 
 Chaos indicators as reducers of the tangent stream, and the pure functions behind them: the Smaller Alignment Index
-SALI (sali), the Fast Lyapunov Indicator FLI (fli), the Mean Exponential Growth factor of Nearby Orbits MEGNO (megno) and the Relative Lyapunov Indicator RLI (rli) and the stretching-number spectra with their spectral distance (stretching). Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer). The shared norm `safe_norm` is in Foundation (D69).
+SALI (sali), the Fast Lyapunov Indicator FLI (fli), the Mean Exponential Growth factor of Nearby Orbits MEGNO (megno) and the Relative Lyapunov Indicator RLI (rli), the stretching-number spectra with their spectral distance (stretching) and the frequency map analysis of an orbit series (naff: the windowed Fourier frequency, the frequency map distance and the weighted phase advance reducer). Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer). The shared norm `safe_norm` is in Foundation (D69).
 """
 module Indicators
 
@@ -15,6 +15,8 @@ import ..Tangent: reducer_init, reducer_update, reducer_final, reducer_step, red
 
 export SALI, alignment_indices, sali_pair, sali_from_log, sali_floor, check_frame, FLI, fli_unlogged, MEGNO, RLI, pair_start, pair_distance
 export StretchingNumbers, spectral_distance, spectrum_cell, spectrum_density, stretching_range, check_run
+export window_weights, window_frequency, WindowFrequency, frequency_map, FrequencyMap, check_frequency_map, circle_distance, frequency_distance, frequency_index
+export birkhoff_weight, birkhoff_weights, phase_increments, weighted_phase_frequency, WeightedPhaseAdvance, PlanarObservable, LiftedAngleObservable
 
 include("sali.jl")
 include("alignment.jl")
@@ -22,5 +24,9 @@ include("fli.jl")
 include("megno.jl")
 include("rli.jl")
 include("stretching.jl")
+include("naff_fft.jl")
+include("naff.jl")
+include("naff_map.jl")
+include("naff_reducer.jl")
 
 end

@@ -1,12 +1,9 @@
 # Indicators
 
-Chaos indicators as reducers of the tangent stream and the pure functions behind them. Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer), so the shared norm `safe_norm` comes from Foundation (D69). Built by the sali run (catalog I2) and the fli-ofli run (catalog I5, FLI only; OFLI deferred to M5); gali (I3) was deferred to M5 (D70); the megno run (catalog I8) added the MEGNO reducer; the rli run (catalog I9) added the RLI reducer, `pair_start` and `pair_distance`; the stretching-numbers run (catalog I10, L13 as the same histogram) added `StretchingNumbers` and, in Tangent, the reducer workspace.
+Chaos indicators as reducers of the tangent stream and the pure functions behind them. Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer), so the shared norm `safe_norm` comes from Foundation (D69). Runs: sali (I2), fli-ofli (I5, FLI only; OFLI to M5), megno (I8), rli (I9), stretching-numbers (I10, L13; added the reducer workspace to Tangent), naff-fma (I12, I12b: frequency map analysis of an orbit series, the one module that reads the orbit, not the deviation matrix; no Tangent change).
 
-- Spec: `workspaces/module-build/stages/01-spec/output/sali-spec.md` (A1 to A16, criteria 1 to 18; decision D66, Amendments D67 and D68). Verified: `stages/04-verify/output/sali-verification.md`. Test plan: `stages/02-tests/output/sali-test-plan.md`. Notes: `stages/03-implement/output/sali-impl-notes.md`.
-- FLI spec: `workspaces/module-build/stages/01-spec/output/fli-ofli-spec.md` (Q1 to Q13, criteria 1 to 16; decisions D71, D72). Test plan: `stages/02-tests/output/fli-ofli-test-plan.md`. Notes: `stages/03-implement/output/fli-ofli-impl-notes.md`.
-- MEGNO spec: `workspaces/module-build/stages/01-spec/output/megno-spec.md` (M1 to M13, criteria 1 to 15; decisions D73, D74). Test plan: `stages/02-tests/output/megno-test-plan.md`. Notes: `stages/03-implement/output/megno-impl-notes.md`.
-- RLI spec: `workspaces/module-build/stages/01-spec/output/rli-spec.md` (RL1 to RL13, criteria 1 to 15; decisions D75, D76, D77). Test plan: `stages/02-tests/output/rli-test-plan.md`. Notes: `stages/03-implement/output/rli-impl-notes.md`.
-- Stretching-numbers spec: `workspaces/module-build/stages/01-spec/output/stretching-numbers-spec.md` (SN1 to SN17, criteria 1 to 16; decisions D78, D79). Test plan: `stages/02-tests/output/stretching-numbers-test-plan.md`. Notes: `stages/03-implement/output/stretching-numbers-impl-notes.md`.
+- Per run, in `workspaces/module-build/stages/`: spec `01-spec/output/<run>-spec.md`, test plan `02-tests/output/<run>-test-plan.md`, notes `03-implement/output/<run>-impl-notes.md`; sali also `04-verify/output/sali-verification.md`.
+- Spec labels and decisions: sali A1 to A16, criteria 1 to 18 (D66, D67, D68); fli-ofli Q1 to Q13, 1 to 16 (D71, D72); megno M1 to M13, 1 to 15 (D73, D74); rli RL1 to RL13, 1 to 15 (D75 to D77); stretching-numbers SN1 to SN17, 1 to 16 (D78, D79); naff-fma NF1 to NF34, criteria 1 to 15, D80a to D80c, D81a, D81b (D80, D81).
 
 ## Files
 
@@ -17,6 +14,8 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 | `fli.jl` | `FLI` reducer and its isbits state `FLIState` (`k = 2`), `check_frame` (FLI method), `fli_unlogged` |
 | `megno.jl` | `MEGNO` reducer and its isbits state `MEGNOState` (`k = 2`, five compensated sums per column), `check_frame` (MEGNO method) |
 | `rli.jl` | `RLI` reducer and its isbits state `RLIState` (`k = 2`, pair frame), `check_frame` (RLI method), `pair_start`, `pair_distance` |
+| `naff_fft.jl`, `naff.jl`, `naff_map.jl` | series path (E1): radix-2 FFT for the coarse search; `window_weights`, `window_frequency` (`WindowFrequency`); `frequency_map` (`FrequencyMap`), `check_frequency_map`, `circle_distance`, `frequency_distance`, `frequency_index` |
+| `naff_reducer.jl` | E2: `birkhoff_weight(s)`, `phase_increments`, `weighted_phase_frequency`, `WeightedPhaseAdvance` with `PlanarObservable`, `LiftedAngleObservable`, state `WPAState`, `check_run` method |
 | `stretching.jl` | `StretchingNumbers` and its isbits state `StretchState` (`k = 2`, counts in the Tangent workspace), `spectral_distance`, `spectrum_cell`, `spectrum_density`, `stretching_range`, `check_run`, `check_frame` (method) |
 
 ## Exports
@@ -35,6 +34,8 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 | `pair_distance(sys, z)` | `safe_norm` of the minimal-image separation of a pair state (plain difference for other maps) |
 | `fli_unlogged(F)` | `exp(F)`, or `nothing` where the exponential overflows |
 | `StretchingNumbers(; range, bins, interval, min_per_cell, replace)` | reducer for `k = 2`: compensated log sums (bitwise L1) and of squares per column, a cumulative histogram of `z = ln(alpha)/tau` in `2 (bins + 2)` workspace counts (overflow cells never clipped); `reducer_final(r, st, ws)` adds `D`, `undersampled`, `counts`, `below`, `above` |
+| `window_frequency(z; order, positions, pad, mean_removal, mirror_ratio)`, `frequency_map(series, N; ...)` | E1: fundamental frequency of a window (cosine window of order 0 to 5, stationary point of `abs2(phi)`), of the pair `[0, N)`, `[N, 2N)` per plane; `delta`, `D = log10 max(delta, 32 eps)`, flags; nothing thrown for data, `check_frequency_map` raises |
+| `WeightedPhaseAdvance(; window, observable, birkhoff_order)` | O(1) reader for any `k >= 1` (columns pass unchanged): weighted mean phase advance of one or several horizons, `2 max(window) + 1` handoffs checked by `check_run(r, tau, N)`; final `(n, handoffs, complete, nu1, nu2, delta, D, below_floor)` |
 | `spectral_distance`, `spectrum_cell`, `spectrum_density`, `stretching_range`, `check_run`, `check_frame(r, W0)` | D from two count vectors (exact `Int` sums); the cell rule; `N_c/(k h)`; the derived range padded by `8 eps` (standard maps, 2 x 2 linear); interval and 10^9-handoff check; unit and non-parallel columns |
 
 ## Invariants a caller can rely on
@@ -54,20 +55,18 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 | MEGNO depends on `tau` (weights at the end of the window, mean over the handoffs `1..K`); the weights are formed in the element type, no 64-bit integer `n^3` | spec M12, criterion 1(v) |
 | RLI is the mean of `DL_k` over the handoffs `1..K` (not a function of `DL` at the last handoff), `0 <= DL <= 2 L_sigma`; `DL` and `RLI` are never clipped; constant tangents give exactly 0; it depends on `tau` | rli spec RL4, RL8, RL10, I1, I2 |
 | Stretching: counts sum to `k` in every column, D bitwise symmetric and in `[0, sqrt(2/h)]`, the log sums bitwise L1; a state of 104 (Float64) or 176 (Double64) bytes plus `4 (bins + 2)` per column; no allocation after warm-up; D depends on `tau`, bins and the column pair and has no threshold; at most one workspace reducer per chain | stretching spec SN4 to SN6, I1, I4, I8 |
+| naff-fma: E1 is a pure function of the series (Experiments owns the feed, spec P1 (a2), criterion 16 is the study's); E2 shares one update with `weighted_phase_frequency` (bitwise equal for the planar observable); state 96 (Float64) or 176 (Double64) bytes plus 64 or 128 per extra horizon, no workspace, no allocation after warm-up; tie tolerance 64 eps of Float64 for every type | naff-fma spec Amendments D80, D81 |
 | MEGNO state is 200 bytes in Float64 and 368 in Double64 (reducer bytes for the tangent-core memory formula); a step-chunked relaunch carries it whole | spec P9 |
 
 ## Tests and verification
 
-- Package: `test/sali/` (23 testsets, AC1 to AC15 and the API); `test/fli-ofli/` (27 testsets); `test/megno/` (26 testsets); `test/rli/` (34 testsets); `test/stretching/` (42 testsets).
+- Package: `test/sali/` (23 testsets, AC1 to AC15 and the API); `test/fli-ofli/` (27 testsets); `test/megno/` (26 testsets); `test/rli/` (34 testsets); `test/stretching/` (42 testsets); `test/naff-fma/` (35 testsets, `NF_FULL_RUN` selects the spec sizes).
 - Stage 04: `verify/sali.jl` (ChaosTools GALI_2 oracle, AC16 and AC17) and `verify/gpu.jl` (AC18).
-- Bench: `bench/sali.jl`, `bench/fli.jl`, `bench/megno.jl`, `bench/rli.jl`, `bench/stretching.jl`.
-
-## Deferred
-
-GALI_k (D70) and OFLI (flows, D71) go to M5; L14 (FTLE grids) is an Experiments product (D78).
+- Bench: `bench/sali.jl`, `bench/fli.jl`, `bench/megno.jl`, `bench/rli.jl`, `bench/stretching.jl`, `bench/naff.jl`.
 
 ## Limits
 
+- Deferred: GALI_k (D70) and OFLI (flows, D71) go to M5; L14 (FTLE grids) is an Experiments product (D78).
 - Callers that supply an initial frame must run `check_frame` on it before the stream (D67); the stream does not, and a dependent frame would read as SALI = 0.
 - `sali_from_log` loses accuracy near SALI = sqrt 2 (condition number about 1 / cos(phi), spec Amendment D68, R1); use the direct form there.
 - The computed SALI lies in [0, sqrt 2 (1 + 2 eps)] (R2). For BigFloat the floor follows the default precision at call time.
@@ -76,3 +75,4 @@ GALI_k (D70) and OFLI (flows, D71) go to M5; L14 (FTLE grids) is an Experiments 
 - MEGNO in Double64 over long lifted orbits: the log sums inherit the Double64 sin and cos floor at large lifted arguments from L1 (a factor 1.64 over 8 eps Psi_n at |x| near 1e6, K = 10); use the wrapped state there. For bounded or regular orbits Y carries about n eps / 10 absolute from the products of the weights and the increments (megno spec, stage 04 notes, R3).
 - RLI needs the caller to build the pair (`pair_start`), the block frame (column 1 = `(xi_0, 0)`, column 2 = `(0, xi_0)`) and to run `check_frame(RLI(), W0)` before the stream: only it sees a mismatched `xi_0` between the blocks. The reducer checks the pairing at every handoff (off-block entries exactly 0, else health error "pairing", D77), so a non-pair stream or a missing block frame fails at the first handoff. Use the wrapped state (lifted Float64 loses Dx = 1e-12 near |x| = 1e4, rli R8) and Dx = 1e-12 in Float64 (rli R6). `RLI(replace = false)` before `MEGNO()` or `RLI()` alone, same chain rule as above. The direction rule, seed, frame source and chain are recorded by Experiments (D76 item 6).
 - Stretching numbers: `range` is the caller's (`stretching_range(sys)` for the standard maps), the caller runs `check_run(r, tau, N)` and `check_frame(r, W0)` before the stream, and the series of D is read by calling `reducer_final(r, st, ws)` at the evaluation handoffs (no emission channel). The counts are 8 (bins + 2) bytes per orbit in every `propagate` final (8 kB at 1000 cells): the recorder must consume chunk by chunk. The 2D panel does not show the printed regular constant of D; it is not a chaos certificate (spec F5). GPU: the Float64 kernel with the workspace verified on the local GPU, Double64 kernel falls back (D68 form). Edge ties follow the rounding of the cell width, the reducer records a failure past 10^9 handoffs, and no Experiments path allocates the workspace yet.
+- naff-fma: E1 needs the series of the window pair (32 N bytes per orbit in Float64) from a feed Experiments does not have yet (obligations: naff-fma test plan, "What Experiments must supply"); the closed-form interpolation, the multi-term decomposition and the 4D map of Bazzani are not built (spec P7, NF28, NF32). A genuine tie closer than 1.4e-14 in a Double64 series is decided by the Float64 transform (D81 item 7). The index separates regular from chaotic orbits only per window pair (sticky orbits, spec F6); thresholds are pre-registered per study. A planar sample exactly at the origin makes its window undefined (`NaN`, no failure).

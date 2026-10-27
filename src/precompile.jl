@@ -29,6 +29,9 @@ using DoubleFloats: Double64
             for alg in qrs, k in (1, 2)
                 propagate(sm, x0, 8; k = k, tau = 2, seed = 1, reducers = (QRSpectrum(alg),), backend = :cpu)
             end
+            # naff-fma: the weighted phase advance reader (2 window + 1 handoffs) and the series path on one window pair
+            propagate(sm, x0, 33; k = 1, tau = 1, seed = 1, reducers = (WeightedPhaseAdvance(window = 16, observable = PlanarObservable(1, 2)),), backend = :cpu)
+            frequency_map(Complex{T}[Complex(cos(exact(T, 0.7) * j), sin(exact(T, 0.7) * j)) for j in 0:63], 32)
             propagate_shadow(sm, x0, 8; d0 = exact(T, 2.0^-20), tau = 2, seed = 1, backend = :cpu)
             # d = 4 linear map, k = 4 (the (4, 4) panel of the QR tests)
             lm = LinearSymplecticMap(block_diagonal(rotation_block(T, exact(T, 0.7)), hyperbolic_block(T, exact(T, 0.3))))

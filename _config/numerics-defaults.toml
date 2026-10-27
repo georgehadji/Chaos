@@ -10,3 +10,11 @@ orthogonality_tol = 8       # multiplier of eps(T) x k x g(method), g = 1 for RG
 pairing_residual_tol = 16   # multiplier of eps(T) x (G_max/tau + M_max), not an absolute value (diagnostics spec, Tolerances)
 det_residual_tol = 4        # multiplier of eps(T) x (1 + M), not an absolute value (diagnostics spec, Tolerances)
 # energy_error_tol =         # set by the first integrator spec
+# naff-fma spec P10 and Amendments D80, D81 (approved at the stage 01 checkpoint, D80); the module takes these as keyword defaults and does not read this file
+frequency_min_window = 16      # E2 minimum window; E1 uses 8 (window_order + 1) samples
+frequency_pad = 8              # coarse grid points per Fourier bin before the stationary-point search
+frequency_floor_multiplier = 32  # index floor delta_floor = multiplier x eps(T) (NF10)
+frequency_mirror_ratio = 0.9   # mirror flag when the mirror amplitude exceeds this fraction of the peak
+frequency_weight = "hanning"   # E1 cosine window family at the order below; E2 uses the exponential Birkhoff weight "wb_exp"
+frequency_window_order = 1     # Laskar cosine window order, accepted 0 to 5; 1 is the Hanning window
+frequency_mean_removal = true  # for the angle-like observable exp(i q) (spec P4, P10); the function keyword default is false and the choice is recorded per run

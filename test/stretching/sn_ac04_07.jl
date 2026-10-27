@@ -207,11 +207,11 @@ end
                 worst_ratio = max(worst_ratio, bound == 0 ? (eD == 0 ? 0.0 : Inf) : Float64(eD / bound))
             end
             # negative control: Float32 accumulation of the log (chaotic classes, n = 1e3, tau = 1, B = 1000, Float64)
-            if T === Float64 && label !== :half && N == 1000 && tau == 1 && B == 1000
+            if T === Float64 && label !== :half && N == minimum(p[2] for p in sn_panel()) && tau == 1 && B == 1000
                 s1 = refs[j].s1
-                S32 = cumsum(Float32.(s1 .- vcat(zero(BigFloat), s1[1:(end - 1)])))
+                S32 = cumsum(Float32.(s1 .- vcat(zero(BigFloat), s1[1:(end - 1)])))  # smallest panel N: 1e3 default, 1e4 under SN_FULL_RUN
                 z32 = Float64.(S32 .- vcat(Float32(0), S32[1:(end - 1)]))
-                e1 = env[1][1000]
+                e1 = env[1][N]
                 cnt32 = sn_hist_ref(z32, lo, hi, B)
                 viol32 += !(all(e1.Nm .<= cnt32) && all(cnt32 .<= e1.Np))
             end

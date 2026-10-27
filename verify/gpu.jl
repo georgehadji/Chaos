@@ -13,7 +13,7 @@ CHILD || @eval using CUDA
 
 const SEED = 20261012
 const ROOT = normpath(joinpath(@__DIR__, ".."))
-# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli) runs only those sections; the
+# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli, stretching) runs only those sections; the
 # default runs everything. Skipping "record" needs an existing data/gpu-benchmark.toml for the launch budget.
 const ONLY = get(ENV, "GPU_ONLY", "")
 want(tag) = isempty(ONLY) || tag in strip.(split(ONLY, ','))
@@ -1611,6 +1611,241 @@ want("rli") && let
             rli_d15("K=10 chaotic class", T, exact(T, 10), xT, nch; chaotic = true)
         end
         rli_d15("K=10 chaotic class", T, exact(T, 10), xT, 100; chaotic = true, partb = false)
+    end
+end
+
+# ------------------------------------------------------------------------------------------------ AC16 (stretching-numbers), tag "stretching"
+# Spec criterion 16 of stretching-numbers-spec.md, the D68 form (the bounds of SN14 and SN15 apply per backend; the GPU and the CPU do not produce the same orbit, so each backend is compared
+# with a BigFloat(256) reference formed at its own realized points). StretchingNumbers reducer (k = 2, chain {StretchingNumbers()}, the replacer) on WrappedStandardMap, seeded frames passed
+# as W0, tau = 1, B = 1000 over the derived range, interval 100; Float64 on the GPU (a FALLBACK with its reason is the pass for Double64 if the kernel does not compile). Classes: regular
+# K = 0.5 (S7 screening, regular_starts), 1024 orbits, n = 4e4; chaotic K = 10, 1024 orbits, n = 1e4.
+# (a) each backend against its own reference: at 65 handoffs g_k = round(n k / 64), k = 1..64, and g = 1 (one propagate call per g, the orbit is a prefix) every cell count lies in its
+# envelope N-_c <= N_c <= N+_c of SN14 (Psi_max over the grid 1..9 and 10 per decade, from the backend's own tangents; orbits with max half-width >= h/2 are counted unresolved and not gated)
+# and |D - D_ref| <= sqrt 2 (U_1 + U_2) / (g sqrt h) + 4 eps D_ref (SN15). (b) CPU-GPU gap: regular class, on the orbits whose final states differ by at most 1e-9 in every coordinate, at
+# every handoff of the grid |N_cpu,c - N_gpu,c| <= (N+ - N-)_cpu,c + (N+ - N-)_gpu,c in every cell of both columns and |D_cpu - D_gpu| <= the SN15 bounds of both backends added; the number of
+# orbits with any differing count at n and the largest per-cell difference, and the distance of the two pooled spectra (SN13) against the same-backend split-half distance, are reported, not
+# gated. The chaotic class is statistical (spec 16(b)): K = 10, n = 1e4, tau = 2, 1024 orbits, the mean of z (column 1 and 2) with the tangent-core AC12(c) tolerances (6 sigma per orbit,
+# 4 SE for the means). The GPU orbit is read with the trace kernel of the rli section (x coordinate; the tangent of the wrapped map depends on x only); its final state is checked bitwise
+# against the propagate result. GPU_SN_M, GPU_SN_N, GPU_SNC_N shrink the orbit count and the run lengths (debugging aid; the default is the spec size).
+MODTAG[] = "stretching-numbers: "
+want("stretching") && include(joinpath(ROOT, "test", "stretching", "sn_helpers.jl"))   # sn_*: BigFloat reference sn_Ref, edge certificate sn_envelope, sn_halfwidths, sn_D_ref
+sn_gest(sys, x0, W0, N, tau, b, B; chunk = nothing) = propagate(sys, x0, N; k = 2, tau = tau, seed = SEED, reducers = (sn_red(sys, B, tau),), W0 = W0, backend = b, chunk = chunk)
+
+# The reference orbit of one backend from its realized x coordinates (steps 1..N, the state before step i) and the seeded columns.
+function sn_g_ref(Kt, xs, W)
+    N = length(xs)
+    w1, w2 = SVector{2,Float64}(W[1, 1], W[2, 1]), SVector{2,Float64}(W[1, 2], W[2, 2])
+    mats = sn_mats_std(Kt, xs)
+    return sn_Ref(sn_ref_s(mats, w1, N), sn_ref_s(mats, w2, N), r15_Ms(Kt, xs), w1, w2, Dict{Tuple{Int,Int},Float64}(), Dict{Int,Vector{Float64}}())
+end
+
+# Envelope, bound and ratios of orbit j of one backend (res_g: g -> propagate result of the prefix run). Returns the envelopes for the pairwise comparison.
+function sn_g_assess(res_g, grid, j, ref, lo, hi, B, h, epsT)
+    N = length(ref.s1)
+    zs = [sn_z_from_s(ref.s1, 1), sn_z_from_s(ref.s2, 1)]
+    eps = [sn_halfwidths(ref, i, epsT, 1, N, lo, hi) for i in 1:2]
+    resolved = all(maximum(eps[i]) < Float64(h) / 2 for i in 1:2)
+    env = [sn_envelope(zs[i], eps[i], lo, hi, B, grid) for i in 1:2]
+    rC = rD = 0.0
+    ndiff = maxU = 0
+    bnd = Dict{Int,Float64}()
+    for g in grid
+        f = res_g[g].finals[j][1]
+        U = env[1][g].U + env[2][g].U
+        maxU = max(maxU, U)
+        Dref = sn_D_ref(env[1][g].N, env[2][g].N, lo, hi, B)
+        bound = setprecision(BigFloat, 256) do
+            sqrt(BigFloat(2)) * U / (g * sqrt(h)) + 4 * epsT * Dref
+        end
+        bnd[g] = Float64(bound)
+        resolved || continue
+        for i in 1:2
+            cnt = sn_cnt(f, i)
+            for c in eachindex(cnt)
+                rC = max(rC, cnt[c] >= env[i][g].Nm[c] && cnt[c] <= env[i][g].Np[c] ? 0.0 : Inf)
+            end
+        end
+        ndiff += any(sn_cnt(f, i) != env[i][g].N for i in 1:2)
+        eD = setprecision(BigFloat, 256) do
+            abs(sn_big(f.D) - Dref)
+        end
+        rD = max(rD, bound == 0 ? (eD == 0 ? 0.0 : Inf) : Float64(eD / bound))
+    end
+    return (env = env, resolved = resolved, rC = rC, rD = rD, ndiff = ndiff, maxU = maxU, bnd = bnd)
+end
+
+function sn_d16(tag, T, Kt, xT, N; chaotic = false)
+    m = length(xT)
+    lab = "$tag, $T, $m orbits, n=$(fmt(N)), tau=1, B=1000"
+    base = WrappedStandardMap(exact(T, Kt))
+    xW = [torus_state(x) for x in xT]
+    Ws = [sn_frame(SEED, j, T) for j in 1:m]
+    B = 1000
+    lo, hi = stretching_range(base)
+    h = setprecision(BigFloat, 256) do
+        (sn_big(hi) - sn_big(lo)) / B
+    end
+    grid = m15_grid(N)
+    gres = Dict{Int,Any}()
+    gres[N] = sn_gest(base, xW, Ws, N, 1, :gpu, B; chunk = AC13_GPU_CHUNK)
+    why = gpu_why(gres[N])
+    why === nothing || return row("AC16a", "$lab: each backend against its own BigFloat reference", "-", "<= 1", fb(why))
+    gpu = gres[N]
+    cpu = sn_gest(base, xW, Ws, N, 1, :cpu, B)
+    cres = Dict{Int,Any}(N => cpu)
+    for g in grid
+        g == N && continue
+        gres[g] = sn_gest(base, xW, Ws, g, 1, :gpu, B; chunk = AC13_GPU_CHUNK)
+        cres[g] = sn_gest(base, xW, Ws, g, 1, :cpu, B)
+    end
+    epsT = Float64(effective_eps(T))
+    PA, XN = r15_trace(base, xW, N, r15_x)
+    dx = [maximum(abs.(cpu.x[j] - gpu.x[j])) for j in 1:m]
+    agree = Set(findall(<=(1e-9), dx))
+    rc = Vector{Any}(undef, m); rg = Vector{Any}(undef, m); gap = Vector{Any}(undef, m)
+    same_c = zeros(Bool, m)
+    Threads.@threads :dynamic for j in 1:m
+        pts = sn_pts(base, xW[j], N)
+        same_c[j] = forward(base, pts[end]) == cpu.x[j]
+        refc = sn_g_ref(Kt, [p[1] for p in pts], Ws[j])
+        refg = sn_g_ref(Kt, PA[j, :], Ws[j])
+        ac = sn_g_assess(cres, grid, j, refc, lo, hi, B, h, epsT)
+        ag = sn_g_assess(gres, grid, j, refg, lo, hi, B, h, epsT)
+        gap[j] = nothing
+        if !chaotic && j in agree && ac.resolved && ag.resolved
+            rN = rDg = 0.0
+            for g in grid
+                fc, fg = cres[g].finals[j][1], gres[g].finals[j][1]
+                for i in 1:2
+                    ec, eg = ac.env[i][g], ag.env[i][g]
+                    cc, cg = sn_cnt(fc, i), sn_cnt(fg, i)
+                    for c in eachindex(ec.N)
+                        d = abs(cc[c] - cg[c])
+                        w = (ec.Np[c] - ec.Nm[c]) + (eg.Np[c] - eg.Nm[c])
+                        rN = max(rN, d == 0 ? 0.0 : (w == 0 ? Inf : d / w))
+                    end
+                end
+                dD = abs(Float64(fc.D) - Float64(fg.D))
+                bb = ac.bnd[g] + ag.bnd[g]
+                rDg = max(rDg, dD == 0 ? 0.0 : (bb == 0 ? Inf : dD / bb))
+            end
+            gap[j] = (rN = rN, rD = rDg)
+        end
+        rc[j] = (resolved = ac.resolved, rC = ac.rC, rD = ac.rD, ndiff = ac.ndiff, maxU = ac.maxU)
+        rg[j] = (resolved = ag.resolved, rC = ag.rC, rD = ag.rD, ndiff = ag.ndiff, maxU = ag.maxU)
+    end
+    same_g = [XN[j] == gpu.x[j] for j in 1:m]
+    row("AC16a", "$lab: the reference orbit reproduces the backend's final state bitwise, CPU / GPU (GPU orbit from the device trace kernel)", "$(count(same_c)) / $(count(same_g)) of $m", "$m / $m", "INFO")
+    for (nm, R, res) in (("cpu", rc, cpu), ("gpu", rg, gpu))
+        bad = count(x -> x.rC > 0, R)
+        row("AC16a", "$lab: backend $nm (provenance $(res.provenance.backend)): orbits with a cell count outside its envelope N- .. N+ at some of the $(length(grid)) handoffs (of $m; resolved orbits only)", bad, "0", pf(bad == 0))
+        row("AC16a", "$lab: backend $nm: max |D - D_ref| / (sqrt 2 (U1 + U2) / (g sqrt h) + 4 eps D_ref) over $m orbits and the grid handoffs (median over orbits $(fmt(rmed([x.rD for x in R]))))", maximum(x.rD for x in R), "<= 1", pf(maximum(x.rD for x in R) <= 1))
+        row("AC16a", "$lab: backend $nm: unresolved orbits (max half-width >= h/2); orbit-handoffs with counts different from the reference; largest U1 + U2", "$(count(x -> !x.resolved, R)); $(sum(x.ndiff for x in R)); $(maximum(x.maxU for x in R))", "reported", "INFO")
+    end
+    row("AC16b", "$lab: orbits with final states apart by more than 1e-9 in some coordinate, CPU vs GPU (bitwise equal: $(count(==(0), dx)); median |dx| $(fmt(rmed(dx))), max $(fmt(maximum(dx))))", count(>(1e-9), dx), "reported", "INFO")
+    chaotic && return
+    G = [g for g in gap if g !== nothing]
+    row("AC16b", "$lab: orbits that enter part (b) (final states within 1e-9 in every coordinate, both backends resolved)", length(G), "reported", "INFO")
+    if !isempty(G)
+        row("AC16b", "$lab: orbits that agree: max over cells, both columns and the grid handoffs of |N_cpu,c - N_gpu,c| / ((N+ - N-)_cpu,c + (N+ - N-)_gpu,c) ($(length(G)) orbits)", maximum(g.rN for g in G), "<= 1", pf(maximum(g.rN for g in G) <= 1))
+        row("AC16b", "$lab: orbits that agree: max |D_cpu - D_gpu| / (SN15 bound of cpu + that of gpu)", maximum(g.rD for g in G), "<= 1", pf(maximum(g.rD for g in G) <= 1))
+    end
+    # reported: count differences at n, pooled spectra (SN13) and the split-half noise reference
+    cn(res, j, i) = Int.(res.finals[j][1].counts[:, i])
+    dmax = [maximum(abs.(cn(cpu, j, 1) .- cn(gpu, j, 1))) for j in 1:m]
+    dmax2 = [maximum(abs.(cn(cpu, j, 2) .- cn(gpu, j, 2))) for j in 1:m]
+    row("AC16b", "$lab: reported, not gated: orbits with any differing count at n (column 1; column 2); largest per-cell count difference (column 1; column 2)", "$(count(>(0), dmax)); $(count(>(0), dmax2)); $(maximum(dmax)); $(maximum(dmax2))", "reported", "INFO")
+    pool(res, idx, i) = sum(cn(res, j, i) for j in idx)
+    hT = (Float64(hi) - Float64(lo)) / B
+    Dxb = spectral_distance(pool(cpu, 1:m, 1), pool(gpu, 1:m, 1), hT)
+    Dcc = spectral_distance(pool(cpu, 1:2:m, 1), pool(cpu, 2:2:m, 1), hT)
+    Dgg = spectral_distance(pool(gpu, 1:2:m, 1), pool(gpu, 2:2:m, 1), hT)
+    row("AC16b", "$lab: reported, not gated: distance D of the two pooled spectra (all $m orbits, column 1) CPU against GPU; same-backend split-half distance (odd against even orbits) CPU, GPU", "$(fmt(Dxb)); $(fmt(Dcc)); $(fmt(Dgg))", "reported", "INFO")
+end
+
+# 16(b) statistical form for the chaotic class: K = 10, n = 1e4, tau = 2, 1024 orbits, tangent-core AC12(c) tolerances on the mean of z (both columns).
+function sn_stat(T)
+    label = "(b) K=10 chaotic ensemble, $T: mean of z, 6 sigma_FT per orbit and 4 SE for the means"
+    reason = gpu_reason(T)
+    isempty(reason) || return row("AC16c", label, "-", "6 sigma; 4 SE", fb(reason))
+    rng = StableRNG(SEED + 50000 + 1003)
+    x0 = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:1024]
+    base = WrappedStandardMap(exact(T, 10))
+    xW = [torus_state(x) for x in x0]
+    Ws = [sn_frame(SEED, j, T) for j in 1:1024]
+    cpu = gpu = nothing
+    e = catchhe(() -> (cpu = sn_gest(base, xW, Ws, 10^4, 2, :cpu, 1000); gpu = sn_gest(base, xW, Ws, 10^4, 2, :gpu, 1000; chunk = AC13_GPU_CHUNK)))
+    e === nothing || return row("AC16c", "(b) K=10, $T, stretching: health error", sprint(showerror, e), "none", "FAIL")
+    why = gpu_why(gpu)
+    why === nothing || return row("AC16c", label, "-", "6 sigma; 4 SE", fb(why))
+    for col in 1:2
+        sc, sg = [Float64(f[1].mean[col]) for f in cpu.finals], [Float64(f[1].mean[col]) for f in gpu.finals]
+        sig = std(sc)
+        maxd = maximum(abs.(sc .- sg)) / sig
+        dm = abs(mean(sc) - mean(sg)) / sqrt((var(sc) + var(sg)) / length(sc))
+        row("AC16c", "(b) K=10, $T, 1024 orbits, n=1e4, tau=2, mean of z column $col: max per-orbit |cpu - gpu| / sigma_FT (sigma_FT=$(fmt(sig))); |difference of means| / SE; means cpu $(fmt(mean(sc))) gpu $(fmt(mean(sg)))", "$(fmt(maxd)); $(fmt(dm))", "6; 4", pf(maxd <= 6 && dm <= 4))
+    end
+    Dc = Float64[Float64(f[1].D) for f in cpu.finals]
+    Dg = Float64[Float64(f[1].D) for f in gpu.finals]
+    row("AC16c", "(b) K=10, $T, D at n = 1e4 (tau = 2, 5000 handoffs, under-sampled): median cpu / gpu; reported", "$(fmt(rmed(Dc))) / $(fmt(rmed(Dg)))", "reported", "INFO")
+end
+
+# Kernel compile record and R6 (GPU): time per orbit-step of the two-column stretching run against a single-orbit L1 (k = 1) and MEGNO (k = 2) run, K = 2 pi, wrapped, tau = 1, B = 100 and 1000.
+function sn_timing()
+    stsz(r, T) = sizeof(typeof(Chaoslab.reducer_init(r, T, Val(2), Val(2))))
+    sys0 = WrappedStandardMap(2pi)
+    mk(B) = StretchingNumbers(; range = stretching_range(sys0), bins = B, interval = 100)
+    row("AC16", "reducer state size in bytes (without the workspace): StretchingNumbers Float64 / Double64; workspace bytes per orbit at B = 100 / 1000 (4 (B + 2) per column, two columns)", "$(stsz(mk(100), Float64)) / $(stsz(mk(100), Double64)); $(8 * 102) / $(8 * 1002)", "reported", "INFO")
+    norb, N = 20_000, 1_000
+    rng = StableRNG(SEED + 16)
+    x0 = [SVector{2,Float64}(2pi * rand(rng), 2pi * rand(rng)) for _ in 1:norb]
+    xw = [torus_state(x) for x in x0]
+    cases = (("StretchingNumbers B = 100 (k = 2)", (b, c) -> propagate(sys0, xw, N; k = 2, tau = 1, seed = SEED, reducers = (mk(100),), backend = b, chunk = c)),
+             ("StretchingNumbers B = 1000 (k = 2)", (b, c) -> propagate(sys0, xw, N; k = 2, tau = 1, seed = SEED, reducers = (mk(1000),), backend = b, chunk = c)),
+             ("L1 single (k = 1)", (b, c) -> propagate(sys0, xw, N; k = 1, tau = 1, seed = SEED, reducers = (Benettin(),), backend = b, chunk = c)),
+             ("MEGNO single (k = 2)", (b, c) -> propagate(sys0, xw, N; k = 2, tau = 1, seed = SEED, reducers = (MEGNO(),), backend = b, chunk = c)))
+    for (nm, run) in cases
+        cpu_t = gpu_t = Inf
+        prov = nothing
+        try
+            run(:gpu, AC13_GPU_CHUNK)       # warm-up (compilation of the kernel on the full chunk shape)
+            for _ in 1:3
+                t = @elapsed res = run(:gpu, AC13_GPU_CHUNK)
+                prov = res.provenance
+                gpu_t = min(gpu_t, t)
+            end
+        catch e
+            row("AC16", "$nm kernel on the device: compile / run error", sprint(showerror, e)[1:min(end, 1500)], "compiles", "FAIL")
+            continue
+        end
+        run(:cpu, nothing)
+        for _ in 1:2
+            cpu_t = min(cpu_t, @elapsed run(:cpu, nothing))
+        end
+        steps = norb * N
+        row("AC16", "$nm kernel (provenance backend $(prov.backend)); $norb orbits x $N steps, K = 2 pi, wrapped, tau = 1: GPU $(fmt(gpu_t / steps * 1e9)) ns/orbit-step, CPU ($(Threads.nthreads()) threads) $(fmt(cpu_t / steps * 1e9)) ns/orbit-step, speedup $(fmt(cpu_t / gpu_t))",
+            prov.backend === :gpu ? gpu_t / steps * 1e9 : NaN, "recorded", prov.backend === :gpu ? "INFO" : fb(prov.backend_fallback_reason))
+    end
+end
+
+want("stretching") && let
+    sn_timing()
+    nreg = parse(Int, get(ENV, "GPU_SN_M", "1024"))
+    x0, ncand, nrep = regular_starts(nreg)
+    N = parse(Int, get(ENV, "GPU_SN_N", string(4 * 10^4)))
+    for T in (Float64, Double64)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC16a", "K=0.5 regular class, $T, n=$(fmt(N)): each backend against its own BigFloat reference", "-", "<= 1", fb(reason)); continue)
+        xT = [SVector{2,T}(T(z[1]), T(z[2])) for z in x0]
+        sn_d16("K=0.5 regular class (S7: $(length(x0)) of $ncand candidates regular, $nrep replaced)", T, 0.5, xT, N)
+    end
+    for T in (Float64, Double64)
+        sn_stat(T)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC16a", "K=10 chaotic class, $T: each backend against its own BigFloat reference", "-", "<= 1", fb(reason)); continue)
+        rng = StableRNG(SEED + 50000 + 1003)
+        xT = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:nreg]
+        sn_d16("K=10 chaotic class", T, 10.0, xT, parse(Int, get(ENV, "GPU_SNC_N", string(10^4))); chaotic = true)
     end
 end
 

@@ -63,3 +63,10 @@ So the cost of the two-column histogram stream is about the cost of L1 (+6 perce
 
 1. AC6, `@test viol32 >= 1` (`test/stretching/sn_ac04_07.jl:223`) fails with `SN_FULL_RUN = true` because its guard `N == 1000` never matches in the full panel (see above). Fix at stage 02 or stage 04: take the control at the `k = 1000` prefix of the `n = 1e4` lines, or add the `N = 1000` panel entries under `SN_FULL`.
 2. Nothing else: the plan's 22 mutation variants and the Items for the owner (1 to 9, accepted by D79) are consistent with the implementation; the code needed no change after the first run.
+
+## Stage 04 follow-up
+
+- Review finding 1 fixed in `src/Indicators/stretching.jl`: a handoff beyond 10^9 is a recorded health failure ("handoffs"); test `test/stretching/sn_limits.jl` added (folder 3476/3476).
+- D79 interval rule: the caller applies "smallest multiple of tau not below 100"; `check_run` rejects any other interval (the reducer cannot see tau, so it cannot round).
+- AC6 negative-control guard fixed at stage 04 (test plan "Corrections").
+

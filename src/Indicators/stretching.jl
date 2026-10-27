@@ -63,7 +63,8 @@ function check_run(r::StretchingNumbers, tau::Integer, N::Integer)
     return nothing
 end
 
-# `code` 0 = ok, 1 = zero or non-finite norm `value` of column `column` at handoff `step`; `n` is the last successful map step,
+# `code` 0 = ok, 1 = zero or non-finite norm `value` of column `column` at handoff `step`, 2 = more than `SN_MAX_HANDOFFS` handoffs
+# (a 4-byte count would wrap; `value` is the count reached); `n` is the last successful map step,
 # `K` the number of successful handoffs; s1, s2 the log sums of the columns, q1, q2 those of the squares.
 struct StretchState{T}
     s1::CompensatedSum{T}
@@ -77,6 +78,8 @@ struct StretchState{T}
     code::Int8
     column::Int8
 end
+
+const SN_MAX_HANDOFFS = 10^9
 
 function reducer_init(::StretchingNumbers{R}, ::Type{T}, ::Val, ::Val{k}) where {R, T, k}
     k == 2 || throw(ArgumentError("StretchingNumbers needs k = 2, got k = $k"))
@@ -127,6 +130,7 @@ function reducer_step(r::StretchingNumbers, st::StretchState{T}, n::Int, x::SVec
         return StretchState{T}(st.s1, st.s2, st.q1, st.q2, value, st.n, st.K, n, Int8(1), column), W
     end
     K = st.K + 1
+    K > SN_MAX_HANDOFFS && return StretchState{T}(st.s1, st.s2, st.q1, st.q2, T(K), st.n, st.K, n, Int8(2), Int8(0)), W
     tau, lo, hi, B = T(n ÷ K), T(r.lo), T(r.hi), r.bins
     l1, l2 = log(a1), log(a2)
     _count!(ws, 0, l1 / tau, lo, hi, B)
@@ -146,6 +150,7 @@ reducer_failed(::StretchingNumbers, st::StretchState) = st.code != 0
 
 function reducer_error(::StretchingNumbers, st::StretchState, orbit, backend)
     value = Float64(st.value)
+    st.code == 2 && return NumericalHealthError("handoffs", value, Float64(SN_MAX_HANDOFFS), st.step, orbit, backend, 0)
     return NumericalHealthError("deviation matrix", value, isfinite(value) ? 0.0 : Inf, st.step, orbit, backend, Int(st.column))
 end
 

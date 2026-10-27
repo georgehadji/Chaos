@@ -31,6 +31,11 @@ using DoubleFloats: Double64
             end
             # naff-fma: the weighted phase advance reader (2 window + 1 handoffs) and the series path on one window pair
             propagate(sm, x0, 33; k = 1, tau = 1, seed = 1, reducers = (WeightedPhaseAdvance(window = 16, observable = PlanarObservable(1, 2)),), backend = :cpu)
+            # weighted-birkhoff: the reader (K = 2 observables, H = 2 horizons, 2 max(window) handoffs) and the pure function with its index
+            wbr = WeightedBirkhoff(window = (16, 32), observables = (CosObservable(1), SinObservable(2)))
+            propagate(sm, x0, 64; k = 1, tau = 1, seed = 1, reducers = (wbr,), backend = :cpu)
+            wbf = weighted_birkhoff(T[sin(exact(T, 0.7) * j + k) for j in 0:63, k in 1:2], (16, 32))
+            birkhoff_index.(wbf.avg1, wbf.avg2, wbf.S)
             frequency_map(Complex{T}[Complex(cos(exact(T, 0.7) * j), sin(exact(T, 0.7) * j)) for j in 0:63], 32)
             propagate_shadow(sm, x0, 8; d0 = exact(T, 2.0^-20), tau = 2, seed = 1, backend = :cpu)
             # d = 4 linear map, k = 4 (the (4, 4) panel of the QR tests)

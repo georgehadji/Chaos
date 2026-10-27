@@ -7,12 +7,12 @@
 
 Weighted Birkhoff average reducer (I13, Das2017, DasYorke2018) for `propagate` with any `k >= 1`: a reader of the orbit point that returns the deviation
 matrix unchanged and replaces no column (any position in a chain; the stream still carries one deviation column). `window` is `N`, or a tuple of `N`
-for several horizons of one pass; each `N` is at least 16 (`ArgumentError` naming `window`). `observables` is a nonempty tuple of `K` isbits callables
-of the orbit point (the wrapped state of `WrappedStandardMap`, a lifted point, a plane of a block map), for example [`CosObservable`](@ref),
+for several horizons of one pass; each `N` is at least 16 (`ArgumentError` naming `window`). `observables` is a nonempty tuple of `K <= 31` isbits callables
+(a longer tuple leaves the unrolled path of the compiler: allocation, possible device compile failure) of the orbit point (the wrapped state of `WrappedStandardMap`, a lifted point, a plane of a block map), for example [`CosObservable`](@ref),
 [`SinObservable`](@ref), [`LiftedObservable`](@ref) or any function; the value is converted to the element type of the orbit (`ArgumentError` naming
 `observables`). The caller guarantees smoothness. The first handoff is the sample 0 of the series; a run has `2 max(window)` handoffs
 ([`check_run`](@ref)). Per observable and horizon: `avg = A / B` of the two windows with the weight `birkhoff_weight` of exponent `birkhoff_order`
-(`>= 1`, `ArgumentError` naming `birkhoff_order`), Neumaier sums, and the largest `abs(f)` of the `2N` samples. The state is isbits with no workspace:
+(an integer from 1 to 4, `ArgumentError` naming `birkhoff_order`: the centre weight `exp(-4^p)` underflows to 0 from `p = 5`, so `B = 0` and every average is NaN), Neumaier sums, and the largest `abs(f)` of the `2N` samples. The state is isbits with no workspace:
 `16 + sizeof(T) H (2 + 5 K)` bytes. A non-finite observable is recorded in the state as its index (kind "observable"); the host raises with the orbit id.
 
 `reducer_final` gives `(n, handoffs, complete, avg1, avg2, S, B, delta, absdig, reldig, dig, below_floor, zero)`: `n` the last handoff (map step),
@@ -30,8 +30,8 @@ end
 function WeightedBirkhoff(; window, observables, birkhoff_order::Integer = 1)
     ws = _wb_windows(window)
     p = _wb_check_order(birkhoff_order)
-    observables isa Tuple && 1 <= length(observables) <= typemax(Int16) && all(o -> isbitstype(typeof(o)), observables) ||
-        throw(ArgumentError("observables must be a nonempty tuple of at most $(typemax(Int16)) isbits callables"))
+    observables isa Tuple && 1 <= length(observables) <= WB_MAX_OBSERVABLES && all(o -> isbitstype(typeof(o)), observables) ||
+        throw(ArgumentError("observables must be a nonempty tuple of at most $WB_MAX_OBSERVABLES isbits callables"))
     return WeightedBirkhoff{length(ws), length(observables), typeof(observables)}(ws, observables, p)
 end
 
@@ -74,6 +74,8 @@ end
 
 function reducer_step(r::WeightedBirkhoff{H, K}, st::WBState{T, H, K}, n::Int, x::SVector, W::SMatrix) where {H, K, T}
     st.code == 0 || return st, W
+    # Every horizon is frozen: only the counters advance, nothing is evaluated (a non-finite value at an extra handoff, as the 2N + 1th of a chain with E2, must not abort the orbit).
+    Int(st.handoffs) >= 2 * maximum(r.window) && return WBState{T, H, K}(st.hor, n, st.handoffs < typemax(Int32) ? st.handoffs + Int32(1) : st.handoffs, Int16(0)), W
     vals = map(o -> T(o(x)), r.observables)::NTuple{K, T}
     bad = _first_nonfinite(vals)
     bad == 0 || return WBState{T, H, K}(st.hor, n, st.handoffs, Int16(bad)), W
@@ -117,11 +119,13 @@ end
 
 The caller's check before the stream (the protocol gives `reducer_init` neither `tau` nor `N`, and the kernel cannot build error messages):
 `ArgumentError` naming `window` unless `tau` divides `N` and the run has `N / tau = 2 max(window)` handoffs. With `x0`, the initial point, every observable
-is evaluated once: `ArgumentError` naming `observable` for one that throws, is not a real number or is not finite there. A chain that holds
+is evaluated once: `ArgumentError` naming `observables` for one that throws, is not a real number or is not finite there; without `x0` the observables are
+not evaluated, so a throwing observable is not caught by the check (it surfaces in the stream). `tau` below 1 is an `ArgumentError` naming `tau`. A chain that holds
 [`WeightedPhaseAdvance`](@ref) takes the longer run its members need; the frozen horizons make the extra handoff harmless, so run the check on the
 stand-alone reducer only (spec D84 item 1).
 """
 function check_run(r::WeightedBirkhoff, tau::Integer, N::Integer; x0 = nothing)
+    tau >= 1 || throw(ArgumentError("tau must be at least 1, got $tau"))
     need = 2 * maximum(r.window)
     (N % tau == 0 && N ÷ tau == need) || throw(ArgumentError("the run of $N steps at tau = $tau does not have the $need handoffs (2 window) that window = $(r.window) needs"))
     x0 === nothing && return nothing
@@ -129,9 +133,9 @@ function check_run(r::WeightedBirkhoff, tau::Integer, N::Integer; x0 = nothing)
         v = try
             o(x0)
         catch e
-            throw(ArgumentError("observable $k throws at the initial point: $(sprint(showerror, e))"))
+            throw(ArgumentError("observables[$k] throws at the initial point: $(sprint(showerror, e))"))
         end
-        (v isa Real && isfinite(v)) || throw(ArgumentError("observable $k is not a finite real number at the initial point: $v"))
+        (v isa Real && isfinite(v)) || throw(ArgumentError("observables[$k] is not a finite real number at the initial point: $v"))
     end
     return nothing
 end

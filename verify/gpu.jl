@@ -13,7 +13,7 @@ CHILD || @eval using CUDA
 
 const SEED = 20261012
 const ROOT = normpath(joinpath(@__DIR__, ".."))
-# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli, stretching, naff) runs only those sections; the
+# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli, stretching, naff, weighted-birkhoff) runs only those sections; the
 # default runs everything. Skipping "record" needs an existing data/gpu-benchmark.toml for the launch budget.
 const ONLY = get(ENV, "GPU_ONLY", "")
 want(tag) = isempty(ONLY) || tag in strip.(split(ONLY, ','))
@@ -2039,6 +2039,187 @@ want("naff") && let
         naff_d15("K=10 chaotic class", T, 10.0, xT, N)
     end
     naff_e1_device("K=0.5 regular class (S7)", [SVector{2,Float64}(z[1], z[2]) for z in x0], N)
+end
+
+# ------------------------------------------------------------------------------------------ AC13 (weighted-birkhoff), tag "weighted-birkhoff"
+# Spec criterion 13 of weighted-birkhoff-spec.md, the D68 form as amended by naff-fma D82 (each backend against a BigFloat(256) reference formed at its own realized samples; the CPU-GPU comparison gated
+# only on IDENTICAL samples; the orbit-level gap reported). WeightedBirkhoff (window N = 1000, one horizon, p = 1) chained before Benettin() (k = 1) on WrappedStandardMap, tau = 1, 2N = 2000 handoffs,
+# Float64 on the device (Double64: FALLBACK with the reason if the kernel does not compile; a compiler error of the Float64 kernel is a FAIL and a finding). Classes: K_std = 0.5 regular (S7 screening,
+# regular_starts), K_std = 10 chaotic, 1024 orbits each. Observable sets: the four trigonometric observables cos q, sin q, cos p, sin p of the spec (set "trig4") and the five of the criteria with the lifted p
+# (set "std5"). (a) each backend's windows within c_1 eps S = 4 eps S and Delta within 8 eps S of the BigFloat(256) evaluation of WB14 at that backend's own samples (the observables evaluated in BigFloat at the
+# exactly widened wrapped states; the device states from the trace kernel, checked bitwise against the propagate result). (b) the device reducer against the CPU pure function on the SAME samples,
+# two readings: (b1) the samples the device itself computed (a trace kernel writing the K observable values at each handoff, read back: the exact input of the device reducer) and (b2) the CPU evaluation of the
+# observables at the device states; gate |avg difference| <= 4 eps S, |Delta difference| <= 8 eps S for every orbit. (c) the orbit-level CPU-GPU gap of the averages is reported. (d) Double64. GPU_WB_M and
+# GPU_WB_N shrink the orbit count and N (debugging aid; the default is the spec size).
+MODTAG[] = "weighted-birkhoff: "
+want("weighted-birkhoff") && include(joinpath(ROOT, "test", "weighted-birkhoff", "wb_helpers.jl"))   # wb_*: BigFloat reference wb_ref_avgs, observable columns wb_fref_std, wb_std5, wb_series
+wbg_trig4() = (CosObservable(1), SinObservable(1), CosObservable(2), SinObservable(2))
+struct WbProj{O}     # the K observable values of a state, evaluated by the device arithmetic (the exact input of the reducer)
+    obs::O
+end
+(p::WbProj)(z) = map(o -> Float64(o(z)), p.obs)
+wbg_red(N, obs; order = 1) = WeightedBirkhoff(; window = N, observables = obs, birkhoff_order = order)
+wbg_est(sys, x0, N, b, obs; chunk = nothing) = propagate(sys, x0, 2N; k = 1, tau = 1, seed = SEED, reducers = (wbg_red(N, obs), Benettin()), backend = b, chunk = chunk)
+
+function wbg_d13(tag, name, T, Kt, xT, N, obs, ncol)
+    m = length(xT)
+    K = length(obs)
+    lab = "$tag, $name (K = $K), $T, $m orbits, N=$N ($(2N) handoffs), tau=1, p=1"
+    sys = WrappedStandardMap(exact(T, Kt))
+    xW = [torus_state(x) for x in xT]
+    gpu = try
+        wbg_est(sys, xW, N, :gpu, obs; chunk = AC13_GPU_CHUNK)
+    catch e
+        return row("AC13a", "$lab: GPU kernel of the reducer chain compiles and runs", sprint(showerror, e)[1:min(end, 3000)], "compiles", "FAIL")
+    end
+    why = gpu_why(gpu)
+    why === nothing || return row("AC13a", "$lab: each backend against its own BigFloat reference", "-", "<= 1", fb(why))
+    cpu = wbg_est(sys, xW, N, :cpu, obs)
+    Sg, XN = naff_dev_states(sys, xW, 2N)                      # device states at the handoffs 1..2N (id trace) and the final state
+    same_g = [XN[j] == gpu.x[j] for j in 1:m]
+    # the observable values computed by the device at the handoffs 1..2N: trace of 2N + 1 steps, state before step i = handoff i - 1, columns 2..2N+1
+    Pobs, _ = r15_trace(sys, xW, 2N + 1, WbProj(obs))
+    epsT = epsf(T)
+    wref = wb_wref(N, 1)                                       # fills the cache before the threaded loop
+    rc = Vector{Any}(undef, m); rg = Vector{Any}(undef, m); b1 = Vector{Any}(undef, m); b2 = Vector{Any}(undef, m)
+    same_c = zeros(Bool, m)
+    Threads.@threads :dynamic for j in 1:m
+        sc = wb_states(sys, xW[j], 2N)
+        same_c[j] = sc[end] == cpu.x[j]
+        for (R, st, res) in ((rc, sc, cpu), (rg, Sg[j], gpu))
+            fb_ = wb_fref_std(st)[:, 1:ncol]
+            f = res.finals[j][1]
+            e1 = zeros(K); e2 = zeros(K); ed = zeros(K)
+            for k in 1:K
+                ref = wb_ref_avgs(fb_[:, k], N, 1)
+                S = Float64(ref.S)
+                e1[k] = wb_err(f.avg1[k], ref.avg1) / (4 * epsT * S)
+                e2[k] = wb_err(f.avg2[k], ref.avg2) / (4 * epsT * S)
+                ed[k] = setprecision(BigFloat, 256) do
+                    Float64(abs(wb_big(f.delta[k]) - (ref.avg1 - ref.avg2))) / (8 * epsT * S)
+                end
+            end
+            R[j] = (a = max(maximum(e1), maximum(e2)), d = maximum(ed))
+        end
+        # (b1): device-computed samples; (b2): CPU observables at the device states
+        samp1 = Matrix{T}(undef, 2N, K)
+        for i in 1:2N, k in 1:K
+            samp1[i, k] = Pobs[j, i + 1][k]
+        end
+        samp2 = wb_series(obs, Sg[j])
+        f = gpu.finals[j][1]
+        for (R, samp) in ((b1, samp1), (b2, samp2))
+            g = weighted_birkhoff(samp, N)
+            ra = 0.0; rd = 0.0
+            for k in 1:K
+                S = Float64(g.S[k])
+                ra = max(ra, abs(f.avg1[k] - g.avg1[k]) / (4 * epsT * S), abs(f.avg2[k] - g.avg2[k]) / (4 * epsT * S))
+                rd = max(rd, abs(f.delta[k] - (g.avg1[k] - g.avg2[k])) / (8 * epsT * S))
+            end
+            R[j] = (a = ra, d = rd)
+        end
+    end
+    row("AC13a", "$lab: the reference orbit reproduces the backend's final state bitwise, CPU / GPU (GPU orbit from the device trace kernel)", "$(count(same_c)) / $(count(same_g)) of $m", "$m / $m", "INFO")
+    for (nm, R, res) in (("cpu", rc, cpu), ("gpu", rg, gpu))
+        ma, md = maximum(x.a for x in R), maximum(x.d for x in R)
+        row("AC13a", "$lab: backend $nm (provenance $(res.provenance.backend)): max over $m orbits, observables and both windows of |avg - avg_ref| / (4 eps S) (median over orbits $(fmt(rmed([x.a for x in R]))))", ma, "<= 1", pf(ma <= 1))
+        row("AC13a", "$lab: backend $nm: max over orbits and observables of |Delta - Delta_ref| / (8 eps S) (median $(fmt(rmed([x.d for x in R]))))", md, "<= 1", pf(md <= 1))
+        row("AC13a", "$lab: backend $nm: realized max |avg - avg_ref| in eps S (the spec's dry run: device 0.52)", ma * 4, "reported", "INFO")
+    end
+    for (nm, R) in (("b1: the samples the device computed (trace of the observable values), read back", b1), ("b2: the CPU evaluation of the observables at the device states", b2))
+        ma, md = maximum(x.a for x in R), maximum(x.d for x in R)
+        row("AC13b", "$lab: same samples $nm: device reducer against the CPU function weighted_birkhoff, max |avg difference| / (4 eps S) over $m orbits, observables and windows (median over orbits $(fmt(rmed([x.a for x in R]))))", ma, "<= 1", pf(ma <= 1))
+        row("AC13b", "$lab: same samples $nm: max |Delta difference| / (8 eps S) (median $(fmt(rmed([x.d for x in R]))))", md, "<= 1", pf(md <= 1))
+        row("AC13b", "$lab: same samples $nm: realized max |avg difference| and |Delta difference| in eps S (spec dry run: 1.0 and 1.0 regular, 0.13 chaotic)", "$(fmt(ma * 4)) / $(fmt(md * 8))", "reported", "INFO")
+    end
+    gapa = [maximum(abs.(Matrix(g[1].avg1) .- Matrix(c[1].avg1))) for (g, c) in zip(gpu.finals, cpu.finals)]
+    gapd = [maximum(abs.(Matrix(g[1].delta) .- Matrix(c[1].delta))) for (g, c) in zip(gpu.finals, cpu.finals)]
+    dx = [maximum(abs.(cpu.x[j] - gpu.x[j])) for j in 1:m]
+    row("AC13c", "$lab: reported, not gated: orbit-level CPU-GPU gap over all orbits: |avg1_cpu - avg1_gpu| median / max; |Delta| median / max; final states apart (bitwise equal: $(count(==(0), dx)); median |dx| $(fmt(rmed(dx))), max $(fmt(maximum(dx))))",
+        "$(fmt(rmed(gapa))) / $(fmt(maximum(gapa))); $(fmt(rmed(gapd))) / $(fmt(maximum(gapd)))", "reported", "INFO")
+    cm = count(f -> f[1].complete && all(isfinite, f[1].avg1) && all(isfinite, f[1].avg2) && all(isfinite, f[1].delta), gpu.finals)
+    row("AC13a", "$lab: orbits with complete and finite device finals", cm, "$m", pf(cm == m && gpu.provenance.backend === :gpu))
+end
+
+# Double64 on the device: the kernel compiles, or the recorded fallback reason is the pass.
+function wbg_d13d(Kt, N, x0)
+    sys = WrappedStandardMap(exact(Double64, Kt))
+    xW = [torus_state(SVector{2,Double64}(Double64(z[1]), Double64(z[2]))) for z in x0[1:min(64, length(x0))]]
+    reason = gpu_reason(Double64)
+    res = try
+        propagate(sys, xW, 2N; k = 1, tau = 1, seed = SEED, reducers = (wbg_red(N, wbg_trig4()), Benettin()), backend = :gpu)
+    catch e
+        return row("AC13d", "K=0.5 regular class, Double64, 64 orbits (or fewer): reducer chain on the device", sprint(showerror, e)[1:min(end, 1500)], "compiles or fallback", "FAIL")
+    end
+    if res.provenance.backend === :gpu
+        row("AC13d", "K=0.5 regular class, Double64, 64 orbits (or fewer): the Double64 reducer kernel compiled and ran on the device (probe said: '$reason')", "compiled", "compiles or fallback", "PASS")
+    else
+        cpu = propagate(sys, xW, 2N; k = 1, tau = 1, seed = SEED, reducers = (wbg_red(N, wbg_trig4()), Benettin()), backend = :cpu)
+        row("AC13d", "K=0.5 regular class, Double64, 64 orbits (or fewer): the result is the CPU result (finals bitwise equal to the :cpu run: $(isequal(res.finals, cpu.finals))), recorded fallback reason", res.provenance.backend_fallback_reason, "compiles or fallback", fb(res.provenance.backend_fallback_reason))
+    end
+end
+
+# R5 on the device: ns per orbit-step of the reader for (K, H) in {(1, 1), (4, 1), (4, 11)} against the stream alone and the E2 reader, CPU (all threads) and device, K_std = 2 pi wrapped, 2000 steps.
+function wbg_timing()
+    sys0 = WrappedStandardMap(2pi)
+    n = 2000
+    norb = parse(Int, get(ENV, "GPU_WB_TIMING_M", "20000"))
+    rng = StableRNG(SEED + 16)
+    xw = [torus_state(SVector{2,Float64}(2pi * rand(rng), 2pi * rand(rng))) for _ in 1:norb]
+    wins(H) = H == 1 ? (1000,) : (16, 32, 64, 128, 256, 400, 500, 600, 700, 800, 1000)
+    cases = Pair{String,Any}["stream alone (Benettin, k = 1)" => (Benettin(),), "E2 reader (window 1000) + Benettin" => (naff_red(1000), Benettin())]
+    for (K, H) in ((1, 1), (4, 1), (4, 11))
+        push!(cases, "WeightedBirkhoff (K, H) = ($K, $H) + Benettin" => (WeightedBirkhoff(; window = wins(H), observables = ntuple(i -> CosObservable(1, i), K)), Benettin()))
+    end
+    for (nm, rs) in cases
+        run(b, c) = propagate(sys0, xw, n; k = 1, tau = 1, seed = SEED, reducers = rs, backend = b, chunk = c)
+        cpu_t = gpu_t = Inf
+        prov = nothing
+        try
+            run(:gpu, AC13_GPU_CHUNK)
+            for _ in 1:3
+                t = @elapsed res = run(:gpu, AC13_GPU_CHUNK)
+                prov = res.provenance
+                gpu_t = min(gpu_t, t)
+            end
+        catch e
+            row("AC13", "R5 $nm: kernel on the device compile / run error", sprint(showerror, e)[1:min(end, 1500)], "compiles", "FAIL")
+            continue
+        end
+        run(:cpu, nothing)
+        for _ in 1:2
+            cpu_t = min(cpu_t, @elapsed run(:cpu, nothing))
+        end
+        steps = norb * n
+        row("AC13", "R5 $nm (provenance backend $(prov.backend)); $norb orbits x $n steps, K = 2 pi, wrapped, tau = 1: GPU $(fmt(gpu_t / steps * 1e9)) ns/orbit-step, CPU ($(Threads.nthreads()) threads) $(fmt(cpu_t / steps * 1e9)) ns/orbit-step, speedup $(fmt(cpu_t / gpu_t))",
+            prov.backend === :gpu ? gpu_t / steps * 1e9 : NaN, "recorded", prov.backend === :gpu ? "INFO" : fb(prov.backend_fallback_reason))
+    end
+end
+
+want("weighted-birkhoff") && let
+    nreg = parse(Int, get(ENV, "GPU_WB_M", "1024"))
+    N = parse(Int, get(ENV, "GPU_WB_N", "1000"))
+    x0, ncand, nrep = regular_starts(nreg)
+    sets = (("trig4", wbg_trig4(), 4), ("std5", wb_std5(), 5))
+    for T in (Float64, Double64)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC13a", "K=0.5 regular class, $T, N=$N: each backend against its own BigFloat reference", "-", "<= 1", fb(reason)); continue)
+        xT = [SVector{2,T}(T(z[1]), T(z[2])) for z in x0]
+        for (nm, obs, ncol) in sets
+            wbg_d13("K=0.5 regular class (S7: $(length(x0)) of $ncand candidates regular, $nrep replaced)", nm, T, 0.5, xT, N, obs, ncol)
+        end
+    end
+    for T in (Float64, Double64)
+        reason = gpu_reason(T)
+        isempty(reason) || (row("AC13a", "K=10 chaotic class, $T, N=$N: each backend against its own BigFloat reference", "-", "<= 1", fb(reason)); continue)
+        rng = StableRNG(SEED + 50000 + 1003)
+        xT = [SVector{2,T}(T(2pi * rand(rng)), T(2pi * rand(rng))) for _ in 1:nreg]
+        for (nm, obs, ncol) in sets
+            wbg_d13("K=10 chaotic class", nm, T, 10.0, xT, N, obs, ncol)
+        end
+    end
+    wbg_d13d(0.5, N, x0)
+    wbg_timing()
 end
 
 counts = Dict{String,Int}()

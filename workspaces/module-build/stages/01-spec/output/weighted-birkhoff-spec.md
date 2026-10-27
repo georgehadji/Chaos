@@ -145,3 +145,25 @@ R4 (sticky orbits) has no panel or regular-range definition in this spec and is 
 
 Criteria 2, 5 and 10 and invariant I5 read as items 1, 3 to 6 above; all others unchanged. Stage stub dry run: 611 checks pass at default sizes, 579 at spec sizes (records excluded), 25 of 25 mutations caught.
 
+
+## Amendment D85 (2026-10-28)
+
+Approved by the owner at the stage 04 checkpoint (decision D85), with criterion 12(b) in the quantile form (option b). Source: `workspaces/module-build/stages/04-verify/output/weighted-birkhoff-verification.md` ("Review", "Findings for the owner"). The code already behaves as items 1 to 6 state (review fixes M1, M2, L1, L2, L3, L5, uncommitted until acceptance); the text below brings the spec to the code.
+
+### Changes to the base spec
+
+1. P7, memory. "K = 1, H = 1: 72 and 112 bytes" becomes "72 and 128" (the formula 16 + sizeof(T) H (2 + 5 K) gives 128 for Double64).
+2. P7 and test plan Item 17, failure code. "K limited to 32767" becomes "K at most 31": a longer tuple leaves the unrolled path (allocation, possible device compile error). The constructor raises the argument error naming `observables`.
+3. P8 and criterion 9, order. "order below 1" becomes "order not an integer from 1 to 4": from 5 the centre weight exp(-4^p) underflows, B = 0 and the averages are NaN. Constructor and pure function raise the argument error naming `birkhoff_order`. A window total of 0 raises the argument error (`birkhoff_order` for the default weight, `weights` for a caller vector).
+4. Criterion 9, further argument errors: a non-finite value among the first 2 max(window) samples of the series (`series`); `tau` below 1 in `check_run` (`tau`). Observable messages read `observables[k]`. Without `x0` a throwing observable is not caught by `check_run`.
+5. WB15, floor. phi = max(32 eps S, floatmin(T)); m is formed as |avg1|/2 + |avg2|/2; if Delta overflows the digits are NaN (undefined, unflagged), never infinite.
+6. Invariant I4, last handoff. After 2 max(window) handoffs only the counters advance: no evaluation, no failure code (a chain with E2 runs 2N + 1 handoffs, D84 item 1).
+7. Criterion 12(b). The gate as worded (1e-12) is marginal: at N = 4000 one of 20 fresh starts gives 9.5e-13 (next 4.0e-14, median 1.3e-14). It becomes: at most 1e-12 at N = 1000; at N = 4000 the 90 percent quantile of the starts at most 1e-13 and no start above 1e-11. The package test keeps its stricter literal 1e-12 for both N (passes on its 20 starts; not edited); `verify/weighted-birkhoff.jl` reports the max and the quantile.
+
+### Recorded, not changed
+
+L4 (value field of `NumericalHealthError` is NaN for an infinite observable), L6 (provenance keys collide with E2 in a chain, no `convention` key: Experiments records the chain and each reducer's options), L8 (non-integer window or order gives InexactError or MethodError), L9 (the unnormalised sum overflows for |f| above floatmax / B: averages and digits NaN, no flag; no realistic observable of the standard map is near that range). Criterion 13(b) as worded passes (0.32 of the bound at worst); the realized same-sample difference of 1.1 to 1.3 eps S on regular orbits (spec bracket 1.0) is probably device fused multiply-add, not isolated; the gate 4 eps S stands. E2 has the same order limit (`weighted_phase_frequency` with p = 5 returns NaN); not touched here, proposed as a naff-fma follow-up.
+
+### Acceptance criteria (amendment)
+
+Criteria 9 and 12(b), invariants I4 and I5 and equation WB15 read as items 3 to 7. Stage 04 result: folder suite 716 pass, 0 fail, 1 broken (AC13, no CUDA in the process) at default and spec sizes; `wb_review.jl` 105 assertions (58 failures and 1 error on the pre-fix code); full `Pkg.test()` 1 398 168 pass, 0 fail, 1 broken; verify log 78 PASS, 0 FAIL; GPU log 36 PASS, 0 FAIL, 3 FALLBACK (Double64 kernel does not compile for the element type).

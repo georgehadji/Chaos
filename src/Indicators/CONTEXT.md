@@ -36,7 +36,7 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 | `StretchingNumbers(; range, bins, interval, min_per_cell, replace)` | reducer for `k = 2`: compensated log sums (bitwise L1) and of squares per column, a cumulative histogram of `z = ln(alpha)/tau` in `2 (bins + 2)` workspace counts (overflow cells never clipped); `reducer_final(r, st, ws)` adds `D`, `undersampled`, `counts`, `below`, `above` |
 | `window_frequency(z; order, positions, pad, mean_removal, mirror_ratio)`, `frequency_map(series, N; ...)` | E1: fundamental frequency of a window (cosine window of order 0 to 5, stationary point of `abs2(phi)`), of the pair `[0, N)`, `[N, 2N)` per plane; `delta`, `D = log10 max(delta, 32 eps)`, flags; nothing thrown for data, `check_frequency_map` raises |
 | `WeightedPhaseAdvance(; window, observable, birkhoff_order)` | O(1) reader for any `k >= 1` (columns pass unchanged): weighted mean phase advance of one or several horizons, `2 max(window) + 1` handoffs checked by `check_run(r, tau, N)`; final `(n, handoffs, complete, near_pi, nu1, nu2, delta, D, below_floor)`, `near_pi` counts planar increments with `abs(Delta) > 0.9 pi` (principal-argument bias) |
-| `WeightedBirkhoff(; window, observables, birkhoff_order)` | O(1) reader for any `k >= 1`, K observables (a tuple of isbits callables of the orbit point) over H horizons; `2 max(window)` handoffs checked by `check_run(r, tau, N; x0)`; final `(n, handoffs, complete, avg1, avg2, S, B, delta, absdig, reldig, dig, below_floor, zero)`, K x H matrices; state `16 + sizeof(T) H (2 + 5 K)` bytes; bitwise `weighted_birkhoff` on the sampled series |
+| `WeightedBirkhoff(; window, observables, birkhoff_order)` | O(1) reader for any `k >= 1`, K <= 31 observables (a tuple of isbits callables of the orbit point) over H horizons, `birkhoff_order` 1 to 4 (the centre weight underflows from 5); `2 max(window)` handoffs checked by `check_run(r, tau, N; x0)`; final `(n, handoffs, complete, avg1, avg2, S, B, delta, absdig, reldig, dig, below_floor, zero)`, K x H matrices; state `16 + sizeof(T) H (2 + 5 K)` bytes; bitwise `weighted_birkhoff` on the sampled series |
 | `spectral_distance`, `spectrum_cell`, `spectrum_density`, `stretching_range`, `check_run`, `check_frame(r, W0)` | D from two count vectors (exact `Int` sums); the cell rule; `N_c/(k h)`; the derived range padded by `8 eps` (standard maps, 2 x 2 linear); interval and 10^9-handoff check; unit and non-parallel columns |
 
 ## Invariants a caller can rely on
@@ -61,7 +61,7 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 
 ## Tests and verification
 
-- Package: `test/sali/` (23 testsets, AC1 to AC15 and the API); `test/fli-ofli/` (27 testsets); `test/megno/` (26 testsets); `test/rli/` (34 testsets); `test/stretching/` (42 testsets); `test/naff-fma/` (35 testsets, `NF_FULL_RUN` selects the spec sizes); `test/weighted-birkhoff/` (30 testsets, `WB_FULL_RUN`).
+- Package: `test/sali/` (23 testsets, AC1 to AC15 and the API); `test/fli-ofli/` (27 testsets); `test/megno/` (26 testsets); `test/rli/` (34 testsets); `test/stretching/` (42 testsets); `test/naff-fma/` (35 testsets, `NF_FULL_RUN` selects the spec sizes); `test/weighted-birkhoff/` (36 testsets, `WB_FULL_RUN`).
 - Stage 04: `verify/sali.jl` (ChaosTools GALI_2 oracle, AC16 and AC17) and `verify/gpu.jl` (AC18).
 - Bench: `bench/sali.jl`, `bench/fli.jl`, `bench/megno.jl`, `bench/rli.jl`, `bench/stretching.jl`, `bench/naff.jl`, `bench/weighted-birkhoff.jl`.
 

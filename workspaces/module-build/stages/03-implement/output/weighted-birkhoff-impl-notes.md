@@ -73,6 +73,21 @@ None in the API or the numbers. Readings the code fixes (all from the plan's Ite
 - AC13 (device testset) is skipped in the package suite (no device in the test process); the GPU smoke above covers compile and the identical-sample comparison; the D68 form with samples read back from the device kernel (trace kernel of `verify/gpu.jl`) is stage 04.
 - The observable's smoothness is the caller's; a discontinuous or non-periodic observable is accepted (R3).
 - The state is `16 + sizeof(T) H (2 + 5 K)` bytes per orbit (1.4 kB at (4, 11) in Float64); the retention decision is the study's (P10). Double64 does not run on the device.
-- `K` is limited to 32767 (an `Int16` failure code); the handoff count saturates at the `Int32` maximum, harmless since horizons freeze after `2N` handoffs.
+- `K` is limited to 31 (stage 04 follow-up; it was 32767, the `Int16` failure code) and `birkhoff_order` to 1 to 4 (stage 04 follow-up); the handoff count saturates at the `Int32` maximum, harmless since horizons freeze after `2N` handoffs.
 - A chain with E2 has `2N + 1` handoffs; `check_run` is exact for the stand-alone reducer (D84 item 1).
 - Not run here (stage 04): criterion 12 external form in `verify/`, the D68 device form of 13(a) and (b), 1 versus N threads in child processes (AC11), the records at spec size, the cost harness R5 on the device.
+
+## Stage 04 follow-up (independent review fixes, 2026-10-28)
+
+A fresh reviewer found no CRITICAL or HIGH finding. Fixes in `src/Indicators/wbirkhoff.jl` and `wbirkhoff_reducer.jl` only (uncommitted); tests in the new `test/weighted-birkhoff/wb_review.jl` (6 testsets, 105 assertions; they fail on the code before the fixes with 58 failures and 1 error) plus one `include` line in `runtests.jl`; the other test files are byte-identical to stage 02. Facts that changed (the rest of these notes stands):
+
+- M1: `birkhoff_order` must be an integer from 1 to 4 (`WB_MAX_ORDER`): the centre weight exp(-4^p) underflows from p = 5 in Float64 and Double64 (B = 0, NaN averages, no flag). The constructor and `weighted_birkhoff` raise `ArgumentError` naming `birkhoff_order`; the function also raises when the summed weight is not positive (naming `birkhoff_order` for the default weight, `weights` for a caller vector). E2 has the same limit and was not touched (finding for the owner).
+- M2: `reducer_step` does nothing but advance the counters once `2 max(window)` handoffs are done (no observable evaluation, no failure code), so a non-finite value at the extra handoff of a chain with E2 no longer aborts the orbit.
+- L1: at most 31 observables (`WB_MAX_OBSERVABLES`, `ArgumentError` naming `observables`); this replaces the 32767 limit of Item 17, and the state size formula is unchanged.
+- L2: `birkhoff_index` floors phi at `floatmin(T)` (a denormal S no longer gives infinite digits), forms m as the sum of the halves, and returns NaN digits (unflagged) when Delta overflows.
+- L3: `weighted_birkhoff` raises `ArgumentError` naming `series` for a non-finite value among the first `2 max(window)` samples.
+- L5: `check_run` requires `tau >= 1` (`ArgumentError` naming `tau`); its messages read `observables[k]`; without `x0` a throwing observable is not caught by the check (documented).
+- Results after the fixes: folder `test/weighted-birkhoff/` 716 passed, 0 failed, 1 broken (default sizes, 2 threads, 54 s; also 716 at the spec sizes, 146 s); GPU run after the fixes: the Float64 kernel compiles and runs, no regression (`verify/gpu.jl`, tag `weighted-birkhoff`); full package suite: 1 398 168 passed, 0 failed, 1 broken (14 min 18 s, `Pkg.test()`, 2 threads).
+- Not fixed, recorded in the verification report: L4 (the `NumericalHealthError` value is NaN for an Inf observable), L6 (provenance keys collide with E2 in a chain; no `convention` key), L7 (the spec text of P7 says 112 bytes for Double64 at K = 1, H = 1; the code and formula give 128: a spec typo), L8 (a non-integer window or order gives InexactError or MethodError), and a new LOW item L9 (the unnormalised sum overflows for observables above floatmax / B: NaN averages, no flag).
+- The "Requests back to stage 02" of these notes were closed at the stage 02 correction (`wb_case` helper); the records ran at the spec sizes in stage 04.
+

@@ -4,6 +4,10 @@
 
 const WB_MIN_WINDOW = NF_E2_MIN_WINDOW
 const WB_FLOOR_MULTIPLIER = 32
+# Largest Birkhoff order: the centre weight is exp(-4^p), which underflows to 0 in Float64 and Double64 (smallest normal exp(-708)) from p = 5, so B = 0.
+const WB_MAX_ORDER = 4
+# Largest number of observables of the reducer: beyond 31 the mapped tuple leaves the unrolled path of the compiler (allocation, possible device compile failure).
+const WB_MAX_OBSERVABLES = 31
 
 """
     CosObservable(i, k = 1)
@@ -65,7 +69,8 @@ function _wb_windows(window)
 end
 
 function _wb_check_order(order)
-    order >= 1 || throw(ArgumentError("birkhoff_order must be at least 1, got $order"))
+    (order isa Integer && 1 <= order <= WB_MAX_ORDER) ||
+        throw(ArgumentError("birkhoff_order must be an integer from 1 to $WB_MAX_ORDER (the centre weight exp(-4^p) underflows above), got $order"))
     return Int(order)
 end
 
@@ -105,13 +110,16 @@ observable) or an `n x K` matrix (a column per observable); `window` is `N` or a
 totals: `avg = A / B` with `A = sum w_jj f`, `B = sum w_jj` (Neumaier sums over the unnormalised weights, window 2 restarting the weight index at 0, one
 `B` for both windows) and `S` the largest `abs(f)` of the `2N` samples. The default weight is `birkhoff_weight` of exponent `order` at the mirrored
 index (`w_0 = 0`); `weights` is a vector of `N` weights used as given (one window only; equal, `t (1 - t)`, `sin^2` for the recorded lines).
-`ArgumentError` naming `window` (an `N` below 16), `birkhoff_order`, `series` (fewer than `2 max(window)` samples) or `weights`.
+`ArgumentError` naming `window` (an `N` below 16), `birkhoff_order` (not an integer from 1 to 4: the centre weight `exp(-4^p)` underflows to 0 in Float64
+and Double64 from `p = 5`; also raised when the summed default weight is 0), `series` (fewer than `2 max(window)` samples, or a non-finite value among the
+used ones) or `weights` (wrong length, or a vector that sums to 0).
 """
 function weighted_birkhoff(series::AbstractMatrix{T}, window; order::Integer = 1, weights = nothing) where {T <: AbstractFloat}
     ws = _wb_windows(window)
     p = _wb_check_order(order)
     n, K = size(series)
     n >= 2 * maximum(ws) || throw(ArgumentError("series: $n samples given, 2 window = $(2 * maximum(ws)) needed"))
+    all(isfinite, view(series, 1:(2 * maximum(ws)), :)) || throw(ArgumentError("series has a non-finite value among its first $(2 * maximum(ws)) samples"))
     weights === nothing || (length(ws) == 1 && length(weights) == ws[1]) ||
         throw(ArgumentError("weights: a vector of length window = $(ws[1]) is needed, with a single window"))
     H = length(ws)
@@ -119,6 +127,7 @@ function weighted_birkhoff(series::AbstractMatrix{T}, window; order::Integer = 1
     for (h, N) in enumerate(ws)
         w = _wb_weights(weights, N, p, T)
         B[h] = _wb_total(w)
+        B[h] > 0 || throw(ArgumentError(weights === nothing ? "birkhoff_order = $p: the summed weight is 0 in $T" : "weights sum to 0 (or less): the weight total must be positive"))
         for k in 1:K
             c = WBCell{T}()
             for j in 0:(2N - 1)
@@ -138,19 +147,24 @@ weighted_birkhoff(series::AbstractVector{<:AbstractFloat}, window; kw...) = weig
 The index of an average pair (WB15), of the type of its arguments and broadcastable over the `K x H` results: `delta = avg1 - avg2` (never clipped);
 `phi = floor_multiplier effective_eps(T) S`; `absdig = -log10 max(abs(delta), phi)`; with `m = (abs(avg1) + abs(avg2)) / 2`,
 `reldig = -log10(max(abs(delta), phi) / m)` where `m > phi` and `NaN` elsewhere; `dig = max(absdig, reldig)` where `reldig` is defined, else `absdig`;
-`below_floor = abs(delta) <= phi`. For `S = 0` the digits are `NaN` and `zero` (the observable is identically 0) is set, together with `below_floor`.
+`below_floor = abs(delta) <= phi`. The floor is at least `floatmin(T)` (a denormal `S` would otherwise give `phi = 0` and infinite digits). For `S = 0` the digits
+are `NaN` and `zero` (the observable is identically 0) is set, together with `below_floor`. The digits are also `NaN` when `delta` overflows (averages of
+opposite sign near `floatmax`); `m` is formed as `abs(avg1) / 2 + abs(avg2) / 2` so that it cannot overflow.
 `absdig` is never above `-log10 phi` and `reldig` never above `-log10(phi / m)`; `dig` can reach `-log10(32 eps)`. `ArgumentError` naming
 `floor_multiplier` unless it is positive.
 """
 function birkhoff_index(avg1::T, avg2::T, S::T; floor_multiplier::Real = WB_FLOOR_MULTIPLIER) where {T <: AbstractFloat}
     floor_multiplier > 0 || throw(ArgumentError("floor_multiplier must be positive, got $floor_multiplier"))
     delta = avg1 - avg2
-    phi = T(floor_multiplier) * effective_eps(T) * S
+    # The floor is at least floatmin: for a denormal S the product 32 eps S underflows to 0 and the digits would be infinite without a flag.
+    phi = max(T(floor_multiplier) * effective_eps(T) * S, floatmin(T))
     a = abs(delta)
     below = a <= phi
     iszero(S) && return (delta = delta, absdig = T(NaN), reldig = T(NaN), dig = T(NaN), below_floor = below, zero = true)
+    # Delta overflows (opposite averages near floatmax): the digits are undefined, not -Inf.
+    isfinite(a) || return (delta = delta, absdig = T(NaN), reldig = T(NaN), dig = T(NaN), below_floor = false, zero = false)
     e = max(a, phi)
-    m = (abs(avg1) + abs(avg2)) / 2
+    m = abs(avg1) / 2 + abs(avg2) / 2   # not (|a1| + |a2|) / 2: that sum overflows near floatmax
     absdig = -log10(e)
     reldig = m > phi ? -log10(e / m) : T(NaN)
     return (delta = delta, absdig = absdig, reldig = reldig, dig = isnan(reldig) ? absdig : max(absdig, reldig), below_floor = below, zero = false)

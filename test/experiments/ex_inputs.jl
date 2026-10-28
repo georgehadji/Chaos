@@ -148,7 +148,7 @@ end
 @testset "AC28 layering of src/Experiments" begin
     src = joinpath(@__DIR__, "..", "..", "src")
     dir = joinpath(src, "Experiments")
-    allowed_internal = ("Foundation", "Systems", "Integrators", "Tangent", "Lyapunov", "Diagnostics")
+    allowed_internal = ("Foundation", "Systems", "Integrators", "Tangent", "Lyapunov", "Diagnostics", "Indicators")   # Indicators added by Amendment D86 (D86x)
     deps = keys(TOML.parsefile(joinpath(@__DIR__, "..", "..", "Project.toml"))["deps"])
     files = isdir(dir) ? filter(endswith(".jl"), readdir(dir)) : String[]
     bad = String[]

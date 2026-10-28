@@ -28,3 +28,11 @@ include(joinpath(@__DIR__, "ex_a5.jl"))   # Amendment D56 and preregistration A5
 include(joinpath(@__DIR__, "ex_a6.jl"))   # Amendment D57 and preregistration A6
 include(joinpath(@__DIR__, "ex_prior.jl"))   # Amendment D58: --prior-record
 include(joinpath(@__DIR__, "ex_backup.jl"))   # Amendment D59: manifest backups
+# Amendment D86 (indicators in the runner and the store): helpers, then one file per group of criteria
+include(joinpath(@__DIR__, "ex_d86_helpers.jl"))
+include(joinpath(@__DIR__, "ex_d86_grammar.jl"))   # D86a to D86d
+include(joinpath(@__DIR__, "ex_d86_chains.jl"))    # D86e to D86h
+include(joinpath(@__DIR__, "ex_d86_windows.jl"))   # D86i to D86m
+include(joinpath(@__DIR__, "ex_d86_run.jl"))       # D86n to D86r
+include(joinpath(@__DIR__, "ex_d86_store.jl"))     # D86s to D86v
+include(joinpath(@__DIR__, "ex_d86_guards.jl"))    # D86w, D86x

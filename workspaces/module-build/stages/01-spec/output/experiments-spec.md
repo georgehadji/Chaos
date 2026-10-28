@@ -863,3 +863,21 @@ Found while writing the D86 tests (`experiments-test-plan.md`, "Amendment D86 (s
 6. Criteria text. (a) "2 controls including the Y5 control" reads 3 controls: the elliptic fixed point, the hyperbolic fixed point and Y5 (A1). (b) D86a: at least 45 malformed blocks that together cover every refusal class of R11 item 6, at least two per kind, several per class allowed (A16). (c) D86d: the 1000 seeded items of every kind are items built from seeded field values with the module's item text and hash functions, not only items of a fixture plan (A17). (d) D86k: the Y5 rotation block of naff-fma criterion 7(a) cannot be written in the panel format; the criterion keeps the exact fixed points and the K_std = 0 map, and the Y5 origin start covers the `undefined window` and `degenerate` bits (A7).
 7. Arm keys and window sizes (A3, A4). An arm with `indicators` non-empty may omit `methods` or give an empty list. "Each window is at least 8 (`order` + 1)" means at least 8 x (`order` + 1).
 
+
+## Deviations accepted at the D86 stage 03 checkpoint (2026-10-28)
+
+Eleven places where the stage 03 implementation differs from the amendment text; the owner approved all of them (D87). Reasons and tests are in `experiments-d86-impl-notes.md`, "Deviations from the spec". Where a line below differs from the amendment, the line wins.
+
+1. Window kinds (`phase_advance`, `birkhoff`) step one handoff at a time and reset the deviation column to `(1, 0)` after each handoff (R14 item 4). The tables are bitwise those of the stand-alone reducers.
+2. The E1 buffer is per orbit (2 W_max complex values), not per launch group (R14 item 3, R17 item 2). `orbit_bytes` still charges B as E28 says.
+3. The pilot horizon and the multiple-of-tau rule ignore an arm that holds window specs only (R20 item 1).
+4. `launches_per_chunk` of a CPU chunk of an indicator spec is 1; for the methods it stays `ceil(orbits / capacity)`.
+5. A launch capacity that does not fit one orbit of a spec (R17 item 3) creates the empty store directory, writes no file and raises `ArgumentError`.
+6. The stretching scalar `first_full_step` is 0.0 when the handoff count never reaches `min_per_cell x bins`.
+7. In the file, `members` and `chain` of a window kind are the single name of the kind; the provenance, range and `observable_names` of stretching and Birkhoff come from the first item of the chunk.
+8. The per-orbit stretching count matrices of a chunk stay in memory until the chunk is written (8 (bins + 2) bytes per orbit, not charged by E28); only the named subset stores them.
+9. `_same(::OrbitRecord)` compares attributes with `isequal` (a failed pair stores `Dx_r = NaN`).
+10. Frame preparation runs in `_open_session` for all items of the plan, before any file or manifest (R13 item 2).
+11. The cost cap of a group of spec items reads the budget of the spec; the manifest arm entry gains `specs` only for arms with indicators.
+
+Lifted-mode frequency bound (naff-fma criterion 7(c), D86l): the error bound of a lifted-coordinate orbit is 16 eps + max|q| eps, not 16 eps.

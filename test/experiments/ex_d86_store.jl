@@ -54,8 +54,11 @@ d86_s_run() = d86_run("s-all", d86_all_block())                       # all six 
                 miss!("final", fin.eltype == "Float64" && fin.size[1] == rows && fin.size[2] == length(d86_at(raw, o, id, "final", "columns")))
                 miss!("flags", flg.eltype == "Int64" && flg.size == (rows,) && !isempty(d86_at(raw, o, id, "flags", "bits")))
                 miss!("no series", !haskey(lay, "/orbits/$o/indicators/$id/series"))
-                sc = L("indicators/$id/scalars")
-                miss!("scalars", sc.eltype == "Float64" && sc.size == (length(d86_at(raw, o, id, "scalars", "columns")),))
+                # E25: orbit scalars are `handoffs`, `near_pi`, `complete` (phase advance) and `handoffs`, `complete` (birkhoff); for `frequency` the table says "none (planes = 1)"
+                if kind != "frequency"
+                    sc = L("indicators/$id/scalars")
+                    miss!("scalars", sc.eltype == "Float64" && sc.size == (length(d86_at(raw, o, id, "scalars", "columns")),))
+                end
                 kind == "phase_advance" && miss!("pa scalars", d86_at(raw, o, id, "scalars", "columns") == ["handoffs", "near_pi", "complete"])
                 kind == "birkhoff" && miss!("bk scalars", d86_at(raw, o, id, "scalars", "columns") == ["handoffs", "complete"] && fin.size[1] == length(spec["windows"]) * length(spec["observables"]))
                 kind == "frequency" && miss!("fq rows", fin.size == (length(spec["windows"]), 11) && !haskey(lay, "/orbits/$o/indicators/$id/scalars"))
@@ -92,8 +95,11 @@ end
 
 # ================================================================ D86t
 @testset "D86t atomic write killed at 20 seeded points; resume after k chunks equals the uninterrupted campaign" begin
+    # The fixture of the kill points: all six kinds, Float64 and Double64, the direction sweep, pooled counts, on the orbit 1 (S_L) and the two extra starts, about 23 chunks
+    # instead of 71 (the kill points and resumes of this testset are 31 campaigns; the size of the panel is not what the criterion is about)
     run = d86_all_ind_block()
-    ref = d86_all_ind_run()                                              # shared with D86q, D86v and D86w (threads 4, capacity all)
+    foreach(a -> a["orbits"] == "S_D" && (a["orbits"] = "S_L"), run["arm"])
+    ref = d86_run("t-ref", run)
     fx = ref.fx
     M = ref.plan.counts.chunks
     refsha = d86_store_sha(ref.store)
@@ -165,7 +171,7 @@ end
     end
     # backend table rows carry the spec ids; the arm totals carry the measured cost per orbit-step against the budget line
     @test all(id -> any(r -> r["method"] == id, man["backend_table"]), keys(ind))
-    @test all(a -> haskey(a, "specs") && all(((id, v),) -> haskey(v, "measured_ns_per_orbit_step") && haskey(v, "budget_line_ns"), a["specs"]), man["arms"])
+    @test all(a -> haskey(a, "specs") && all(v -> haskey(v, "measured_ns_per_orbit_step") && haskey(v, "budget_line_ns"), values(a["specs"])), values(man["arms"]))
     # chunk entries: omitted orbits, flag counts recounted from the files, transform seconds for frequency
     omitted = Dict{String, Set{Int}}()
     for ce in man["chunks"]
@@ -218,7 +224,8 @@ end
     pfiles = ex_chunk_files(joinpath(out, "store"))
     @test !isempty(pfiles) && all(f -> EX.read_chunk(f).attrs["pilot"] === true, pfiles) && isdir(EX.default_store(fx.prereg)) == default_before
     # the first-chunk cost cap reads the budget line of the spec (safety 3: 300 ns, not the 200 ns of the block): 2.01 times the line pauses the arm, 1.99 continues
-    blk = d86_block([d86_arm("a", "S_D", ["tg"], ["Float64"], [100]), d86_arm("b", "S_D", ["st"], ["Float64"], [100])],
+    # The arm a has two run types (horizons 100 and 80), so two launch groups: the first group sets the cost, the second must stay pending when the arm is paused (D53l form).
+    blk = d86_block([d86_arm("a", "S_D", ["tg"], ["Float64"], [100, 80]), d86_arm("b", "S_D", ["st"], ["Float64"], [100])],
                     [merge(d86_spec("tangent"), Dict("budget" => Dict{String, Any}("Float64" => Dict{String, Any}("ns_cpu_thread" => 100.0, "safety" => 3)))), d86_spec("stretching")])
     fc = d86_fx("v-cap", blk)
     line(arm) = (arm == "a" ? 300.0 : 200.0) * 1e-9
@@ -226,7 +233,14 @@ end
     hi = ex_campaign(fc; store = ex_store("d86-v-hi"), threads = 1, hooks = EX.RunHooks(clock = ex_clock(cost(2.01))))
     lo = ex_campaign(fc; store = ex_store("d86-v-lo"), threads = 1, hooks = EX.RunHooks(clock = ex_clock(cost(1.99))))
     @test hi.status == "paused arms" && hi.paused == ["a"]
-    @test lo.status == "complete" && isempty(lo.paused)
+    manh = EX.read_json(hi.manifest)
+    # D53l form: the first group of the arm ran, its later chunks are recorded as paused and were not run, the other arm completed
+    paused = [c for c in manh["chunks"] if c["status"] == "paused"]
+    @test !isempty(paused) && all(c -> c["arms"] == ["a"] && !(c["ordinal"] in hi.ran), paused)
+    @test manh["arms"]["a"]["status"] == "paused: cost cap" && manh["arms"]["b"]["status"] == "complete"
+    @test any(c -> c["status"] == "ok" && c["arms"] == ["a"], manh["chunks"])
+    manl = EX.read_json(lo.manifest)
+    @test lo.status == "complete" && isempty(lo.paused) && all(c -> c["status"] == "ok", manl["chunks"])
     # the CPU reference rerun reproduces CPU items bit for bit
     run = d86_all_ind_run()
     chk = EX.rerun_check(run.fx.prereg, run.fx.panel, run.store; code_version = EX_CODE, threads = 2, thread_override = true, allow_dirty = true)

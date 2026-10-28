@@ -4,18 +4,22 @@
 import Dates
 
 """
-    RunHooks(; clock, kill, mutate, observe)
+    RunHooks(; clock, kill, mutate, observe, frame, series)
 
 Test hooks of the runner; every field is optional and the module calls a hook only through this struct. `clock(event, info)` is the
 only source of time (seconds since the Unix epoch); `kill(point, info)` is called at group and writer points and its exceptions
 propagate unchanged; `mutate(info, orbits)` runs after a chunk attempt is computed, before the checks; `observe(info, attrs, orbits)`
-runs after the checks, just before the write.
+runs after the checks, just before the write; `frame(kind, info, W)` returns the frame to use in place of `W` before the frame checks of the indicator
+specs (`kind` is `:frame` for a deviation frame, `:pair_frame` for the block frame of a pair); `series(info, orbit, buffer)` runs on the series buffer of
+the frequency kind after the orbit pass and before the transforms (D86).
 """
 Base.@kwdef struct RunHooks
     clock::Any = nothing
     kill::Any = nothing
     mutate::Any = nothing
     observe::Any = nothing
+    frame::Any = nothing
+    series::Any = nothing
 end
 
 const NS_PER_S = 10^9          # nanoseconds per second
@@ -42,9 +46,12 @@ struct RunCtx
     ref::Dict{Tuple, NamedTuple}
     frames::Dict{Tuple{String, String, Int}, Any}
     warmed::Set{Tuple}
+    specs::Dict{String, Any}      # indicator specs of the block by id (D86)
+    hooks::RunHooks
+    bytes::Dict{Tuple, Int}       # bytes(orbit) of the indicator run types (E28), filled before the parallel region
 end
 
-function make_ctx(plan::RunPlan, items = plan.items)
+function make_ctx(plan::RunPlan, items = plan.items; hooks::RunHooks = RunHooks())
     gr = plan.block.raw["grid"]
     grids = Dict{Tuple{Int, Int}, Vector{Int}}()
     ref = Dict{Tuple, NamedTuple}()
@@ -55,7 +62,8 @@ function make_ctx(plan::RunPlan, items = plan.items)
         end
         _label(it.precision) == "Float64" && get!(ref, (it.orbit, it.method, it.tau, it.direction, it.coordinate_mode), it)
     end
-    return RunCtx(plan, plan.defaults, grids, ref, Dict{Tuple{String, String, Int}, Any}(), Set{Tuple}())
+    specs = Dict{String, Any}(sp["id"] => sp for sp in get(plan.block.raw, "indicator", Dict{String, Any}[]))
+    return RunCtx(plan, plan.defaults, grids, ref, Dict{Tuple{String, String, Int}, Any}(), Set{Tuple}(), specs, hooks, Dict{Tuple, Int}())
 end
 
 # ---------------------------------------------------------------- start checks (R7)
@@ -113,7 +121,8 @@ function _recorder_table(t)
     t isa AbstractDict || return Dict{String, Any}()
     return Dict{String, Any}(String(m) => (threads = get(r, "threads", 0), cpu_ns_per_step = get(r, "cpu_ns_per_step", nothing),
         gpu_ns_per_step = get(r, "gpu_ns_per_step", nothing), gpu_faster = get(r, "gpu_faster", false), date = get(r, "date", ""),
-        launch_steps = get(r, "launch_steps", nothing), orbits = get(r, "orbits", nothing), steps = get(r, "steps", nothing))
+        launch_steps = get(r, "launch_steps", nothing), orbits = get(r, "orbits", nothing), steps = get(r, "steps", nothing),
+        spec_sha256 = get(r, "spec_sha256", ""))
         for (m, r) in t if r isa AbstractDict)
 end
 
@@ -149,11 +158,20 @@ function gpu_record(root::AbstractString = _root())
     end
 end
 
-# Orbits per launch from the free memory (R3 item 3): the most demanding run type of the plan bounds it.
+# Orbits per launch from the free memory (R3 item 3): the most demanding run type of the plan bounds it. An indicator item reads the bytes of E28 from
+# its reducers; one orbit that does not fit refuses the start, naming the spec, bytes(orbit) and the free memory (R17 item 3).
 function _launch_capacity(plan::RunPlan, free::Integer, f)
     best = typemax(Int)
     for c in plan.chunks
         it = plan.items[first(c.items)]
+        if it.kind !== nothing
+            b = orbit_bytes(plan, it)
+            cap = group_capacity(plan, it; free_bytes = free, f = f)
+            cap >= 1 || throw(ArgumentError("indicator spec `$(it.method)`: one orbit needs $(b.total) bytes (M $(b.M), R $(b.R), S $(b.S), B $(b.B)) " *
+                                            "and $f of the $free free bytes is not enough"))
+            best = min(best, cap)
+            continue
+        end
         T = _element_type(_label(it.precision))
         wrapped = it.coordinate_mode == "wrapped"
         cols = 3 + (wrapped ? 2 : 0) + it.vectors + length(diagnostic_names(it.method))

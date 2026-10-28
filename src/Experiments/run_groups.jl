@@ -13,7 +13,7 @@ end
 function _attrs(plan, it, row, ordinal, key, hash, arms, norbits; git, threads, capacity, utc, status, attempt, first_reasons, failure_reasons,
                 setup, pilot, prov = cpu_prov(row.reason), dirty = false, session = 1, control_stop = false)
     gpu = prov.backend === :gpu
-    orth, impl = _impl(it.method)
+    orth, impl = it.kind === nothing ? _impl(it.method) : ("none", it.kind)
     a = Dict{String, Any}("schema_version" => 2, "study" => plan.study, "chunk" => ordinal, "chunk_key" => key, "chunk_hash" => hash,
         "plan_sha256" => plan.hash, "panel_sha256" => plan.panel.sha256, "git_sha" => git, "code_version" => plan.code_version,
         "prereg_sha256" => plan.prereg_header, "config_sha256" => block_hash(plan.block), "julia_version" => string(VERSION),
@@ -24,10 +24,12 @@ function _attrs(plan, it, row, ordinal, key, hash, arms, norbits; git, threads, 
         "first_attempt_reasons" => first_reasons, "failure_reasons" => failure_reasons, "pilot" => pilot, "arms" => arms,
         "renorm_interval_tau" => it.tau, "deviation_vectors_k" => it.vectors, "seed" => parse(Int, it.run_seed),
         "chunk_size" => gpu ? prov.chunk_size : capacity, "gpu_chunks" => prov.gpu_chunks, "steps_per_launch" => gpu ? prov.launch_steps : it.horizon,
-        "launches_per_chunk" => gpu ? prov.launches : cld(norbits, capacity), "orthonormalizer" => orth,
+        "launches_per_chunk" => gpu ? prov.launches : it.kind === nothing ? cld(norbits, capacity) : 1, "orthonormalizer" => orth,
         "implementation" => impl, "setup_check" => setup, "dirty" => dirty, "session" => session, "control_stop" => control_stop,
         "created_utc" => utc, "complete" => true)
     it.eps === nothing || (a["perturbation"] = it.eps)
+    it.direction === nothing && delete!(a, "direction")
+    it.kind === nothing || merge!(a, ind_root_attrs(plan, it))
     return a
 end
 
@@ -106,7 +108,7 @@ function _write_result!(s::Session, chunk, recs, status, attempt, first_reasons,
     write_chunk(path, attrs, recs; hook = pt -> _kill(s.hooks, pt, (ordinal = chunk.ordinal, path = path, chunks_done = length(s.ran))))
     push!(s.ran, chunk.ordinal)
     status == "failed" && final_failed && push!(s.failed, chunk.ordinal)
-    s.entries[chunk.ordinal] = chunk_entry(chunk, attrs, recs)
+    s.entries[chunk.ordinal] = chunk_entry(chunk, attrs, recs; plan = s.ctx.plan)
     _refresh_paused!(s)
     write_manifest(s)
     _kill(s.hooks, :chunk_done, (ordinal = chunk.ordinal, path = path, chunks_done = length(s.ran)))
@@ -149,7 +151,7 @@ function group_info(s::Session, gi, todo)
     armset = Set(a for o in todo for a in plan.chunks[o].arms)
     arms = [a["name"] for a in plan.block.raw["arm"] if a["name"] in armset]
     return (group = gi, chunks = todo, arms = arms, precision = _label(first(its).precision), orbits = length(its), steps = sum(it.horizon for it in its; init = 0),
-            backend = row.backend === :gpu && !s.device_lost[] ? :gpu : :cpu)
+            backend = row.backend === :gpu && !s.device_lost[] ? :gpu : :cpu, spec = first(its).kind === nothing ? nothing : first(its).method)
 end
 
 function _refresh_paused!(s::Session)
@@ -182,7 +184,7 @@ function measure_arms!(s::Session, info, wall, workers, backend::Symbol = :cpu) 
         (name in info.arms && !(name in s.measured)) || continue
         push!(s.measured, name)
         name in s.cap_override && continue
-        line = budget_line_ns(rb, arm, backend, info.precision)
+        line = budget_line_ns(rb, arm, backend, info.precision; spec = info.spec === nothing ? nothing : s.ctx.specs[info.spec])
         if cost_ns > factor * line
             push!(s.paused, name)
             push!(s.reasons, "arm $name paused: measured $(round(cost_ns; digits = 3)) ns per orbit-step above $factor times the budget line $line ns")

@@ -848,7 +848,7 @@ GALI_k for k > 2 (D70) and OFLI (D71, flows, M5); flows; the Henon map (Y2) and 
 The owner approved Amendment D86 with the resolutions below. The base D86 text above is unchanged; where a line below differs from an open point, the line wins.
 
 - P26 to P39 Approved as proposed, each with the default stated in its line of "Open points for the owner (amendment)".
-- P34 Resolved: the run store stays at version 2, the change is additive (precedent D56); `lyap` becomes optional and `kind` marks the files of the new kinds. `schema/run-store.md` is edited at stage 03, not here.
+- P34 Resolved: the run store stays at version 2, the change is additive (precedent D56); `lyap` becomes optional and `kind` marks the files of the new kinds. `schema/run-store.md` is edited at stage 05 (D86z), not here.
 - P39 Left open as proposed: the sticky ensemble (R4) is defined in the p2 preregistration; the recorder stores what any definition of the study would read.
 
 ## Corrections at the D86 stage 02 checkpoint (2026-10-28)

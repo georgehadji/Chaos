@@ -34,9 +34,15 @@ end
 
 function _open_session(plan, prereg, panel; store, manifest, threads, capacity, free_bytes, hooks, git, dirty, over_threads, rec, prior, cap_override,
                        manifest_reset = false)
-    ctx = make_ctx(plan)
+    ctx = make_ctx(plan; hooks = hooks)
+    prime_frames!(ctx, plan.items)      # D86: the frames are built and checked before the first chunk (a refusal writes nothing)
     free = free_bytes === nothing ? Int(Sys.free_memory()) : Int(free_bytes)
-    cap = capacity === nothing ? _launch_capacity(plan, free, 0.5) : max(1, Int(capacity))
+    cap = capacity === nothing ? (try
+        _launch_capacity(plan, free, 0.5)
+    catch e
+        e isa ArgumentError && mkpath(store)      # R17 item 3: a refusal leaves the (empty) store directory, never a file
+        rethrow()
+    end) : max(1, Int(capacity))
     table = backend_table(plan; threads = threads, record = rec)
     prev, note = _prev_manifest(manifest, store, manifest_reset)
     sessions, paused, prior_cap = _prior_state(prev, cap_override)

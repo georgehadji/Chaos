@@ -142,9 +142,11 @@ d86_bits(x::AbstractArray) = vec(x)
 d86_same(a, b) = a isa AbstractArray && b isa AbstractArray ? (size(a) == size(b) && d86_bits(a) == d86_bits(b)) : isequal(a, b)
 
 # canonical bytes of a raw read-back (datasets and attributes), without wall and thread seconds, host and time attributes
-function d86_canon_raw(raw::AbstractDict)
+# `skip` names root attributes (exact keys, "@name") that differ by design between runs that must agree on everything else
+function d86_canon_raw(raw::AbstractDict; skip = ())
     io = IOBuffer()
     for k in sort(collect(keys(raw)))
+        k in skip && continue
         any(s -> occursin(s, k), ("@created_utc", "@cpu", "@threads", "@session", "@chunk_size", "@git_sha", "@dirty", "@julia_version", "@packages")) && continue
         v = raw[k]
         if occursin(r"/cost/", k) && v isa AbstractVector
@@ -157,8 +159,11 @@ function d86_canon_raw(raw::AbstractDict)
     end
     return take!(io)
 end
-d86_canon_file(f) = d86_canon_raw(d86_raw(f))
-d86_store_sha(store) = ex_sha256(reduce(vcat, [Vector{UInt8}(codeunits(basename(f))); d86_canon_file(f)] for f in ex_chunk_files(store); init = UInt8[]))
+d86_canon_file(f; skip = ()) = d86_canon_raw(d86_raw(f); skip = skip)
+d86_store_sha(store; skip = ()) = ex_sha256(reduce(vcat, [Vector{UInt8}(codeunits(basename(f))); d86_canon_file(f; skip = skip)] for f in ex_chunk_files(store); init = UInt8[]))
+# the attributes that differ by design between a device run, a fallback run, a rerun and a CPU run (the backend and its reason, the device, the launch shape, the attempt):
+# I24 asks every stored dataset and the other attributes to be identical
+const D86_BACKEND_ATTRS = ("@backend", "@backend_fallback_reason", "@device", "@gpu_chunks", "@attempt", "@first_attempt_reasons")
 
 # one orbit of a chunk file: the dataset of an indicator, its attribute
 d86_ds(raw, orbit, spec, name) = raw["orbits/$orbit/indicators/$spec/$name"]
@@ -239,7 +244,7 @@ function d86_spec_text(spec::AbstractDict)
     rec(Dict{String, Any}(k => v for (k, v) in spec if k != "budget"), "indicator")
     return String(take!(io))
 end
-d86_spec_hash(spec) = ex_sha256(d86_spec_text(spec))
+d86_spec_hash(spec) = (t = d86_spec_text(spec); d86_memo(() -> ex_sha256(t), (:sh, t)))
 
 # item text of a new kind (E27): the D53 text without `eps`, with `direction` only when present, then kind and spec lines
 function d86_item_text(it, spec_hash::AbstractString)
@@ -354,6 +359,8 @@ end
 d86_nofiles(store) = !isdir(store) || (isempty(ex_chunk_files(store)) && isempty(ex_tmp_files(store)))
 d86_files(store) = isdir(store) ? ex_chunk_files(store) : String[]
 
+# the panel entry of an orbit id, `nothing` for the extra starts (ids after the panel)
+d86_pinfo(plan, o) = o <= length(plan.panel.orbits) ? plan.panel.orbits[o] : nothing
 d86_spec_of(plan, it) = only(s for s in plan.block.raw["indicator"] if s["id"] == it.method)
 
 # the stand-alone pair run on the identical orbit (O16): xi0 as stored, the block frame (xi_0, 0), (0, xi_0), the member in its replacing form

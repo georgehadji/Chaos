@@ -370,7 +370,7 @@ end
     hex(n) = join(rand(rng, collect("0123456789abcdef"), n))
     # Every field of the item is drawn (correction 6c of the D86 stage 02 checkpoint): the items are not plan items of a fixture, they are built as NamedTuples with the
     # fields of E27 and passed to the module's own item_text and item_hash.
-    function seeded_item(k::AbstractString, spec)
+    function seeded_item(k::AbstractString, spec, sh)                       # sh: the spec hash, computed once per kind (one external process, not one per item)
         id = spec["id"]
         has_dir = d86_has_dir(spec)
         return (orbit = rand(rng, 1:5000), system = rand(rng, ("standard", "linear")), param = string(round(5 * rand(rng); digits = 3)), x0 = string(6 * rand(rng)),
@@ -378,11 +378,12 @@ end
                 precision = rand(rng, ("Float64", "Double64")), horizon = rand(rng, 1:2000), tau = rand(rng, (1, 2, 4)), eps = nothing,
                 direction = has_dir ? rand(rng, ("pi/4", "0.3", string(round(3 * rand(rng); digits = 4)))) : nothing, coordinate_mode = rand(rng, ("lifted", "wrapped")),
                 vectors = k in ("frequency", "phase_advance", "birkhoff") ? 1 : 2, grid_sha256 = hex(64), code_version = "code-" * hex(8), hash_version = 1,
-                kind = k, spec = d86_spec_hash(spec))
+                kind = k, spec = sh)
     end
     for k in ("tangent", "pair", "stretching", "frequency", "phase_advance", "birkhoff")
         spec = first(s for s in run["indicator"] if s["kind"] == k)
-        items = [seeded_item(k, spec) for _ in 1:1000]
+        sh = d86_spec_hash(spec)
+        items = [seeded_item(k, spec, sh) for _ in 1:1000]
         texts = EX.item_text.(items)
         @test texts == [d86_item_text(it, it.spec) for it in items]
         @test EX.item_hash.(items) == ex_sha256_many(texts)

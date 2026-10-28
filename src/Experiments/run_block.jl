@@ -67,8 +67,8 @@ function _rb_primary(p)
         "coordinate_mode" => _rb_str(p["coordinate_mode"], "primary.coordinate_mode", RB_MODES))
 end
 
-const _ARM_REQUIRED = ("name", "orbits", "methods", "precisions", "horizons")
-const _ARM_OPTIONAL = ("tau", "eps", "direction", "coordinate_mode", "h1_check", "stop_exempt")
+const _ARM_REQUIRED = ("name", "orbits", "precisions", "horizons")
+const _ARM_OPTIONAL = ("methods", "indicators", "tau", "eps", "direction", "coordinate_mode", "h1_check", "stop_exempt")
 const RB_CONTROL_SCOPES = ("all", "exact_start")
 
 function _rb_arm(a, path)
@@ -76,9 +76,9 @@ function _rb_arm(a, path)
     name = a["name"]
     (name isa AbstractString && !isempty(name)) || _rb_err("$path.name", "must be a non-empty text")
     out = Dict{String, Any}("name" => String(name), "orbits" => _rb_str(a["orbits"], "$path.orbits", RB_SUBSETS),
-        "methods" => _rb_list(a["methods"], "$path.methods", (x, p) -> _rb_str(x, p, RB_METHODS)),
         "precisions" => _rb_list(a["precisions"], "$path.precisions", (x, p) -> _rb_str(x, p, RB_PRECISIONS)),
         "horizons" => _rb_list(a["horizons"], "$path.horizons", (x, p) -> _rb_int(x, p)))
+    _rb_arm_lists!(out, a, path)
     haskey(a, "tau") && (out["tau"] = _rb_list(a["tau"], "$path.tau", (x, p) -> _rb_int(x, p)))
     haskey(a, "eps") && (out["eps"] = _rb_list(a["eps"], "$path.eps", (x, p) -> _rb_real(x, p; ok = >(0), what = "positive")))
     haskey(a, "direction") && (out["direction"] = _rb_list(a["direction"], "$path.direction", _rb_direction))
@@ -89,6 +89,22 @@ function _rb_arm(a, path)
         a[k] isa Bool || _rb_err("$path.$k", "must be true or false, got $(repr(a[k]))")
         out[k] = a[k]
     end
+    return out
+end
+
+# D86: an arm lists catalog methods, indicator spec ids or both; `methods` may be absent or empty when `indicators` is non-empty.
+function _rb_arm_lists!(out, a, path)
+    has_i = haskey(a, "indicators")
+    (haskey(a, "methods") || has_i) || _rb_err(path, "the arm lists neither methods nor indicators")
+    has_i && (out["indicators"] = _rb_list(a["indicators"], "$path.indicators", function (x, p)
+        (x isa AbstractString && !isempty(x)) || _rb_err(p, "must be an indicator id, got $(repr(x))")
+        return String(x)
+    end))
+    if haskey(a, "methods")
+        out["methods"] = has_i && a["methods"] isa AbstractVector && isempty(a["methods"]) ? String[] :
+                         _rb_list(a["methods"], "$path.methods", (x, p) -> _rb_str(x, p, RB_METHODS))
+    end
+    has_i && !allunique(out["indicators"]) && _rb_err("$path.indicators", "an id may appear once")
     return out
 end
 
@@ -111,7 +127,7 @@ function _rb_grid(g, arms, prim)
     _rb_keys(g, "grid", ("points_per_decade", "first_steps", "extra_fractions"))
     fr = _rb_list(g["extra_fractions"], "grid.extra_fractions", (x, p) -> _rb_real(x, p; ok = x -> 0 < x < 1, what = "inside (0, 1)"))
     for (i, a) in enumerate(arms), N in a["horizons"], tau in _rb_taus(a, prim), f in fr
-        f == 0.1 && !(N % 10 == 0 && (N ÷ 10) % tau == 0) &&
+        f == 0.1 && !isempty(get(a, "methods", String[])) && !(N % 10 == 0 && (N ÷ 10) % tau == 0) &&
             _rb_err("grid.extra_fractions", "arm[$i]: the fraction 0.1 needs N / 10 = $(N / 10) to be a multiple of tau = $tau")
     end
     return Dict{String, Any}("points_per_decade" => _rb_int(g["points_per_decade"], "grid.points_per_decade"),
@@ -149,7 +165,7 @@ function _rb_backend(b, used)
     return out
 end
 
-function _rb_health(h, arms)
+function _rb_health(h, arms, spec_ids = String[])
     keys_ = ("fail_fraction", "control_bound", "control_methods", "setup_check_steps", "setup_check_tol", "drift_bound",
              "rerun_attempts", "stop_failed_fraction", "first_chunk_cost_factor", "wall_cap_hours")
     _rb_keys(h, "health", keys_, ("control_scope", "control_bound_method"))
@@ -176,14 +192,20 @@ function _rb_health(h, arms)
         scope["control_bound_method"] = cbm
     end
     return merge(scope, Dict{String, Any}("fail_fraction" => frac("fail_fraction"), "control_bound" => pos("control_bound"),
-        "control_methods" => _rb_list(h["control_methods"], "health.control_methods", (x, p) -> _rb_str(x, p, RB_METHODS)),
+        "control_methods" => _rb_list(h["control_methods"], "health.control_methods", function (x, p)
+            x in spec_ids && _rb_err(p, "`$x` is an indicator spec id: the exact-exponent control rule is for the exponent methods")
+            return _rb_str(x, p, RB_METHODS)
+        end),
         "setup_check_steps" => steps, "setup_check_tol" => pos("setup_check_tol"), "drift_bound" => pos("drift_bound"),
         "rerun_attempts" => _rb_int(h["rerun_attempts"], "health.rerun_attempts"; min = 0),
         "stop_failed_fraction" => frac("stop_failed_fraction"), "first_chunk_cost_factor" => pos("first_chunk_cost_factor"),
         "wall_cap_hours" => pos("wall_cap_hours")))
 end
 
-function _rb_misc(d, arms, prim)
+# D86 (R20 item 1): the pilot runs the window kinds at their own run length, so an arm that holds window specs only is outside the pilot horizon rule.
+_pilot_arm(a, specs) = !isempty(get(a, "methods", String[])) || any(id -> !ind_window_kind(only(s["kind"] for s in specs if s["id"] == id)), get(a, "indicators", String[]))
+
+function _rb_misc(d, arms, prim, specs = Dict{String, Any}[])
     _rb_keys(d["k19"], "k19", ("threads",))
     v = d["verify"]
     _rb_keys(v, "verify", ("backend_agreement", "rerun_sample"))
@@ -192,9 +214,10 @@ function _rb_misc(d, arms, prim)
     p = d["pilot"]
     _rb_keys(p, "pilot", ("orbits_per_k", "horizon", "seed_label"))
     ph = _rb_int(p["horizon"], "pilot.horizon")
-    shortest = minimum(minimum(a["horizons"]) for a in arms)
+    parms = [a for a in arms if _pilot_arm(a, specs)]
+    shortest = minimum((minimum(a["horizons"]) for a in parms); init = typemax(Int))
     ph <= shortest || _rb_err("pilot.horizon", "$ph exceeds the shortest arm horizon $shortest")
-    for a in arms, tau in _rb_taus(a, prim)
+    for a in parms, tau in _rb_taus(a, prim)
         ph % tau == 0 || _rb_err("pilot.horizon", "$ph is not a multiple of tau = $tau")
     end
     (p["seed_label"] isa AbstractString && !isempty(p["seed_label"])) || _rb_err("pilot.seed_label", "must be a non-empty text")
@@ -238,15 +261,18 @@ computation.
 """
 function run_block(d::AbstractDict)
     top = ("panel_prereg_sha256_accepted", "primary", "arm", "grid", "backend", "health", "budget", "k19", "verify", "pilot")
-    _rb_keys(d, "run", top, ("h4",))
+    _rb_keys(d, "run", top, ("h4", "indicator"))
     h4 = _rb_h4(get(d, "h4", nothing))
     prim = _rb_primary(d["primary"])
     arms = _rb_arms(d["arm"], prim, !isempty(h4))
     used = [p for p in RB_PRECISIONS if any(a -> p in a["precisions"], arms)]
     raw = Dict{String, Any}("panel_prereg_sha256_accepted" => _rb_accepted(d["panel_prereg_sha256_accepted"]), "primary" => prim,
         "arm" => arms, "grid" => _rb_grid(d["grid"], arms, prim), "backend" => _rb_backend(d["backend"], used),
-        "health" => _rb_health(d["health"], arms), "budget" => _rb_budget(d["budget"], used), "h4" => h4)
-    merge!(raw, _rb_misc(d, arms, prim))
+        "budget" => _rb_budget(d["budget"], used), "h4" => h4)
+    specs = _rb_indicators(get(d, "indicator", nothing), arms, prim)
+    raw["health"] = _rb_health(d["health"], arms, [s["id"] for s in specs])
+    isempty(specs) || (raw["indicator"] = specs)
+    merge!(raw, _rb_misc(d, arms, prim, specs))
     return RunBlock(raw)
 end
 
@@ -277,7 +303,7 @@ block_hash(rb::RunBlock) = bytes2hex(sha256(block_text(rb)))
 
 # Merge of the run tables of successive amendments (A5 over A4): a later key replaces an earlier one, tables merge key by key, the
 # lists of tables `arm` (by `name`) and `h4` (by `label`) are replaced entry by entry and new entries are appended in order.
-const _LIST_KEYS = Dict("arm" => "name", "h4" => "label")
+const _LIST_KEYS = Dict("arm" => "name", "h4" => "label", "indicator" => "id")
 
 function merge_run(a::AbstractDict, b::AbstractDict)
     out = Dict{String, Any}(a)

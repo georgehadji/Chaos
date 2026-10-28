@@ -132,3 +132,41 @@ build_panel(PREREG; out = RUN_PANEL)
 const RUN_STORE = joinpath(DIR, "run-store")
 SUITE["run_campaign chunk (S_L, L5, 1e4 steps, written)"] = @benchmarkable run_campaign($RUN_PREREG, $RUN_PANEL; store = $RUN_STORE,
     manifest = $(joinpath(DIR, "run-manifest.json")), threads = Threads.nthreads(), allow_dirty = true, code_version = "bench") setup = (rm($RUN_STORE; recursive = true, force = true)) samples = 3 evals = 1
+
+# Indicator recorders (D86): one orbit of the standard map per kind at N = 1e5 steps (the window kinds at windows 1000 and 4000, run length 8000 or 8001
+# steps); ns per orbit-step is time / steps. The budget lines of the study are the study's; the numbers measured here go in the implementation notes.
+const IND_SPECS = [
+    ("tangent FLI MEGNO SALI", Dict{String, Any}("kind" => "tangent", "id" => "tg", "members" => ["FLI", "MEGNO", "SALI"])),
+    ("tangent SALI", Dict{String, Any}("kind" => "tangent", "id" => "ts", "members" => ["SALI"])),
+    ("stretching 1000 bins", Dict{String, Any}("kind" => "stretching", "id" => "st", "range" => "derived", "bins" => 1000, "interval" => 1, "min_per_cell" => 1, "counts" => "none")),
+    ("frequency 1000 4000 (orbit pass)", Dict{String, Any}("kind" => "frequency", "id" => "fq", "observable" => "q_plus_i_p", "windows" => [1000, 4000], "order" => 1,
+        "positions" => "half", "pad" => 4, "mean_removal" => true, "mirror_ratio" => 0.5, "floor_multiplier" => 8.0)),
+    ("phase advance 1000 4000", Dict{String, Any}("kind" => "phase_advance", "id" => "pa", "observable" => "planar", "windows" => [1000, 4000], "birkhoff_order" => 2)),
+    ("birkhoff K = 4, 1000 4000", Dict{String, Any}("kind" => "birkhoff", "id" => "bk", "windows" => [1000, 4000], "birkhoff_order" => 2,
+        "observables" => [Dict{String, Any}("kind" => k, "coordinate" => 1, "frequency" => f) for k in ("cos", "sin") for f in (1, 2)])),
+]
+
+function ind_item_bench(spec)
+    item = (system = "standard", param = "1.5", x0 = "1.0", p0 = "2.0", coordinate_mode = "wrapped")
+    sys, x0 = WrappedStandardMap(1.5), torus_state(SVector(1.0, 2.0))
+    red = EXP.ind_chain(Float64, item, spec, sys)
+    L = EXP.ind_run_length(spec)
+    N = L === nothing ? RUN_N : L
+    b = EXP._new_ind_buf(record_grid(N, 1; points_per_decade = 20, first_steps = 100, extra_fractions = [0.1, 0.5]), true, length(EXP.ind_series_columns(spec)))
+    if EXP.ind_window_kind(spec["kind"])
+        W1 = SMatrix{2, 1, Float64}(1.0, 0.0)
+        buf = Vector{ComplexF64}(undef, 2 * maximum(spec["windows"]))
+        feed = spec["kind"] == "frequency" ? (j, x) -> (buf[j] = ComplexF64(x[1], x[2]); nothing) : (j, x) -> nothing
+        st0 = EXP.Tangent._init_states(red, Float64, Val(2), Val(1))
+        return @benchmarkable EXP._ind_window_loop!($b, $sys, $x0, $W1, $red, $st0, 1, $N, 1, true, $feed) samples = 5 evals = 1
+    end
+    W0 = deviation_frame(Float64, "pi/4", 2)
+    st0 = EXP.Tangent._init_states(red, Float64, Val(2), Val(2))
+    nws = EXP.Tangent._chain_workspace(red, Float64, Val(2), Val(2))
+    ws = nws == 0 ? EXP.Tangent._NO_WS : zeros(UInt32, nws)
+    return @benchmarkable EXP._ind_series_loop!($b, $sys, $x0, $W0, $red, $st0, $ws, 1, $N, 1, true) samples = 5 evals = 1
+end
+
+for (name, spec) in IND_SPECS
+    SUITE["run indicator $name"] = ind_item_bench(spec)
+end

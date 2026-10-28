@@ -45,6 +45,7 @@ end
 # The pilot items: every run type of the plan (horizon replaced by the pilot horizon) on every start, in groups of one run type.
 function pilot_items(plan::RunPlan, starts)
     rb, df = plan.block, plan.defaults
+    ctx = (specs = Dict{String, Any}(sp["id"] => sp for sp in get(rb.raw, "indicator", Dict{String, Any}[])),)
     ktext = _k_texts(plan)
     nid = maximum(it.orbit for it in plan.items)
     ctx0 = (grids = Dict{Tuple{Int, Int}, NamedTuple}(), grid = rb.raw["grid"], bits = df["bigfloat_bits"], cv = plan.code_version)
@@ -57,7 +58,9 @@ function pilot_items(plan::RunPlan, starts)
             base = (id = id, system = "standard", param = ktext[st["k_index"]], x0 = string(st["x0"]), p0 = string(st["p0"]), run_seed = string(df["seed"]),
                     orbit_seed = string(orbit_seed(df["seed"], id)), design_class = "pilot", setup_class = "T", cell = "pilot:k$(st["k_index"])",
                     exponent = nothing, in_SD = false, in_SL = false, k_index = st["k_index"], control_exact = false)
-            push!(items, _make_item(length(items) + 1, base, m, prec, rb.raw["pilot"]["horizon"], tau, eps === nothing ? nothing : parse(Float64, eps), dir, mode, ctx0))
+            spec = get(ctx.specs, m, nothing)       # D86: a window kind runs at its own run length, the others at the pilot horizon (R20 item 1)
+            N = spec !== nothing && ind_window_kind(spec["kind"]) ? tau * ind_run_length(spec) : rb.raw["pilot"]["horizon"]
+            push!(items, _make_item(length(items) + 1, base, m, prec, N, tau, eps === nothing ? nothing : parse(Float64, eps), dir, mode, ctx0; spec = spec))
             push!(ids, length(items))
         end
         push!(groups, ids)
@@ -124,7 +127,7 @@ function _pilot_group!(plan, ctx, hooks, store, its, gi, ordinal0, o)
                        failure_reasons = String[], setup = "not applicable", pilot = true, prov = prov, dirty = o.dirty)
         write_chunk(chunk_path(store, ordinal0 + n), attrs, recs[idx])
     end
-    return (its = its, recs = recs, steps = steps, wall = t1 - t0, workers = workers, cells = length(cells), backend = prov.backend,
+    return (its = its, recs = recs, steps = steps, wall = t1 - t0, workers = workers, cells = length(cells), backend = prov.backend, times = times,
             eff = real_wall > 0 ? clamp(sum(times) / (real_wall * workers), 0.0, 1.0) : 1.0)
 end
 
@@ -154,8 +157,24 @@ function _pilot_arms(plan::RunPlan, cost, eff, threads)
     return out
 end
 
+# Per-spec fields of a cost row (R20 item 1): the horizon run, bytes(orbit), the capacity read, the flag shares, the orbit pass and the transform of a frequency spec.
+function _pilot_spec_row(plan, g)
+    it = first(g.its)
+    id = it.method
+    n = length(g.recs)
+    shares = Dict{String, Any}(nm => c / n for (nm, c) in ind_flag_counts(g.recs, id))
+    row = Dict{String, Any}("horizon" => it.horizon, "bytes_per_orbit" => orbit_bytes(plan, it).total, "flag_shares" => shares,
+                            "capacity" => group_capacity(plan, it; free_bytes = Int(Sys.free_memory()), f = Tangent.CHUNK_HEADROOM))
+    if it.kind == "frequency"
+        tr = sum((o.cost[id][6] for o in g.recs); init = 0.0)
+        row["transform_seconds"], row["orbit_pass_seconds"] = tr, max(sum(g.times) - tr, 0.0)
+    end
+    return row
+end
+
 function _pilot_report(plan, starts, groups, o, dirty)
     cost = _pilot_costs(groups)
+    extra = Dict((first(g.its).method, _label(first(g.its).precision)) => _pilot_spec_row(plan, g) for g in groups if first(g.its).kind !== nothing)
     bk = Dict((first(g.its).method, _label(first(g.its).precision)) => g.backend for g in groups)
     eff = isempty(groups) ? 1.0 : sum(g.eff for g in groups) / length(groups)
     share = Dict{String, Any}()
@@ -164,8 +183,8 @@ function _pilot_report(plan, starts, groups, o, dirty)
         share[m] = isempty(rs) ? 0.0 : count(exceeded, rs) / length(rs)
     end
     return Dict{String, Any}("not_study_data" => PILOT_NOTE, "starts" => starts, "plan_sha256" => plan.hash,
-        "cost" => [Dict{String, Any}("method" => m, "precision" => p, "backend" => String(bk[(m, p)]), "thread_seconds_per_orbit_step" => c[3] / c[1],
-                                     "wall_seconds_per_orbit_step" => c[2] / c[1]) for ((m, p), c) in sort!(collect(cost); by = first)],
+        "cost" => [merge(Dict{String, Any}("method" => m, "precision" => p, "backend" => String(bk[(m, p)]), "thread_seconds_per_orbit_step" => c[3] / c[1],
+                                           "wall_seconds_per_orbit_step" => c[2] / c[1]), get(extra, (m, p), Dict{String, Any}())) for ((m, p), c) in sort!(collect(cost); by = first)],
         "arms" => _pilot_arms(plan, cost, eff, o.threads), "first_departure" => _first_departure(plan, starts),
         "k19" => Dict{String, Any}("threads" => plan.block.raw["k19"]["threads"], "device_record" => _record_dict(o.records[1]),
                                    "prior_record" => _record_dict(o.records[2])),
@@ -188,7 +207,7 @@ function run_pilot(prereg::AbstractString, panel::AbstractString; out::AbstractS
     rec = device_record === nothing ? gpu_record() : device_record
     starts = pilot_starts(plan)
     items, groups = pilot_items(plan, starts)
-    ctx = make_ctx(plan, items)
+    ctx = make_ctx(plan, items; hooks = hooks)
     cap = capacity === nothing ? _launch_capacity(plan, Int(Sys.free_memory()), 0.5) : max(1, Int(capacity))
     o = (threads = Int(threads), capacity = cap, git = git, dirty = dirty !== nothing, records = (rec, prior_record), lost = Ref(false), table = backend_table(plan; threads = threads, record = rec))
     store = joinpath(out, "store")
@@ -214,18 +233,29 @@ function _sample_items(plan::RunPlan, arm, n)
 end
 
 function _same_bits(a::OrbitRecord, b::OrbitRecord)
-    ok = _same(a.t, b.t) && _same(a.state, b.state) && keys(a.lyap) == keys(b.lyap) && keys(a.diagnostics) == keys(b.diagnostics) &&
+    ok = _same(a.t, b.t) && _same(a.state, b.state) && keys(a.lyap) == keys(b.lyap) && keys(a.diagnostics) == keys(b.diagnostics) && _same_indicators(a.indicators, b.indicators) &&
          (a.winding === nothing ? b.winding === nothing : b.winding !== nothing && _same(a.winding, b.winding))
     return ok && all(m -> _same(a.lyap[m], b.lyap[m]), keys(a.lyap)) && all(m -> _same(a.diagnostics[m], b.diagnostics[m]), keys(a.diagnostics))
 end
 
-_max_diff(a::OrbitRecord, b::OrbitRecord) = maximum((maximum(abs.(a.lyap[m] .- b.lyap[m])) for m in keys(a.lyap)); init = 0.0)
+_max_diff(a::OrbitRecord, b::OrbitRecord) = max(maximum((maximum(abs.(a.lyap[m] .- b.lyap[m])) for m in keys(a.lyap)); init = 0.0), _ind_max_diff(a, b))
+
+# Largest absolute difference of the stored tables of the indicator specs (NaN positions that agree count as 0).
+function _ind_max_diff(a::OrbitRecord, b::OrbitRecord)
+    d = 0.0
+    for id in keys(a.indicators), f in (:series, :final, :scalars)
+        x, y = getfield(a.indicators[id], f), getfield(get(b.indicators, id, a.indicators[id]), f)
+        x === nothing && continue
+        d = max(d, maximum((abs(u - v) for (u, v) in zip(x, y) if !(isnan(u) && isnan(v))); init = 0.0))
+    end
+    return d
+end
 
 """
     rerun_check(prereg, panel, store; code_version, threads, thread_override, allow_dirty, sample) -> Vector
 
 Rerun `[run.verify].rerun_sample` items per arm (or `sample`) on the CPU and compare them with the stored chunk files: one
-`(item, arm, backend, bitwise, max_abs_diff)` per item; items whose chunk file is missing are left out.
+`(item, arm, backend, bitwise, max_abs_diff, gated)` per item; items whose chunk file is missing are left out.
 """
 function rerun_check(prereg::AbstractString, panel::AbstractString, store::AbstractString; code_version = nothing, defaults = nothing,
                      threads::Integer = Threads.nthreads(), thread_override::Bool = false, allow_dirty::Bool = false, repo = nothing, sample = nothing)
@@ -245,7 +275,8 @@ function rerun_check(prereg::AbstractString, panel::AbstractString, store::Abstr
         it = plan.items[id]
         stored = only(o for o in ch.orbits if o.id == it.orbit)
         again = run_item(it, ctx)
-        push!(out, (item = id, arm = arm["name"], backend = ch.attrs["backend"], bitwise = _same_bits(stored, again), max_abs_diff = _max_diff(stored, again)))
+        push!(out, (item = id, arm = arm["name"], backend = ch.attrs["backend"], bitwise = _same_bits(stored, again), max_abs_diff = _max_diff(stored, again),
+                    gated = ch.attrs["backend"] != "gpu"))      # no cross-backend tolerance on indicators (R20 item 2): a device item is reported, not gated
     end
     return out
 end

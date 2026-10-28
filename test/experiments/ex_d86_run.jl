@@ -196,7 +196,16 @@ end
     rec = (threads = 4, cpu_ns_per_step = 8.25, gpu_ns_per_step = 2.47, gpu_faster = true, date = "2026-10-28",
            recorder = Dict{String, Any}(id => (threads = 4, gpu_faster = true, spec_sha256 = sha) for (id, sha) in shas))
     cpu = d86_run("p-cpu", blk)
-    ref = d86_store_sha(cpu.store)
+    ref = d86_store_sha(cpu.store; skip = D86_BACKEND_ATTRS)
+    # the comparison is strict on everything but the attributes that differ by design: a changed dataset value, and a changed attribute outside that list, are detected
+    raw1 = first(r for r in (d86_raw(f) for f in ex_chunk_files(cpu.store)) if any(endswith(k, "/series") for k in keys(r)))
+    base_hash = d86_canon_raw(raw1; skip = D86_BACKEND_ATTRS)
+    mut = copy(raw1); k_series = first(k for k in keys(raw1) if endswith(k, "/series")); v = copy(raw1[k_series]); v[1, 1] = nextfloat(v[1, 1]); mut[k_series] = v
+    @test d86_canon_raw(mut; skip = D86_BACKEND_ATTRS) != base_hash
+    mut2 = copy(raw1); mut2["@horizon"] = raw1["@horizon"] + 1
+    @test d86_canon_raw(mut2; skip = D86_BACKEND_ATTRS) != base_hash
+    mut3 = copy(raw1); mut3["@backend"] = "gpu"
+    @test d86_canon_raw(mut3; skip = D86_BACKEND_ATTRS) == base_hash
     function with_dev(dev, tag)
         store = ex_store("d86-p-$tag")
         res = ex_with_device(() -> ex_campaign(fx; store = store, device_record = rec, hooks = ex_zero_clock()), dev)
@@ -204,12 +213,12 @@ end
     end
     res, store = with_dev(ex_hdev(), "ok")
     @test res.status == "complete" && any(f -> EX.read_chunk(f).attrs["backend"] == "gpu", ex_chunk_files(store))
-    @test d86_store_sha(store) == ref                                               # the KA CPU backend gives the bits of the CPU loop
+    @test d86_store_sha(store; skip = D86_BACKEND_ATTRS) == ref                     # the KA CPU backend gives the bits of the CPU loop (datasets and all other attributes)
     for (dev, r, tag) in ((ex_hdev((ci, li, c) -> throw(ExOOM())), R[4], "oom"), (ex_hdev((ci, li, c) -> throw(ExCompile())), R[3], "compile"))
         res, store = with_dev(dev, tag)
         att = [EX.read_chunk(f).attrs for f in ex_chunk_files(store)]
         @test res.status == "complete" && all(a -> a["backend"] == "cpu" && a["backend_fallback_reason"] == r, att)
-        @test d86_store_sha(store) == ref
+        @test d86_store_sha(store; skip = D86_BACKEND_ATTRS) == ref
     end
     # the capacity of a device batch reads the bytes of the chain: free memory chosen so that 9 orbits fit with a 256 byte reducer allowance and 8 with the 392 bytes of the chain
     tplan = d86_plan("p-t4", d86_one(d86_spec("tangent"); orbits = "S_D"))
@@ -315,7 +324,9 @@ const D86_BK_BITS = ["below_floor", "zero", "reldig_undefined"]
     hooks = EX.RunHooks(clock = ex_clock(info -> 0.0; start = 0.0), mutate = ex_fault(nan1!; ord = c.ordinal, log = log))
     res = ex_with_device(() -> ex_campaign(fx; store = store, device_record = rec, hooks = hooks), ex_hdev())
     @test res.status == "complete" && [(l.attempt, l.backend) for l in log if l.ordinal == c.ordinal] == [(1, :gpu), (2, :cpu)]
-    @test d86_store_sha(store) == d86_store_sha(cpu.store)
+    ra = EX.read_chunk(joinpath(store, "chunk-$(lpad(c.ordinal, 5, '0')).h5")).attrs
+    @test ra["attempt"] == 2 && ra["backend"] == "cpu" && ra["backend_fallback_reason"] == Chaoslab.FALLBACK_REASONS[5] && !isempty(ra["first_attempt_reasons"])
+    @test d86_store_sha(store; skip = D86_BACKEND_ATTRS) == d86_store_sha(cpu.store; skip = D86_BACKEND_ATTRS)     # datasets and all other attributes equal a CPU run
     # the exact-exponent control rule does not read indicator items: a large change in an indicator column of a control orbit stops nothing
     bump(orbits, info) = (o = only(o for o in orbits if o.id == 14); ind(o, "t4").series[end, 1] += 1.0)
     fxc = d86_fx("r-ctrl", d86_block([d86_arm("a", "S_D", ["t4"], ["Float64"], [100]; h1_check = true)], [d86_spec("tangent"; id = "t4")]))

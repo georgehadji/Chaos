@@ -120,7 +120,7 @@ function load_entries!(s::Session, keep::Dict{Int, String}, retry::Bool)
     for c in plan.chunks
         if haskey(keep, c.ordinal)
             ch = read_chunk(keep[c.ordinal])
-            e = chunk_entry(c, ch.attrs, ch.orbits)
+            e = chunk_entry(c, ch.attrs, ch.orbits; plan = plan)
             failed = e["status"] == "failed"
             push!(s.entries, e)
             (failed && retry) || push!(s.skipped, c.ordinal)

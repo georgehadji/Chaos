@@ -138,11 +138,15 @@ end
     short = d86_one(d86_spec("phase_advance"))
     short["arm"][1]["horizons"] = [64]
     @test d86_rej(() -> EX.plan_run(d86_fx("f-c3", short).prereg, d86_fx("f-c3", short).panel; code_version = EX_CODE), "horizons")
-    # an observable index beyond the dimension: the grammar allows coordinates 1 and 2 only, so the run check of the reducer is the gate (Indicators level)
-    @test_throws ArgumentError Chaoslab.check_run(Chaoslab.WeightedPhaseAdvance(window = 16, observable = Chaoslab.PlanarObservable(1, 3)), 1, 33; d = 2)
-    # (d) a pair with Dx_r outside [Dx / 2, 2 Dx] (a lifted start at 1e9, where one ulp is 1.2e-7 > Dx = 1e-8) fails its chunk with kind separation; the rerun repeats it
+    # an observable index beyond the dimension: the grammar allows coordinates 1 and 2 only, so the run check of the reducer is the gate (Indicators level). The limit is 2 d
+    # (the wrapped state of a map of dimension d has 2 d entries, naff_reducer.jl: "observable indices must lie in 1:2d"), so the index 5 is beyond for d = 2 and 3 is not
+    @test_throws ArgumentError Chaoslab.check_run(Chaoslab.WeightedPhaseAdvance(window = 16, observable = Chaoslab.PlanarObservable(1, 5)), 1, 33; d = 2)
+    @test Chaoslab.check_run(Chaoslab.WeightedPhaseAdvance(window = 16, observable = Chaoslab.PlanarObservable(1, 3)), 1, 33; d = 2) === nothing
+    # (d) a pair with Dx_r outside [Dx / 2, 2 Dx] fails its chunk with kind separation; the rerun repeats it. Independent of the direction u (A8): both lifted coordinates of
+    # the start are 1e9, where one ulp is 1.2e-7 > 2 Dx = 2e-8, so B = A + Dx u rounds back to A in both coordinates whatever u is (Dx_r = 0)
     orbs3 = ex_panel_orbits(:std)
-    only(o for o in orbs3 if o["id"] == 1)["x0_dec"] = "1.0e9"
+    o1 = only(o for o in orbs3 if o["id"] == 1)
+    o1["x0_dec"] = "1.0e9"; o1["p0_dec"] = "1.0e9"; o1["x0"] = 1.0e9; o1["p0"] = 1.0e9
     pp3 = ex_write_panel(ex_path("d86-f-d-panel.toml"); orbits = orbs3)
     pr3 = ex_write_prereg_run(ex_path("d86-f-d-prereg.md"), d86_one(d86_spec("pair"; members = ["RLI"]); orbits = "S_L"))
     fxd = (; run = nothing, panel = pp3, prereg = pr3, tag = "f-d", orbits = orbs3)
@@ -241,9 +245,9 @@ end
         lam = setprecision(() -> Float64(sum(sal(n) / sal(j) for j in 1:n)), BigFloat, 256)
         @test abs(col("SALI.sali")[i] - Float64(sal(n))) <= 8 * EX_EPS * lam + Float64(sal(n)) * 2 * bs(n) + 4 * EX_EPS
     end
-    # MEGNO column 2 at tau = 1: Y = ln(n^2 + 1) - (1/n) ln prod_{i=1..n} (i^2 + 1) within 6 B_S(n)
+    # MEGNO column 2 at tau = 1: megno-spec M10(a): "Y(n) = ln(n^2 + 1) - (1/n) ln prod_{i=0..n-1} (i^2 + 1)", within 6 B_S(n)
     for (i, n) in enumerate(t)
-        y = setprecision(() -> Float64(log(BigFloat(n)^2 + 1) - sum(log(BigFloat(j)^2 + 1) for j in 1:n) / n), BigFloat, 256)
+        y = setprecision(() -> Float64(log(BigFloat(n)^2 + 1) - sum(log(BigFloat(j)^2 + 1) for j in 0:(n - 1)) / n), BigFloat, 256)
         @test abs(col("MEGNO.Y2")[i] - y) <= 6 * bs(n)
     end
 end

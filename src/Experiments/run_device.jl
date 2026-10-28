@@ -211,6 +211,7 @@ nine) and `backend = :cpu`. Otherwise `prov` holds the tangent-core provenance f
 `hook = false` skips the test hook of tangent-core (the warm-up launch).
 """
 function device_records(ctx::RunCtx, items; hook::Bool = true)
+    first(items).kind === nothing || return ind_device_records(ctx, items; hook = hook)      # D86: the indicator kinds have their own kernels
     prime_frames!(ctx, items)
     it = first(items)
     T, bits = parse_precision(it.precision)

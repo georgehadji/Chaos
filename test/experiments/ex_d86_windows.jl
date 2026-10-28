@@ -23,9 +23,10 @@ d86_win_run() = d86_run("win", d86_win_block())
 
 # stretching: all orbits of S_D with the counts of S_L, tau 1 and 4, plus the same spec on orbit 1 alone
 d86_st_spec() = d86_spec("stretching"; id = "s1")
-function d86_st_block(; orbits = "S_D", bins = 20)
-    sp = d86_spec("stretching"; id = "s1", bins = bins)
-    return d86_block([d86_arm("st", orbits, ["s1"], ["Float64"], [100]; tau = [1, 4]), d86_arm("stw", orbits, ["s1"], ["Float64"], [100]; coordinate_mode = ["wrapped"])], [sp])
+function d86_st_block(; orbits = "S_D", bins = 20, range = "derived", direction = nothing)
+    sp = d86_spec("stretching"; id = "s1", bins = bins, range = range)
+    kw = direction === nothing ? (;) : (; direction = direction)
+    return d86_block([d86_arm("st", orbits, ["s1"], ["Float64"], [100]; tau = [1, 4], kw...), d86_arm("stw", orbits, ["s1"], ["Float64"], [100]; coordinate_mode = ["wrapped"], kw...)], [sp])
 end
 
 # ================================================================ D86i
@@ -54,9 +55,12 @@ end
             last = d86_stretch_final(it, spec, it.horizon)
             sc = d86_ds(raw, o, "s1", "scalars")
             f = last.fin
-            first_full = t[findfirst(x -> x ÷ it.tau >= spec["min_per_cell"] * spec["bins"], t)]
-            expected = Float64[f.handoffs; f.sum; f.comp; f.sum2; f.comp2; f.mean; f.std; f.below; f.above; first_full]
-            miss!("scalars length", length(sc) == length(expected) == 18)
+            # E25: "the first grid step at which the handoff count reaches min_per_cell x bins"; when the run never reaches it (tau = 4: 25 handoffs against 40) the
+            # spec names no value, so that entry is not compared
+            ifull = findfirst(x -> x ÷ it.tau >= spec["min_per_cell"] * spec["bins"], t)
+            expected = Float64[f.handoffs; f.sum; f.comp; f.sum2; f.comp2; f.mean; f.std; f.below; f.above]
+            ifull === nothing || push!(expected, t[ifull])
+            miss!("scalars length", length(sc) == 18)
             miss!("scalars values", all(v -> any(s -> reinterpret(UInt64, s) == reinterpret(UInt64, v), sc), expected))
             rg = d86_at(raw, o, "s1", "scalars", "range")                                   # two binary64, lo then hi, on `scalars` (correction 5)
             miss!("range", rg isa Vector{Float64} && rg == [last.range[1], last.range[2]])
@@ -92,25 +96,49 @@ end
 end
 
 @testset "D86i stretching closed forms through the recorder: Y5 hyperbolic and the K = 0 shear (O18)" begin
-    # Y5 with the frame (pi/4, 3 pi/4) is the eigenframe of the symmetric hyperbolic block: z = +/- ln mu per handoff, single cells, D = sqrt(2 / h) (stretching SN8b)
-    run = d86_run("st-cf", d86_st_block(; bins = 21))
+    # Y5 hyperbolic (stretching SN8b): for a unit column v of the frame the stretching number of handoff k is z_k = ln(norm(A^k v) / norm(A^(k-1) v)) (tau = 1), computed here in
+    # BigFloat(256) from the stored matrix; the counts are those of the cells of z_k "tolerance 0 under the edge condition" and D = ||N1 - N2|| / (k sqrt(h)) (SN5) within 4 eps.
+    # An exact eigenframe (direction pi/4) cannot be used: the column along the contracting direction is rounded off it, and the rounding grows like mu^k, so after about 20
+    # handoffs the recorded column is the expanding direction (the stand-alone reducer does the same); the closed form is therefore taken for the direction 0.3, where it
+    # holds for all k. The derived range is the exact bound padded by 8 eps, so z of Y5 sits at its edge by construction; a given range [-2, 2] puts the z away from the edges.
+    run = d86_run("st-cf", d86_st_block(; bins = 21, range = [-2.0, 2.0], direction = ["0.3"]))
     plan = run.plan
     bad = String[]
+    nchecked = Ref(0)
     d86_each(run) do it, o, raw, c, file
         (o == 15 && it.tau == 1 && it.coordinate_mode == "lifted") || return
-        sc = d86_ds(raw, o, "s1", "scalars"); lo, hi = d86_at(raw, o, "s1", "scalars", "range")
+        nchecked[] += 1
+        lo, hi = d86_at(raw, o, "s1", "scalars", "range")
+        (lo == -2.0 && hi == 2.0) || push!(bad, "range")
         D = d86_ds(raw, o, "s1", "series")[:, 1]
-        h = setprecision(() -> (BigFloat(hi) - BigFloat(lo)) / 21, BigFloat, 256)
-        lnmu = setprecision(() -> log((3 + sqrt(BigFloat(5))) / 2), BigFloat, 256)
-        cell(z) = Int(floor((z - BigFloat(lo)) / h)) + 1
-        frac(z) = (u = (z - BigFloat(lo)) / h; abs(u - round(u)))
-        (frac(lnmu) > 1e-6 && frac(-lnmu) > 1e-6) || push!(bad, "edge condition")            # the closed form needs z away from a cell edge
-        want = zeros(Int, 23, 2); want[cell(lnmu) + 1, 1] = it.horizon; want[cell(-lnmu) + 1, 2] = it.horizon
-        pc = d86_stretch_final(it, d86_st_spec(), it.horizon).fin.counts
-        Int.(pc) == want || push!(bad, "counts")
-        dcf = setprecision(() -> Float64(sqrt(2 / h)), BigFloat, 256)
+        n = it.horizon
+        W = EX.deviation_frame(Float64, it.direction, 2)
+        A = Chaoslab.y5_control(parse(Float64, it.param)).sys.A
+        counts, margin = setprecision(256) do
+            B = BigFloat(21); h = (BigFloat(hi) - BigFloat(lo)) / B
+            cnt = zeros(Int, 23, 2); mar = BigFloat(1)
+            for j in 1:2
+                v = BigFloat.(collect(W[:, j])); Ab = BigFloat.(Matrix(A))
+                prev = log(sqrt(sum(abs2, v)))
+                for k in 1:n
+                    v = Ab * v
+                    cur = log(sqrt(sum(abs2, v)))
+                    z = cur - prev; prev = cur
+                    u = (z - BigFloat(lo)) / h
+                    cell = z < lo ? 0 : z > hi ? 22 : min(Int(floor(u)) + 1, 21)
+                    cnt[cell + 1, j] += 1
+                    mar = min(mar, abs(u - round(u)))
+                end
+            end
+            cnt, mar
+        end
+        margin > 1e-9 || push!(bad, "edge condition")                                       # a z within 1e-9 of a cell edge would make the counts depend on rounding
+        pc = d86_stretch_final(it, d86_spec_of(plan, it), n).fin.counts
+        Int.(pc) == counts || push!(bad, "counts")
+        dcf = setprecision(() -> Float64(sqrt(sum((counts[:, 1] .- counts[:, 2]) .^ 2)) / (n * sqrt((BigFloat(4) / 21)))), BigFloat, 256)
         abs(D[end] - dcf) <= 4 * EX_EPS * dcf || push!(bad, "D")
     end
+    @test nchecked[] == 1
     @test isempty(bad)
     # K = 0 shear, identity frame: column 1 = (1, 0) has b = 0, so every stretching number is exactly 0 and all its counts sit in the central cell (bins odd)
     orbs = ex_panel_orbits(:std)
@@ -159,12 +187,15 @@ end
     end
     @test isempty(bad)
     # (c) the buffer is released: resident bytes after a chunk exceed those before by at most the stored results plus 64 kB (full GC, allocation counters)
-    big = d86_one(d86_spec("frequency"; id = "fq", windows = [250]); mode = "wrapped", name = "big")
-    fb = d86_fx("j-big", big)
+    # 40 orbits (the panel :big): the buffers of a chunk would be 40 x 32 x 250 = 320 kB if they were kept, five times the 64 kB of the criterion
+    bigblk = d86_one(d86_spec("frequency"; id = "fq", windows = [250]); orbits = "P", mode = "wrapped", name = "big")
+    fb = d86_fx("j-big", bigblk; panel = :big)
     plan2 = ex_plan(fb)
     ctx = EX.make_ctx(plan2)
     items = NamedTuple[it for it in plan2.items if it.method == "fq"]
-    EX.compute_records(ctx, items[1:2], 1)                                           # warm-up outside the measurement
+    # warm-up outside the measurement: one full pass over the same items (the constant series of the control orbits fill a one-time cache of the transform; the criterion
+    # is that the buffer is not kept, so what is measured is the growth of a second pass)
+    EX.compute_records(ctx, items, 1)
     GC.gc(true); before = Base.gc_live_bytes()
     recs = EX.compute_records(ctx, items, 1)
     GC.gc(true); after = Base.gc_live_bytes()
@@ -204,7 +235,7 @@ end
     bad = String[]
     d86_each(run; methods = ["fq", "fqp"]) do it, o, raw, c, file
         for (k, v) in raw
-            (v isa AbstractArray && startswith(k, "orbits/$o/")) || continue
+            (v isa AbstractArray && startswith(k, "orbits/$o/") && !occursin("@", k)) || continue          # datasets only (attributes such as `columns` are string vectors)
             occursin(allowed, k) || push!(bad, k)
             v isa AbstractArray && length(v) >= 2 * 40 && !(k in ("orbits/$o/state", "orbits/$o/winding") || occursin(r"/(t|diagnostics/\w+)$", k)) && push!(bad, "long $k")
         end
@@ -265,8 +296,14 @@ end
             end
             "below_floor" in names[1] || push!(bad, "below_floor orbit $o")
         end
+        # The hyperbolic fixed point (0, 0) is exact for the binary64 map: exp(i q) is the constant 1. naff-fma 11(b) (replacement of item 8): a window of equal samples is
+        # degenerate "when either mean removal is on or the common value is zero"; with mean removal off and a nonzero common value it "is a line at frequency 0: status ok"
+        # with the near-zero flag. So `fm` (mean removal on) gives the `degenerate` bit, and `f0` (mean removal off) a zero frequency with `near_zero1`.
+        if it.method == "fm" && o == 14
+            "degenerate" in names[1] || push!(bad, "degenerate orbit $o")
+        end
         if it.method == "f0" && o == 14
-            "degenerate" in names[1] || push!(bad, "degenerate orbit $o")        # the hyperbolic fixed point (0, 0) is exact for the binary64 map: a constant series
+            (fin[1, 1] == 0.0 && "near_zero1" in names[1] && !("degenerate" in names[1])) || push!(bad, "zero frequency orbit $o")
         end
         # whatever the orbit: the table and the flags are those of the pure function
         spec = d86_spec_of(plan, it)
@@ -284,7 +321,7 @@ end
     @test isempty(bad)
     # the fixed-point controls count in the manifest, the chunk is ok
     man = EX.read_json(run.res.manifest)
-    ch = only(c for c in man["chunks"] if c["status"] == "ok" && get(c, "key", "") != "" && occursin("method=f0", c["key"]) && occursin("cell=controls", c["key"]))
+    ch = only(c for c in man["chunks"] if c["status"] == "ok" && get(c, "key", "") != "" && occursin("method=fm", c["key"]) && occursin("cell=controls", c["key"]))
     @test ch["indicator_flags"]["degenerate"] >= 1
     # an injected non-finite sample fails the chunk and names the orbit id and the sample index (naff-fma criterion 11(a))
     blk = d86_one(d86_spec("frequency"; id = "fq"); orbits = "S_D", mode = "wrapped")
@@ -307,7 +344,9 @@ end
         names = d86_flagset.(flg, Ref(bits))
         Wm = maximum(spec["windows"])
         # the stand-alone reducer on the same orbit (O16), chain of one: planar, and lifted from the state coordinate and its winding count (wrapped) or the lifted coordinate
-        obs = spec["observable"] == "planar" ? Chaoslab.PlanarObservable(1, 2) : it.coordinate_mode == "wrapped" ? Chaoslab.LiftedAngleObservable(1, 3) : Chaoslab.LiftedAngleObservable(1)
+        # (the linear control Y5 has no torus: its state has two components in both modes and no winding count, E26)
+        obs = spec["observable"] == "planar" ? Chaoslab.PlanarObservable(1, 2) :
+              (it.coordinate_mode == "wrapped" && it.system != "linear") ? Chaoslab.LiftedAngleObservable(1, 3) : Chaoslab.LiftedAngleObservable(1)
         fr = ex_with_prec(it.precision) do T
             sys, x = ex_sys_x(it, T)
             red = Chaoslab.WeightedPhaseAdvance(window = Tuple(spec["windows"]), observable = obs, birkhoff_order = spec["birkhoff_order"])
@@ -325,10 +364,12 @@ end
         end
         sc = d86_ds(raw, o, it.method, "scalars"); cn = d86_at(raw, o, it.method, "scalars", "columns")
         (cn == ["handoffs", "near_pi", "complete"] && sc[1] == 2Wm + 1 && sc[2] == fr.near_pi && sc[3] == 1.0) || push!(bad, "scalars $o")
-        plan.panel.orbits[o]["control_kind"] == "y5" && it.method == "pa" && !("undefined window" in names[1]) && push!(bad, "undefined window Y5")     # the Y5 start is the origin: a planar sample at the origin
+        d86_pinfo(plan, o) !== nothing && d86_pinfo(plan, o)["control_kind"] == "y5" && it.method == "pa" && !("undefined window" in names[1]) && push!(bad, "undefined window Y5")     # the Y5 start is the origin: a planar sample at the origin
     end
     @test isempty(bad)
-    # the lifted observable on the K = 0 map gives p_0 / (2 pi) within 16 eps (naff-fma 7(b))
+    # The lifted observable on the K = 0 map gives p_0 / (2 pi). naff-fma 7(b) gates 16 eps for "wrapped state with winding counts ... lifted post-kick momentum rebuilt from the
+    # winding counts": the wrapped mode. In the lifted mode the coordinate itself is rounded at each step (at most |q| eps / 2 per increment; 7(c): "the series built from the
+    # lifted coordinate is reported with its error (about |q| eps), not gated"), so the lifted mode is gated by 16 eps plus |q|max eps, the scale 7(c) names.
     blk = d86_block([d86_arm("k0", "P", ["pl"], ["Float64"], [65]; coordinate_mode = ["wrapped", "lifted"])], [d86_spec("phase_advance"; id = "pl", observable = "lifted", windows = [16, 32])])
     k0 = d86_k0_run("l-k0", blk)
     @test k0.res.status == "complete"
@@ -338,8 +379,10 @@ end
         (o <= 11 && !k0.plan.panel.orbits[o]["control"]) || return
         fin, _, _ = d86_final(raw, o, "pl")
         p0 = k0.plan.panel.orbits[o]["p0"]
+        qmax = maximum(abs, raw["orbits/$o/state"][:, 1])
+        bound = it.coordinate_mode == "wrapped" ? 16 * EX_EPS : (16 + qmax) * EX_EPS
         for r in 1:2, col in 1:2
-            abs(BigFloat(fin[r, col]) - BigFloat(p0) / tp) <= 16 * EX_EPS || push!(bad, "nu orbit $o $(it.coordinate_mode)")
+            abs(BigFloat(fin[r, col]) - BigFloat(p0) / tp) <= bound || push!(bad, "nu orbit $o $(it.coordinate_mode)")
         end
     end
     @test isempty(bad)
@@ -375,7 +418,6 @@ end
         if it.precision == "Float64" && it.coordinate_mode == "wrapped"
             raw["@observable_names"] == [Chaoslab.observable_name(ob) for ob in d86_observables(s, "wrapped")] || push!(bad, "names")
         end
-        orbit = plan.panel.orbits[o]
         if o == 14                                                                                  # the hyperbolic fixed point (0, 0): cos q = 1 and sin q = 0 for every sample
             n1, n2 = d86_flagset(flg[1], bits), d86_flagset(flg[2], bits)
             (reinterpret(UInt64, fin[1, 5]) == 0x0000000000000000 && "below_floor" in n1 && !("zero" in n1)) || push!(bad, "constant observable")

@@ -15,7 +15,11 @@ struct OrbitRecord
     first_exceedance::Dict{String, Int}
     cost::Dict{String, Vector{Float64}}
     failure::String
+    indicators::Dict{String, NamedTuple}    # D86: the tables of the indicator specs by spec id (empty for the exponent methods)
 end
+
+OrbitRecord(id, attrs, t, state, winding, lyap, diagnostics, thresholds, first_exceedance, cost, failure) =
+    OrbitRecord(id, attrs, t, state, winding, lyap, diagnostics, thresholds, first_exceedance, cost, failure, Dict{String, NamedTuple}())
 
 # ---------------------------------------------------------------- the non-raising monitor
 struct RunMonitor{S}
@@ -233,6 +237,7 @@ function _blank_failed!(b::RecBuf)
 end
 
 function _run_item(::Type{T}, item, ctx) where {T}
+    item.kind === nothing || return run_indicator_item(T, item, ctx)
     sys, x0 = _system_start(T, item)
     W0 = get(ctx.frames, (item.precision, item.direction, item.vectors), nothing)
     W0 === nothing && (W0 = deviation_frame(T, item.direction, item.vectors))
@@ -252,11 +257,16 @@ end
 # Deviation frames of the items, computed once per (precision, direction, k) before the parallel region (read-only afterwards).
 function prime_frames!(ctx, items)
     for it in items
+        it.kind === nothing || get!(() -> orbit_bytes(ctx.plan, it).total, ctx.bytes, _ind_bytes_key(it))
+        it.direction === nothing && continue
         key = (it.precision, it.direction, it.vectors)
-        haskey(ctx.frames, key) && continue
-        T, bits = parse_precision(it.precision)
-        ctx.frames[key] = bits === nothing ? deviation_frame(T, it.direction, it.vectors) :
-                          setprecision(() -> deviation_frame(T, it.direction, it.vectors), BigFloat, bits)
+        if !haskey(ctx.frames, key)
+            T, bits = parse_precision(it.precision)
+            W = bits === nothing ? deviation_frame(T, it.direction, it.vectors) :
+                setprecision(() -> deviation_frame(T, it.direction, it.vectors), BigFloat, bits)
+            ctx.frames[key] = ctx.hooks.frame === nothing ? W : ctx.hooks.frame(:frame, (precision = it.precision, direction = it.direction, vectors = it.vectors), W)
+        end
+        it.kind === nothing || check_item_frame!(ctx, it, ctx.frames[key])
     end
 end
 
@@ -269,7 +279,7 @@ function warm_up!(ctx, items, nt::Integer; dev::Bool = false)
         key = (typeof(it), it.precision, it.method, it.vectors, it.coordinate_mode, it.system, dev)
         key in ctx.warmed && continue
         push!(ctx.warmed, key)
-        w = merge(it, (horizon = min(it.horizon, it.tau * cld(WARM_STEPS, it.tau)),))
+        w = it.kind !== nothing && ind_window_kind(it.kind) ? it : merge(it, (horizon = min(it.horizon, it.tau * cld(WARM_STEPS, it.tau)),))
         get!(ctx.grids, (w.horizon, w.tau)) do
             gr = ctx.plan.block.raw["grid"]
             record_grid(w.horizon, w.tau; points_per_decade = gr["points_per_decade"], first_steps = gr["first_steps"], extra_fractions = gr["extra_fractions"])

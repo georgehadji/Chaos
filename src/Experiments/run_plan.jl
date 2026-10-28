@@ -21,16 +21,21 @@ struct RunPlan
     study::String
     code_version::String
     prereg_header::String
+    not_applicable::Dict{String, Vector{Int}}                   # D86: orbits without an item for a spec, by spec id
+    omitted_cells::Dict{String, Vector{Tuple{Int, String}}}     # the same with the panel cell of each orbit
 end
 
 const _ITEM_FIELDS = (:orbit, :system, :param, :x0, :p0, :run_seed, :orbit_seed, :method, :precision, :horizon, :tau, :eps,
-                      :direction, :coordinate_mode, :vectors, :grid_sha256, :code_version, :hash_version)
+                      :direction, :coordinate_mode, :vectors, :grid_sha256, :code_version, :hash_version, :kind, :spec)
 
-"LF text of the hashed fields of a work item, one `name=value` line each (`eps` for L2 only)."
+# `eps` for L2 only, `direction` only for the items that have one, `kind` and `spec` only for the indicator kinds (D86, E27).
+_item_prop(it, f::Symbol) = hasproperty(it, f) ? getproperty(it, f) : nothing
+
+"LF text of the hashed fields of a work item, one `name=value` line each (`eps` for L2 only; indicator items add `kind` and `spec` last)."
 function item_text(it)
     io = IOBuffer()
     for f in _ITEM_FIELDS
-        f === :eps && it.eps === nothing && continue
+        (f in (:eps, :direction, :kind, :spec) && _item_prop(it, f) === nothing) && continue
         print(io, f, "=", getproperty(it, f), "\n")
     end
     return String(take!(io))
@@ -109,7 +114,7 @@ end
 # ---------------------------------------------------------------- work items
 _arm_dim(arm, key, prim) = get(arm, key, [prim[key]])
 
-function _make_item(id, b, method, prec, N, tau, eps, dir, mode, ctx)
+function _make_item(id, b, method, prec, N, tau, eps, dir, mode, ctx; spec = nothing)
     g = get!(ctx.grids, (N, tau)) do
         gr = record_grid(N, tau; points_per_decade = ctx.grid["points_per_decade"], first_steps = ctx.grid["first_steps"],
                          extra_fractions = ctx.grid["extra_fractions"])
@@ -118,19 +123,32 @@ function _make_item(id, b, method, prec, N, tau, eps, dir, mode, ctx)
     label = prec == "BigFloat" ? "BigFloat($(ctx.bits))" : prec
     base = (orbit = b.id, system = b.system, param = b.param, x0 = b.x0, p0 = b.p0, run_seed = b.run_seed, orbit_seed = b.orbit_seed,
             method = method, precision = label, horizon = N, tau = tau, eps = eps === nothing ? nothing : string(eps), direction = dir,
-            coordinate_mode = mode, vectors = method in ("L1", "L2") ? 1 : 2, grid_sha256 = g.hash, code_version = ctx.cv,
-            hash_version = HASH_VERSION)
+            coordinate_mode = mode, vectors = spec === nothing ? (method in ("L1", "L2") ? 1 : 2) : (ind_window_kind(spec["kind"]) ? 1 : 2),
+            grid_sha256 = g.hash, code_version = ctx.cv, hash_version = HASH_VERSION,
+            kind = spec === nothing ? nothing : spec["kind"], spec = spec === nothing ? nothing : spec_hash(spec))
     return (; id = id, base..., hash = item_hash(base), arms = String[], design_class = b.design_class, setup_class = b.setup_class,
-            cell = b.cell, exponent = b.exponent, control_exact = b.control_exact)
+            cell = b.cell, exponent = b.exponent, control_exact = b.control_exact, in_SD = b.in_SD, in_SL = b.in_SL)
 end
 
-# All (orbit id, method, precision, horizon, tau, eps, direction, mode) of one arm and one precision, in the order of R1 item 4.
-function _arm_products(arm, prec, prim, subset)
+# Whether a spec item carries the direction of the arm (R11 item 2): the tangent and stretching kinds, the pair with the direction frame source.
+ind_has_direction(spec) = spec["kind"] in ("tangent", "stretching") || (spec["kind"] == "pair" && spec["frame_source"] == "direction")
+
+# All (orbit id, method or spec id, precision, horizon, tau, eps, direction, mode) of one arm and one precision, in the order of R1 item 4: the methods,
+# then the indicator specs of the arm, over the dimensions that apply (a spec without a direction is not swept over the directions).
+function _arm_products(arm, prec, prim, subset, specs = Dict{String, Any}())
     out = Tuple[]
-    for N in arm["horizons"], mode in _arm_dim(arm, "coordinate_mode", prim), dir in _arm_dim(arm, "direction", prim),
-        tau in _arm_dim(arm, "tau", prim), m in arm["methods"], eps in (m == "L2" ? _arm_dim(arm, "eps", prim) : (nothing,)),
-        id in subset
-        push!(out, (id, m, prec, N, tau, eps, dir, mode))
+    dirs = _arm_dim(arm, "direction", prim)
+    for N in arm["horizons"], mode in _arm_dim(arm, "coordinate_mode", prim), dir in dirs, tau in _arm_dim(arm, "tau", prim)
+        for m in get(arm, "methods", String[]), eps in (m == "L2" ? _arm_dim(arm, "eps", prim) : (nothing,)), id in subset
+            push!(out, (id, m, prec, N, tau, eps, dir, mode))
+        end
+        for sid in get(arm, "indicators", String[])
+            d = ind_has_direction(specs[sid]) ? dir : nothing
+            (d === nothing && dir != first(dirs)) && continue
+            for id in subset
+                push!(out, (id, sid, prec, N, tau, nothing, d, mode))
+            end
+        end
     end
     return out
 end
@@ -141,24 +159,36 @@ function _build_items(rb, bases, ctx)
     subsets = Dict("P" => [b.id for b in bases if b.design_class != "h4"], "S_D" => [b.id for b in bases if b.in_SD], "S_L" => [b.id for b in bases if b.in_SL],
                    "h4" => [b.id for b in bases if b.design_class == "h4"])
     byid = Dict(b.id => b for b in bases)
+    specs = Dict{String, Any}(s["id"] => s for s in get(raw, "indicator", Dict{String, Any}[]))
     items, index = NamedTuple[], Dict{Tuple, Int}()
     before = Dict{String, Tuple{Int, Int}}(a["name"] => (0, 0) for a in raw["arm"])
     pre_steps = Dict{String, Int}(p => 0 for p in PRECISION_ORDER)
+    omitted = Dict{String, Vector{Tuple{Int, String}}}()
+    checked = Set{Tuple}()
     for prec in PRECISION_ORDER, arm in raw["arm"]
         prec in arm["precisions"] || continue
-        for key in _arm_products(arm, prec, prim, subsets[arm["orbits"]])
+        for key in _arm_products(arm, prec, prim, subsets[arm["orbits"]], specs)
+            spec = get(specs, key[2], nothing)
+            b = byid[key[1]]
+            if spec !== nothing
+                if !ind_applicable(spec, b.system)
+                    any(o -> o[1] == b.id, get!(omitted, key[2], Tuple{Int, String}[])) || push!(omitted[key[2]], (b.id, b.cell))
+                    continue
+                end
+                (key[2], b.id, key[4], key[5], key[8]) in checked || (ind_check_plan(spec, b, key[5], key[4], key[8]); push!(checked, (key[2], b.id, key[4], key[5], key[8])))
+            end
             n, s = before[arm["name"]]
             before[arm["name"]] = (n + 1, s + key[4])
             pre_steps[prec] += key[4]
             i = get(index, key, 0)
             if i == 0
-                push!(items, _make_item(length(items) + 1, byid[key[1]], key[2], prec, key[4], key[5], key[6], key[7], key[8], ctx))
+                push!(items, _make_item(length(items) + 1, b, key[2], prec, key[4], key[5], key[6], key[7], key[8], ctx; spec = spec))
                 i = index[key] = length(items)
             end
             push!(items[i].arms, arm["name"])
         end
     end
-    return items, before, pre_steps
+    return items, before, pre_steps, omitted
 end
 
 # ---------------------------------------------------------------- chunks
@@ -167,8 +197,9 @@ _label(p) = replace(p, r"\(\d+\)" => "")
 _runtype(it) = (method = it.method, precision = it.precision, horizon = it.horizon, tau = it.tau, eps = it.eps,
                 direction = it.direction, coordinate_mode = it.coordinate_mode)
 
-_chunk_key(it) = "method=$(it.method) precision=$(it.precision) horizon=$(it.horizon) tau=$(it.tau) eps=$(it.eps === nothing ? "-" : it.eps) " *
-                 "direction=$(it.direction) mode=$(it.coordinate_mode) cell=$(it.cell)"
+_chunk_key(it) = "method=$(it.method) " * (_item_prop(it, :kind) === nothing ? "" : "kind=$(it.kind) spec=$(it.spec[1:16]) ") *
+                 "precision=$(it.precision) horizon=$(it.horizon) tau=$(it.tau) eps=$(it.eps === nothing ? "-" : it.eps) " *
+                 "direction=$(it.direction === nothing ? "-" : it.direction) mode=$(it.coordinate_mode) cell=$(it.cell)"
 
 # The values that decide a chunk's status (R3 item 2): they change the hash, not the key.
 function _status_text(rb, df)
@@ -227,18 +258,20 @@ end
 function _steps(items, before, pre_steps, rb)
     first_arm = Dict(a["name"] => 0 for a in rb.raw["arm"])
     after_p = Dict(p => 0 for p in PRECISION_ORDER)
+    per_spec = Dict{String, NamedTuple{(:items, :steps), Tuple{Int, Int}}}()
     for it in items
         first_arm[first(it.arms)] += it.horizon
         after_p[_label(it.precision)] += it.horizon
+        it.kind === nothing || (c = get(per_spec, it.method, (items = 0, steps = 0)); per_spec[it.method] = (items = c.items + 1, steps = c.steps + it.horizon))
     end
     arms = Dict(name => (items_before = n, steps_before = s, steps_after = first_arm[name]) for (name, (n, s)) in before)
     precs = Dict(p => (steps_before = pre_steps[p], steps_after = after_p[p]) for p in PRECISION_ORDER if pre_steps[p] > 0)
     tb, ta = sum(a.steps_before for a in values(arms)), sum(a.steps_after for a in values(arms))
-    return (arms = arms, precisions = precs, total_before = tb, total_after = ta, saving = tb - ta)
+    return (arms = arms, precisions = precs, total_before = tb, total_after = ta, saving = tb - ta, specs = per_spec)
 end
 
 "Canonical bytes of a plan: counts, step counts, chunk table with hashes, panel and block hashes, defaults, code version."
-function _plan_text(chunks, items, steps, rb, df, panel, study, cv)
+function _plan_text(chunks, items, steps, rb, df, panel, study, cv, omitted = Dict{String, Vector{Tuple{Int, String}}}())
     io = IOBuffer()
     println(io, "chaoslab-plan 1\nstudy=", study, "\nblock_sha256=", block_hash(rb), "\npanel_sha256=", panel.sha256, "\ncode_version=", cv)
     println(io, "hash_version=", HASH_VERSION)
@@ -247,6 +280,12 @@ function _plan_text(chunks, items, steps, rb, df, panel, study, cv)
     for a in rb.raw["arm"]
         s = steps.arms[a["name"]]
         println(io, "arm ", a["name"], " items_before=", s.items_before, " steps_before=", s.steps_before, " steps_after=", s.steps_after)
+    end
+    for id in sort!(collect(keys(steps.specs)))      # D86: per spec, only when the block has specs
+        println(io, "spec ", id, " items=", steps.specs[id].items, " steps=", steps.specs[id].steps)
+    end
+    for id in sort!(collect(keys(omitted)))
+        println(io, "not_applicable ", id, " orbits=", join(sort!(first.(omitted[id])), ","))
     end
     for c in chunks
         println(io, "chunk ", c.ordinal, " ", c.hash, " items=", length(c.items), " arms=", join(c.arms, ","), " ", c.key)
@@ -276,7 +315,10 @@ function plan_run(prereg::AbstractString, panel::AbstractString; code_version = 
     nP = isempty(pnl.orbits) ? 0 : maximum(Int(o["id"]) for o in pnl.orbits)
     bases = vcat([_panel_base(o) for o in pnl.orbits], [_h4_base(h, nP + i, seed) for (i, h) in enumerate(rb.raw["h4"])])
     ctx = (grids = Dict{Tuple{Int, Int}, NamedTuple}(), grid = rb.raw["grid"], bits = df["bigfloat_bits"], cv = cv)
-    items, before, pre_steps = _build_items(rb, bases, ctx)
+    items, before, pre_steps, omitted = _build_items(rb, bases, ctx)
+    for (id, os) in omitted        # an arm that selects no orbit for a spec is an error naming the spec (R12 item 2)
+        any(it -> it.method == id, items) || throw(ArgumentError("indicator spec `$id` is undefined for every orbit its arms select (orbits $(join(sort!(first.(os)), ", ")))"))
+    end
     isempty(items) && throw(ArgumentError("run plan holds zero items: the arms select no orbit of the panel"))
     for it in items
         it.method == "L6" && _label(it.precision) != "Float64" &&
@@ -284,9 +326,9 @@ function plan_run(prereg::AbstractString, panel::AbstractString; code_version = 
     end
     chunks = _build_chunks(items, rb, df)
     steps = _steps(items, before, pre_steps, rb)
-    text = _plan_text(chunks, items, steps, rb, df, pnl, study, cv)
+    text = _plan_text(chunks, items, steps, rb, df, pnl, study, cv, omitted)
     return RunPlan(items, chunks, (items = length(items), chunks = length(chunks)), steps, bytes2hex(sha256(text)), text, rb, df, pnl,
-                   study, cv, chk.header_sha256)
+                   study, cv, chk.header_sha256, Dict{String, Vector{Int}}(id => sort!(first.(os)) for (id, os) in omitted), omitted)
 end
 
 _code_version_default() = code_version()

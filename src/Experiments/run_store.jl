@@ -96,6 +96,7 @@ function _put_orbit!(f, o::OrbitRecord)
     for (m, c) in o.cost
         g["cost/" * m] = c
     end
+    _put_indicators!(g, o)
 end
 
 _bits(x::AbstractArray{Float64}) = reinterpret(UInt64, vec(x))
@@ -104,9 +105,9 @@ _bits(x::AbstractArray) = vec(x)
 _same(a::AbstractArray, b::AbstractArray) = size(a) == size(b) && _bits(a) == _bits(b)
 
 function _same(a::OrbitRecord, b::OrbitRecord)
-    a.id == b.id && a.attrs == b.attrs && _same(a.t, b.t) && _same(a.state, b.state) && keys(a.lyap) == keys(b.lyap) &&
+    a.id == b.id && isequal(a.attrs, b.attrs) && _same(a.t, b.t) && _same(a.state, b.state) && keys(a.lyap) == keys(b.lyap) &&
         (a.winding === nothing ? b.winding === nothing : b.winding !== nothing && _same(a.winding, b.winding)) &&
-        all(m -> _same(a.lyap[m], b.lyap[m]), keys(a.lyap)) && keys(a.diagnostics) == keys(b.diagnostics) &&
+        all(m -> _same(a.lyap[m], b.lyap[m]), keys(a.lyap)) && _same_indicators(a.indicators, b.indicators) && keys(a.diagnostics) == keys(b.diagnostics) &&
         all(m -> _same(a.diagnostics[m], b.diagnostics[m]) && a.thresholds[m] === b.thresholds[m] && a.first_exceedance[m] == b.first_exceedance[m],
             keys(a.diagnostics)) && all(m -> _same(a.cost[m], b.cost[m]), keys(a.cost))
 end
@@ -147,8 +148,10 @@ function write_chunk(path::AbstractString, attrs::AbstractDict, orbits::Abstract
     tmp = path * ".tmp"
     mkpath(dirname(abspath(path)))
     want = merge(Dict{String, Any}(attrs), Dict{String, Any}("complete" => false))
+    prov = pop!(want, "provenance", Dict{String, Any}())      # the reducers' own keys, one group per member (D86, R15)
     HDF5.h5open(tmp, "w") do f
         _put_attrs!(f, want)
+        _put_provenance!(f, prov)
         HDF5.create_group(f, "orbits")
         hook(:before_data)
         half = cld(length(orbits), 2)
@@ -156,11 +159,13 @@ function write_chunk(path::AbstractString, attrs::AbstractDict, orbits::Abstract
             _put_orbit!(f, o)
             j == half && hook(:during_data)
         end
+        _put_pooled!(f, orbits)
     end
     back = read_chunk(tmp)
     length(back.orbits) == length(orbits) && all(_same(a, b) for (a, b) in zip(orbits, back.orbits)) ||
         error("write_chunk: $tmp differs from the buffers after the write")
-    bad = _attr_diff(want, back.attrs)
+    isequal(prov, get(back.attrs, "provenance", Dict{String, Any}())) || error("write_chunk: provenance of $tmp differs from the buffers after the write")
+    bad = _attr_diff(want, Dict{String, Any}(k => v for (k, v) in back.attrs if k != "provenance"))
     isempty(bad) || error("write_chunk: root attributes of $tmp differ from the buffers after the write: " * join(bad, ", "))
     hook(:after_data)
     HDF5.h5open(tmp, "r+") do f
@@ -190,12 +195,14 @@ function _read_diag(g::HDF5.Group)
 end
 
 function _read_orbit(g::HDF5.Group, id::Int)
-    lg, cg = HDF5.open_group(g, "lyap"), HDF5.open_group(g, "cost")
-    lyap = Dict{String, Matrix{Float64}}(m => read(HDF5.open_dataset(lg, m)) for m in keys(lg))
+    cg = HDF5.open_group(g, "cost")
+    lyap = haskey(g, "lyap") ? (lg = HDF5.open_group(g, "lyap"); Dict{String, Matrix{Float64}}(m => read(HDF5.open_dataset(lg, m)) for m in keys(lg))) :
+           Dict{String, Matrix{Float64}}()        # the items of the indicator specs have no lyap group (D86)
     diag, thr, fe = _read_diag(g)
     cost = Dict{String, Vector{Float64}}(m => read(HDF5.open_dataset(cg, m)) for m in keys(cg))
     wind = haskey(g, "winding") ? read(HDF5.open_dataset(g, "winding")) : nothing
-    return OrbitRecord(id, _read_attrs(g), read(HDF5.open_dataset(g, "t")), read(HDF5.open_dataset(g, "state")), wind, lyap, diag, thr, fe, cost, "")
+    return OrbitRecord(id, _read_attrs(g), read(HDF5.open_dataset(g, "t")), read(HDF5.open_dataset(g, "state")), wind, lyap, diag, thr, fe, cost, "",
+                       _read_indicators(g))
 end
 
 "Read a chunk file: `(attrs, orbits)`, the orbit records in id order."
@@ -204,7 +211,9 @@ function read_chunk(path::AbstractString)
     HDF5.h5open(String(path), "r") do f
         og = HDF5.open_group(f, "orbits")
         ids = sort!([parse(Int, k) for k in keys(og)])
-        return (attrs = _read_attrs(f), orbits = OrbitRecord[_read_orbit(HDF5.open_group(og, string(id)), id) for id in ids])
+        attrs = _read_attrs(f)
+        haskey(f, "provenance") && (attrs["provenance"] = _read_provenance(f))
+        return (attrs = attrs, orbits = OrbitRecord[_read_orbit(HDF5.open_group(og, string(id)), id) for id in ids])
     end
 end
 

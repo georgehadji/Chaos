@@ -17,6 +17,10 @@ function _first_nonfinite(o::OrbitRecord)
     for (m, v) in o.diagnostics
         all(isfinite, v) || return "diagnostics/" * m
     end
+    for (id, t) in o.indicators
+        w = ind_nonfinite(id, t)
+        isempty(w) || return w
+    end
     return ""
 end
 
@@ -47,6 +51,7 @@ function nonfinite_reasons(recs)
         what = _first_nonfinite(o)
         isempty(o.failure) || push!(out, "numerical health error: " * o.failure)
         isempty(what) || !isempty(o.failure) || push!(out, "non-finite value in $what of orbit $(o.id)")
+        isempty(o.failure) && foreach(d -> push!(out, "$d (orbit $(o.id))"), ind_defects(o))
     end
     return out
 end

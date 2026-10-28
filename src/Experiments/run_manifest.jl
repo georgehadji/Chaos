@@ -44,8 +44,7 @@ end
 
 _record_dict(r::Nothing) = "absent"
 function _record_dict(r)
-    d = Dict{String, Any}("threads" => r.threads, "cpu_ns_per_step" => r.cpu_ns_per_step, "gpu_ns_per_step" => r.gpu_ns_per_step,
-                          "gpu_faster" => r.gpu_faster, "date" => r.date)
+    d = Dict{String, Any}(String(k) => getproperty(r, k) for k in (:threads, :cpu_ns_per_step, :gpu_ns_per_step, :gpu_faster, :date, :spec_sha256) if hasproperty(r, k))
     hasproperty(r, :recorder) && (d["recorder"] = Dict{String, Any}(m => _record_dict(x) for (m, x) in r.recorder))
     return d
 end
@@ -59,7 +58,7 @@ function _static(s::Session)
     plan = s.ctx.plan
     clean = s.git.known && isempty(s.git.tracked) && isempty(s.git.untracked)
     dev = Foundation.probe(Foundation.DEVICE[], Float64).device
-    return Dict{String, Any}("study" => plan.study, "schema_version" => 2, "plan_sha256" => plan.hash,
+    d = Dict{String, Any}("study" => plan.study, "schema_version" => 2, "plan_sha256" => plan.hash,
         "plan_counts" => Dict{String, Any}("items" => plan.counts.items, "chunks" => plan.counts.chunks,
                                            "steps_before" => plan.steps.total_before, "steps_after" => plan.steps.total_after),
         "git" => Dict{String, Any}("sha" => s.git.sha, "clean" => clean),
@@ -72,18 +71,22 @@ function _static(s::Session)
         "block" => Dict{String, Any}("text" => block_text(plan.block), "sha256" => block_hash(plan.block)), "defaults" => plan.defaults,
         "launch" => Dict{String, Any}("free_bytes" => s.free_bytes, "f" => s.f, "capacity" => s.capacity),
         "removed_temporaries" => s.removed)
+    plan_has_specs(plan) && (d["indicators"] = indicator_manifest(plan))
+    return d
 end
 
 "Manifest entry of a chunk from its attributes and orbit records (a file read back, or the buffers just written)."
-function chunk_entry(chunk, attrs, recs)
+function chunk_entry(chunk, attrs, recs; plan = nothing)
     cost = [c for o in recs for c in values(o.cost)]
     flags = Dict{String, Any}(f => flagged_ids(recs, f) for f in ("diagnostics exceeded", "drift", "excluded", "breakdown_tau"))
-    return Dict{String, Any}("ordinal" => chunk.ordinal, "key" => chunk.key, "hash" => chunk.hash, "arms" => chunk.arms,
+    e = Dict{String, Any}("ordinal" => chunk.ordinal, "key" => chunk.key, "hash" => chunk.hash, "arms" => chunk.arms,
         "status" => attrs["status"], "attempt" => attrs["attempt"], "backend" => attrs["backend"],
         "fallback_reason" => attrs["backend_fallback_reason"], "orbits" => length(recs), "steps" => round(Int, sum(c[1] for c in cost; init = 0.0)),
         "wall_seconds" => sum(c[3] for c in cost; init = 0.0), "thread_seconds" => sum(c[4] for c in cost; init = 0.0),
         "first_attempt_reasons" => attrs["first_attempt_reasons"], "flags" => flags, "setup_check" => get(attrs, "setup_check", "not applicable"),
         "control_stop" => get(attrs, "control_stop", false) === true, "control_info" => control_info(recs))
+    haskey(attrs, "kind") && indicator_entry!(e, chunk, recs, plan)
+    return e
 end
 
 function pending_entry(chunk, status)
@@ -94,8 +97,8 @@ function pending_entry(chunk, status)
 end
 
 # Budget line in ns per orbit-step (R5 item 5): ns of a precision (the arm's first unless given) times its safety factor, for the CPU or the device.
-function budget_line_ns(rb::RunBlock, arm, backend::Symbol = :cpu, precision = first(arm["precisions"]))
-    b = rb.raw["budget"][precision]
+function budget_line_ns(rb::RunBlock, arm, backend::Symbol = :cpu, precision = first(arm["precisions"]); spec = nothing)
+    b = spec === nothing ? rb.raw["budget"][precision] : spec["budget"][precision]      # D86: an indicator spec has its own budget line
     return (backend === :gpu ? get(b, "ns_gpu", b["ns_cpu_thread"]) : b["ns_cpu_thread"]) * b["safety"]
 end
 
@@ -110,6 +113,7 @@ function _arm_entries(s::Session)
         out[arm["name"]] = Dict{String, Any}("steps" => steps, "wall_seconds" => sum(e["wall_seconds"] for e in es; init = 0.0),
             "thread_seconds" => thr, "cost_ns_per_orbit_step" => steps > 0 ? NS_PER_S * thr / steps : 0.0, "budget_ns" => budget_line_ns(rb, arm),
             "status" => status)
+        haskey(arm, "indicators") && (out[arm["name"]]["specs"] = arm_spec_costs(s, arm, es))
     end
     return out
 end

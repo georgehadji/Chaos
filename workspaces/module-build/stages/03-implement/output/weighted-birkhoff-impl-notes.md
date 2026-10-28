@@ -72,7 +72,7 @@ None in the API or the numbers. Readings the code fixes (all from the plan's Ite
 
 - AC13 (device testset) is skipped in the package suite (no device in the test process); the GPU smoke above covers compile and the identical-sample comparison; the D68 form with samples read back from the device kernel (trace kernel of `verify/gpu.jl`) is stage 04.
 - The observable's smoothness is the caller's; a discontinuous or non-periodic observable is accepted (R3).
-- The state is `16 + sizeof(T) H (2 + 5 K)` bytes per orbit (1.4 kB at (4, 11) in Float64); the retention decision is the study's (P10). Double64 does not run on the device.
+- The state is `16 + sizeof(T) H (2 + 5 K)` bytes per orbit (1952 bytes at (4, 11) in Float64); the retention decision is the study's (P10). Double64 does not run on the device.
 - `K` is limited to 31 (stage 04 follow-up; it was 32767, the `Int16` failure code) and `birkhoff_order` to 1 to 4 (stage 04 follow-up); the handoff count saturates at the `Int32` maximum, harmless since horizons freeze after `2N` handoffs.
 - A chain with E2 has `2N + 1` handoffs; `check_run` is exact for the stand-alone reducer (D84 item 1).
 - Not run here (stage 04): criterion 12 external form in `verify/`, the D68 device form of 13(a) and (b), 1 versus N threads in child processes (AC11), the records at spec size, the cost harness R5 on the device.

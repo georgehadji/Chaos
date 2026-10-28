@@ -68,12 +68,14 @@ phase_increments(z::AbstractVector{Complex{T}}) where {T <: AbstractFloat} = T[_
 NF6 for the two windows of `N` increments (radians) of any float type, BigFloat included: `nu = A / (2 pi B)`, `A = sum w_j Delta_j`, `B = sum w_j`
 (Neumaier sums over the unnormalised weights). The default weights are `birkhoff_weight` (exponent `p`) at the mirrored index, window 2 restarting
 at `t = 0`; `weights` is a vector of `N` weights used as given (equal, `sin^2`, ... for the recorded line R2). `pi` is taken at the precision of the
-data. `ArgumentError` naming `window` (`N` below 16), `increments` (fewer than `2N`) or `weights` (length not `N`).
+data. `ArgumentError` naming `window` (`N` below 16), `increments` (fewer than `2N`), `weights` (length not `N`) or `birkhoff_order` (`p` not an
+integer from 1 to 4 with the default weights: the centre weight underflows from `p = 5`).
 """
 function weighted_phase_frequency(increments::AbstractVector{T}, N::Integer; weights = nothing, p::Integer = 1) where {T <: AbstractFloat}
     N >= NF_E2_MIN_WINDOW || throw(ArgumentError("window length $N is below the minimum window $NF_E2_MIN_WINDOW"))
     length(increments) >= 2N || throw(ArgumentError("increments: $(length(increments)) given, 2 window = $(2N) needed"))
     weights === nothing || length(weights) == N || throw(ArgumentError("weights: $(length(weights)) given, window = $N needed"))
+    weights === nothing && _wb_check_order(p)
     tp = 2 * Systems._pi(first(increments))
     nu = ntuple(Val(2)) do h
         A = B = CompensatedSum{T}()
@@ -125,8 +127,8 @@ _observable_name(::LiftedAngleObservable) = "lifted-angle"
 
 Weighted mean phase advance reducer (E2, Bazzani2023 pp.3, 19; spec P1 option (c)) for `propagate` with any `k >= 1`: a reader of the orbit point
 that ignores the deviation matrix and returns it unchanged (the stream still carries one column, spec P1 fact (iii)). `window` is `N`, or a tuple of
-`N` for several horizons of one run (one set of sums each); each `N` is at least 16 (`ArgumentError` naming `window`), `birkhoff_order >= 1`
-(`ArgumentError` naming `birkhoff_order`). The first handoff is the sample 0 of the series, the increment `j` runs from sample `j` to `j + 1`, and a
+`N` for several horizons of one run (one set of sums each); each `N` is at least 16 (`ArgumentError` naming `window`), `birkhoff_order` an integer
+from 1 to 4 (`ArgumentError` naming `birkhoff_order`: the centre weight `exp(-4^p)` underflows from `p = 5`, so `B = 0` and every frequency is NaN). The first handoff is the sample 0 of the series, the increment `j` runs from sample `j` to `j + 1`, and a
 run has `2 max(window) + 1` handoffs ([`check_run`](@ref)). Per horizon and window `nu = A / (2 pi B)` with the Neumaier sums `A = sum w_j Delta_j`,
 `B = sum w_j` and the weight `birkhoff_weight` (NF6, D81 item 10); the state is isbits with no workspace: 96 bytes in Float64 and 176 in
 Double64 for one horizon, plus 64 and 128 per extra horizon. A non-finite sample is recorded in the state (kind "series", the host raises).
@@ -146,8 +148,7 @@ end
 function WeightedPhaseAdvance(; window, observable::NaffObservable, birkhoff_order::Integer = 1)
     ws = window isa Integer ? (Int(window),) : Tuple(Int.(window))
     (!isempty(ws) && all(>=(NF_E2_MIN_WINDOW), ws)) || throw(ArgumentError("window must be at least $NF_E2_MIN_WINDOW, got $window"))
-    birkhoff_order >= 1 || throw(ArgumentError("birkhoff_order must be at least 1, got $birkhoff_order"))
-    return WeightedPhaseAdvance{length(ws), typeof(observable)}(ws, observable, Int(birkhoff_order))
+    return WeightedPhaseAdvance{length(ws), typeof(observable)}(ws, observable, _wb_check_order(birkhoff_order))
 end
 
 struct WPAHorizon{T}

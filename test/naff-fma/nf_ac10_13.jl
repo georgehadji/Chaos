@@ -205,6 +205,12 @@ end
     @test named(() -> WeightedPhaseAdvance(; window = 8, observable = PlanarObservable(1, 2)), "window") && named(() -> WeightedPhaseAdvance(; window = (100, 8), observable = PlanarObservable(1, 2)), "window")
     @test nf_error(() -> WeightedPhaseAdvance(; window = 100)) isa Exception && nf_error(() -> WeightedPhaseAdvance(; observable = PlanarObservable(1, 2))) isa Exception
     @test named(() -> WeightedPhaseAdvance(; window = 100, observable = PlanarObservable(1, 2), birkhoff_order = 0), "birkhoff_order")
+    # Order guard (weighted-birkhoff review M1, follow-up): the centre weight exp(-4^p) underflows from p = 5, B = 0 and nu is NaN.
+    @test named(() -> WeightedPhaseAdvance(; window = 100, observable = PlanarObservable(1, 2), birkhoff_order = 5), "birkhoff_order")
+    @test named(() -> weighted_phase_frequency(inc, 50; p = 5), "birkhoff_order") && named(() -> weighted_phase_frequency(inc, 50; p = 0), "birkhoff_order")
+    @test all(isfinite, weighted_phase_frequency(inc, 50; p = 4)) && all(isfinite, weighted_phase_frequency(Double64.(inc), 50; p = 4))
+    @test all(isfinite, weighted_phase_frequency(inc, 50; weights = ones(50), p = 5))   # caller weights do not use p
+    @test WeightedPhaseAdvance(; window = 100, observable = PlanarObservable(1, 2), birkhoff_order = 4).birkhoff_order == 4
     @test named(() -> check_run(WeightedPhaseAdvance(; window = 100, observable = PlanarObservable(1, 2)), 1, 150), "window")
 end
 

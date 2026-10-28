@@ -167,3 +167,13 @@ L4 (value field of `NumericalHealthError` is NaN for an infinite observable), L6
 ### Acceptance criteria (amendment)
 
 Criteria 9 and 12(b), invariants I4 and I5 and equation WB15 read as items 3 to 7. Stage 04 result: folder suite 716 pass, 0 fail, 1 broken (AC13, no CUDA in the process) at default and spec sizes; `wb_review.jl` 105 assertions (58 failures and 1 error on the pre-fix code); full `Pkg.test()` 1 398 168 pass, 0 fail, 1 broken; verify log 78 PASS, 0 FAIL; GPU log 36 PASS, 0 FAIL, 3 FALLBACK (Double64 kernel does not compile for the element type).
+
+## Stage 04 notes (2026-10-28)
+
+Accepted with the verification report (`../../04-verify/output/weighted-birkhoff-verification.md`), Amendment D85 included.
+
+- R1 (cos q, absdig medians, 1000 starts per class): K = 0.5 regular 11.16 at N = 1000 and 14.15 (the Float64 floor, 55.7 percent of starts flagged) at N = 4000; chaotic classes 1.2 to 1.6 at N = 1000. Regular starts below 5.5: 4.8 percent at N = 1000, 0.4 percent at N = 4000. Lifted p: regular 10.59, chaotic about -2.0. The wrapped angle reads 68 percent and the lifted angle 87 percent of regular starts as chaotic-like. Double64 reaches 24.9 (R6).
+- Criteria 1 to 11 pass with realized ratios 0.05 to 0.5 of the gates (exact: criterion 6, 0 of 480 orbits differ; 8, state bytes equal the formula; 11, thread counts 1, 2, 4, 16 give identical hashes). 12(a) agreement with mpmath 1e-33 against the gate 1e-18; 12(b) in the D85 form. The p = 2 dry run of criterion 4 (7.2 and 8.2 eps S) is not reproduced; measured 2.9 and 2.8 eps S.
+- Criterion 13: Float64 device kernel compiles and runs (GPU tag 36 PASS, 0 FAIL, Double64 3 FALLBACK); 13(a) worst ratio 0.21, 13(b) worst 0.32 (realized 1.1 to 1.3 eps S on regular orbits, probably device fused multiply-add, not isolated). At (K, H) = (4, 11) the device is 2.3 times slower than the 16-thread CPU.
+- Review: no CRITICAL or HIGH. M1, M2, L1, L2, L3, L5 fixed (D85); L4, L6, L8, L9 recorded; P7 text corrected (D85).
+- Limits carried: order 5 and above refused (E2 of naff-fma has the same limit, unguarded: follow-up); K at most 31; Float64 digits plateau at 14 to 17; R4 (sticky orbits) and criterion 16 are the study's; weighted FLI, RRE, parameterization method and the multiscale profile (idea 25) are not built.

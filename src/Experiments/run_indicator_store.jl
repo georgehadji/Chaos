@@ -83,7 +83,9 @@ function _same_indicators(a::AbstractDict, b::AbstractDict)
 end
 
 # ---------------------------------------------------------------- root attributes of a chunk of a spec
-_h5val(v::Union{Bool, Integer, AbstractFloat, AbstractString}) = v isa AbstractString ? String(v) : v
+# Only the types HDF5 writes natively go through; anything else (Double64, BigFloat, BigInt, a tuple) is stored as its exact text.
+_h5val(v::AbstractString) = String(v)
+_h5val(v::Union{Bool, Base.BitInteger, Float32, Float64}) = v
 _h5val(v) = string(v)
 
 # The reducers' own provenance, kept apart per member so that no key is overwritten (E23, correction 4 of the D86 stage 02 checkpoint).

@@ -196,7 +196,7 @@ function _freq_tables(spec, buf::AbstractVector{Complex{T}}, orbit::Int) where {
                           mirror_ratio = spec["mirror_ratio"], floor_multiplier = spec["floor_multiplier"])
         a, c = m.w1[1], m.w2[1]
         final[r, :] .= Float64.((a.nu, c.nu, a.amplitude, c.amplitude, a.mirror_amplitude, c.mirror_amplitude, a.second_ratio, c.second_ratio, m.dist[1], m.delta, m.D))
-        flags[r] = _flag_word([m.below_floor, m.status[1] === :degenerate, m.status[1] === :failed, a.tie, c.tie, a.near_zero, c.near_zero, a.mirror, c.mirror, false, false])
+        flags[r] = _flag_word([m.below_floor, m.status[1] === :degenerate, m.status[1] === :failed, a.tie, c.tie, a.near_zero, c.near_zero, a.mirror, c.mirror, !a.refined, !c.refined])   # the two refined bits are set only when the window was not refined (R18 item 2, "refined (false only)")
         if m.failure !== nothing && isempty(failure)
             failure = "NumericalHealthError: series = NaN, non-finite sample $(m.failure.sample) of window $(m.failure.window) (plane $(m.failure.plane)) of spec " *
                       "`$(spec["id"])` at orbit $orbit, backend cpu"

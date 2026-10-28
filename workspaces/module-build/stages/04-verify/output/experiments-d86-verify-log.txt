@@ -1,0 +1,247 @@
+# experiments D86 verification (CPU part), julia 1.13.2, threads 23, cpu arrowlake-s, HDF5.jl 0.17.4, 31.43492889404297 GiB host memory
+# prereg workspaces\study\stages\01-design\output\p1-le-benchmark-preregistration.md, panel workspaces\study\stages\02-panel\output\p1-le-benchmark-panel.toml, block verify\experiments-indicators-block.toml, scratch C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\d86-verify
+# git head 5b1f91d968d72af0198af027951c2ea493477785, tracked or untracked changes: ?? verify/experiments-indicators-block.toml; ?? verify/experiments-indicators-campaign.jl; ?? verify/experiments-indicators-closed.jl; ?? verify/experiments-indicators-device.jl; ?? verify/experiments-indicators-hash.jl; ?? verify/experiments-indicators-memory.jl; ?? verify/experiments-indicators-plan.jl; ?? verify/experiments-indicators-prep.jl; ?? verify/experiments-indicators-reader.jl; ?? verify/experiments-indicators-series.jl; ?? verify/experiments-indicators-source.jl; ?? verify/experiments-indicators.jl; ?? workspaces/module-build/stages/04-verify/output/experiments-d86-review.md; ?? workspaces/module-build/stages/04-verify/output/experiments-d86-verify-log.txt
+# workaround for finding F1 active (EXI_PATCH): true
+# D86y before: files under data/p1-le-benchmark = 1741 (the finished P1 campaign); entries under data/ = 2679
+D86y | reduced panel: drawn orbits (60 per K for 6 K), controls, orbits in S_L (one per cell) | 360, 13, 23 | 360, 13, one per populated cell | PASS
+D86y | reduced block: spec kinds present (one spec of each kind) | birkhoff,frequency,pair,phase_advance,stretching,tangent | all six kinds | PASS
+D86y | plan of the reduced block: items, chunks | 2793, 352 | - | INFO
+D86y | INFO | plan, spec bk (birkhoff): items 395, planned orbit-steps 790000
+D86y | INFO | plan, spec fq (frequency): items 395, planned orbit-steps 790000
+D86y | INFO | plan, spec pa (phase_advance): items 396, planned orbit-steps 792396
+D86y | INFO | plan, spec pr (pair): items 396, planned orbit-steps 118800
+D86y | INFO | plan, spec st (stretching): items 419, planned orbit-steps 1676000
+D86y | INFO | plan, spec tg (tangent): items 419, planned orbit-steps 1676000
+D86y | windows of the window kinds and the horizons of their arms | fq/bk 250,1000 -> 2000; pa 250,1000 -> 2001 | horizon = tau x run length (R11 item 3) | PASS
+D86c | orbits without an item for a spec (the Y5 control has no torus: exp_i_q, cos, sin undefined), by spec | Dict("bk" => [883], "fq" => [883]) | fq: [883], bk: [883] | PASS
+D86c | plan hash identical on a second planning | equal | equal | PASS
+D86y | INFO | injected failure: chunk 25 = method=tg kind=tangent spec=2c240875a2e6f205 precision=Float64 horizon=4000 tau=1 eps=- direction=pi/4 mode=wrapped cell=k1:T
+D86y | INFO | chunks by spec: L1: 24, bk: 47, fq: 47, pa: 47, pr: 47, st: 70, tg: 70
+# section SETUP took 0.6 s
+F1 | unpatched campaign: process exit ok / the first error / chunk files written before it (90.4376754 s) | false / MethodError: no method matching unsafe_convert(::Type{Ptr{Nothing}}, ::Double64) / 237 | FINDING: the campaign aborts with an exception at the first Double64 stretching chunk (run_indicator_store.jl:86, _h5val passes a Double64 to HDF5) | INFO
+F1 | INFO | stack: @ Chaoslab.Experiments C:\Users\tesse\Documents\Vibe Coding\Chaos\src\Experiments\run_indicator_store.jl:31
+# section F1 took 90.6 s
+D86b | INFO | code_version of the running P1 campaign (attribute of data/p1-le-benchmark/chunk-00001.h5, read only): b921a1dc72f7d5ebb37e86118d1b7c5a95d40a2909fc130ffccff3ae8ba85e73; manifest plan_sha256 81b04cdf5fd6cfd2f659946274ca77dca0313156d66ebcb8599a733036cd4fec, chunks 1363
+D86b | the code of commit ba21bcc (worktree: *.jl under src and ext, Project.toml, the lock) against 1c3de19, the commit before Amendment D86 touched src: differing code files (documentation files in src: 1, not code) | 0 | 0 | PASS
+D86b | INFO | differing files of src between ba21bcc and HEAD: 22 files changed, 1473 insertions(+), 97 deletions(-)
+D86b | INFO | _config/numerics-defaults.toml changed between ba21bcc and HEAD: no
+D86b | INFO | plans written by child processes: old code (worktree ba21bcc) 19.9 s, current code 15.2 s; 16936 lines each
+D86b [full] | plan_sha256 of the real P1 preregistration and panel: old code / current code / running campaign's manifest | 81b04cdf5fd6cfd2 / 81b04cdf5fd6cfd2 / 81b04cdf5fd6cfd2 | all equal | PASS
+D86b [full] | plan text hash, block hash, counts (items, chunks): old equals current | true, true, 15569 1363 | true, true, 15569 1363 | PASS
+D86b [full] | item hashes (all work items): old code against current code, differences | 0 | 0 of 15569 | PASS
+D86b [full] | ordinals, keys and hashes of all 1363 chunks: old code against current code, differences | 0 | 0 | PASS
+D86b [full] | ordinals, keys and hashes of all chunks: current code against the manifest of the running (finished) P1 campaign, differences | 0 | 0 | PASS
+D86b | INFO | no chunk key of an old method has a `kind=` or `spec=` field: true
+D86b | INFO | worktree removed: true; git worktree list: C:/Users/tesse/Documents/Vibe Coding/Chaos 5b1f91d [main]
+# section D86B took 40.6 s
+D86y | uninterrupted reduced campaign in its own process (23 threads, cold start, capacity from the free memory): status, chunks run, chunks failed twice | complete with failed chunks, 352 of 352, 1 | complete with failed chunks, all chunks, exactly the injected one | PASS
+D86y | wall time of the campaign (run_campaign only) / of the whole process including Julia start, package load and compilation | 108.2 s / 127.1 s | < 900 s on 23 threads (proposed 15 min) | PASS
+D86y | peak host memory of that process (Sys.maxrss, peak working set) / before the campaign | 1.01 GiB / 0.55 GiB | < 8 GiB (proposed) | PASS
+D86y | session 1 killed after 70 chunks (injected kill): killed, final files / temporary files left | true: 70 / 0 | killed | PASS
+D86y | session 2 killed during the data of chunk 71 (spec st): no final file for it, one temporary file left (I13) | true: final=false tmp=["chunk-00071.h5.tmp"] | killed, no final file, one .tmp | PASS
+O20 | independent reader on the store after the two kills: every final file complete and valid, the .tmp ignored | true | reader PASS | PASS
+D86y | interrupted campaign resumed to the end (session 3): status, chunks run in session 3, skipped, failed | complete with failed chunks: ran 282, skipped 70, failed 0, 36.0 s | complete with failed chunks; no new failure (the injected chunk 25 was written in session 1, see the manifest check below) | PASS
+D86y | uninterrupted campaign B in the main process (warm): status, chunks run, failed, wall s | complete with failed chunks: ran 352, failed [25], 32.7 s | complete with failed chunks; failed = the injected chunk only | PASS
+D53o/D86t | second run on the finished campaign: chunks run, files modified | 0, 0 | 0, 0 | PASS
+I24/D86q | campaign on 4 threads with launch capacity 7 (own process): status, failed | complete with failed chunks: failed 1 | same status as B | PASS
+D86y | campaign A: manifest status and failed chunks (the campaign stops only by the injected cause) | complete with failed chunks, failed [25] | complete with failed chunks, [25] | PASS
+D86y | campaign B: manifest status and failed chunks (the campaign stops only by the injected cause) | complete with failed chunks, failed [25] | complete with failed chunks, [25] | PASS
+D86y | campaign C: manifest status and failed chunks (the campaign stops only by the injected cause) | complete with failed chunks, failed [25] | complete with failed chunks, [25] | PASS
+D86y | campaign T4: manifest status and failed chunks (the campaign stops only by the injected cause) | complete with failed chunks, failed [25] | complete with failed chunks, [25] | PASS
+D86y | chunk files in stores A, B, C, T4 | (A = 352, B = 352, C = 352, T4 = 352) | 352 each | PASS
+D86y | INFO | child C result line: CAMPAIGN C status=complete with failed chunks chunks=352 ran=352 failed=1 threads=23 wall_s=108.21 maxrss_before_bytes=595279872 maxrss_bytes=1089044480 injected_ordinal=25 capacity=memory patch=1
+# section CAMPAIGN took 373.8 s
+O20/D86s | independent reader (HDF5.jl in a separate process, no Chaoslab; checks the layout of R15, E24, E25, E31), store A: files read, checks failed, seconds | 352 of 352 files, 0 failed, 34.0 s | all files, 0 failed | PASS
+O20 | INFO | store A reader notes: 28; the first: C|chunk-00168.h5|NOTE|orbit 65 row 4: reldig is NaN with `zero` set and `reldig_undefined` clear (E31 wording says reldig_undefined)
+O20 | store A: module read_chunk equals the independent reader: files, attributes (root, orbit, provenance, dataset), datasets (sha-256 of the raw bytes, dtype, shape) | 352 files, 47812 attributes, 33977 datasets, 0 differ | 0 differ | PASS
+O20/D86s | independent reader (HDF5.jl in a separate process, no Chaoslab; checks the layout of R15, E24, E25, E31), store B: files read, checks failed, seconds | 352 of 352 files, 0 failed, 31.6 s | all files, 0 failed | PASS
+O20 | INFO | store B reader notes: 28; the first: C|chunk-00168.h5|NOTE|orbit 65 row 4: reldig is NaN with `zero` set and `reldig_undefined` clear (E31 wording says reldig_undefined)
+O20 | store B: module read_chunk equals the independent reader: files, attributes (root, orbit, provenance, dataset), datasets (sha-256 of the raw bytes, dtype, shape) | 352 files, 47812 attributes, 33977 datasets, 0 differ | 0 differ | PASS
+O20/D86s | independent reader (HDF5.jl in a separate process, no Chaoslab; checks the layout of R15, E24, E25, E31), store C: files read, checks failed, seconds | 352 of 352 files, 0 failed, 36.6 s | all files, 0 failed | PASS
+O20 | INFO | store C reader notes: 28; the first: C|chunk-00168.h5|NOTE|orbit 65 row 4: reldig is NaN with `zero` set and `reldig_undefined` clear (E31 wording says reldig_undefined)
+O20 | store C: module read_chunk equals the independent reader: files, attributes (root, orbit, provenance, dataset), datasets (sha-256 of the raw bytes, dtype, shape) | 352 files, 47812 attributes, 33977 datasets, 0 differ | 0 differ | PASS
+O20/D86s | independent reader (HDF5.jl in a separate process, no Chaoslab; checks the layout of R15, E24, E25, E31), store T4: files read, checks failed, seconds | 352 of 352 files, 0 failed, 41.0 s | all files, 0 failed | PASS
+O20 | INFO | store T4 reader notes: 28; the first: C|chunk-00168.h5|NOTE|orbit 65 row 4: reldig is NaN with `zero` set and `reldig_undefined` clear (E31 wording says reldig_undefined)
+O20 | store T4: module read_chunk equals the independent reader: files, attributes (root, orbit, provenance, dataset), datasets (sha-256 of the raw bytes, dtype, shape) | 352 files, 47812 attributes, 33977 datasets, 0 differ | 0 differ | PASS
+D86s | INFO | kind tangent: 70 files; datasets (eltype and Julia shape; file extents are the reverse): cost/<id>: Float64 5; diagnostics/det: Float64 135; diagnostics/symp: Float64 135; indicators/<id>/series: Float64 135x10; state: Float64 135x2; t: Int64 135; winding: Int64 135x2
+D86s | INFO | kind pair: 47 files; datasets (eltype and Julia shape; file extents are the reverse): cost/<id>: Float64 5; diagnostics/det: Float64 111; diagnostics/symp: Float64 111; indicators/<id>/series: Float64 111x8; state: Float64 111x2; t: Int64 111; winding: Int64 111x2
+D86s | INFO | kind stretching: 70 files; datasets (eltype and Julia shape; file extents are the reverse): cost/<id>: Float64 5; diagnostics/det: Float64 135; diagnostics/symp: Float64 135; indicators/<id>/counts: UInt32 102x2; indicators/<id>/scalars: Float64 18; indicators/<id>/series: Float64 135x1; state: Float64 135x2; t: Int64 135; winding: Int64 135x2
+D86s | INFO | kind frequency: 47 files; datasets (eltype and Julia shape; file extents are the reverse): cost/<id>: Float64 6; diagnostics/det: Float64 127; diagnostics/symp: Float64 127; indicators/<id>/final: Float64 2x11; indicators/<id>/flags: Int64 2; state: Float64 127x2; t: Int64 127; winding: Int64 127x2
+D86s | INFO | kind phase_advance: 47 files; datasets (eltype and Julia shape; file extents are the reverse): cost/<id>: Float64 5; diagnostics/det: Float64 128; diagnostics/symp: Float64 128; indicators/<id>/final: Float64 2x4; indicators/<id>/flags: Int64 2; indicators/<id>/scalars: Float64 3; state: Float64 128x2; t: Int64 128; winding: Int64 128x2
+D86s | INFO | kind birkhoff: 47 files; datasets (eltype and Julia shape; file extents are the reverse): cost/<id>: Float64 5; diagnostics/det: Float64 127; diagnostics/symp: Float64 127; indicators/<id>/final: Float64 8x8; indicators/<id>/flags: Int64 8; indicators/<id>/scalars: Float64 2; state: Float64 127x2; t: Int64 127; winding: Int64 127x2
+D86s | `lyap` absent from the files of every new kind, present in the L1 files (the reader checks both) | checked by the reader | 0 failed | PASS
+I14/D86t/D86y | resumed (killed twice) campaign A against uninterrupted campaign B: differing datasets and attributes outside times and host fields (created_utc, cpu, threads, session), via the independent reader | 0 | 0 | PASS
+I24/D86q | campaign B (23 threads, capacity 1000) against campaign T4 (4 threads, capacity 7): differing datasets and attributes outside times, host fields, chunk_size and launches_per_chunk | 0 | 0 | PASS
+I24/D86q | campaign B (capacity 1000) against campaign C (own process, capacity from the free memory): differing datasets and attributes outside times, host fields, chunk_size and launches_per_chunk | 0 | 0 | PASS
+O20 | HDF5 command-line tool h5dump (-m %.17g; no HDF5.jl, no Chaoslab) on 24 ok files of the six kinds, every indicator dataset of one orbit each (series, final, flags, scalars, counts): equal to the module's values exactly | 49 datasets, 0 differ | 0 differ | PASS
+# section READER took 180.3 s
+R7 | manifest B: R7 keys, chunk entries (352 of 352, statuses Dict("ok" => 351, "failed" => 1)), arm entries, plan hash, schema version | missing String[] / String[] / String[] | none missing | PASS
+R19 | manifest B: `indicators` table by spec id | bk,fq,pa,pr,st,tg | all six specs | PASS
+R19 | manifest B: per spec kind, canonical text, spec hash (recomputed from the block), chain record, budget, bytes(orbit) terms (sum equals total), windows and run length, frame source and direction rule, observable names | 0 defects String[] | 0 | PASS
+R19 | INFO | manifest B: chain record of tg Any["FLI(replace=false)", "MEGNO(replace=false)", "SALI(replace=true)"]; bytes(orbit) of tg Dict{String, Any}("M" => 112, "R" => 392, "B" => 0, "S" => 18360, "total" => 18864)
+R19 | manifest B: backend table has a row per (precision, spec id) for the six specs | 12 of 13 rows are spec rows | 12 rows (6 specs x 2 precisions, Float64 and Double64) | PASS
+R19 | manifest B: `indicator_flags` of 327 indicator chunks equal the recount from the files; `not_applicable` of the controls chunks of fq and bk lists orbit 883 (2); `transform_seconds` on 47 frequency chunks | 0 defects | 0 | PASS
+R19 | INFO | manifest B: flag counts summed over the chunks: ["below_floor" => 221, "degenerate" => 13, "mirror1" => 174, "mirror2" => 182, "near_zero1" => 10, "near_zero2" => 8, "reldig_undefined" => 89, "tie1" => 2, "tie2" => 2, "undefined window" => 6, "zero" => 9]
+R19 | manifest B: per-arm totals have the per-spec measured cost per orbit-step against the spec's budget line | true | true | PASS
+COST | arm lift | spec st | measured 486 ns per orbit-step (thread time) | budget line 400 ns
+COST | arm lift | spec tg | measured 833.3 ns per orbit-step (thread time) | budget line 800 ns
+COST | arm pair | spec pr | measured 1.294e+04 ns per orbit-step (thread time) | budget line 1600 ns
+COST | arm pair_d | spec pr | measured 3824 ns per orbit-step (thread time) | budget line 1.2e+05 ns
+COST | arm pha | spec pa | measured 966.2 ns per orbit-step (thread time) | budget line 600 ns
+COST | arm pha_d | spec pa | measured 4098 ns per orbit-step (thread time) | budget line 4.5e+04 ns
+COST | arm ser | spec st | measured 400.5 ns per orbit-step (thread time) | budget line 400 ns
+COST | arm ser | spec tg | measured 475.3 ns per orbit-step (thread time) | budget line 800 ns
+COST | arm ser_d | spec st | measured 3642 ns per orbit-step (thread time) | budget line 3e+04 ns
+COST | arm ser_d | spec tg | measured 5928 ns per orbit-step (thread time) | budget line 6e+04 ns
+COST | arm win | spec bk | measured 513.9 ns per orbit-step (thread time) | budget line 1200 ns
+COST | arm win | spec fq | measured 4102 ns per orbit-step (thread time) | budget line 800 ns
+COST | arm win_d | spec bk | measured 4994 ns per orbit-step (thread time) | budget line 9e+04 ns
+COST | arm win_d | spec fq | measured 1.023e+04 ns per orbit-step (thread time) | budget line 6e+04 ns
+R19 | INFO | manifest B: thread count Dict{String, Any}("available" => 23, "used" => 23), device cpu, launch Dict{String, Any}("f" => 0.5, "capacity" => 1000, "free_bytes" => 6758326272)
+R7 | manifest A: R7 keys, chunk entries (352 of 352, statuses Dict("ok" => 351, "failed" => 1)), arm entries, plan hash, schema version | missing String[] / String[] / String[] | none missing | PASS
+R19 | manifest A: `indicators` table by spec id | bk,fq,pa,pr,st,tg | all six specs | PASS
+R19 | manifest A: per spec kind, canonical text, spec hash (recomputed from the block), chain record, budget, bytes(orbit) terms (sum equals total), windows and run length, frame source and direction rule, observable names | 0 defects String[] | 0 | PASS
+R19 | INFO | manifest A: chain record of tg Any["FLI(replace=false)", "MEGNO(replace=false)", "SALI(replace=true)"]; bytes(orbit) of tg Dict{String, Any}("M" => 112, "R" => 392, "B" => 0, "S" => 18360, "total" => 18864)
+R19 | manifest A: backend table has a row per (precision, spec id) for the six specs | 12 of 13 rows are spec rows | 12 rows (6 specs x 2 precisions, Float64 and Double64) | PASS
+R19 | manifest A: `indicator_flags` of 327 indicator chunks equal the recount from the files; `not_applicable` of the controls chunks of fq and bk lists orbit 883 (2); `transform_seconds` on 47 frequency chunks | 0 defects | 0 | PASS
+R19 | INFO | manifest A: flag counts summed over the chunks: ["below_floor" => 221, "degenerate" => 13, "mirror1" => 174, "mirror2" => 182, "near_zero1" => 10, "near_zero2" => 8, "reldig_undefined" => 89, "tie1" => 2, "tie2" => 2, "undefined window" => 6, "zero" => 9]
+R19 | manifest A: per-arm totals have the per-spec measured cost per orbit-step against the spec's budget line | true | true | PASS
+COST | arm lift | spec st | measured 771 ns per orbit-step (thread time) | budget line 400 ns
+COST | arm lift | spec tg | measured 990.3 ns per orbit-step (thread time) | budget line 800 ns
+COST | arm pair | spec pr | measured 1.244e+04 ns per orbit-step (thread time) | budget line 1600 ns
+COST | arm pair_d | spec pr | measured 3816 ns per orbit-step (thread time) | budget line 1.2e+05 ns
+COST | arm pha | spec pa | measured 922.2 ns per orbit-step (thread time) | budget line 600 ns
+COST | arm pha_d | spec pa | measured 4150 ns per orbit-step (thread time) | budget line 4.5e+04 ns
+COST | arm ser | spec st | measured 929.3 ns per orbit-step (thread time) | budget line 400 ns
+COST | arm ser | spec tg | measured 565.5 ns per orbit-step (thread time) | budget line 800 ns
+COST | arm ser_d | spec st | measured 3476 ns per orbit-step (thread time) | budget line 3e+04 ns
+COST | arm ser_d | spec tg | measured 5726 ns per orbit-step (thread time) | budget line 6e+04 ns
+COST | arm win | spec bk | measured 667.8 ns per orbit-step (thread time) | budget line 1200 ns
+COST | arm win | spec fq | measured 6436 ns per orbit-step (thread time) | budget line 800 ns
+COST | arm win_d | spec bk | measured 4320 ns per orbit-step (thread time) | budget line 9e+04 ns
+COST | arm win_d | spec fq | measured 9776 ns per orbit-step (thread time) | budget line 6e+04 ns
+# section MANIFEST took 13.5 s
+D86e | chain record equals the forms the module must set (all members but the last non-replacing, the last replacing), the spec text and hash equal the block's, one provenance group per member with its own `indicator` value, on 187 files of tg, pr, st | 0 | 0 | PASS
+D86g | tangent family on 389 ok orbits (Float64, Double64; wrapped, lifted): t differs from the grid / non-finite column / FLI decreasing / SALI outside [0, sqrt 2 (1 + 2 eps)] | 0 / 0 / 0 / 0 | 0 / 0 / 0 / 0 | PASS
+I21 | orbit point (state, winding) and the two monitor columns at the 135 grid steps of tg and st (Float64, wrapped) against the L1 item of the same orbit: orbits compared / differing | 716 / 0 | 0 differ | PASS
+I21 | orbit point of fq, bk, pa, pr (Float64, wrapped; windows 2000 and 2001, pair 300 steps) against the L1 item at the grid steps both have: orbits compared / differing | 1490 / 0 | 0 differ | PASS
+O16 | INFO | sample orbits (Float64 wrapped): [29, 68, 65, 12, 124, 205, 212, 162, 348, 354, 313, 396, 517, 553, 470, 633, 716, 674, 670, 757, 844, 802, 856, 837]; controls [871, 872, 873, 883]; Double64: [1, 121, 226]
+O16/I20/I22 | tg (chain FLI, MEGNO, SALI) against the stand-alone replacing FLI(), MEGNO(), SALI() run directly to the step, on the identical orbit, at 5 seeded grid steps and the last: orbits 31, values compared / differing | 1740 / 0 | 0 differ (bitwise) | PASS
+O16/D86h | pr (RLI, MEGNO on the pair map) against the stand-alone RLI(), MEGNO() on the PairMap with the stored xi_0 at 6 grid steps per orbit (horizon 300): values compared / differing; stored Dx_r differing from the realized separation of pair_start; xi_0 not a unit vector | 768 / 0; 0; 0 | 0; 0; 0 | PASS
+D86h/R13 | realized separation Dx_r / nominal Dx of all 396 pair orbits: min, max, outside [1/2, 2] | 0.9994, 1, 0 | 0 outside | PASS
+O18/D86h | RLI and DL exactly 0 at every grid step for the Y5 control (orbit 883), Float64 wrapped and the Double64 chunk if any (111 rows) | true | exactly 0 | PASS
+D86i/O16 | stretching: stored D at 3 seeded grid steps and the last, the 17 orbit scalars and the range against the stand-alone final that includes the workspace (bitwise); values compared / differing | 155 / 0 | 0 differ | PASS
+D86i | stretching counts are stored for the orbits of the subset S_L only (a count matrix present exactly when the orbit is in S_L): orbits agreeing / disagreeing | 419 / 0 | 0 disagree | PASS
+D86i | stored count matrices of the S_L orbits checked against the stand-alone counts (3), disagreeing | 0 | 0 | PASS
+D86i/E29 | pooled counts of 3 chunks (first, middle, last of the stretching chunks) against the exact integer sum of the stand-alone counts of every orbit of the chunk; chunks checked / differing | 3 / 0 | 0 differ | PASS
+O17/D86j(d) | frequency tables (2 windows) from the plain-iteration series of the Float64 wrapped map and frequency_map: rows compared / differing | 30 / 0 | 0 differ (bitwise) | PASS
+O17/D86l | phase-advance tables from the plain-iteration series, phase_increments and weighted_phase_frequency: rows compared / differing | 30 / 0 | 0 differ (bitwise) | PASS
+O17/D86m | weighted Birkhoff tables (4 observables, 2 windows) from the plain-iteration series and weighted_birkhoff: rows compared / differing | 120 / 0 | 0 differ (bitwise) | PASS
+O17/D86j(d) | Double64 frequency rows (nu1, nu2, dist, delta, D) from the series of the package's forward in Double64: rows compared / differing | 8 / 0 | 0 differ | PASS
+D86j(f) | frequency file: largest dataset of an orbit has 254 elements (grid length 127, 2 windows x 11 columns = 22): no dataset holds the 2000-sample series | 254 | <= 2 x grid length (270) | PASS
+D86j(b) | stored bytes per orbit and window for frequency: final (Float64 (2, 11)) + flag word (Int64 (2,)) | 96 | 96 (eleven binary64 and one int64 flag word) | PASS
+D86k | INFO | flag rows set over the campaign (spec.flag => rows): ["bk.below_floor" => 652, "bk.reldig_undefined" => 247, "bk.zero" => 28, "fq.below_floor" => 120, "fq.degenerate" => 26, "fq.mirror1" => 258, "fq.mirror2" => 268, "fq.near_zero1" => 14, "fq.near_zero2" => 8, "fq.tie1" => 2, "fq.tie2" => 2, "pa.below_floor" => 84, "pa.undefined window" => 12]
+D86k | fixed-point controls (hyperbolic and elliptic) in the frequency chunk: chunk status ok and the `degenerate` bit set where the series is constant | 4 orbits; flags [(871, [2, 2]), (872, [34, 34]), (873, [2, 2])] | status ok, flags data | PASS
+# section FILES took 13.4 s
+O18 | closed-form campaign (12 K_std = 0 shear orbits, controls 871, 872, Y5 883; frame direction 0): status, chunks, chunks failed twice (only the controls chunk of the pair arm y5long at N = 4000, finding F2) | complete with failed chunks, 18 chunks, failed [12] | complete with failed chunks, failed = [12] | PASS
+F2 | INFO | pair at N = 4000 on the controls cell (holds the linear control Y5, orbit 883): chunk status failed, attempt 2; failure_reasons ["numerical health error: NumericalHealthError: state = -Inf (threshold Inf) at step 770, orbit 883, backend cpu"] (R18 item 5: a failed pair is deterministic and not retried to success; the study chooses the horizon)
+F2 | the failing orbit of that chunk is the Y5 control (orbit 883) and the failure is the overflow of the shadow orbit at step 770 | true | true (design limit of the pair on Y5, not a defect) | PASS
+O18/D86g | K_std = 0 shear through the recorder (wrapped and lifted, direction 0): FLI.fli1 and MEGNO column 1 (Y1, Ybar1, Ybar20_1) exactly 0 at every grid step; values / nonzero | 10848 / 0 | all exactly 0 | PASS
+O18/D86g | FLI_B against (1/2) ln(n^2 + 1) in BigFloat(256) within B_S(n) = 8 eps (n + 3): grid rows / outside / worst ratio | 2712 / 0 / 0.02083 | 0 outside | PASS
+O18/D86g | SALI against sqrt(2 - 2 n / sqrt(n^2 + 1)) within 8 eps Lambda_n + SALI_ref 2 B_S + 4 eps (sali A15 with the floor as B_meas): grid rows / outside / worst ratio | 2712 / 0 / 0.004837 | 0 outside | PASS
+O18/D86g | MEGNO column 2 against ln(n^2 + 1) - (1/n) sum_{j=0}^{n-1} ln(j^2 + 1) (megno M10a) within 6 B_S(n): grid rows / outside / worst ratio | 2712 / 0 / 0.005952 | 0 outside | PASS
+O18/D86h | pair chain RLI, MEGNO: RLI and DL exactly 0 at every grid step for the shear orbits and for Y5 (orbit 883 present: true); grid rows / nonzero values | 1469 / 0 | all exactly 0 | PASS
+O18/D86k | frequency on the K_std = 0 line (wrapped, windows 64 and 128): nu1, nu2 within 16 eps of p/(2 pi) mod 1 (BigFloat(256), p the stored momentum; naff-fma criterion 7(b)): values / outside / worst ratio | 48 / 0 / 0.01187 | 0 outside | PASS
+O18/D86l | phase advance, lifted observable, wrapped and lifted mode (windows 64 and 128): nu1, nu2 within 16 eps + max|q| eps of the lifted p/(2 pi) (D87 bound): values / outside / worst ratio | 96 / 0 / 0.03463 | 0 outside | PASS
+O18 | INFO | stretching, birkhoff and the Y5 rotation block are covered in the suite (D86i, D86m); the Y5 origin start and the K_std = 0 weighted Birkhoff criterion 3 (window 1000) are not repeated here
+# section O18 took 9.7 s
+O19/D86d | spec text (canonical, no budget) and spec hash of the 6 specs: recomputed from the TOML of verify/experiments-indicators-block.toml with sha256sum, equal to the module's | true | 6 of 6 equal | PASS
+O19/D86d | item text (written from E27) and item hash (sha256sum) of all 2793 work items of the reduced plan: texts differing from the module's / hashes differing from the plan's | 0 / 0 | 0 / 0 | PASS
+O19/D86d | of which items of the six new kinds / items of L1; the `spec=` line of every new item equals the independently computed spec hash | 2420 / 373; mismatching spec lines 0 | 0 mismatching | PASS
+O19/D86d | chunk key of every one of the 352 chunks rebuilt from the item fields (second form of R12 item 3 for the new kinds, the old form for L1): differing from the plan's | 0 | 0 | PASS
+O19 | chunk hash of all chunks: sha256sum of the chunk text equals the plan's hash; differing | 0 | 0 | PASS
+O19 | plan hash: sha256sum of the plan text equals the plan's hash | true | true | PASS
+O19/D86d | files of campaign B: chunk_key, chunk_hash, plan_sha256, the item hashes of the orbits and spec_sha256 equal the independently recomputed values; files compared / differing | 352 / 0 | 0 differ | PASS
+# section O19 took 12.1 s
+D86v/D86y | CPU reference rerun of rerun_sample = 20 items per arm on store B (9 arms, 5.1 s): items, bitwise equal, backend of the stored items | 180, 180, cpu | all bitwise (CPU) | PASS
+D86v | INFO | rerun items by spec: ["L1" => 6, "bk" => 20, "fq" => 20, "pa" => 40, "pr" => 40, "st" => 29, "tg" => 25]
+# section RERUN took 5.2 s
+D86v | INFO | pilot report keys: ["arms", "cost", "diagnostics_share", "dirty_tree", "first_departure", "k19", "not_study_data", "parallel_efficiency", "plan_sha256", "starts", "threads"]; written C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\d86-verify\pilot\pilot-report.json in 33.6 s
+D86v | pilot report states that the numbers are not study data | true | true | PASS
+PILOT | spec bk | bytes_per_orbit=8024 | capacity=484268 | flag_shares=Dict{String, Any}("below_floor" => 0.25, "reldig_undefined" => 0.16666666666666666) | horizon=2000 | precision=Double64 | thread_seconds_per_orbit_step=3.462e-06 | wall_seconds_per_orbit_step=5.77e-07
+PILOT | spec bk | bytes_per_orbit=7584 | capacity=512364 | flag_shares=Dict{String, Any}("below_floor" => 0.4166666666666667, "reldig_undefined" => 0.3333333333333333) | horizon=2000 | precision=Float64 | thread_seconds_per_orbit_step=4.43e-07 | wall_seconds_per_orbit_step=7.383e-08
+PILOT | spec fq | bytes_per_orbit=71304 | capacity=54495 | flag_shares=Dict{String, Any}("mirror2" => 0.5833333333333334, "below_floor" => 0.16666666666666666, "mirror1" => 0.5833333333333334) | horizon=2000 | orbit_pass_seconds=0.04888 | precision=Double64 | thread_seconds_per_orbit_step=1.007e-05 | transform_seconds=0.1791 | wall_seconds_per_orbit_step=1.678e-06
+PILOT | spec fq | bytes_per_orbit=39216 | capacity=99201 | flag_shares=Dict{String, Any}("mirror2" => 0.4166666666666667, "below_floor" => 0.25, "near_zero1" => 0.08333333333333333, "mirror1" => 0.5833333333333334) | horizon=2000 | orbit_pass_seconds=0.003263 | precision=Float64 | thread_seconds_per_orbit_step=4.764e-06 | transform_seconds=0.05559 | wall_seconds_per_orbit_step=7.94e-07
+PILOT | spec pa | bytes_per_orbit=7664 | capacity=507015 | flag_shares=Dict{String, Any}() | horizon=2001 | precision=Double64 | thread_seconds_per_orbit_step=3.734e-06 | wall_seconds_per_orbit_step=6.223e-07
+PILOT | spec pa | bytes_per_orbit=7432 | capacity=522842 | flag_shares=Dict{String, Any}() | horizon=2001 | precision=Float64 | thread_seconds_per_orbit_step=2.976e-07 | wall_seconds_per_orbit_step=4.961e-08
+PILOT | spec pr | bytes_per_orbit=14216 | capacity=273337 | flag_shares=Dict{String, Any}() | horizon=300 | precision=Double64 | thread_seconds_per_orbit_step=4.238e-06 | wall_seconds_per_orbit_step=4.238e-06
+PILOT | spec pr | bytes_per_orbit=13808 | capacity=281885 | flag_shares=Dict{String, Any}() | horizon=300 | precision=Float64 | thread_seconds_per_orbit_step=3.941e-07 | wall_seconds_per_orbit_step=3.941e-07
+PILOT | spec st | bytes_per_orbit=8352 | capacity=465250 | flag_shares=Dict{String, Any}() | horizon=300 | precision=Double64 | thread_seconds_per_orbit_step=2.387e-06 | wall_seconds_per_orbit_step=2.387e-06
+PILOT | spec st | bytes_per_orbit=6368 | capacity=611228 | flag_shares=Dict{String, Any}() | horizon=300 | precision=Float64 | thread_seconds_per_orbit_step=2.937e-07 | wall_seconds_per_orbit_step=2.937e-07
+PILOT | spec tg | bytes_per_orbit=15992 | capacity=242982 | flag_shares=Dict{String, Any}() | horizon=300 | precision=Double64 | thread_seconds_per_orbit_step=3.435e-06 | wall_seconds_per_orbit_step=3.435e-06
+PILOT | spec tg | bytes_per_orbit=13808 | capacity=281889 | flag_shares=Dict{String, Any}() | horizon=300 | precision=Float64 | thread_seconds_per_orbit_step=4.077e-07 | wall_seconds_per_orbit_step=4.077e-07
+D86v | pilot rows for the six specs: window kinds at their own run length (fq, bk 2000; pa 2001), series kinds at the pilot horizon (300) | bk:2000, fq:2000, pa:2001, pr:300, st:300, tg:300 | fq/bk 2000, pa 2001, others 300; fq reports the orbit pass and the transform separately | PASS
+D86y | study data folder after the pilot and the campaigns: files under data/p1-le-benchmark and entries under data/ unchanged | 1741 files, 2679 entries | 1741 files, 2679 entries | PASS
+# section PILOT took 34.5 s
+# (section PILOT was rerun alone after a correction of the script line that sorted the pilot rows; the first run raised a MethodError there; lines above spliced from the rerun)
+D86n | INFO | bytes(orbit) of bk Float64 wrapped: module M 80 R 392 S 7112 B 0 total 7584; E28 written here: M 80 R 392 S 7112 B 0 total 7584; 127 grid steps, 7 columns
+D86n | INFO | bytes(orbit) of bk Double64 wrapped: module M 144 R 768 S 7112 B 0 total 8024; E28 written here: M 144 R 768 S 7112 B 0 total 8024; 127 grid steps, 7 columns
+D86n | INFO | bytes(orbit) of fq Float64 wrapped: module M 80 R 24 S 7112 B 32000 total 39216; E28 written here: M 80 R 24 S 7112 B 32000 total 39216; 127 grid steps, 7 columns
+D86n | INFO | bytes(orbit) of fq Double64 wrapped: module M 144 R 48 S 7112 B 64000 total 71304; E28 written here: M 144 R 48 S 7112 B 64000 total 71304; 127 grid steps, 7 columns
+D86n | INFO | bytes(orbit) of pa Float64 wrapped: module M 80 R 184 S 7168 B 0 total 7432; E28 written here: M 80 R 184 S 7168 B 0 total 7432; 128 grid steps, 7 columns
+D86n | INFO | bytes(orbit) of pa Double64 wrapped: module M 144 R 352 S 7168 B 0 total 7664; E28 written here: M 144 R 352 S 7168 B 0 total 7664; 128 grid steps, 7 columns
+D86n | INFO | bytes(orbit) of pr Float64 wrapped: module M 176 R 312 S 13320 B 0 total 13808; E28 written here: M 176 R 312 S 13320 B 0 total 13808; 111 grid steps, 15 columns
+D86n | INFO | bytes(orbit) of pr Double64 wrapped: module M 336 R 560 S 13320 B 0 total 14216; E28 written here: M 336 R 560 S 13320 B 0 total 14216; 111 grid steps, 15 columns
+D86n | INFO | bytes(orbit) of st Float64 wrapped: module M 112 R 944 S 8640 B 0 total 9696; E28 written here: M 112 R 944 S 8640 B 0 total 9696; 135 grid steps, 8 columns
+D86n | INFO | bytes(orbit) of st Float64 lifted: module M 96 R 944 S 6480 B 0 total 7520; E28 written here: M 96 R 944 S 6480 B 0 total 7520; 135 grid steps, 6 columns
+D86n | INFO | bytes(orbit) of st Double64 wrapped: module M 208 R 1040 S 8640 B 0 total 9888; E28 written here: M 208 R 1040 S 8640 B 0 total 9888; 135 grid steps, 8 columns
+D86n | INFO | bytes(orbit) of tg Float64 wrapped: module M 112 R 392 S 18360 B 0 total 18864; E28 written here: M 112 R 392 S 18360 B 0 total 18864; 135 grid steps, 17 columns
+D86n | INFO | bytes(orbit) of tg Float64 lifted: module M 96 R 392 S 16200 B 0 total 16688; E28 written here: M 96 R 392 S 16200 B 0 total 16688; 135 grid steps, 15 columns
+D86n | INFO | bytes(orbit) of tg Double64 wrapped: module M 208 R 688 S 18360 B 0 total 19256; E28 written here: M 208 R 688 S 18360 B 0 total 19256; 135 grid steps, 17 columns
+D86n | bytes(orbit) of every (spec, precision, mode) of the reduced plan: module against E28 with the reducer bytes read from the reducers; combinations compared / differing | 14 / 0 | 0 differ | PASS
+D86n | reducer state bytes at Float64 (SALI, FLI, MEGNO, RLI) read from the reducers | 72, 96, 200, 88 | 72, 96, 200, 88 | PASS
+D86n | stretching reducer at 1000 bins: reducer_bytes (state 104 plus the workspace of 2 (bins + 2) integers of 4 bytes = 8016) | 8120 | 104 + 8016 = 8120 | PASS
+D86n/R17 | worked example (a) tangent FLI, MEGNO, SALI, N = 4000: bytes(orbit) M 112 + R 392 + S 18360 + B 0 = 18864; capacity at F = 16 GB, f = 0.5: 424088; at F = 4 GB: 106022 | 18864, 424088 | 18864, 424088, 106022 at 4 GB | PASS
+D86n/R17 | worked example (b) frequency, windows 250, 1000, 4000 (run length 8000): bytes(orbit) M 80 + R 24 + S 7896 + B 128000 = 136000; capacity at F = 16 GB, f = 0.5: 58823 | 136000, 58823 | 136000, 58823 | PASS
+D86n/R17 | worked example (c) stretching, 1000 bins, N = 4000: bytes(orbit) M 112 + R 8144 + S 8640 + B 0 = 16896; capacity at F = 16 GB, f = 0.5: 473484 | 16896, 473484 | 16896, 473484 | PASS
+D86n/R17 | worked example (d) phase advance, three windows (run length 8001): bytes(orbit) M 80 + R 248 + S 7896 + B 0 = 8224; capacity at F = 16 GB, f = 0.5: 972762 | 8224, 972762 | 8224, 972762 | PASS
+D86n/R17 | worked example (d) weighted Birkhoff, K = 4, H = 3: bytes(orbit) M 80 + R 568 + S 7896 + B 0 = 8544; capacity at F = 16 GB, f = 0.5: 936329 | 8544, 936329 | 8544, 936329 | PASS
+D86n/R17 | frequency, Double64: the buffer term B for W_max = 4000 | 256000 | 256000 (64 W_max) | PASS
+D86j(a) | frequency capacity halves (floor) when the free memory halves: capacity at 16 GB, 8 GB | 58823, 29411 | 58823, 29411 | PASS
+D86n | chunk keys and hashes of the worked-example plan do not depend on the free memory (plan is a function of its inputs only) | plan built once; keys contain no memory field | true | PASS
+# section MEM took 2.2 s
+D86w | INFO | src/Experiments, numeric token 1000 (window): 2 hits; src/Experiments/run_pilot.jl:6, src/Experiments/run_record.jl:273
+   hit | src/Experiments/run_pilot.jl:6 | const PILOT_MAX_DRAWS = 1000
+   hit | src/Experiments/run_record.jl:273 | const WARM_STEPS = 1000   # steps of the warm-up run of a run type (an item shorter than this is warmed by itself)
+D86w | INFO | src/Experiments, numeric token 1e-12 (separation): 0 hits
+D86w | INFO | src/Experiments, numeric token 2000 / 2001 (run length): 0 hits
+D86w | INFO | src/Experiments, numeric token 250 (window): 0 hits
+D86w | INFO | src/Experiments, numeric token 400.0 / 800.0 / 600.0 (budget lines): 0 hits
+D86w | INFO | src/Experiments, numeric token 4000 (horizon): 1 hits; src/Experiments/run_groups.jl:55
+   hit | src/Experiments/run_groups.jl:55 | const PAR_STEPS_PER_TASK = 4000
+D86w | INFO | src/Experiments, numeric token 8.0 (floor_multiplier): 1 hits; src/Experiments/run_record.jl:316
+   hit | src/Experiments/run_record.jl:316 | reducers = (_estimator(method, 8.0), RunMonitor(sys))
+D86w | src/Experiments: numeric tokens 250, 1000, 2001, 4000 and 8.0 outside comments: hits / hits without an explanation as an engineering constant of D53 or a placeholder (each hit is listed above with its line) | 4 / 0 | 0 unexplained | PASS
+   explained | src/Experiments/run_groups.jl:55 | steps per task of the parallel scheduler (D53)
+   explained | src/Experiments/run_pilot.jl:6 | limit of the draws of a pilot start (D53, not an indicator value)
+   explained | src/Experiments/run_record.jl:273 | steps of the warm-up run of a run type (D53)
+   explained | src/Experiments/run_record.jl:316 | placeholder orthogonality tolerance of the hot-loop allocation probe of an exponent method (D53)
+D86w/I27 | src/Experiments: assignments of a literal number to a spec key name (bins, interval, min_per_cell, order, pad, mirror_ratio, floor_multiplier, separation, birkhoff_order, windows): hits / hits that are a default of a spec key | 1 / 0 | 0 defaults | PASS
+   hit | src/Experiments/run_indicator_record.jl:357 | r = m == "stretching" ? StretchingNumbers(; range = (-1.0, 1.0), bins = 1, interval = 1, min_per_cell = 0) : _ind_member(m, true) | placeholder reducer built only to call check_frame, which reads none of these parameters
+D86w | run_indicator*.jl and run_block.jl: code lines (comments excluded) naming threshold, detect, crossing, first_cross, sticky: lines / lines that are not the R5 monitor threshold | 1 / 0 | 0 (the grammar has no such key) | PASS
+   hit | src/Experiments/run_indicator_record.jl:321 | thr = Dict{String, Float64}("det" => Float64(det_threshold(df["det_residual_tol"], T, M)), "symp" => Float64(symp_threshold(df["det_residual_tol"], T, M))) | the monitor exceedance threshold of R5 (determinant and symplecticity residual), not an indicator threshold
+D86w | INFO | rest of src/Experiments, code lines with those words (the monitor exceedance rule of R5 and the panel builder; not indicator logic): 17 lines in files ["src/Experiments/inputs.jl", "src/Experiments/run_health.jl", "src/Experiments/run_record.jl", "src/Experiments/run_store.jl"]
+D86w/D86a | a spec carrying the key `threshold` is refused before any computation | run block `indicator[1].threshold`: unknown key | refused naming the key | PASS
+D86w/D86a | a spec carrying the key `class` is refused before any computation | run block `indicator[1].class`: unknown key | refused naming the key | PASS
+D86w/D86a | a spec carrying the key `detect` is refused before any computation | run block `indicator[1].detect`: unknown key | refused naming the key | PASS
+D86w/D86a | a spec carrying the key `first_crossing` is refused before any computation | run block `indicator[1].first_crossing`: unknown key | refused naming the key | PASS
+D86w/D86a | a spec id in [run.health].control_methods is refused | run block `health.control_methods[2]`: `tg` is an indicator spec id: the exact-exponent control rule is for th | refused | PASS
+D86w/I27 | a spec without one of its kind keys (no default in the module) is refused naming the key | run block `indicator[3].bins`: missing key | refused naming `bins` | PASS
+D86w | INFO | names of root attributes, orbit attributes, provenance keys and datasets in the files of campaign B (101 distinct): matching threshold, detect, cross, class, sticky: ["diagnostics@threshold", "orbit@class_label", "orbit@design_class"]
+D86w | no attribute or dataset of the new kinds names a threshold, a detection or a crossing; the only matches are the monitor exceedance threshold of R5 and the panel class labels (D53) | ["diagnostics@threshold", "orbit@class_label", "orbit@design_class"] | subset of ["diagnostics@threshold", "orbit@class_label", "orbit@design_class"] | PASS
+# section D86W took 1.7 s
+D86y | the study's data folder: files under data/p1-le-benchmark and every entry (path, size, modification time) under data/ before and after this script | 1741 files / 2679 entries; listings equal: true | unchanged (0 files written by this check; the P1 campaign's own 1741 files are untouched) | PASS
+D86y | INFO | data/gpu-benchmark.toml untouched (the record is not retaken for D86): size 2566 bytes, listed in the unchanged tree above
+D86y | every store, manifest and temporary file of this script lies under the scratch folder | yes (C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\d86-verify) | yes | PASS
+# section ISOLATION took 0.2 s
+# summary (recomputed after the splice of section PILOT): PASS 113 FAIL 0 INFO 63; the first full run reported # summary: PASS 111 FAIL 1 INFO 63, total seconds 813.5, peak RSS of this process 1.17 GiB

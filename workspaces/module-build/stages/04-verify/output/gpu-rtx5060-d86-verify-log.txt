@@ -1,0 +1,179 @@
+# D86 device check, julia 1.13.2, threads 23, cpu arrowlake-s
+# device ChaoslabCUDAExt.CUDADevice, NVIDIA GeForce RTX 5060 Laptop GPU, CUDA.jl 6.4.2, runtime 13.4.0, free 6925.0 MiB, stack limit 4096 B
+# probe(Float64): (loadable = true, functional = true, device = "NVIDIA GeForce RTX 5060 Laptop GPU", compiles = true, gpu_faster = true)
+# git head 5b1f91d968d72af0198af027951c2ea493477785; workaround F1 active (EXI_PATCH): true
+# data/gpu-benchmark.toml sha256 before: ec33c0b79407658afcc0e50562920c11e33d5893260f63d8582c3ce3008d368a (read only)
+# plan: (items = 2793, chunks = 352); FALLBACK_REASONS (9): 1: CUDA.jl not loadable | 2: no functional device | 3: kernel does not compile for the element type | 4: device out of memory | 5: NumericalHealthError raised only on the GPU | 6: reducer is CPU-only | 7: GPU not faster for the element type | 8: launch exceeds the display watchdog | 9: device lost
+D86y | INFO | record in force (data/gpu-benchmark.toml, Float64 table of NVIDIA GeForce RTX 5060 Laptop GPU): threads 23, gpu_faster true, per-method records for L1, L2, L3, L4, L4b, L5, L5b, L9
+TABLE | Double64 | bk (birkhoff) | cpu | cpu | cpu |  | 
+TABLE | Double64 | fq (frequency) | cpu | cpu | cpu |  | 
+TABLE | Double64 | pa (phase_advance) | cpu | cpu | cpu |  | 
+TABLE | Double64 | pr (pair) | cpu | cpu | cpu |  | 
+TABLE | Double64 | st (stretching) | cpu | cpu | cpu |  | 
+TABLE | Double64 | tg (tangent) | cpu | cpu | cpu |  | 
+TABLE | Float64 | bk (birkhoff) | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | fq (frequency) | auto | cpu | cpu | reducer is CPU-only | 
+TABLE | Float64 | pa (phase_advance) | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | pr (pair) | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE | Float64 | st (stretching) | auto | cpu | cpu | reducer is CPU-only | 
+TABLE | Float64 | tg (tangent) | auto | cpu | cpu | GPU not faster for the element type | 
+D86o/D86y | backend table with the record in force at 23 threads (no per-spec record exists yet): every Float64 spec row resolves to the CPU; CPU-only kinds with the sixth reason, the others with the seventh and no new reason | GPU not faster for the element type | reducer is CPU-only | reasons among the nine of FALLBACK_REASONS | PASS
+D86o/R16 | spec st (stretching) is CPU only: Float64 auto resolves to the CPU with the sixth reason | reducer is CPU-only | reducer is CPU-only | PASS
+D86o/R16 | spec fq (frequency) is CPU only: Float64 auto resolves to the CPU with the sixth reason | reducer is CPU-only | reducer is CPU-only | PASS
+# section TABLE took 1.2 s
+RECORD | tg | tangent | 1024 orbits x 4000 steps | device 64.88 ns per orbit-step | cpu 23 threads 45.14 ns per orbit-step (1038 thread-ns) | device/cpu 1.437 | gpu_faster false | launches 1 of 4000 steps, batches 1 of 27116
+RECORD | pr | pair | 1024 orbits x 300 steps | device 267.6 ns per orbit-step | cpu 23 threads 925.4 ns per orbit-step (2.128e+04 thread-ns) | device/cpu 0.2891 | gpu_faster true | launches 1 of 300 steps, batches 1 of 259751
+RECORD | st | stretching | FALLBACK(reducer is CPU-only) | cpu 15.34 ns per orbit-step on 23 threads (352.7 thread-ns)
+RECORD | fq | frequency | FALLBACK(reducer is CPU-only) | cpu 277.4 ns per orbit-step on 23 threads (6380 thread-ns)
+RECORD | pa | phase_advance | 1024 orbits x 2001 steps | device 32.79 ns per orbit-step | cpu 23 threads 29.34 ns per orbit-step (674.9 thread-ns) | device/cpu 1.117 | gpu_faster false | launches 1 of 2001 steps, batches 1 of 54205
+RECORD | bk | birkhoff | 1024 orbits x 2000 steps | device 63.1 ns per orbit-step | cpu 23 threads 29.29 ns per orbit-step (673.6 thread-ns) | device/cpu 2.155 | gpu_faster false | launches 1 of 2000 steps, batches 1 of 54232
+D86y | INFO | per-spec records written to C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\d86-verify\device\gpu-benchmark-d86.toml (scratch folder; data/gpu-benchmark.toml untouched)
+TABLE-AFTER | Double64 | bk (birkhoff) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | fq (frequency) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | pa (phase_advance) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | pr (pair) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | st (stretching) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | tg (tangent) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Float64 | bk (birkhoff) | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE-AFTER | Float64 | fq (frequency) | auto | cpu | cpu | reducer is CPU-only | 
+TABLE-AFTER | Float64 | pa (phase_advance) | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE-AFTER | Float64 | pr (pair) | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+TABLE-AFTER | Float64 | st (stretching) | auto | cpu | cpu | reducer is CPU-only | 
+TABLE-AFTER | Float64 | tg (tangent) | auto | cpu | cpu | GPU not faster for the element type | 
+D86o/D86y | backend table at 23 threads following the per-spec records (gpu where the record says gpu_faster, else the cpu with the seventh reason); st and fq with the sixth reason | bk:cpu fq:cpu pa:cpu pr:gpu st:cpu tg:cpu | follows the records | PASS
+D86o/R16 | a record whose spec_sha256 differs from the spec hash resolves tg to the CPU with the note `record taken on another chain` and the seventh reason | cpu, GPU not faster for the element type, note: record taken on another chain (spec_sha256 differs from the spec hash) | cpu, seventh reason, note | PASS
+# section RECORD took 41.1 s
+D86p | tg (tangent): 373 items on the device: provenance backend / launches / batches | gpu / 1 / 2 of 27116 | backend gpu | PASS
+D86p | INFO | tg: device records bitwise equal to the CPU records (series, tables, scalars, state, t): 60 of 373; flag words differing: 0; largest |difference| of a stored table value 5546; final states apart by more than 1e-9: 208; median / max final-state gap 0.6821 / 6.249 (orbit-level gap: reported, not gated)
+D86p/R18 | tg: every device record has a finite orbit point and passes the health rule of its kind (no non-finite value outside its flag) | true | true | PASS
+D86p | pr (pair): 373 items on the device: provenance backend / launches / batches | gpu / 1 / 2 of 259751 | backend gpu | PASS
+D86p | INFO | pr: device records bitwise equal to the CPU records (series, tables, scalars, state, t): 41 of 373; flag words differing: 0; largest |difference| of a stored table value 79.67; final states apart by more than 1e-9: 183; median / max final-state gap 1.503e-11 / 6.247 (orbit-level gap: reported, not gated)
+D86p/R18 | pr: every device record has a finite orbit point and passes the health rule of its kind (no non-finite value outside its flag) | true | true | PASS
+D86p | pa (phase_advance): 373 items on the device: provenance backend / launches / batches | gpu / 1 / 2 of 54205 | backend gpu | PASS
+D86p | INFO | pa: device records bitwise equal to the CPU records (series, tables, scalars, state, t): 13 of 373; flag words differing: 0; largest |difference| of a stored table value 2.938; final states apart by more than 1e-9: 203; median / max final-state gap 0.6954 / 6.161 (orbit-level gap: reported, not gated)
+D86p/R18 | pa: every device record has a finite orbit point and passes the health rule of its kind (no non-finite value outside its flag) | true | true | PASS
+D86p | bk (birkhoff): 372 items on the device: provenance backend / launches / batches | gpu / 1 / 1 of 54232 | backend gpu | PASS
+D86p | INFO | bk: device records bitwise equal to the CPU records (series, tables, scalars, state, t): 12 of 372; flag words differing: 8; largest |difference| of a stored table value 865; final states apart by more than 1e-9: 202; median / max final-state gap 0.479 / 6.23 (orbit-level gap: reported, not gated)
+D86p/R18 | bk: every device record has a finite orbit point and passes the health rule of its kind (no non-finite value outside its flag) | true | true | PASS
+D86p | fq (frequency): device recording of 372 items | FALLBACK(reducer is CPU-only) | the sixth reason (CPU only) | PASS
+D86p | st (stretching): device recording of 373 items | FALLBACK(reducer is CPU-only) | the sixth reason (CPU only) | PASS
+# section PARITY took 10.1 s
+O21/D86p | pa, Float64, 372 orbits x 2 windows x 2 frequencies (1468 compared, 20 undefined on both sides), same samples (trace of the device orbit): max |nu_device reducer - nu CPU pure function| / (2 B_E2), B_E2 = 8 eps (1 + max|Delta|/2 pi) | 0.002313 | <= 1 | PASS
+O21 | pa: the trace kernel's final state equals the recorder's stored orbit point at the last grid step (the samples are the recorder's own device orbit), bitwise | 372 of 372 | all | PASS
+O21/D86p | bk, Float64, 372 orbits, 4 observables x 2 windows: (b1) the samples the device computed (trace of the observable values), device reducer against weighted_birkhoff: max |avg difference| / (4 eps S), max |Delta difference| / (8 eps S) | 0.2507, 0.1424 | <= 1, <= 1 | PASS
+O21/D86p | bk: (b2) the CPU evaluation of the observables at the device states | 0.2534, 0.1424 | <= 1, <= 1 | PASS
+O21/D86p | tg (FLI, MEGNO, SALI) Float64: recorder device columns at N = 4000 against the verified device path (propagate, same chain, same frames, backend gpu; provenance gpu for 372 of 372): orbits bitwise equal / largest difference | 372 of 372 / 0 | all bitwise equal | PASS
+O21/D86p | pr (RLI, MEGNO on the pair map) Float64: recorder device columns at N = 300 against the verified device path (propagate on the PairMap with the stored xi_0 and the block frame; provenance gpu for 372 of 372): orbits bitwise equal / largest difference | 372 of 372 / 0 | all bitwise equal | PASS
+# section O21 took 14.9 s
+O21/D86p | SALI of the chain tg on the device, regular class (K = 0.5, 24 orbits, N = 4000): max |L - L_ref| / (8 eps (Psi1 + Psi2)) against BigFloat(256) at the device's own orbit points (sali criterion 18(a)) | 0.0006857 | <= 1 | PASS
+O21/D86p | SALI: max |SALI - SALI_ref| / B_SALI(n) over the 24 resolved orbits | 0.0008554 | <= 1 | PASS
+O21 | the trace kernel's final state equals the recorder's stored orbit point at the last grid step, bitwise | 24 of 24 | all | PASS
+# section O21 took 1.5 s
+D86p/R16 | tg, Double64, 23 items, device recording requested: the group falls back to the CPU with a recorded reason (the Double64 kernel is not offered) | FALLBACK(kernel does not compile for the element type) | FALLBACK with a reason of FALLBACK_REASONS | FALLBACK
+D86p/R16 | pr, Double64, 23 items, device recording requested: the group falls back to the CPU with a recorded reason (the Double64 kernel is not offered) | FALLBACK(kernel does not compile for the element type) | FALLBACK with a reason of FALLBACK_REASONS | FALLBACK
+D86p/R16 | pa, Double64, 23 items, device recording requested: the group falls back to the CPU with a recorded reason (the Double64 kernel is not offered) | FALLBACK(kernel does not compile for the element type) | FALLBACK with a reason of FALLBACK_REASONS | FALLBACK
+D86p/R16 | bk, Double64, 23 items, device recording requested: the group falls back to the CPU with a recorded reason (the Double64 kernel is not offered) | FALLBACK(kernel does not compile for the element type) | FALLBACK with a reason of FALLBACK_REASONS | FALLBACK
+# section DOUBLE took 24.0 s
+D86y | device campaign GC: status, failed chunks (the injected one only), wall s | complete with failed chunks, [25], 82.1 s | complete with failed chunks, [25] | PASS
+D86y | device campaign G1: status, failed chunks (the injected one only), wall s | complete with failed chunks, [25], 48.3 s | complete with failed chunks, [25] | PASS
+D86y | device campaign G2: status, failed chunks (the injected one only), wall s | complete with failed chunks, [25], 63.4 s | complete with failed chunks, [25] | PASS
+BACKEND | campaign GC | bk/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign GC | bk/Float64 | chunks by backend Dict("cpu" => 24) | reasons ["GPU not faster for the element type"]
+BACKEND | campaign GC | fq/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign GC | fq/Float64 | chunks by backend Dict("cpu" => 24) | reasons ["reducer is CPU-only"]
+BACKEND | campaign GC | pa/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign GC | pa/Float64 | chunks by backend Dict("cpu" => 24) | reasons ["GPU not faster for the element type"]
+BACKEND | campaign GC | pr/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign GC | pr/Float64 | chunks by backend Dict("cpu" => 24) | reasons ["GPU not faster for the element type"]
+BACKEND | campaign GC | st/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign GC | st/Float64 | chunks by backend Dict("cpu" => 47) | reasons ["reducer is CPU-only"]
+BACKEND | campaign GC | tg/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign GC | tg/Float64 | chunks by backend Dict("cpu" => 47) | reasons ["GPU not faster for the element type"]
+BACKEND | campaign G1 | bk/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G1 | bk/Float64 | chunks by backend Dict("cpu" => 24) | reasons ["GPU not faster for the element type"]
+BACKEND | campaign G1 | fq/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G1 | fq/Float64 | chunks by backend Dict("cpu" => 24) | reasons ["reducer is CPU-only"]
+BACKEND | campaign G1 | pa/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G1 | pa/Float64 | chunks by backend Dict("cpu" => 24) | reasons ["GPU not faster for the element type"]
+BACKEND | campaign G1 | pr/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G1 | pr/Float64 | chunks by backend Dict("gpu" => 24) | reasons [""]
+BACKEND | campaign G1 | st/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G1 | st/Float64 | chunks by backend Dict("cpu" => 47) | reasons ["reducer is CPU-only"]
+BACKEND | campaign G1 | tg/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G1 | tg/Float64 | chunks by backend Dict("cpu" => 47) | reasons ["GPU not faster for the element type"]
+BACKEND | campaign G2 | bk/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G2 | bk/Float64 | chunks by backend Dict("gpu" => 24) | reasons [""]
+BACKEND | campaign G2 | fq/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G2 | fq/Float64 | chunks by backend Dict("cpu" => 24) | reasons ["reducer is CPU-only"]
+BACKEND | campaign G2 | pa/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G2 | pa/Float64 | chunks by backend Dict("gpu" => 24) | reasons [""]
+BACKEND | campaign G2 | pr/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G2 | pr/Float64 | chunks by backend Dict("gpu" => 24) | reasons [""]
+BACKEND | campaign G2 | st/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G2 | st/Float64 | chunks by backend Dict("cpu" => 47) | reasons ["reducer is CPU-only"]
+BACKEND | campaign G2 | tg/Double64 | chunks by backend Dict("cpu" => 23) | reasons [""]
+BACKEND | campaign G2 | tg/Float64 | chunks by backend Dict("gpu" => 46, "cpu" => 1) | reasons ["", "NumericalHealthError raised only on the GPU"]
+D86y/R16 | campaign G2 (gpu request): chunks of tg, pr, pa, bk (Float64) ran on the device; st and fq (Float64) on the CPU with the sixth reason; Double64 on the CPU | bk/Float64: Dict("gpu" => 24); fq/Float64: Dict("cpu" => 24); pa/Float64: Dict("gpu" => 24); pr/Float64: Dict("gpu" => 24); st/Float64: Dict("cpu" => 47); tg/Float64: Dict("gpu" => 46, "cpu" => 1) | gpu for tg, pr, pa, bk; cpu for st, fq | PASS
+D86y/R16 | campaign G1 (auto with the per-spec records at 23 threads): each spec's backend follows its record | bk/Float64: Dict("cpu" => 24); fq/Float64: Dict("cpu" => 24); pa/Float64: Dict("cpu" => 24); pr/Float64: Dict("gpu" => 24); st/Float64: Dict("cpu" => 47); tg/Float64: Dict("cpu" => 47) | follows the records | PASS
+O20/D86y | independent reader on the files of device campaign GC: files, failed checks | 352, 0 | 352, 0 | PASS
+O20/D86y | independent reader on the files of device campaign G2: files, failed checks | 352, 0 | 352, 0 | PASS
+D86y/O21 | INFO | device campaign G2 against the CPU campaign GC, spec bk: orbits 372, bitwise equal tables and orbit points 12, largest |difference| of a stored table value 865, median 0.5749 (orbit-level gap: reported, not gated)
+D86y/O21 | INFO | device campaign G2 against the CPU campaign GC, spec fq: orbits 372, bitwise equal tables and orbit points 372, largest |difference| of a stored table value 0, median 0 (orbit-level gap: reported, not gated)
+D86y/O21 | INFO | device campaign G2 against the CPU campaign GC, spec pa: orbits 373, bitwise equal tables and orbit points 13, largest |difference| of a stored table value 2.938, median 0.1586 (orbit-level gap: reported, not gated)
+D86y/O21 | INFO | device campaign G2 against the CPU campaign GC, spec pr: orbits 373, bitwise equal tables and orbit points 41, largest |difference| of a stored table value 79.67, median 2.245e-06 (orbit-level gap: reported, not gated)
+D86y/O21 | INFO | device campaign G2 against the CPU campaign GC, spec st: orbits 396, bitwise equal tables and orbit points 396, largest |difference| of a stored table value 0, median 0 (orbit-level gap: reported, not gated)
+D86y/O21 | INFO | device campaign G2 against the CPU campaign GC, spec tg: orbits 366, bitwise equal tables and orbit points 32, largest |difference| of a stored table value 5546, median 105.3 (orbit-level gap: reported, not gated)
+D86y/R16 | st and fq (CPU only) are bitwise equal between the device campaign G2 and the CPU campaign GC | st 396 of 396; fq 372 of 372 | all | PASS
+D86y | INFO | manifest G2: device NVIDIA GeForce RTX 5060 Laptop GPU, threads Dict{String, Any}("available" => 23, "used" => 23), backend table rows for specs: Double64 bk -> cpu; Double64 fq -> cpu; Double64 pa -> cpu; Double64 pr -> cpu; Double64 st -> cpu; Double64 tg -> cpu; Float64 bk -> gpu; Float64 fq -> cpu; Float64 pa -> gpu; Float64 pr -> gpu; Float64 st -> cpu; Float64 tg -> gpu
+# section CAMPAIGN took 310.5 s
+D86y | INFO | figure written: C:\Users\tesse\Documents\Vibe Coding\Chaos\workspaces\module-build\stages\04-verify\output\experiments-d86-device.png
+# section PLOT took 34.5 s
+# data/gpu-benchmark.toml sha256 after: ec33c0b79407658afcc0e50562920c11e33d5893260f63d8582c3ce3008d368a (before ec33c0b79407658afcc0e50562920c11e33d5893260f63d8582c3ce3008d368a): unchanged
+# summary: PASS 32 FAIL 0 FALLBACK 4 INFO 14, peak RSS 2.64 GiB
+# D86 device check, julia 1.13.2, threads 23, cpu arrowlake-s
+# device ChaoslabCUDAExt.CUDADevice, NVIDIA GeForce RTX 5060 Laptop GPU, CUDA.jl 6.4.2, runtime 13.4.0, free 6925.0 MiB, stack limit 4096 B
+# probe(Float64): (loadable = true, functional = true, device = "NVIDIA GeForce RTX 5060 Laptop GPU", compiles = true, gpu_faster = true)
+# git head 5b1f91d968d72af0198af027951c2ea493477785; workaround F1 active (EXI_PATCH): true
+# data/gpu-benchmark.toml sha256 before: ec33c0b79407658afcc0e50562920c11e33d5893260f63d8582c3ce3008d368a (read only)
+# plan: (items = 2793, chunks = 352); FALLBACK_REASONS (9): 1: CUDA.jl not loadable | 2: no functional device | 3: kernel does not compile for the element type | 4: device out of memory | 5: NumericalHealthError raised only on the GPU | 6: reducer is CPU-only | 7: GPU not faster for the element type | 8: launch exceeds the display watchdog | 9: device lost
+RECORD | tg | tangent | 1024 orbits x 4000 steps | device 69.13 ns per orbit-step | cpu 23 threads 37.26 ns per orbit-step (856.9 thread-ns) | device/cpu 1.856 | gpu_faster false | launches 1 of 4000 steps, batches 1 of 27116
+RECORD | pr | pair | 1024 orbits x 300 steps | device 297 ns per orbit-step | cpu 23 threads 695.9 ns per orbit-step (1.6e+04 thread-ns) | device/cpu 0.4269 | gpu_faster true | launches 1 of 300 steps, batches 1 of 259751
+RECORD | st | stretching | FALLBACK(reducer is CPU-only) | cpu 15.95 ns per orbit-step on 23 threads (366.9 thread-ns)
+RECORD | fq | frequency | FALLBACK(reducer is CPU-only) | cpu 213.4 ns per orbit-step on 23 threads (4909 thread-ns)
+RECORD | pa | phase_advance | 1024 orbits x 2001 steps | device 30.6 ns per orbit-step | cpu 23 threads 50.69 ns per orbit-step (1166 thread-ns) | device/cpu 0.6037 | gpu_faster true | launches 1 of 2001 steps, batches 1 of 54205
+RECORD | bk | birkhoff | 1024 orbits x 2000 steps | device 62.35 ns per orbit-step | cpu 23 threads 43.81 ns per orbit-step (1008 thread-ns) | device/cpu 1.423 | gpu_faster false | launches 1 of 2000 steps, batches 1 of 54232
+D86y | INFO | per-spec records written to C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\d86-verify\device\gpu-benchmark-d86.toml (scratch folder; data/gpu-benchmark.toml untouched)
+TABLE-AFTER | Double64 | bk (birkhoff) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | fq (frequency) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | pa (phase_advance) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | pr (pair) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | st (stretching) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Double64 | tg (tangent) | cpu | cpu | cpu |  | 
+TABLE-AFTER | Float64 | bk (birkhoff) | auto | cpu | cpu | GPU not faster for the element type | 
+TABLE-AFTER | Float64 | fq (frequency) | auto | cpu | cpu | reducer is CPU-only | 
+TABLE-AFTER | Float64 | pa (phase_advance) | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+TABLE-AFTER | Float64 | pr (pair) | auto | gpu | NVIDIA GeForce RTX 5060 Laptop GPU |  | 
+TABLE-AFTER | Float64 | st (stretching) | auto | cpu | cpu | reducer is CPU-only | 
+TABLE-AFTER | Float64 | tg (tangent) | auto | cpu | cpu | GPU not faster for the element type | 
+D86o/D86y | backend table at 23 threads following the per-spec records (gpu where the record says gpu_faster, else the cpu with the seventh reason); st and fq with the sixth reason | bk:cpu fq:cpu pa:gpu pr:gpu st:cpu tg:cpu | follows the records | PASS
+D86o/R16 | a record whose spec_sha256 differs from the spec hash resolves tg to the CPU with the note `record taken on another chain` and the seventh reason | cpu, GPU not faster for the element type, note: record taken on another chain (spec_sha256 differs from the spec hash) | cpu, seventh reason, note | PASS
+# section RECORD took 41.3 s
+D86p | tg (tangent): 373 items on the device: provenance backend / launches / batches | gpu / 1 / 2 of 27116 | backend gpu | PASS
+D86p | INFO | tg: device records bitwise equal to the CPU records (series, tables, scalars, state, t): 60 of 373; flag words differing: 0; largest |difference| of a stored table value 5546; final states apart by more than 1e-9: 208; median / max final-state gap 0.6821 / 6.249 (orbit-level gap: reported, not gated)
+D86p/R18 | tg: every device record has a finite orbit point and passes the health rule of its kind (no non-finite value outside its flag) | true | true | PASS
+D86p | pr (pair): 373 items on the device: provenance backend / launches / batches | gpu / 1 / 2 of 259751 | backend gpu | PASS
+D86p | INFO | pr: device records bitwise equal to the CPU records (series, tables, scalars, state, t): 41 of 373; flag words differing: 0; largest |difference| of a stored table value 79.67; final states apart by more than 1e-9: 183; median / max final-state gap 1.503e-11 / 6.247 (orbit-level gap: reported, not gated)
+D86p/R18 | pr: every device record has a finite orbit point and passes the health rule of its kind (no non-finite value outside its flag) | true | true | PASS
+D86p | pa (phase_advance): 373 items on the device: provenance backend / launches / batches | gpu / 1 / 2 of 54205 | backend gpu | PASS
+D86p | INFO | pa: device records bitwise equal to the CPU records (series, tables, scalars, state, t): 13 of 373; flag words differing: 0; largest |difference| of a stored table value 2.938; final states apart by more than 1e-9: 203; median / max final-state gap 0.6954 / 6.161 (orbit-level gap: reported, not gated)
+D86p/R18 | pa: every device record has a finite orbit point and passes the health rule of its kind (no non-finite value outside its flag) | true | true | PASS
+D86p | bk (birkhoff): 372 items on the device: provenance backend / launches / batches | gpu / 1 / 1 of 54232 | backend gpu | PASS
+D86p | INFO | bk: device records bitwise equal to the CPU records (series, tables, scalars, state, t): 12 of 372; flag words differing: 8; largest |difference| of a stored table value 865; final states apart by more than 1e-9: 202; median / max final-state gap 0.479 / 6.23 (orbit-level gap: reported, not gated)
+D86p/R18 | bk: every device record has a finite orbit point and passes the health rule of its kind (no non-finite value outside its flag) | true | true | PASS
+D86p | fq (frequency): device recording of 372 items | FALLBACK(reducer is CPU-only) | the sixth reason (CPU only) | PASS
+D86p | st (stretching): device recording of 373 items | FALLBACK(reducer is CPU-only) | the sixth reason (CPU only) | PASS
+# section PARITY took 9.8 s
+D86y | INFO | figure written: C:\Users\tesse\Documents\Vibe Coding\Chaos\workspaces\module-build\stages\04-verify\output\experiments-d86-device.png
+# section PLOT took 30.4 s
+# data/gpu-benchmark.toml sha256 after: ec33c0b79407658afcc0e50562920c11e33d5893260f63d8582c3ce3008d368a (before ec33c0b79407658afcc0e50562920c11e33d5893260f63d8582c3ce3008d368a): unchanged
+# summary: PASS 12 FAIL 0 FALLBACK 0 INFO 6, peak RSS 2.38 GiB

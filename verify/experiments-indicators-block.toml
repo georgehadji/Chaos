@@ -1,0 +1,248 @@
+# Reduced run block for D86y (module-build experiments, Amendment D86, stage 04). A VERIFICATION INPUT, NOT A PREREGISTRATION:
+# every value below was chosen for the check, none is a study value and none is a p2 value. It replaces the first [run] block of a copy of the
+# real P1 preregistration (verify/experiments-indicators-prep.jl) and is run against a reduced copy of the real panel file (60 orbits per K and all
+# 13 controls; one orbit per cell in the subset S_L). One spec of each kind:
+#   tg  tangent       chain FLI, MEGNO, SALI, N = 4000
+#   pr  pair          RLI then MEGNO, N = 300 (the Y5 control overflows at step 770, see section O18 of verify/experiments-indicators.jl: finding F2)
+#   st  stretching    100 bins, N = 4000, counts stored for the subset S_L
+#   fq  frequency     windows 250 and 1000 (run length 2000)
+#   pa  phase_advance windows 250 and 1000 (run length 2001)
+#   bk  birkhoff      windows 250 and 1000 (run length 2000)
+# Float64 on all panel orbits, Double64 on S_L (one orbit per cell); wrapped mode (pair, exp_i_q, cos and sin need it) and one lifted arm.
+[run]
+panel_prereg_sha256_accepted = ["650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46"]
+
+[run.primary]
+tau = 1
+eps = 1e-8
+direction = "pi/4"
+coordinate_mode = "lifted"
+
+# series kinds with an L1 twin (the twin carries the orbit of the invariance check I21); wrapped
+[[run.arm]]
+name = "ser"
+orbits = "P"
+methods = ["L1"]
+indicators = ["tg", "st"]
+precisions = ["Float64"]
+horizons = [4000]
+coordinate_mode = ["wrapped"]
+
+[[run.arm]]
+name = "ser_d"
+orbits = "S_L"
+indicators = ["tg", "st"]
+precisions = ["Double64"]
+horizons = [4000]
+coordinate_mode = ["wrapped"]
+
+# the pair: its own horizon, because the linear control Y5 grows by exp(0.92 n) and its shadow orbit overflows at step 770
+[[run.arm]]
+name = "pair"
+orbits = "P"
+indicators = ["pr"]
+precisions = ["Float64"]
+horizons = [300]
+coordinate_mode = ["wrapped"]
+
+[[run.arm]]
+name = "pair_d"
+orbits = "S_L"
+indicators = ["pr"]
+precisions = ["Double64"]
+horizons = [300]
+coordinate_mode = ["wrapped"]
+
+# lifted mode: the tangent chain and stretching on the one-per-cell subset
+[[run.arm]]
+name = "lift"
+orbits = "S_L"
+indicators = ["tg", "st"]
+precisions = ["Float64"]
+horizons = [4000]
+
+# window kinds: the horizon of the arm is tau times the run length (R11 item 3)
+[[run.arm]]
+name = "win"
+orbits = "P"
+indicators = ["fq", "bk"]
+precisions = ["Float64"]
+horizons = [2000]
+coordinate_mode = ["wrapped"]
+
+[[run.arm]]
+name = "win_d"
+orbits = "S_L"
+indicators = ["fq", "bk"]
+precisions = ["Double64"]
+horizons = [2000]
+coordinate_mode = ["wrapped"]
+
+[[run.arm]]
+name = "pha"
+orbits = "P"
+indicators = ["pa"]
+precisions = ["Float64"]
+horizons = [2001]
+coordinate_mode = ["wrapped"]
+
+[[run.arm]]
+name = "pha_d"
+orbits = "S_L"
+indicators = ["pa"]
+precisions = ["Double64"]
+horizons = [2001]
+coordinate_mode = ["wrapped"]
+
+[[run.indicator]]
+id = "tg"
+kind = "tangent"
+members = ["FLI", "MEGNO", "SALI"]
+[run.indicator.budget.Float64]
+ns_cpu_thread = 400.0
+ns_gpu = 40.0
+safety = 2
+[run.indicator.budget.Double64]
+ns_cpu_thread = 20000.0
+safety = 3
+
+[[run.indicator]]
+id = "pr"
+kind = "pair"
+members = ["RLI", "MEGNO"]
+separation = 1e-12
+frame_source = "seeded"
+[run.indicator.budget.Float64]
+ns_cpu_thread = 800.0
+ns_gpu = 80.0
+safety = 2
+[run.indicator.budget.Double64]
+ns_cpu_thread = 40000.0
+safety = 3
+
+[[run.indicator]]
+id = "st"
+kind = "stretching"
+range = "derived"
+bins = 100
+interval = 4
+min_per_cell = 2
+counts = "S_L"
+[run.indicator.budget.Float64]
+ns_cpu_thread = 200.0
+safety = 2
+[run.indicator.budget.Double64]
+ns_cpu_thread = 10000.0
+safety = 3
+
+[[run.indicator]]
+id = "fq"
+kind = "frequency"
+observable = "exp_i_q"
+windows = [250, 1000]
+order = 2
+positions = "half"
+pad = 4
+mean_removal = true
+mirror_ratio = 0.5
+floor_multiplier = 8.0
+[run.indicator.budget.Float64]
+ns_cpu_thread = 400.0
+safety = 2
+[run.indicator.budget.Double64]
+ns_cpu_thread = 20000.0
+safety = 3
+
+[[run.indicator]]
+id = "pa"
+kind = "phase_advance"
+observable = "planar"
+windows = [250, 1000]
+birkhoff_order = 2
+[run.indicator.budget.Float64]
+ns_cpu_thread = 300.0
+ns_gpu = 30.0
+safety = 2
+[run.indicator.budget.Double64]
+ns_cpu_thread = 15000.0
+safety = 3
+
+[[run.indicator]]
+id = "bk"
+kind = "birkhoff"
+windows = [250, 1000]
+birkhoff_order = 2
+observables = [
+  { kind = "cos", coordinate = 1, frequency = 1 },
+  { kind = "sin", coordinate = 1, frequency = 1 },
+  { kind = "cos", coordinate = 2, frequency = 2 },
+  { kind = "lifted", coordinate = 2 },
+]
+[run.indicator.budget.Float64]
+ns_cpu_thread = 600.0
+ns_gpu = 60.0
+safety = 2
+[run.indicator.budget.Double64]
+ns_cpu_thread = 30000.0
+safety = 3
+
+[run.grid]
+points_per_decade = 20
+first_steps = 100
+extra_fractions = [0.1, 0.5]
+
+[run.backend]
+Float64 = "auto"
+Double64 = "cpu"
+BigFloat = "cpu"
+
+# control_bound opened (1.0) as in the earlier reduced campaigns: the exact-exponent control rule belongs to L1 only (P37) and is not under test here
+[run.health]
+fail_fraction = 0.05
+control_bound = 1.0
+control_methods = ["L1"]
+control_scope = "exact_start"
+setup_check_steps = { T = 100, R = 100, control_elliptic = 100, control_hyperbolic = 5, C = 5, S = 5, X = 5, h4 = 5 }
+setup_check_tol = 1e-10
+drift_bound = 1e6
+rerun_attempts = 1
+stop_failed_fraction = 0.05
+first_chunk_cost_factor = 1e6
+wall_cap_hours = 12
+
+[run.budget.Float64]
+ns_cpu_thread = 207.6
+ns_gpu = 2.468
+safety = 2
+
+[run.budget.Double64]
+ns_cpu_thread = 6634.6
+safety = 3
+
+[run.budget.BigFloat]
+ns_cpu_thread = 296311.3
+safety = 3
+
+[run.k19]
+threads = 23
+
+[run.verify]
+backend_agreement = { per_orbit_sigma = 6.0, mean_standard_errors = 4.0 }
+rerun_sample = 20
+
+[run.pilot]
+orbits_per_k = 2
+horizon = 300
+seed_label = "d86y-verify-pilot"
+
+[[run.h4]]
+K = "pi/2"
+x0 = "1e-3"
+p0 = "-1e-3"
+label = "d86y_h4_a"
+
+[[run.h4]]
+K = "2pi"
+x0 = "1e-3"
+p0 = "-1e-3"
+label = "d86y_h4_b"

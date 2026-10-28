@@ -400,11 +400,12 @@ function _d86_ref_freq(it, spec)
         w1.tie && push!(fl, "tie1"); w2.tie && push!(fl, "tie2")
         w1.near_zero && push!(fl, "near_zero1"); w2.near_zero && push!(fl, "near_zero2")
         w1.mirror && push!(fl, "mirror1"); w2.mirror && push!(fl, "mirror2")
+        w1.refined || push!(fl, "refined1"); w2.refined || push!(fl, "refined2")      # the bit is set only for a window that was not refined (R18 item 2)
         (; vals, flags = fl, status = r.status[1])
     end
 end
 const D86_FREQ_COLS = ["nu1", "nu2", "amp1", "amp2", "mirror1", "mirror2", "second1", "second2", "dist", "delta", "D"]
-const D86_FLAGS_CHECKED = ("below_floor", "degenerate", "failed", "tie1", "tie2", "near_zero1", "near_zero2", "mirror1", "mirror2")
+const D86_FLAGS_CHECKED = ("below_floor", "degenerate", "failed", "tie1", "tie2", "near_zero1", "near_zero2", "mirror1", "mirror2", "refined1", "refined2")
 
 # the E2 rows from the pure functions on the series built by plain iteration (O17)
 function _d86_ref_pa(it, spec)

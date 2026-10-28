@@ -319,6 +319,9 @@ function plan_run(prereg::AbstractString, panel::AbstractString; code_version = 
     for (id, os) in omitted        # an arm that selects no orbit for a spec is an error naming the spec (R12 item 2)
         any(it -> it.method == id, items) || throw(ArgumentError("indicator spec `$id` is undefined for every orbit its arms select (orbits $(join(sort!(first.(os)), ", ")))"))
     end
+    for spec in get(rb.raw, "indicator", [])    # a spec whose arms select no orbit at all is an error naming the spec (R12 item 2)
+        any(it -> it.method == spec["id"], items) || throw(ArgumentError("indicator spec `$(spec["id"])` is selected by no orbit of the panel (the arms that hold it select an empty subset)"))
+    end
     isempty(items) && throw(ArgumentError("run plan holds zero items: the arms select no orbit of the panel"))
     for it in items
         it.method == "L6" && _label(it.precision) != "Float64" &&

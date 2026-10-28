@@ -36,3 +36,4 @@ include(joinpath(@__DIR__, "ex_d86_windows.jl"))   # D86i to D86m
 include(joinpath(@__DIR__, "ex_d86_run.jl"))       # D86n to D86r
 include(joinpath(@__DIR__, "ex_d86_store.jl"))     # D86s to D86v
 include(joinpath(@__DIR__, "ex_d86_guards.jl"))    # D86w, D86x
+include(joinpath(@__DIR__, "ex_d86_review.jl"))   # stage 04 review fixes

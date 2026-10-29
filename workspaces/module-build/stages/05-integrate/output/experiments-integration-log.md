@@ -147,7 +147,7 @@ Short hashes are the commits on `main..module/experiments-runner` that touched t
 
 ## Amendment D86 (stage 05)
 
-Date 2026-10-29. Third scope of the slug: recording of the six indicator kinds by the study runner (decisions D86, D87, D88; spec `experiments-spec.md`, "Amendment D86" and the sections after it). Worked on `main`, no branch yet (decision D47: one branch per change; the branch is made at the commit step). Milestone M3 (decision D49), stage 05 of `workspaces/module-build`, third integration of the slug. Commit SHA: (set when committed).
+Date 2026-10-29. Third scope of the slug: recording of the six indicator kinds by the study runner (decisions D86, D87, D88; spec `experiments-spec.md`, "Amendment D86" and the sections after it). Worked and committed on `main` (owner decision at the stage 05 checkpoint, 2026-10-29: no branch, as for stages 01 to 04 of this amendment; commit f731b16). Milestone M3 (decision D49), stage 05 of `workspaces/module-build`, third integration of the slug. Commit SHA: (set when committed).
 
 ### Catalog rows flipped
 
@@ -175,7 +175,7 @@ Quoted from the verification report; the numbers are those of the final code unl
 
 | Check | Result |
 |-------|--------|
-| `Pkg.test()` after the fixes R5, R8, R9 (working tree, uncommitted) | 1,400,166 pass, 0 fail, 0 error, 1 broken (outside experiments); quality 12 of 12; 17 min |
+| `Pkg.test()` after the fixes R5, R8, R9 (f731b16) | 1,400,166 pass, 0 fail, 0 error, 1 broken (outside experiments); quality 12 of 12; 17 min |
 | experiments folder after the fixes R5, R8, R9 | 6854 pass, 0 fail, 0 error |
 | ICM validator | ALL CHECKS PASS (`python scripts/icm_validate.py`) |
 | Audit | status matches evidence: no catalog row changes and no open criterion beyond the LOW findings below; this log names the files (the commit SHA is set at the commit); `CHANGELOG.md` has the entry under Unreleased, Added |
@@ -203,7 +203,7 @@ Quoted from the verification report; the numbers are those of the final code unl
 
 ### Files changed since the previous log
 
-Short hashes are the commits on `main` from 38eee93 to 366677f that touched the file: 38eee93 stage 01, ba21bcc stage 02, 2e1c100 and 5b1f91d stage 03, 62fd6c2 and 366677f stage 04. "working tree" means uncommitted at the time of writing (the review fixes R5, R8, R9 and this stage's documents); its commit SHA is set when committed. Stage paths are relative to `workspaces/module-build/`.
+Short hashes are the commits on `main` from 38eee93 to 366677f that touched the file: 38eee93 stage 01, ba21bcc stage 02, 2e1c100 and 5b1f91d stage 03, 62fd6c2 and 366677f stage 04. "working tree" means uncommitted at the time of writing (the review fixes R5, R8, R9 and this stage's documents); its commit is f731b16 (stage 05). Stage paths are relative to `workspaces/module-build/`.
 
 - `CHANGELOG.md` (working tree)
 - `_config/architecture.md` (working tree)

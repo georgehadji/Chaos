@@ -207,14 +207,14 @@ function an_study(tag::AbstractString; p = an_fx_params(), lam = nothing, flags 
     mkpath(store)
     # preregistration with the SELF hash rule
     prep(t) = replace(replace(t, "\r\n" => "\n"), r"(?m)^(\| SHA-256 of this file \(current version\) \|)[^\n|]*\|" => s"\1 SELF |")
-    text = "# Preregistration: an-fixture\n\n## Header\n\n| Field | Value |\n|-------|-------|\n| Study slug | an-fixture |\n" *
+    text = "# Preregistration: p1-le-benchmark\n\n## Header\n\n| Field | Value |\n|-------|-------|\n| Study slug | p1-le-benchmark |\n" *
            "| SHA-256 of this file (current version) | " * "0"^64 * " (rule: fixture) |\n| Amendment log | A1 (2026-01-01, fixture) |\n\nFixture. Not a study.\n"
     h = an_sha256(prep(text))
     text = replace(text, "0"^64 => h; count = 1)
-    prereg = joinpath(dir, "an-fixture-preregistration.md")
+    prereg = joinpath(dir, "p1-le-benchmark-preregistration.md")
     write(prereg, text)
     # panel file
-    panel = joinpath(dir, "an-fixture-panel.toml")
+    panel = joinpath(dir, "p1-le-benchmark-panel.toml")
     cells = [Dict{String, Any}("class" => c, "drawn" => n, "k_index" => k, "qualifying" => 100, "reason" => "", "status" => "populated")
              for (k, c, n) in ((1, "C", 4), (1, "S", 2), (1, "X", 2), (1, "T", 2), (2, "C", 4), (2, "T", 2))]
     open(panel, "w") do io
@@ -222,7 +222,7 @@ function an_study(tag::AbstractString; p = an_fx_params(), lam = nothing, flags 
             "cells" => cells, "format_version" => 1), "orbit" => AN_ORBITS))
     end
     ph = an_sha256(read(panel))
-    params_file = an_write_params(joinpath(dir, "an-fixture-parameters.toml"), p)
+    params_file = an_write_params(joinpath(dir, "p1-le-benchmark-parameters.toml"), p)
     specs = an_specs(p)
     chunks = Dict{String, Any}[]
     for (ord, sp) in enumerate(specs)
@@ -243,7 +243,7 @@ function an_study(tag::AbstractString; p = an_fx_params(), lam = nothing, flags 
         end
         key = "method=$(sp.method) precision=$(sp.precision) horizon=$(sp.horizon) tau=$(sp.tau) eps=$(sp.eps) direction=$(sp.direction) mode=$(sp.mode)"
         ch = "c"^60 * lpad(string(ord), 4, '0')
-        root = Dict{String, Any}("schema_version" => 2, "study" => "an-fixture", "chunk" => ord, "chunk_key" => key, "chunk_hash" => ch, "plan_sha256" => "p"^64,
+        root = Dict{String, Any}("schema_version" => 2, "study" => "p1-le-benchmark", "chunk" => ord, "chunk_key" => key, "chunk_hash" => ch, "plan_sha256" => "p"^64,
             "panel_sha256" => ph, "prereg_sha256" => h, "git_sha" => "a"^40, "code_version" => "an-code-1", "backend_request" => "cpu", "backend" => "cpu",
             "device" => "cpu", "backend_fallback_reason" => "", "precision" => sp.precision, "method" => sp.method, "horizon" => sp.horizon, "tau" => sp.tau,
             "vectors" => sp.method in ("L1", "L2") ? 1 : 2, "coordinate_mode" => sp.mode, "direction" => sp.direction, "grid_sha256" => "g"^64,
@@ -254,11 +254,11 @@ function an_study(tag::AbstractString; p = an_fx_params(), lam = nothing, flags 
         push!(chunks, Dict{String, Any}("ordinal" => ord, "key" => key, "hash" => ch, "arms" => sp.arms, "status" => "ok", "attempt" => 1, "orbits" => length(sp.orbits),
             "flags" => Dict{String, Any}(f => Int[] for f in ("diagnostics exceeded", "drift", "excluded", "breakdown_tau"))))
     end
-    manifest = joinpath(dir, "an-fixture-manifest.json")
-    AX._write_json(manifest, Dict{String, Any}("study" => "an-fixture", "schema_version" => 2, "status" => status, "plan_sha256" => "p"^64, "chunks" => chunks,
+    manifest = joinpath(dir, "p1-le-benchmark-manifest.json")
+    AX._write_json(manifest, Dict{String, Any}("study" => "p1-le-benchmark", "schema_version" => 2, "status" => status, "plan_sha256" => "p"^64, "chunks" => chunks,
         "prereg" => Dict("header" => h, "sha256_end" => h), "panel" => Dict("sha256_end" => ph, "build_hash" => "e"^64), "overrides" => Dict{String, Any}(),
         "reasons" => String[]))
-    return (; dir, store, prereg, panel, manifest, params = params_file, p, out = joinpath(dir, "out"), specs, chunks = length(chunks), study = "an-fixture",
+    return (; dir, store, prereg, panel, manifest, params = params_file, p, out = joinpath(dir, "out"), specs, chunks = length(chunks), study = "p1-le-benchmark",
             prereg_hash = h, panel_hash = ph)
 end
 an_cached(tag; kw...) = get!(() -> an_study(tag; kw...), AN_STUDIES, tag)

@@ -122,22 +122,29 @@ function _write_defect(out, study::String, ctrl, hashes)
     return path
 end
 
-"""
-    analyze(; prereg, manifest, panel, params, store, out, figures = false, threads, seed) -> NamedTuple
+# The checks, the items and the control rows that the labelling and the full analysis of study p1-le-benchmark share (E17).
+function _p1_prepare(prereg, manifest, panel, params, store)
+    c = check_inputs(prereg, manifest, panel, params, store)
+    items = read_store(manifest, store)
+    check_items(items, c.man, c.p)
+    orbits = TOML.parsefile(panel)["orbit"]
+    idx = index_items(items)
+    ctrl = _controls(idx, orbits, c.p)
+    return (c = c, items = items, orbits = orbits, idx = idx, ctrl = ctrl)
+end
 
-Run the analysis of the spec. Every input is checked before anything is written (an `ArgumentError` names the cause). A gated control above
+"""
+    analyze_p1(; prereg, manifest, panel, params, store, out, figures = false, threads, seed) -> NamedTuple
+
+Run the analysis of the spec for study `p1-le-benchmark`. Every input is checked before anything is written (an `ArgumentError` names the cause). A gated control above
 its bound stops the run with status `:control_defect` and a defect report; otherwise the tables file `<study>-tables.md` is written and, when
 `figures` is true and the plotting extension is loaded, the figures. Status `:ok`, `:figures_skipped` or `:control_defect`.
 """
-function analyze(; prereg, manifest, panel, params, store, out, figures::Bool = false, threads::Integer = Threads.nthreads(), seed::Union{Nothing, Integer} = nothing)
-    c = check_inputs(prereg, manifest, panel, params, store)
+function analyze_p1(; prereg, manifest, panel, params, store, out, figures::Bool = false, threads::Integer = Threads.nthreads(), seed::Union{Nothing, Integer} = nothing)
+    pre = _p1_prepare(prereg, manifest, panel, params, store)
+    c, items, orbits, idx, ctrl = pre.c, pre.items, pre.orbits, pre.idx, pre.ctrl
     p, man = c.p, c.man
     sd = seed === nothing ? default_seed() : Int(seed)
-    items = read_store(manifest, store)
-    check_items(items, man, p)
-    orbits = TOML.parsefile(panel)["orbit"]
-    idx = index_items(items)
-    ctrl = _controls(idx, orbits, p)
     study = String(man["study"])
     ctrl.ok || return merge(_empty_result(:control_defect, c.hashes), (defects = ctrl.defects, tables = _write_defect(out, study, ctrl, c.hashes)))
     flags, dirs, bf = _flag_map(items), _dirs_map(items, p), _bf_label(items)

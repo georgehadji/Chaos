@@ -69,8 +69,8 @@ end
 @testset "AC15 and the default scenario: content, sets, decisions, labels" begin
     st = an_cached("default")
     res = an_res("default", st)
-    @test res.status === :ok && isfile(res.tables) && basename(res.tables) == "an-fixture-tables.md"
-    @test an_files(st.out) == ["an-fixture-tables.md"]                                  # figures not requested: tables only
+    @test res.status === :ok && isfile(res.tables) && basename(res.tables) == "p1-le-benchmark-tables.md"
+    @test an_files(st.out) == ["p1-le-benchmark-tables.md"]                                  # figures not requested: tables only
     @test collect(keys(res.decisions)) == [:H1, :H2, :H3, :H4, :H5]                      # decided in this order (I5)
     # sets
     @test sort(res.sets.E_ch) == [1, 2, 3, 4, 11, 12, 13, 14, 17, 18, 20] && sort(res.sets.W) == collect(1:8) && sort(res.sets.S) == [11, 12, 13, 14]
@@ -193,8 +193,8 @@ end
     res = an_res("defect", st)
     @test res.status === :control_defect && res.decisions === nothing
     @test length(res.defects) == 1 && res.defects[1].id == 17 && res.defects[1].method == "L9"
-    @test an_files(st.out) == ["an-fixture-defect.md"]                             # a defect report and nothing else
-    rep = read(joinpath(st.out, "an-fixture-defect.md"), String)
+    @test an_files(st.out) == ["p1-le-benchmark-defect.md"]                             # a defect report and nothing else
+    rep = read(joinpath(st.out, "p1-le-benchmark-defect.md"), String)
     @test occursin("17", rep) && occursin("L9", rep) && !occursin("## T2", rep)
 end
 

@@ -40,6 +40,25 @@ The plotting is `ext/ChaoslabCairoMakieExt.jl` (CairoMakie as a weak dependency,
 | A hypothesis whose eligible set has fewer than `min_set` orbits is "not decidable" with the count | `decide_h1` to `decide_h5` |
 | Items of the tau sweep with `breakdown_tau` are results, not failures | `check_items`, F7 |
 
+## Second study: p2-indicators (Amendment D89)
+
+`analyze` reads the single header row "Study slug" of the preregistration (`p2_dispatch.jl`) and runs the pipeline of that study: `p1-le-benchmark` is `analyze_p1` (unchanged, `pipeline.jl`), `p2-indicators` is `analyze_p2` (`p2_pipeline.jl`); any other slug is refused. The command gains the options `--p1-store`, `--p1-preregistration`, `--p1-manifest`, `--p1-parameters` (the P1 reference inputs of the labels; a usage error for any other study). Exit code 2 means "figures skipped": the drawers of the six figures are a follow-up to the figures extension (P11). Spec: "Amendment D89" of the analysis spec; parameter table of 58 keys (E22); output `<out>/p2-indicators-tables.md`.
+
+| File | Holds |
+|------|-------|
+| `p2_rules.jl` | `p2_budget_step`, `p2_nearest_step`, `p2_window_row`, `p2_growth`, `p2_ratio`, `p2_verdict` (R1, R2), `p2_score`, `p2_detection`, `p2_median` |
+| `p2_agree.jl` | `p2_contingency`, `p2_unanimity`, `p2_spearman`, `p2_auc`, `p2_regular_range`, `p2_leaving_budget`, `p2_share_below` |
+| `p2_stat.jl` | `p2_stat` (H1 to H5), `p2_h6_stats`, `p2_flips`, `p2_decide`, `p2_robust` |
+| `p2_boot.jl` | `p2_label`, `p2_resample`, `p2_bootstrap` (joint resampling, streams keyed by label) |
+| `p2_sets.jl` | `p2_sets` (E29), `p2_rho`, `p2_grid_label`, `p2_rotation_numbers`, `p2_lift` |
+| `p2_store.jl` | `p2_read_store`, `p2_find_item`, `p2_flag`, `p2_grid_starts` |
+| `p2_params.jl` | `p2_read_params`, `P2_PARAM_KEYS` (E22) |
+| `p2_check.jl` | the input checks of E36 (`p2_check_inputs`, `p2_check_items`) |
+| `p2_orbits.jl` | the items each orbit must have, the value records at the recorded steps, the orbit table with the reference class |
+| `p2_hyp.jl` | verdict tables, the six decisions, the extension, the R2 version, the gate and the second versions |
+| `p2_report.jl`, `p2_items.jl`, `p2_hitems.jl`, `p2_ritems.jl` | AUC, ranges, sensitivities, packages, flags, controls, cost; the items T1 to T17 and the data tables F1 to F6 |
+| `p2_render.jl`, `p2_pipeline.jl`, `p2_dispatch.jl` | the tables file, `analyze_p2`, `analyze` and `study_slug` |
+
 ## Limits and deferred
 
 | Item | Note |

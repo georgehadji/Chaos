@@ -8,7 +8,7 @@ an_cli_args(st; extra = String[]) = vcat(["analyze", st.prereg, st.manifest, st.
     io = IOBuffer()
     @test AN.cli(an_cli_args(st); io = io) == 2
     out = String(take!(io))
-    @test occursin("figures skipped", out) && isfile(joinpath(st.out, "an-fixture-tables.md"))
+    @test occursin("figures skipped", out) && isfile(joinpath(st.out, "p1-le-benchmark-tables.md"))
     # help
     io = IOBuffer()
     @test AN.cli(["analyze", "--help"]; io = io) == 0

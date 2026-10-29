@@ -1,0 +1,42 @@
+# Implementation notes: analysis, Amendment D89 (stage 03)
+
+Date of the run: 2026-10-29, Julia 1.13.2. Spec: `workspaces/module-build/stages/01-spec/output/analysis-spec.md`, "Amendment D89". Tests: `test/analysis/an_p2_*.jl`, plan `stages/02-tests/output/analysis-test-plan.md`. Code: `src/Analysis/p2_*.jl` (17 files, 2107 lines, none above 195 lines, no function of 50 lines or more), `pipeline.jl`, `cli.jl`, `Analysis.jl` (changed), `bench/analysis.jl` (four entries added), `src/Analysis/CONTEXT.md` (file table). No test, no `data/`, no frozen document, no other layer was touched.
+
+## Result
+
+Folder suite, `julia --project -t 4 --check-bounds=yes`: 997 tests, 962 pass, 22 fail, 13 error. Every D89 test passes (all 19 `an_p2_*.jl` files, the guards of the P1 path included). The 35 failures and errors are in the old P1 tests and have one cause: the slug `an-fixture` of `test/analysis/an_helpers.jl` is refused by E21 ("unknown study slug"). See "Open conflict A1". With the slug replaced by `p1-le-benchmark` in a scratch copy of the old test files (not in the repository) the old P1 tests pass (404 of 411; the 7 left are path artefacts of the copy: the layering and the verify-environment checks read `../../src`).
+
+Quality gates (temporary environment with Aqua and JET, `test/quality.jl`): Aqua all pass; JET clean (no possible error in any own module). `test/layering.jl` passes; D89t (imports of Analysis are Experiments, SHA, StableRNGs, TOML only) passes. Coverage of `src/Analysis` from the folder suite: the P2 files 99 percent (one line or two uncovered per file at most), P1 files 88 to 100 percent, module 98 percent. The full `Pkg.test()` was not run.
+
+## Open conflict A1
+
+Owner decision A1 (stage 02 checkpoint): stage 03 changes the base fixture slug `an-fixture` to a known slug and E21 stays strict. The stage 03 brief says tests are not edited. Both cannot hold: `an_helpers.jl` lines 210, 212, 214, 217, 225, 246, 258, 261 (`an_study`, slug, file names, manifest `study`) and the expected names in `an_cli.jl:11`, `an_pipeline.jl:72, 73, 196, 197` use `an-fixture`. E21 is implemented strictly (`p2_dispatch.jl`: any slug but the two known ones is refused naming the slug and both known ones) and nothing special-cases `an-fixture`. Needed change, one rule: replace `an-fixture` by `p1-le-benchmark` in those six files (a global replace; verified in a scratch copy).
+
+## Readings that differ from the spec text or that the tests fix
+
+1. R2 version (E33). The spec says every statistic is recomputed with the verdicts of R2. The tests pin a narrower reading: `p2_ref_recs` (`an_p2_refstore.jl`) takes the verdict series from R2 but the censored detection times from the R1 verdicts, and `p2_ref_h6` uses R1 verdicts for the directions and the precisions, also in the R2 version. Built as the tests pin it: under R2 only H1, H4, H5 (the V series) change; M_X, Q, R_X and H6 stay those of R1. The spec-literal reading is the constant `P2_R2_REDETECT = true` in `p2_hyp.jl` (the detection under R2 is already computed: `detection2`); with it the test `an_p2_pipeline.jl` "extension ... the R2 version" fails (H2.M, H3.M_w, H3.M_s, H3.R, H3.R_lo, H3.passing, H6.dir.delta, H6.dir.dropped, H6.prec.delta differ). Question for the owner: spec or test? A test change of `p2_ref_recs` and `p2_ref_h6` (use `rule`) would settle it.
+2. A2 (numeric value against its quote by `string(value)`) is built as decided, with the raw TOML text also accepted (an integer `5` matches a quote `5`). On the real preregistration this cannot be satisfied for several keys: the prereg writes `1e-4`, `1e-7`, `1e5`, `10^4`, `95 percent`, `5` (a TOML float `5.0` gives `5.0`), and for the four label keys (`label_*`) the section "Reference class rho(o)" holds no number at all (it refers to P1 "Label rules"). Stage 04 will be blocked at the table check unless the quote rule is widened (a numeric token that parses to the value) or the quotes are chosen differently; `p2_params.jl` function `_p2_texts` is the one place to change. Not widened without the owner.
+3. `p2_leaving_budget` is all or nothing in the pipeline: if the regular range is missing at any budget of an indicator and K, the leaving budget is `nothing` (as `an_p2_pipeline.jl` computes it). The spec reads "for every later index".
+4. The extension H4 on the design ensemble uses the whole T_s^design (not restricted to E8) with the label set name `T_s_design_8` and set rule `E8` (the test reference does the same).
+5. `p2_grid_starts(prereg)` has no panel argument in the test call. First id of the grid: keyword `first_id`, else one above the largest id of the panel file given by keyword `panel` (the pipeline passes it), else the single `*-panel.toml` next to the preregistration (the fixture), else 884.
+6. Items of series kinds (tg, pr, st) must be finite in every row and column (table E31 of D86: every column required finite); window kinds finite unless the second flag bit is set, `reldig` also unless `reldig_undefined`; an infinite value anywhere refuses. The check covers rows that no budget uses (the test `nan-series` needs this). It passed on the real store.
+7. The recorded steps of an item must equal those of the first orbit of its chunk and match `steps_recorded` (a missing row is detected there; a missing needed step cannot be detected otherwise because `n(b)` is the first step not before `b`).
+8. A control with a positive exponent and no `control_scope` is not refused in P2 (the spec E36 does not list it); the stored `control_deviation` is checked to 1e-12.
+9. `--out` inside the repository `data/` refuses for study p2-indicators only (P1 refusals stay as before, I11).
+10. The old P1 command had a defect: `--threads N` always raised (`something(..., throw(...))` evaluates the throw). Fixed in `cli.jl` (`_threads`); no P1 test or output depends on it.
+11. `analyze` is now the dispatcher (`p2_dispatch.jl`); the old body is `analyze_p1` (`pipeline.jl`) with the shared preparation `_p1_prepare`, also used for the in-memory P1 labelling. A P2 table given with a P1 preregistration is refused with its unknown and missing keys named (only when it has keys of the P2 set, so `read_params` itself behaves as before).
+12. Tables: an undefined number is the text `nothing` in the markdown and in the digest (the test digest rule `string(x)`).
+13. Spearman (E30) is reported in F1 (extra column `spearman`); F2 adds the rows `t_det`; T1 carries two text lines (omissions, drops).
+
+## Performance (not authoritative: scratch parameter table, see below)
+
+Dry run on the real stores (`data/p2-indicators`, `data/p1-le-benchmark`, read only, output in the session scratch area): 82 s wall at 8 threads and 66 s at 23 threads, peak resident memory 1.64 GiB (8 threads) and 1.82 GiB (23 threads), the tables file 1.0 MB, byte-identical at 8 and 23 threads. Most of the time is serial (reading 695 chunk files, the P1 labelling). Set sizes equal the drafting prototype of the spec: E_all 2974, E8 2236, W2 214, S2 448, T_s 30, T_s^design 96, regular 1159, gate 80, S_D* 109, S_L* 51. No finite-value, identity, flag-count or coverage refusal fired on the real store.
+The dry run used a scratch parameter table with the 58 values of the preregistration and dummy quotes, with the quote check switched off (`Chaoslab.Analysis._p2_quotes` replaced in the scratch session only), because the table of E22 does not exist yet and the quote check cannot pass (reading 2). It is not the stage 04 run and no result of it is recorded here.
+`bench/analysis.jl`: `p2_bootstrap` H1 on 214 orbits at 1e4 resamples 0.61 s; H2 on 448 orbits 1.5 s; `p2_unanimity` 28 pairs 214 orbits 87 microseconds; `p2_auc` 300 against 150 scores 15 microseconds. The study runs 7 decisions of bootstrap per set rule and variant (about 35 labels), parallel over labels.
+
+## Known limits and not checked
+
+- E36 o (input changed while the run goes): the hashes are taken at the start and compared before the tables are written (P2 inputs and P1 reference inputs); a test hook was not added.
+- Not done here (stage 04): the independent Python layer (O6), the real P2 parameter table, D89v to D89x, the PDF figures (P11, exit code 2).
+- The bootstrap runs on records through `p2_stat` (readable, same code as the point statistics); a faster index-based form was not needed.
+- The coverage was measured on a run where the old P1 tests fail on the slug, so the P1 files are slightly under-covered.

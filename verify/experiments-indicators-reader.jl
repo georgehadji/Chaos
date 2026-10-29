@@ -172,7 +172,13 @@ for fn in files
                 chk(fn, kind == "stretching" && collect(keys(f["pooled"])) == [id], "pooled groups $(collect(keys(f["pooled"]))) in a $kind file")
                 for pid in keys(f["pooled"])
                     g = f["pooled"][pid]
-                    chk(fn, haskey(g, "counts") && haskey(HDF5.attributes(g), "orbits"), "pooled/$pid lacks counts or the attribute orbits")
+                    chk(fn, haskey(HDF5.attributes(g), "orbits"), "pooled/$pid lacks the attribute orbits")
+                    # D88: counts and the attribute range exist together, exactly when the orbits of the chunk share one range (scalars@range of each orbit)
+                    orng = [HDF5.read_attribute(f["orbits"][o]["indicators"][pid]["scalars"], "range") for o in keys(f["orbits"])
+                            if haskey(f["orbits"][o], "indicators") && haskey(f["orbits"][o]["indicators"], pid) && haskey(f["orbits"][o]["indicators"][pid], "scalars")]
+                    same = !isempty(orng) && all(r -> reinterpret(UInt64, r) == reinterpret(UInt64, first(orng)), orng)
+                    chk(fn, haskey(g, "counts") == same && haskey(HDF5.attributes(g), "range") == same, "pooled/$pid: counts $(haskey(g, "counts")) range $(haskey(HDF5.attributes(g), "range")) but ranges shared = $same")
+                    same && haskey(HDF5.attributes(g), "range") && chk(fn, HDF5.read_attribute(g, "range") == first(orng), "pooled/$pid range differs from the range of the orbits")
                     if haskey(g, "counts")
                         C = read(g["counts"])
                         println(out, "Q|", fn, "|", pid, "|", eltype(C), "|", join(cdims(g["counts"]), "x"), "|", join(size(C), "x"), "|", rawsha(C), "|", HDF5.read_attribute(g, "orbits"))

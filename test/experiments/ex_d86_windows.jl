@@ -38,11 +38,12 @@ end
     rng = StableRNG(d86_seed('i', 1))
     bad = Dict{String, Int}()
     miss!(tag, ok) = ok || (bad[tag] = get(bad, tag, 0) + 1)
-    pooled = Dict{Int, Matrix{Int}}()
+    pooled = Dict{Int, Any}()
     for file in ex_chunk_files(run.store)
         c = plan.chunks[ex_ordinal(file)]
         raw = d86_raw(file)
         want = zeros(Int, spec["bins"] + 2, 2)
+        rngs = Vector{Float64}[]
         for i in c.items
             it = plan.items[i]; o = it.orbit
             t = raw["orbits/$o/t"]
@@ -64,6 +65,7 @@ end
             miss!("scalars values", all(v -> any(s -> reinterpret(UInt64, s) == reinterpret(UInt64, v), sc), expected))
             rg = d86_at(raw, o, "s1", "scalars", "range")                                   # two binary64, lo then hi, on `scalars` (correction 5)
             miss!("range", rg isa Vector{Float64} && rg == [last.range[1], last.range[2]])
+            push!(rngs, rg)
             # counts exist only for the orbits of the named subset (S_L = orbit 1), sum to the handoff count per column, equal the stand-alone counts
             has = haskey(raw, "orbits/$o/indicators/s1/counts")
             miss!("counts subset", has == plan.panel.orbits[o]["in_SL"])
@@ -74,14 +76,18 @@ end
             want .+= Int.(last.fin.counts)
         end
         # the pooled counts of a chunk: the exact integer sum over the chunk's orbits of the counts at the last grid step
-        pc = raw["pooled/s1/counts"]
-        miss!("pooled", pc isa Matrix{Int64} && pc == want && raw["pooled/s1@orbits"] == length(c.items))
+        # (D88) stored with the range of the cells when the orbits of the chunk share one range, not stored otherwise
+        shared = all(==(first(rngs)), rngs)
+        pc = get(raw, "pooled/s1/counts", nothing)
+        miss!("pooled orbits", raw["pooled/s1@orbits"] == length(c.items))
+        miss!("pooled presence", (pc !== nothing) == shared && haskey(raw, "pooled/s1@range") == shared)
+        shared && miss!("pooled", pc isa Matrix{Int64} && pc == want && raw["pooled/s1@range"] == first(rngs))
         pooled[c.ordinal] = pc
     end
     @test isempty(bad)
     # unchanged when the order of the chunks is reversed
     rev = d86_run("st-rev", d86_st_block(); order = :reverse)
-    revp = Dict(ex_ordinal(f) => d86_raw(f)["pooled/s1/counts"] for f in ex_chunk_files(rev.store))
+    revp = Dict(ex_ordinal(f) => get(d86_raw(f), "pooled/s1/counts", nothing) for f in ex_chunk_files(rev.store))
     @test revp == pooled
     # an item recorded alone and in a group with other orbits has identical stored data (the workspace is per orbit)
     alone = d86_run("st-alone", d86_st_block(; orbits = "S_L"))

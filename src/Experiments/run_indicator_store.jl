@@ -35,14 +35,18 @@ end
 
 _read_provenance(f) = (pg = HDF5.open_group(f, "provenance"); Dict{String, Any}(m => _read_attrs(HDF5.open_group(pg, m)) for m in keys(pg)))
 
-# The pooled counts of a chunk (E29): the exact integer sum over the orbits of the count of each cell at the last grid step, stored once per spec.
+# The pooled counts of a chunk (E29, D88): the exact integer sum over the orbits of the count of each cell at the last grid step, stored once per spec with the
+# range of the cells. Orbits that do not share one range (derived ranges of different K or of the linear control) have no common cells: the group then holds
+# the number of orbits and nothing else.
 function _put_pooled!(f, orbits)
     ids = sort!(unique(id for o in orbits for (id, t) in o.indicators if t.pool !== nothing))
     for id in ids
-        tabs = [o.indicators[id].pool for o in orbits if haskey(o.indicators, id) && o.indicators[id].pool !== nothing]
+        ts = [o.indicators[id] for o in orbits if haskey(o.indicators, id) && o.indicators[id].pool !== nothing]
         g = HDF5.create_group(f, "pooled/$id")
-        _put_ds!(g, "counts", reduce(+, (Int64.(p) for p in tabs)))
-        HDF5.write_attribute(g, "orbits", length(tabs))
+        HDF5.write_attribute(g, "orbits", length(ts))
+        all(t -> isequal(t.range, first(ts).range), ts) || continue
+        _put_ds!(g, "counts", reduce(+, (Int64.(t.pool) for t in ts)))
+        HDF5.write_attribute(g, "range", first(ts).range)
     end
     return nothing
 end

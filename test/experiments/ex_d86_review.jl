@@ -24,3 +24,24 @@ end
     end
     @test r isa ArgumentError && occursin("`tg`", r.msg)
 end
+
+@testset "D88 pooled counts carry their range and are not written across ranges" begin
+    run = d86_run("review-d88", d86_one(d86_spec("stretching"; id = "st"); orbits = "S_D", horizon = 100))
+    plan = run.plan
+    shared = mixed = 0
+    for file in ex_chunk_files(run.store)
+        c = plan.chunks[ex_ordinal(file)]
+        raw = d86_raw(file)
+        os = [plan.items[i].orbit for i in c.items]
+        rs = [raw["orbits/$o/indicators/st/scalars@range"] for o in os]
+        @test raw["pooled/st@orbits"] == length(os)
+        if all(r -> isequal(r, first(rs)), rs)
+            shared += 1
+            @test haskey(raw, "pooled/st/counts") && raw["pooled/st@range"] == first(rs)
+        else
+            mixed += 1
+            @test !haskey(raw, "pooled/st/counts") && !haskey(raw, "pooled/st@range")
+        end
+    end
+    @test shared > 0 && mixed > 0
+end

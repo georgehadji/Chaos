@@ -74,9 +74,12 @@ d86_s_run() = d86_run("s-all", d86_all_block())                       # all six 
             end
         end
         if kind == "stretching"
-            pl = lay["/pooled/$(it0.method)/counts"]
-            miss!("pooled", pl.eltype == "Int64" && pl.size == (spec["bins"] + 2, 2) && haskey(raw, "pooled/$(it0.method)@orbits"))
-            pooled_seen[] += 1
+            miss!("pooled orbits", haskey(raw, "pooled/$(it0.method)@orbits"))
+            if haskey(lay, "/pooled/$(it0.method)/counts")                    # (D88) only for a chunk whose orbits share one range
+                pl = lay["/pooled/$(it0.method)/counts"]
+                miss!("pooled", pl.eltype == "Int64" && pl.size == (spec["bins"] + 2, 2) && get(raw, "pooled/$(it0.method)@range", nothing) isa Vector{Float64})
+                pooled_seen[] += 1
+            end
         end
     end
     @test isempty(bad)

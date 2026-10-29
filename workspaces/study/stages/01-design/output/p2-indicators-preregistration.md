@@ -11,8 +11,8 @@ FROZEN 2026-10-29. The scope (claim C3, detection latency, classification stabil
 | Claims tested | C3 (diagnostic inequivalence), with the two P2 outputs of the paper row: detection latency and classification stability. C1 and C2 are not tested here: the accepted P1 results are reused as ground-truth labels (D61, D65) |
 | Value types | FALSIFIES (H1 to H6), NEGATIVE allowed, TOOL (`/_config/value-types.md`). NOT claimed: NOVEL (no prior-art check was made for this study, K9) and REPRODUCES (no row of `benchmarks.md` is matched) |
 | Git SHA at freeze | 71456146c8aeafa025142b8c2c96f12a6d9cebee (parent commit of the freeze commit) |
-| SHA-256 of this file (current version) | 33445fd7f445c18a9c0d816ead1f248b03fb73266c8a6eb344a4c71ecaa58266 (rule: the whole cell is replaced by the word SELF before hashing, UTF-8, LF; as P1 Amendment A1 item 1) |
-| Amendment log | A1 (2026-10-29, section "Amendment A1"; parent commit c81c7677c0d5a87d1db70d6e92db45fc5b4c8106; replaces freeze hash f43875763b404fb408c11ea7793ddec812f0ab0a2cd0cdc3cf11896e5afe70df) |
+| SHA-256 of this file (current version) | a69bddb2a9045f8aac25ba7771fe7e5d90e70f9ff63203646e3684c8e19efff4 (rule: the whole cell is replaced by the word SELF before hashing, UTF-8, LF; as P1 Amendment A1 item 1) |
+| Amendment log | A1 (2026-10-29, section "Amendment A1"; parent commit c81c7677c0d5a87d1db70d6e92db45fc5b4c8106; replaces freeze hash f43875763b404fb408c11ea7793ddec812f0ab0a2cd0cdc3cf11896e5afe70df); A2 (2026-10-29, section "Amendment A2"; parent commit be6a4256771c68ac3db7329222de1d31c6f8386a; replaces hash 33445fd7f445c18a9c0d816ead1f248b03fb73266c8a6eb344a4c71ecaa58266) |
 
 Value types, in the words of `value-types.md`:
 - FALSIFIES: H1 to H6 each have a metric and a numeric decision rule below, fixed before any data exists.
@@ -14544,3 +14544,11 @@ x0 = "6.1522856132800118"
 p0 = "3.0106929596902185"
 label = "grid-k8-i23-j11"
 ```
+
+## Amendment A2 (2026-10-29)
+
+Approved by the owner at the stage 03 pilot checkpoint, before stage 03-run produced any data file. Base sections above are left as frozen; where they differ, this section wins. Evidence: `workspaces/study/stages/03-run/output/p2-indicators-pilot-evidence.md`, finding F-R1-f (pilot of experiments spec R20, 24 non-panel starts, horizon 1e5; the pilot is not study data).
+
+1. Text correction, no number. The reason given for D_E1 >= -4 in the E1 row of table R1 ("5 decades above the mean-removal bias (about -8.5, Methods, choice 1)") and the last two sentences of Methods, choice 1 ("The bias of 3e-9 gives D of about -8.5, five decades below the decision level ...") are replaced by this statement: the frequency bias of `mean_removal = true` belongs to each window's frequency estimate and is common to the two windows of a pair, so it cancels in the circle distance on which D is built; the pilot's K = 0 starts, the case where the bias was measured, give D at the floor (-14.1) at every window from 100 to 51200. The decision level -4 of E1 and E2 stays: it lies about 10 decades above the regular floor of the pilot and below its strong-chaos starts, the nearest of which are D_E1 = -3.95 and -3.79 at W = 51200 (two K = pi/2 starts), margins of 0.05 and 0.21 decades. The conclusion drawn in Methods, choice 1 (the bias cannot flip a verdict) stands; the sensitivity spec `fq1_raw` and its table T11 are unchanged.
+2. Nothing else changes. No number of tables R1 and R2, no hypothesis threshold, no panel rule, no spec, no arm, no budget line and nothing in the run block changes; the plan hash of the pilot (3823fa4a89fee047ab1f9ca63fee3d4e2dafa372c50b1d63c6de244fa8a18a81) is the plan hash of the run.
+3. Hash rule as in Amendment A1 item 3: the header cell holds the hash of this file under the SELF rule; this amendment updates it and logs above the hash it replaces.

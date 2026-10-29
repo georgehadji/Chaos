@@ -1,0 +1,139 @@
+
+["NVIDIA GeForce RTX 5060 Laptop GPU".Double64]
+cpu_ns_per_step = 132.45755000000003
+reason = "kernel does not compile for the element type"
+date = "2026-10-19"
+threads = 23
+gpu_faster = false
+
+["NVIDIA GeForce RTX 5060 Laptop GPU".Float64]
+cpu_ns_per_step = 3.3850819999999997
+gpu_ns_per_step = 2.493011
+date = "2026-10-19"
+threads = 23
+gpu_ns_per_step_wave = 9.21958984375
+gpu_faster = true
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.L9]
+    cpu_ns_per_step = 8.754284667968749
+    gpu_ns_per_step = 38.75798852539063
+    date = "2026-10-20"
+    orbits = 2048
+    threads = 23
+    steps = 200000
+    gpu_faster = false
+    launch_steps = 105922
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.pr]
+    cpu_ns_per_step = 9.144931640624998
+    gpu_ns_per_step = 55.307377929687505
+    date = "2026-10-29"
+    orbits = 1024
+    threads = 23
+    steps = 20000
+    spec_sha256 = "0157687ac94fcd06f9278d01538aab1ea7b686af4899e84a9c277ea0ee697464"
+    gpu_faster = false
+    launch_steps = 20000
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.pa1]
+    cpu_ns_per_step = 9.478998122271754
+    gpu_ns_per_step = 72.18618184423248
+    date = "2026-10-29"
+    orbits = 1024
+    threads = 23
+    steps = 102401
+    spec_sha256 = "7d5a9d62ba611a602985cce12df082dbdccb6a74dda83b8ff40416661102cacf"
+    gpu_faster = false
+    launch_steps = 102401
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.bk1]
+    cpu_ns_per_step = 21.18781661987305
+    gpu_ns_per_step = 185.07856941223147
+    date = "2026-10-29"
+    orbits = 1024
+    threads = 23
+    steps = 102400
+    spec_sha256 = "638cb49aa3f43f0aa4fa2c10ed10f6c79e608749f0f2551c8e1bb8dd9f6a573a"
+    gpu_faster = false
+    launch_steps = 102400
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.tg]
+    cpu_ns_per_step = 8.79775390625
+    gpu_ns_per_step = 43.932021484375
+    date = "2026-10-29"
+    orbits = 1024
+    threads = 23
+    steps = 20000
+    spec_sha256 = "2c240875a2e6f205149d09c005988bf93b33a76a29737365350e65918538e5d7"
+    gpu_faster = false
+    launch_steps = 20000
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.L1]
+    cpu_ns_per_step = 4.080784912109375
+    gpu_ns_per_step = 12.445262207031249
+    date = "2026-10-20"
+    orbits = 2048
+    threads = 23
+    steps = 200000
+    gpu_faster = false
+    launch_steps = 105922
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.L5b]
+    cpu_ns_per_step = 8.611662841796875
+    gpu_ns_per_step = 27.9508271484375
+    date = "2026-10-20"
+    orbits = 2048
+    threads = 23
+    steps = 200000
+    gpu_faster = false
+    launch_steps = 105922
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.L3]
+    cpu_ns_per_step = 7.584184814453125
+    gpu_ns_per_step = 25.127724365234375
+    date = "2026-10-20"
+    orbits = 2048
+    threads = 23
+    steps = 200000
+    gpu_faster = false
+    launch_steps = 105922
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.L5]
+    cpu_ns_per_step = 8.35522021484375
+    gpu_ns_per_step = 27.124676513671876
+    date = "2026-10-20"
+    orbits = 2048
+    threads = 23
+    steps = 200000
+    gpu_faster = false
+    launch_steps = 105922
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.L2]
+    cpu_ns_per_step = 4.4058640136718745
+    gpu_ns_per_step = 17.736082763671877
+    date = "2026-10-20"
+    orbits = 2048
+    threads = 23
+    steps = 200000
+    gpu_faster = false
+    launch_steps = 105922
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.L4]
+    cpu_ns_per_step = 7.624294433593751
+    gpu_ns_per_step = 25.15801416015625
+    date = "2026-10-20"
+    orbits = 2048
+    threads = 23
+    steps = 200000
+    gpu_faster = false
+    launch_steps = 105922
+
+    ["NVIDIA GeForce RTX 5060 Laptop GPU".Float64.recorder.L4b]
+    cpu_ns_per_step = 8.43552099609375
+    gpu_ns_per_step = 35.85341870117188
+    date = "2026-10-20"
+    orbits = 2048
+    threads = 23
+    steps = 200000
+    gpu_faster = false
+    launch_steps = 105922

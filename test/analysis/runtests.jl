@@ -14,3 +14,25 @@ include(joinpath(@__DIR__, "an_pipeline.jl"))
 include(joinpath(@__DIR__, "an_cli.jl"))
 include(joinpath(@__DIR__, "an_breakdown.jl"))     # regression of stage 04: breakdown_tau items on the real store
 include(joinpath(@__DIR__, "an_review.jl"))        # regressions of the stage 04 review
+
+# D89 stage 02 (Amendment D89, study p2-indicators). The module has no D89 functionality yet: the files below are RED, except the fixture self-test and the guards of the
+# P1 path (an_p2_dispatch.jl, first testset). Helpers first, then one file per theme.
+include(joinpath(@__DIR__, "an_p2_ref.jl"))          # independent reference implementation of the decision layer
+include(joinpath(@__DIR__, "an_p2_helpers.jl"))      # parameter table, preregistration, run blocks
+include(joinpath(@__DIR__, "an_p2_study.jl"))        # designed orbits and the writer of the chunk records
+include(joinpath(@__DIR__, "an_p2_build.jl"))        # assembly of the synthetic study, editing helpers
+include(joinpath(@__DIR__, "an_p2_refstore.jl"))     # expected tables computed from the designed study
+include(joinpath(@__DIR__, "an_p2_fixture.jl"))      # fixture self-test: passes before the module exists
+include(joinpath(@__DIR__, "an_p2_dispatch.jl"))     # D89a, D89t
+include(joinpath(@__DIR__, "an_p2_params.jl"))       # D89b
+include(joinpath(@__DIR__, "an_p2_verdicts.jl"))     # D89e, D89f, D89g, D89y
+include(joinpath(@__DIR__, "an_p2_detection.jl"))    # D89h
+include(joinpath(@__DIR__, "an_p2_agreement.jl"))    # D89i, D89j
+include(joinpath(@__DIR__, "an_p2_sets.jl"))         # D89k, D89l
+include(joinpath(@__DIR__, "an_p2_stats.jl"))        # D89m, D89n (statistics and decisions)
+include(joinpath(@__DIR__, "an_p2_bootstrap.jl"))    # D89o
+include(joinpath(@__DIR__, "an_p2_refusals.jl"))     # D89c, D89d, D89r after refusals
+include(joinpath(@__DIR__, "an_p2_pipeline.jl"))     # sets, verdicts, detection, decisions, extension, R2, gate, AUC end to end
+include(joinpath(@__DIR__, "an_p2_variant.jl"))      # drift orbit, sticky orbit 5, gate violation and second versions, NOT ROBUST
+include(joinpath(@__DIR__, "an_p2_reported.jl"))     # T11, T15, T16, T17
+include(joinpath(@__DIR__, "an_p2_output.jl"))       # D89p, D89q, D89r, D89s, D89u

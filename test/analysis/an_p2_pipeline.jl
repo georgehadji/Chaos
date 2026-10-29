@@ -150,45 +150,26 @@ end
 
 @testset "D89 default scenario: AUC, regular range, leaving budget (E31, M10)" begin
     st = p2_cached("default"); res = p2_res("default", st); (; ref, S) = p2_refs("default", st); p = st.p
-    auc = p2_ref_auc(st, ref, S)
-    @test Set(keys(res.auc)) == Set(keys(auc)) && all(k -> p2_same(res.auc[k], auc[k]), keys(auc))
-    # hand counts: K index 1 has 13 chaotic and 7 regular orbits of E_all, K index 2 has 11 and 5; by source only the grid at K 1 has both classes at 5 or more
-    @test (a = res.auc[(:LE, 6, 1, "pooled")]; (a.n_C, a.n_R) == (13, 7)) && (a = res.auc[(:LE, 6, 2, "pooled")]; (a.n_C, a.n_R) == (11, 5)) && res.auc[(:LE, 6, 1, "pooled")].auc !== nothing
-    @test res.auc[(:LE, 6, 1, "panel")].auc === nothing && res.auc[(:LE, 6, 1, "grid")].auc !== nothing && res.auc[(:LE, 6, 2, "grid")].auc === nothing
-    # RLI exists for S_L and G: 8 chaotic and 6 regular orbits at K 1 (computed), 9 and 3 at K 2 (fewer than min_set regular orbits: not computed); STR enters the AUC
-    @test (a = res.auc[(:RLI, 6, 1, "pooled")]; (a.n_C, a.n_R) == (8, 6) && a.auc !== nothing) && (a = res.auc[(:RLI, 6, 2, "pooled")]; (a.n_C, a.n_R) == (9, 3) && a.auc === nothing)
-    @test haskey(res.auc, (:STR, 9, 1, "pooled")) && res.auc[(:STR, 9, 1, "pooled")].auc == 1.0                  # every chaotic D (0.02 ..) is below every regular D (0.5 ..): the score -log10 D is higher
+    kidx = Dict(0.5 => 1, 2 * pi => 2)                    # in the default study the K index of a panel orbit and of a grid orbit agree with the K value (0.5, 2 pi)
+    auc = p2_ref_auc_K(st, ref, S)
+    @test all(((X, k, K, src),) -> p2_same(p2_kget(res.auc, K2 -> (X, k, K2, src), K, kidx[K]), auc[(X, k, K, src)]), keys(auc))
+    # hand counts: K = 0.5 has 13 chaotic and 7 regular orbits of E_all, K = 2 pi has 11 and 5; by source only the grid at K = 0.5 has both classes at 5 or more
+    A(X, k, K, src) = p2_kget(res.auc, K2 -> (X, k, K2, src), K, kidx[K])
+    @test (a = A(:LE, 6, 0.5, "pooled"); (a.n_C, a.n_R) == (13, 7)) && (a = A(:LE, 6, 2 * pi, "pooled"); (a.n_C, a.n_R) == (11, 5)) && A(:LE, 6, 0.5, "pooled").auc !== nothing
+    @test A(:LE, 6, 0.5, "panel").auc === nothing && A(:LE, 6, 0.5, "grid").auc !== nothing && A(:LE, 6, 2 * pi, "grid").auc === nothing
+    # RLI exists for S_L and G: 8 chaotic and 6 regular orbits at K = 0.5 (computed), 9 and 3 at K = 2 pi (fewer than min_set regular orbits: not computed); STR enters the AUC
+    @test (a = A(:RLI, 6, 0.5, "pooled"); (a.n_C, a.n_R) == (8, 6) && a.auc !== nothing) && (a = A(:RLI, 6, 2 * pi, "pooled"); (a.n_C, a.n_R) == (9, 3) && a.auc === nothing)
+    @test A(:STR, 9, 0.5, "pooled").auc == 1.0                  # every chaotic D (0.02 ..) is below every regular D (0.5 ..): the score -log10 D is higher
     @test all(a -> a.auc === nothing || 0.0 <= a.auc <= 1.0, values(res.auc))
     # regular range: the 5th and 95th percentile of the scores of the regular set at that K (type 7), for the indicators of I_7 and STR, when at least min_set orbits exist
-    orbs = Dict(o.id => o for o in p2_ref_orbits(st))
-    bad = String[]
-    for X in vcat(P2_X7, :STR), kidx in 1:2, k in 0:9
-        sc = Float64[ref.S[(id, X)][k + 1] for id in S.regular if orbs[id].kindex == kidx && haskey(ref.S, (id, X)) && ref.S[(id, X)][k + 1] !== nothing]
-        want = length(sc) >= p.min_set ? (lo = p2ref_percentile(sc, 0.05), hi = p2ref_percentile(sc, 0.95), median = p2ref_median(sc), n = length(sc)) : nothing
-        got = res.range[(X, kidx, k)]
-        (want === nothing ? got === nothing : (got !== nothing && p2_same(got, want))) || push!(bad, "$X $kidx $k")
-    end
+    rng = p2_ref_ranges_K(st, ref, S)
+    bad = [(X, K, k) for ((X, K, k), want) in rng if !(let got = p2_kget(res.range, K2 -> (X, K2, k), K, kidx[K]); want === nothing ? got === nothing : (got !== nothing && p2_same(got, want)) end)]
     @test isempty(bad)
     # leaving budget of the sticky orbits (T_s) and the share below the regular median at k = 9
-    badl = String[]
-    for id in S.T_s, X in vcat(P2_X7, :STR)
-        kidx = orbs[id].kindex
-        haskey(ref.S, (id, X)) || continue
-        up = [res.range[(X, kidx, k)] === nothing ? nothing : res.range[(X, kidx, k)].hi for k in 0:9]
-        sc = ref.S[(id, X)]
-        want = nothing
-        if all(!isnothing, up)
-            for k in 0:9
-                all(j -> sc[j + 1] !== nothing && sc[j + 1] > up[j + 1], k:9) && (want = p.budgets[k + 1]; break)
-            end
-        end
-        res.leaving[(id, X)] === want || push!(badl, "$id $X")
-    end
-    @test isempty(badl)
-    for X in vcat(P2_X7, :STR), kidx in 1:2
-        ids = [id for id in S.T_s if orbs[id].kindex == kidx && haskey(ref.S, (id, X)) && ref.S[(id, X)][10] !== nothing]
-        rg = res.range[(X, kidx, 9)]
-        want = (rg === nothing || isempty(ids)) ? nothing : count(id -> ref.S[(id, X)][10] < rg.median, ids) / length(ids)
-        @test p2_same(res.below_median[(X, kidx)], want)
+    lv = p2_ref_leaving_K(st, ref, S, rng)
+    @test isempty([(id, X) for ((id, X), want) in lv if res.leaving[(id, X)] !== want])
+    bl = p2_ref_below_K(st, ref, S, rng)
+    for ((X, K), want) in sort!(collect(bl); by = string)
+        @test p2_same(p2_kget(res.below_median, K2 -> (X, K2), K, kidx[K]), want)
     end
 end

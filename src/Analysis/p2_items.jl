@@ -5,10 +5,10 @@ _tbl(cols, rows; extra = String[]) = (columns = String[cols...], rows = Vector{A
 
 _src(o) = o.source === :panel ? "panel" : "grid"
 
-# Groups for the rows by source and by K index: (source label, K label, predicate on an orbit record).
+# Groups for the rows by source and by K value (binary64 equality: the panel and the grid share K values, not K indexes): (source label, K label, predicate on an orbit record).
 function _groups(orbits)
-    ks = sort!(unique(o.kindex for o in orbits if !o.control))
-    return vcat([("all", "all", _ -> true)], [(s, "all", o -> _src(o) == s) for s in ("panel", "grid")], [("all", k, o -> o.kindex == k) for k in ks])
+    ks = sort!(unique(Float64[o.K for o in orbits if !o.control && o.K !== nothing]))
+    return vcat([("all", "all", _ -> true)], [(s, "all", o -> _src(o) == s) for s in ("panel", "grid")], [("all", k, o -> o.K == k) for k in ks])
 end
 
 function p2_t1(orbits, S, reports)
@@ -50,7 +50,7 @@ function p2_t2(orbits, S, vt, p)
                          isempty(st) ? anystep : length(st) == 1 ? st[1] : join(st, "/")])
         end
     end
-    return _tbl(["indicator", "k", "budget", "set", "source", "K index", "chaotic", "regular", "undecided", "not applicable", "step"], rows)
+    return _tbl(["indicator", "k", "budget", "set", "source", "K", "chaotic", "regular", "undecided", "not applicable", "step"], rows)
 end
 
 function _verdict_vec(vt, ids, X, k)
@@ -103,7 +103,7 @@ end
 # F4 (and T9): the AUC rows.
 function p2_f4(auc)
     rows = [[String(X), k, kidx, src, a.n_C, a.n_R, a.auc] for ((X, k, kidx, src), a) in sort!(collect(auc); by = kv -> (findfirst(==(kv[1][1]), P2_ALL), kv[1][2], kv[1][3], kv[1][4]))]
-    return _tbl(["indicator", "k", "K index", "source", "n_C", "n_R", "AUC"], rows)
+    return _tbl(["indicator", "k", "K", "source", "n_C", "n_R", "AUC"], rows)
 end
 
 # F5: the lattice of the grid: one row per grid orbit with its class and the verdicts of I_8 at b_P and the last budget.

@@ -36,3 +36,4 @@ include(joinpath(@__DIR__, "an_p2_pipeline.jl"))     # sets, verdicts, detection
 include(joinpath(@__DIR__, "an_p2_variant.jl"))      # drift orbit, sticky orbit 5, gate violation and second versions, NOT ROBUST
 include(joinpath(@__DIR__, "an_p2_reported.jl"))     # T11, T15, T16, T17
 include(joinpath(@__DIR__, "an_p2_output.jl"))       # D89p, D89q, D89r, D89s, D89u
+include(joinpath(@__DIR__, "an_p2_review.jl"))       # review findings of stage 04 (K value pooling, infinite percentiles, stripped attributes, text against value, ...)

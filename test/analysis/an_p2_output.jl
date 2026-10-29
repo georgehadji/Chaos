@@ -5,17 +5,18 @@ const P2_DETRUNS = Dict{Symbol, Any}()
 @testset "D89p T2: counts add up to the set sizes (I17), by source and by K, the step used" begin
     st = p2_cached("default"); res = p2_res("default", st); (; ref, S) = p2_refs("default", st)
     T2 = res.items.T2
+    kc = p2_kfield(T2)
     cols = ["chaotic", "regular", "undecided", "not applicable"]
     sets = Dict("W2" => S.W2, "S2" => S.S2, "T_s" => S.T_s, "regular" => S.regular)
     bad = String[]
     for X in P2_X8, k in 0:9, (nm, ids) in sets
-        rows = p2_rowsof(T2, "indicator" => String(X), "k" => k, "set" => nm, "source" => "all", "K index" => "all")
+        rows = p2_rowsof(T2, "indicator" => String(X), "k" => k, "set" => nm, "source" => "all", kc => "all")
         length(rows) == 1 || (push!(bad, "$X $k $nm rows"); continue)
         sum(rows[1][p2_tcol(T2, c)] for c in cols) == length(ids) || push!(bad, "$X $k $nm sum")
-        panel = p2_rowsof(T2, "indicator" => String(X), "k" => k, "set" => nm, "source" => "panel", "K index" => "all")[1]
-        grid = p2_rowsof(T2, "indicator" => String(X), "k" => k, "set" => nm, "source" => "grid", "K index" => "all")[1]
-        k1 = p2_rowsof(T2, "indicator" => String(X), "k" => k, "set" => nm, "source" => "all", "K index" => 1)[1]
-        k2 = p2_rowsof(T2, "indicator" => String(X), "k" => k, "set" => nm, "source" => "all", "K index" => 2)[1]
+        panel = p2_rowsof(T2, "indicator" => String(X), "k" => k, "set" => nm, "source" => "panel", kc => "all")[1]
+        grid = p2_rowsof(T2, "indicator" => String(X), "k" => k, "set" => nm, "source" => "grid", kc => "all")[1]
+        k1 = p2_rowsof(T2, "indicator" => String(X), "k" => k, "set" => nm, "source" => "all", kc => p2_klabel(T2, 0.5, 1))[1]
+        k2 = p2_rowsof(T2, "indicator" => String(X), "k" => k, "set" => nm, "source" => "all", kc => p2_klabel(T2, 2 * pi, 2))[1]
         for c in cols
             j = p2_tcol(T2, c)
             (panel[j] + grid[j] == rows[1][j] && k1[j] + k2[j] == rows[1][j]) || push!(bad, "$X $k $nm by-source or by-K $c")
@@ -23,13 +24,13 @@ const P2_DETRUNS = Dict{Symbol, Any}()
     end
     @test isempty(bad)
     # hand rows: LE at k = 6 on W2: seven chaotic (W and W2 profiles), four regular (the sticky orbits); the step n(b_6) = 2816; RLI exists for 8 of the 11 orbits
-    r = p2_rowsof(T2, "indicator" => "LE", "k" => 6, "set" => "W2", "source" => "all", "K index" => "all")[1]
+    r = p2_rowsof(T2, "indicator" => "LE", "k" => 6, "set" => "W2", "source" => "all", kc => "all")[1]
     @test Tuple(r[p2_tcol(T2, c)] for c in cols) == (7, 4, 0, 0) && r[p2_tcol(T2, "step")] == P2_NK[7] == 2816 && r[p2_tcol(T2, "budget")] == 2560
-    r = p2_rowsof(T2, "indicator" => "RLI", "k" => 6, "set" => "W2", "source" => "all", "K index" => "all")[1]
+    r = p2_rowsof(T2, "indicator" => "RLI", "k" => 6, "set" => "W2", "source" => "all", kc => "all")[1]
     @test Tuple(r[p2_tcol(T2, c)] for c in cols) == (8, 0, 0, 3) && r[p2_tcol(T2, "step")] == P2_NKB[7]
-    r = p2_rowsof(T2, "indicator" => "E1", "k" => 6, "set" => "W2", "source" => "all", "K index" => "all")[1]
+    r = p2_rowsof(T2, "indicator" => "E1", "k" => 6, "set" => "W2", "source" => "all", kc => "all")[1]
     @test r[p2_tcol(T2, "step")] == 1280 && r[p2_tcol(T2, "regular")] == 11                      # a window row: the window W = b / 2
-    r = p2_rowsof(T2, "indicator" => "WBA", "k" => 3, "set" => "regular", "source" => "all", "K index" => "all")[1]
+    r = p2_rowsof(T2, "indicator" => "WBA", "k" => 3, "set" => "regular", "source" => "all", kc => "all")[1]
     @test r[p2_tcol(T2, "undecided")] == 1                                                         # orbit 15 has the flag zero at every window
 end
 
@@ -89,8 +90,8 @@ end
     # F4 holds the AUC rows (T9 and F4 share the data): one row per (indicator, budget, K, source)
     F4 = res.items.F4
     @test length(F4.rows) == length(res.auc) && Set(r[p2_tcol(F4, "indicator")] for r in F4.rows) == Set(String.(vcat(P2_X8, :STR)))
-    r = p2_rowsof(F4, "indicator" => "LE", "k" => 6, "K index" => 1, "source" => "pooled")[1]
-    @test (r[p2_tcol(F4, "n_C")], r[p2_tcol(F4, "n_R")]) == (13, 7) && p2_same(r[p2_tcol(F4, "AUC")], res.auc[(:LE, 6, 1, "pooled")].auc)
+    r = p2_rowsof(F4, "indicator" => "LE", "k" => 6, p2_kfield(F4) => p2_klabel(F4, 0.5, 1), "source" => "pooled")[1]
+    @test (r[p2_tcol(F4, "n_C")], r[p2_tcol(F4, "n_R")]) == (13, 7) && p2_same(r[p2_tcol(F4, "AUC")], p2_kget(res.auc, K2 -> (:LE, 6, K2, "pooled"), 0.5, 1).auc)
     # F5: the lattice of each K index: one row per grid orbit with rho and the verdicts of I_8 at b_P and N_c
     F5 = res.items.F5
     @test length(F5.rows) == 24 && [r[p2_tcol(F5, "id")] for r in F5.rows] == collect(21:44)

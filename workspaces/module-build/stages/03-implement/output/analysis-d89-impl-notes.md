@@ -4,7 +4,7 @@ Date of the run: 2026-10-29, Julia 1.13.2. Spec: `workspaces/module-build/stages
 
 ## Result
 
-Folder suite, `julia --project -t 4 --check-bounds=yes` (after the owner rework of 2026-10-29, tests reworked at stage 02): 1134 tests, all pass (including the 434 P1 tests). Aqua and JET clean in a temporary environment, `test/layering.jl` and D89t pass. Coverage measured before the rework: P2 files 99 percent, module 98 percent. The full `Pkg.test()` was not run.
+Folder suite, `julia --project -t 4 --check-bounds=yes` (after the owner rework of 2026-10-29, tests reworked at stage 02): 1213 tests after the stage 04 review tests: 1211 pass, 1 fail, 1 error; the two are test errors (see "Review fixes"). Before the review tests: 1134, all pass (including the 434 P1 tests). Aqua and JET clean in a temporary environment, `test/layering.jl` and D89t pass. Coverage measured before the rework: P2 files 99 percent, module 98 percent. The full `Pkg.test()` was not run.
 
 ## A1 (closed)
 
@@ -30,6 +30,21 @@ The stage 02 rework changed the base fixture slug; E21 is strict (`p2_dispatch.j
 
 Dry run on the real stores (`data/p2-indicators`, `data/p1-le-benchmark`, read only, output in the session scratch area) with a drafted real parameter table (58 keys with quote and text, accepted by the reader with the quote check on): 81 s wall at 23 threads (82 s at 8 threads earlier), peak resident memory 1.8 GiB, the tables file 1.0 MB; byte-identical at 8 and 23 threads (earlier table). Most of the time is serial (reading 695 chunk files, the P1 labelling). Set sizes equal the drafting prototype of the spec: E_all 2974, E8 2236, W2 214, S2 448, T_s 30, T_s^design 96, regular 1159, gate 80, S_D* 109, S_L* 51. No finite-value, identity, flag-count or coverage refusal fired. The drafted table is not a stage 04 artifact (not compared line by line to the preregistration) and no result of the run is recorded here.
 `bench/analysis.jl`: `p2_bootstrap` H1 on 214 orbits at 1e4 resamples 0.61 s; H2 on 448 orbits 1.5 s; `p2_unanimity` 28 pairs 214 orbits 87 microseconds; `p2_auc` 300 against 150 scores 15 microseconds. About 35 bootstrap labels per run, parallel over labels.
+
+## Review fixes (stage 04 findings)
+
+1. K pooling is by the binary64 K value (panel and grid together, the Y5 control without K is in no row): `res.auc[(X, k, K, source)]`, `res.range[(X, K, k)]`, `res.below_median[(X, K)]` are keyed by the Float64 K; the column "K" (T2 to T10, T13, T14, F4) holds the K value or "all". T1 and F5 keep the K index (T1 counts every orbit by (source, K index)). The pooled decisions are unchanged.
+2. `_p2_percentile` and the median of the range never give NaN with infinite scores (equal neighbours: that value; an infinite neighbour: the order statistic nearer to h).
+3. In P2 a chunk without `plan_sha256`, `prereg_sha256`, `panel_sha256`, `status` or `study` is refused naming the attribute (the P1 helper is unchanged).
+4. A numeric `text` (a list: element-wise) must equal the value; texts that are not numbers ("95 percent", "5th", "10^4") are not compared.
+5. The leaving budget takes the ranges with `nothing` entries as they are (a budget without a range counts as not above).
+6. The K = 0 line leaves out non-finite distances; `res.k0line[W]` has `fq1_nonfinite` and `pa1_nonfinite`, also in T16 (the maximum is `nothing` if no distance is finite).
+7. An unknown kind with a flag table is a named refusal; the flag names are verified at positions 2 (degenerate, undefined window, zero) and 3 (failed, reldig_undefined).
+9. A control with a positive exponent and no `control_deviation` is refused (named).
+12. A growth ratio that overflows to Inf is chaotic and has no score.
+Readings added (8, 10, 11): the E34 share 0.05 and the design class S of T_s^design are module constants, not keys of the 58 (a gap of the spec); the 5 percent rule is applied jointly per label (unreachable on the real sets); in the E8 extension T_s^design is not intersected with E8.
+
+Test errors found (not edited): `an_p2_output.jl:94` reads `res.auc[(:LE, 6, 1, "pooled")]` with a K index while the review tests require K-value keys (use `p2_kget` as `an_p2_pipeline.jl:155` does); `an_p2_params.jl:113-115` (value 7.5 with the text "5" must be read) contradicts the review test 4 (value 100 with the text "10" must be refused): the same situation, one test must change. The implementation follows the review test.
 
 ## Known limits and not checked
 

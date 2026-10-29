@@ -1,22 +1,23 @@
 # Study p2-indicators (Amendment D89): the quantities reported without a decision rule (E31, E35): AUC, regular range, leaving budget, sensitivities, packages, flags,
 # controls, the K = 0 line and the cost. Every number is read from the verdict tables or from stored values; nothing is recomputed from an orbit (I18).
 
-_kindexes(orb, ids) = sort!(unique(orb[id].kindex for id in ids))
+# The K values of the orbits of a set, by binary64 equality (panel and grid share a value, not an index); an orbit without K (the Y5 control) has none.
+_kvalues(orb, ids) = sort!(unique(Float64[orb[id].K for id in ids if orb[id].K !== nothing]))
 
-"AUC(X, k, K) with the class counts, pooled over the panel and the grid and by source (E31); the key is `(X, k, K index, source)`, k from 0."
+"AUC(X, k, K) with the class counts, pooled over the panel and the grid and by source (E31); the key is `(X, k, K value, source)`, k from 0."
 function p2_auc_table(vt, orbits, S, p)
     orb = Dict(o.id => o for o in orbits)
-    out = Dict{Tuple{Symbol, Int, Int, String}, NamedTuple}()
-    for X in P2_ALL, k in 0:(length(p.budgets) - 1), kidx in _kindexes(orb, S.E_all), src in ("pooled", "panel", "grid")
+    out = Dict{Tuple{Symbol, Int, Float64, String}, NamedTuple}()
+    for X in P2_ALL, k in 0:(length(p.budgets) - 1), Kv in _kvalues(orb, S.E_all), src in ("pooled", "panel", "grid")
         cs, rs = Float64[], Float64[]
         for id in S.E_all
             o = orb[id]
-            (o.kindex == kidx && (src == "pooled" || (src == "panel") == (o.source === :panel))) || continue
+            (o.K == Kv && (src == "pooled" || (src == "panel") == (o.source === :panel))) || continue
             sc = get(vt.scores, (id, X), nothing)
             (sc === nothing || sc[k + 1] === nothing) && continue
             push!(o.rho === :C ? cs : rs, sc[k + 1])
         end
-        out[(X, k, kidx, src)] = (n_C = length(cs), n_R = length(rs), auc = p2_auc(cs, rs; min_set = p.min_set))
+        out[(X, k, Kv, src)] = (n_C = length(cs), n_R = length(rs), auc = p2_auc(cs, rs; min_set = p.min_set))
     end
     return out
 end
@@ -24,29 +25,29 @@ end
 """
     p2_range_tables(vt, orbits, S, p) -> (range, leaving, below_median)
 
-Regular range of the scores of the regular set at each K index and budget, the leaving budget of each sticky orbit and the share of the sticky orbits below the regular median
+Regular range of the scores of the regular set at each K value and budget, the leaving budget of each sticky orbit and the share of the sticky orbits below the regular median
 at the last budget (M10, P25), for the indicators of I_7 and STR.
 """
 function p2_range_tables(vt, orbits, S, p)
     orb = Dict(o.id => o for o in orbits)
-    nb, KI = length(p.budgets), _kindexes(orb, S.E_all)
+    nb, KI = length(p.budgets), _kvalues(orb, S.E_all)
     Xs = vcat(P2_I7, :STR)
-    range = Dict{Tuple{Symbol, Int, Int}, Any}()
-    for X in Xs, kidx in KI, k in 0:(nb - 1)
-        sc = Float64[vt.scores[(id, X)][k + 1] for id in S.regular if orb[id].kindex == kidx && haskey(vt.scores, (id, X)) && vt.scores[(id, X)][k + 1] !== nothing]
-        range[(X, kidx, k)] = p2_regular_range(sc, p)
+    range = Dict{Tuple{Symbol, Float64, Int}, Any}()
+    for X in Xs, Kv in KI, k in 0:(nb - 1)
+        sc = Float64[vt.scores[(id, X)][k + 1] for id in S.regular if orb[id].K == Kv && haskey(vt.scores, (id, X)) && vt.scores[(id, X)][k + 1] !== nothing]
+        range[(X, Kv, k)] = p2_regular_range(sc, p)
     end
     leaving = Dict{Tuple{Int, Symbol}, Any}()
     for id in S.T_s, X in Xs
         haskey(vt.scores, (id, X)) || continue
-        up = [range[(X, orb[id].kindex, k)] === nothing ? nothing : range[(X, orb[id].kindex, k)].hi for k in 0:(nb - 1)]
-        leaving[(id, X)] = any(isnothing, up) ? nothing : p2_leaving_budget(vt.scores[(id, X)], up, p)
+        up = [range[(X, orb[id].K, k)] === nothing ? nothing : range[(X, orb[id].K, k)].hi for k in 0:(nb - 1)]
+        leaving[(id, X)] = p2_leaving_budget(vt.scores[(id, X)], up, p)       # a budget without a range counts as not above (P25)
     end
-    below = Dict{Tuple{Symbol, Int}, Any}()
-    for X in Xs, kidx in KI
-        sc = Float64[vt.scores[(id, X)][nb] for id in S.T_s if orb[id].kindex == kidx && haskey(vt.scores, (id, X)) && vt.scores[(id, X)][nb] !== nothing]
-        rg = range[(X, kidx, nb - 1)]
-        below[(X, kidx)] = (rg === nothing || isempty(sc)) ? nothing : p2_share_below(sc, rg.median)
+    below = Dict{Tuple{Symbol, Float64}, Any}()
+    for X in Xs, Kv in KI
+        sc = Float64[vt.scores[(id, X)][nb] for id in S.T_s if orb[id].K == Kv && haskey(vt.scores, (id, X)) && vt.scores[(id, X)][nb] !== nothing]
+        rg = range[(X, Kv, nb - 1)]
+        below[(X, Kv)] = (rg === nothing || isempty(sc)) ? nothing : p2_share_below(sc, rg.median)
     end
     return range, leaving, below
 end
@@ -122,6 +123,7 @@ function p2_controls(ctx, vt = nothing)
         it = ctx.idx[p2_key(id, "L1", "Float64", p.N_1, 1, p.directions[1])]
         lam = it.lam[_p2_row(it, p.N_1, "control")]
         dev, stored = abs(lam - Float64(o["exponent"])), get(it.attrs, "control_deviation", nothing)
+        stored === nothing && Float64(o["exponent"]) > 0 && _fail("the L1 item of control $id (positive exponent) has no control_deviation attribute")
         stored === nothing || abs(dev - Float64(stored)) <= 1e-12 || _fail("control_deviation $stored of control $id differs from the deviation $dev recomputed from the stored series")
         v9 = vt === nothing ? Dict{Symbol, Symbol}() : Dict{Symbol, Symbol}(X => vt.verdicts[(id, X, :R1)][end] for X in P2_I8 if haskey(vt.verdicts, (id, X, :R1)))
         push!(rows, (id = id, scope = haskey(it.attrs, "control_scope") ? String(it.attrs["control_scope"]) : nothing, exponent = Float64(o["exponent"]), lambda = lam,
@@ -137,9 +139,14 @@ function p2_k0line(ctx, S)
     p0 = Dict(Int(o["id"]) => Float64(o["p0"]) for o in ctx.panel)
     out = Dict{Int, NamedTuple}()
     for W in p.windows
-        dist(spec, hor) = maximum(cd(it.final[findfirst(==("W=$W"), it.rows), _p2_col(it, it.fcolumns, "nu1")], mod(p0[id] / (2 * pi), 1.0))
-                                  for id in S.gate for it in (ctx.idx[p2_key(id, spec, "Float64", hor, 1, nothing)],))
-        out[W] = (fq1 = dist("fq1", p.N_c), pa1 = dist("pa1", p.N_c + 1))
+        function dist(spec, hor)
+            d = Float64[cd(it.final[findfirst(==("W=$W"), it.rows), _p2_col(it, it.fcolumns, "nu1")], mod(p0[id] / (2 * pi), 1.0))
+                        for id in S.gate for it in (ctx.idx[p2_key(id, spec, "Float64", hor, 1, nothing)],)]
+            f = filter(isfinite, d)                     # a window without a frequency (flag degenerate or undefined window) has no distance; it is counted
+            return (isempty(f) ? nothing : maximum(f), length(d) - length(f))
+        end
+        (a, na), (b, nb) = dist("fq1", p.N_c), dist("pa1", p.N_c + 1)
+        out[W] = (fq1 = a, pa1 = b, fq1_nonfinite = na, pa1_nonfinite = nb)
     end
     return out
 end

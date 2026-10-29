@@ -146,6 +146,15 @@ function _p2_machine(path, p, rb)
         _p2err(path, :grid_orbit_count, "is not the product of the K count, grid_i_count and grid_j_count")
 end
 
+# A text that is a number (or a list of numbers) must equal the value; a text that is not a number ("95 percent", "5th", "10^4") is not compared (I14).
+function _p2_same_number(path, k, text, v)
+    (v isa Real || (v isa AbstractVector && eltype(v) <: Integer)) || return
+    want = v isa Real ? [Float64(v)] : Float64.(v)
+    got = [tryparse(Float64, strip(t)) for t in (v isa Real ? [text] : split(text, ','))]
+    any(isnothing, got) && return
+    got == want || _p2err(path, k, "has the text \"$text\", which differs from the value $(repr(v))")
+end
+
 function _p2_quotes(path, p, entries, text)
     secs = _p2_sections(text)
     for k in P2_PARAM_KEYS
@@ -154,6 +163,7 @@ function _p2_quotes(path, p, entries, text)
         haskey(secs, e.section) || _p2err(path, k, "names the section \"$(e.section)\", which the preregistration does not have")
         occursin(replace(e.qtext, "\r\n" => "\n"), secs[e.section]) || _p2err(path, k, "has a quote that does not occur in the section \"$(e.section)\"")
         occursin(e.text, e.qtext) || _p2err(path, k, "has the text \"$(e.text)\", which does not occur in its quote")
+        _p2_same_number(path, k, e.text, getfield(p, k))
     end
 end
 

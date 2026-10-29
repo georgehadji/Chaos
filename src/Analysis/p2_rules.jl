@@ -85,7 +85,7 @@ Chaos score of E31, oriented so that a larger score means more chaotic (`nothing
 """
 function p2_score(X::Symbol, v)
     if X in (:LE, :SALI, :FLI, :MEGNO)
-        return v.r === nothing ? nothing : Float64(v.r)
+        return (v.r === nothing || !isfinite(v.r)) ? nothing : Float64(v.r)       # a ratio that overflowed to Inf is chaotic but has no score
     elseif X === :RLI
         (v.rli isa Real && !isnan(v.rli) && v.rli >= 0 && v.rli < Inf) || return nothing
         return v.rli == 0 ? -Inf : log10(Float64(v.rli))

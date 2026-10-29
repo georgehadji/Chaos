@@ -1,0 +1,336 @@
+[persist_divisor]
+section = "M4 Detection time and outcomes"
+quote = "b_k <= N_c / 4"
+text = "4"
+value = 4
+
+[r2_le_factor]
+section = "M2 Verdicts: score and class rule of each indicator"
+quote = "LE: n lambda_1(n) >= 3 ln n"
+text = "3"
+value = 3.0
+
+[n_s]
+section = "Weak-chaos set W2, strong-chaos set S2, sticky ensemble T_s (R4)"
+quote = "n_s = 1e5 and f_s = 0.2"
+text = "1e5"
+value = 100000
+
+[budgets]
+section = "M1 Budgets and horizons"
+quote = "Budget list B = {b_k = 200 x 2^k, k = 0 to 9} = 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400"
+text = "200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400"
+value = [200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400]
+
+[min_set]
+section = "M8 Sets, bootstrap, undecidable sets"
+quote = "A set with fewer than 20 orbits"
+text = "20"
+value = 20
+
+[h2_q_min]
+section = "H2 (claim C3, detection-time divergence)"
+quote = "Q >= 10"
+text = "10"
+value = 10.0
+
+[windows]
+section = "Run block (draft)"
+machine = true
+value = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200]
+
+[h3_r_lower_gt]
+section = "H3 (detection latency, regime dependence)"
+quote = "the lower end of the 95 percent bootstrap interval of R_X is > 3"
+text = "3"
+value = 3.0
+
+[s2_lambda_min]
+section = "Weak-chaos set W2, strong-chaos set S2, sticky ensemble T_s (R4)"
+quote = "S2 (strong chaos): lambda_ref >= 1.0"
+text = "1.0"
+value = 1.0
+
+[rli_threshold]
+section = "M2 Verdicts: score and class rule of each indicator"
+quote = "RLI >= 1e-7"
+text = "1e-7"
+value = 1.0e-7
+
+[directions]
+section = "Run block (draft)"
+machine = true
+value = ["pi/4", "0.3", "0.3 + pi/5", "0.3 + 2pi/5", "0.3 + 3pi/5"]
+
+[wba_digits_threshold]
+section = "M2 Verdicts: score and class rule of each indicator"
+quote = "dig_min < 6"
+text = "6"
+value = 6.0
+
+[h6_flip_min]
+section = "H6 (classification stability under direction and precision)"
+quote = "max_X delta_dir(X) >= 0.05"
+text = "0.05"
+value = 0.05
+
+[bootstrap_level]
+section = "M8 Sets, bootstrap, undecidable sets"
+quote = "the 95 percent interval is the percentile interval"
+text = "95 percent"
+value = 0.95
+
+[w2_lambda_max]
+section = "Weak-chaos set W2, strong-chaos set S2, sticky ensemble T_s (R4)"
+quote = "W2 (weak chaos): lambda_ref <= 0.1"
+text = "0.1"
+value = 0.1
+
+[N_dir]
+section = "Run block (draft)"
+machine = true
+value = 1000000
+
+[grid_i_count]
+section = "Run block (draft)"
+machine = true
+value = 24
+
+[gate_k_index]
+section = "Eligible sets"
+quote = "K = 0 gate set: the 80 orbits of the panel cells (K index 1, classes T and R)"
+text = "1"
+value = 1
+
+[h3_r_min]
+section = "H3 (detection latency, regime dependence)"
+quote = "R_X >= 10"
+text = "10"
+value = 10.0
+
+[gate_classes]
+section = "Eligible sets"
+quote = "K = 0 gate set: the 80 orbits of the panel cells (K index 1, classes T and R)"
+text = "T and R"
+value = ["T", "R"]
+
+[censor_factor]
+section = "M4 Detection time and outcomes"
+quote = "2 N_c = 204800"
+text = "2"
+value = 2
+
+[e2_d_threshold]
+section = "M2 Verdicts: score and class rule of each indicator"
+quote = "D_E2 >= -4"
+text = "-4"
+value = -4.0
+
+[label_estimator_bound]
+section = "Reference class rho(o)"
+quote = "above the P1 H1a bound at N_1 gives U"
+text = "P1 H1a bound"
+value = 1.0e-8
+
+[label_rotation_tol]
+section = "Reference class rho(o)"
+quote = "structure axis from the rotation numbers of the recorded orbit points"
+text = "rotation numbers"
+value = 1.0e-7
+
+[grid_k_values]
+section = "Run block (draft)"
+machine = true
+value = ["0.5", "0.75", "0.971635406", "1.25", "1.5707963267948966", "2", "3", "6.2831853071795865"]
+
+[gate_max_share]
+section = "Analysis plan"
+quote = "must be at most 0.10"
+text = "0.10"
+value = 0.1
+
+[label_lambda_min]
+section = "Reference class rho(o)"
+quote = "the same two label rules (P1 \"Label rules\""
+text = "Label rules"
+value = 0.0001
+
+[h1_u_min]
+section = "H1 (claim C3, classification divergence at a fixed budget)"
+quote = "U(b_P) >= 0.20"
+text = "0.20"
+value = 0.2
+
+[h4_dphi_lower_min]
+section = "H4 (claim C3, sticky orbits)"
+quote = "the lower end of its 95 percent bootstrap interval is >= 0.25"
+text = "0.25"
+value = 0.25
+
+[h4_dphi_min]
+section = "H4 (claim C3, sticky orbits)"
+quote = "Delta_phi >= 0.50"
+text = "0.50"
+value = 0.5
+
+[range_upper_percentile]
+section = "M10 Regular range of sticky orbits (naff-fma R4, weighted-birkhoff R4)"
+quote = "from the 5th to the 95th percentile"
+text = "95th"
+value = 95.0
+
+[drift_bound]
+section = "Run block (draft)"
+machine = true
+value = 1.0e6
+
+[N_1]
+section = "Run block (draft)"
+machine = true
+value = 10000000
+
+[h3_count_min]
+section = "H3 (detection latency, regime dependence)"
+quote = "for at least 5 of the 7 indicators"
+text = "5"
+value = 5
+
+[h2_q_lower_gt]
+section = "H2 (claim C3, detection-time divergence)"
+quote = "the lower end of the 95 percent bootstrap interval of Q is > 3"
+text = "3"
+value = 3.0
+
+[f_s]
+section = "Weak-chaos set W2, strong-chaos set S2, sticky ensemble T_s (R4)"
+quote = "n_s = 1e5 and f_s = 0.2"
+text = "0.2"
+value = 0.2
+
+[r2_megno_threshold]
+section = "M2 Verdicts: score and class rule of each indicator"
+quote = "MEGNO: Ybar20_1(n) >= 2.5"
+text = "2.5"
+value = 2.5
+
+[e1_d_threshold]
+section = "M2 Verdicts: score and class rule of each indicator"
+quote = "D_E1 >= -4"
+text = "-4"
+value = -4.0
+
+[h5_fmed_min]
+section = "H5 (classification stability over the budget)"
+quote = "F_med >= 0.10"
+text = "0.10"
+value = 0.1
+
+[h1_amin_max]
+section = "H1 (claim C3, classification divergence at a fixed budget)"
+quote = "A_min(b_P) <= 0.80"
+text = "0.80"
+value = 0.8
+
+[b_primary]
+section = "M1 Budgets and horizons"
+quote = "Primary budget b_P = b_6 = 12800"
+text = "12800"
+value = 12800
+
+[bootstrap_seed]
+section = "Open points for the owner at the checkpoint"
+quote = "the bootstrap settings (1e4 resamples, seed 20261012)"
+text = "20261012"
+value = 20261012
+
+[panel_sha256]
+section = "Panel P (reused by reference)"
+quote = "SHA-256 `881874d26aa8883caa0545331ba167a3f2c9e3c249cdb6ba32ad39c98ad348d5`"
+text = "881874d26aa8883caa0545331ba167a3f2c9e3c249cdb6ba32ad39c98ad348d5"
+value = "881874d26aa8883caa0545331ba167a3f2c9e3c249cdb6ba32ad39c98ad348d5"
+
+[plan_sha256]
+section = "Amendment A2 (2026-10-29)"
+quote = "the plan hash of the pilot (3823fa4a89fee047ab1f9ca63fee3d4e2dafa372c50b1d63c6de244fa8a18a81) is the plan hash of the run"
+text = "3823fa4a89fee047ab1f9ca63fee3d4e2dafa372c50b1d63c6de244fa8a18a81"
+value = "3823fa4a89fee047ab1f9ca63fee3d4e2dafa372c50b1d63c6de244fa8a18a81"
+
+[h1_u_lower_min]
+section = "H1 (claim C3, classification divergence at a fixed budget)"
+quote = "the lower end of its 95 percent bootstrap interval is >= 0.10"
+text = "0.10"
+value = 0.1
+
+[h5_fmed_lower_min]
+section = "H5 (classification stability over the budget)"
+quote = "the lower end of the 95 percent bootstrap interval of F_med is >= 0.05"
+text = "0.05"
+value = 0.05
+
+[r2_sali_threshold]
+section = "M2 Verdicts: score and class rule of each indicator"
+quote = "SALI: SALI(n) <= 1e-8"
+text = "1e-8"
+value = 1.0e-8
+
+[N_c]
+section = "Run block (draft)"
+machine = true
+value = 102400
+
+[range_lower_percentile]
+section = "M10 Regular range of sticky orbits (naff-fma R4, weighted-birkhoff R4)"
+quote = "from the 5th to the 95th percentile"
+text = "5th"
+value = 5.0
+
+[label_growth_ratio]
+section = "Reference class rho(o)"
+quote = "the same two label rules (P1 \"Label rules\""
+text = "Label rules"
+value = 5.0
+
+[ratio_threshold]
+section = "M2 Verdicts: score and class rule of each indicator"
+quote = "r_SALI >= 5"
+text = "5"
+value = 5.0
+
+[le_floor]
+section = "M2 Verdicts: score and class rule of each indicator"
+quote = "lambda_1(n) >= 1e-4 and r_LE >= 5"
+text = "1e-4"
+value = 0.0001
+
+[r2_fli_factor]
+section = "M2 Verdicts: score and class rule of each indicator"
+quote = "FLI: fli(n) >= 3 ln n"
+text = "3"
+value = 3.0
+
+[gate_size]
+section = "Eligible sets"
+quote = "K = 0 gate set: the 80 orbits of the panel cells (K index 1, classes T and R)"
+text = "80"
+value = 80
+
+[bootstrap_resamples]
+section = "M8 Sets, bootstrap, undecidable sets"
+quote = "10^4 resamples of the orbits of the set"
+text = "10^4"
+value = 10000
+
+[grid_j_count]
+section = "Run block (draft)"
+machine = true
+value = 12
+
+[panel_build_sha256]
+section = "Run block (draft)"
+machine = true
+value = "650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46"
+
+[grid_orbit_count]
+section = "Run block (draft)"
+machine = true
+value = 2304

@@ -150,3 +150,13 @@ end
 
 p2_tcol(t, nm) = (i = findfirst(==(nm), t.columns); i === nothing ? error("table has no column $nm; columns: $(t.columns)") : i)
 p2_rowsof(t, pairs...) = [r for r in t.rows if all(((nm, v),) -> r[p2_tcol(t, nm)] == v, pairs)]
+
+# delete an attribute (root: path ""), the group or dataset is closed before the file as in p2_set_attr
+function p2_del_attr(file, path, name)
+    AX.HDF5.h5open(file, "r+") do h
+        g = path == "" ? h : h[path]
+        AX.HDF5.delete_attribute(g, name)
+        path == "" || close(g)
+        flush(h)
+    end
+end

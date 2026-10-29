@@ -53,7 +53,7 @@ end
     @test all(X -> rows[17].verdicts9[X] === :chaotic, P2_X7) && all(X -> rows[19].verdicts9[X] === :regular, P2_X7) && !haskey(rows[20].verdicts9, :E1) && rows[20].verdicts9[:LE] === :chaotic
     # the K = 0 line: the largest circle distance of the stored frequency nu1 to p0 / (2 pi) modulo 1 over the gate orbits, per window (hand: orbit 10 is the largest)
     kl = p2_ref_k0(st, ref, S)
-    @test Set(keys(res.k0line)) == Set(p.windows) && all(W -> p2_same(res.k0line[W], kl[W]; rtol = 1e-9), p.windows)
+    @test Set(keys(res.k0line)) == Set(p.windows) && all(W -> p2_same((fq1 = res.k0line[W].fq1, pa1 = res.k0line[W].pa1), (fq1 = kl[W].fq1, pa1 = kl[W].pa1); rtol = 1e-9), p.windows)
     @test res.k0line[20].fq1 == 0.0 && isapprox(res.k0line[10240].fq1, 2 * 9 * 1e-10; atol = 1e-14) && isapprox(res.k0line[10240].pa1, 6 * 9 * 1e-10; atol = 1e-14)
     # T17: the measured cost per orbit-step against the line, the bytes per orbit and the transform seconds, read from the manifest (nothing is measured)
     ids = sort(collect(keys(P2_SPEC_INFO)))

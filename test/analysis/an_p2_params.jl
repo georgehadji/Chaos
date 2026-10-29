@@ -4,11 +4,11 @@
 
 p2_readp(st; params = st.params, kw...) = AN.p2_read_params(params; prereg = st.prereg, p1_params = st.p1.params, kw...)
 # a consistent prereg and table pair for the parameter set p (the quotes follow the values, the run blocks follow the windows)
-function p2_pair(tag, p; style = :section, kw...)
+function p2_pair(tag, p; style = :section, texts = Dict{Symbol, String}(), kw...)
     dir = an_path("p2par-$tag"); mkpath(dir)
-    text, _ = p2_prereg_text(p; style)
+    text, _ = p2_prereg_text(p; style, texts)
     pre = joinpath(dir, "prereg.md"); write(pre, text)
-    return pre, p2_write_params(joinpath(dir, "params.toml"), p; style, kw...)
+    return pre, p2_write_params(joinpath(dir, "params.toml"), p; style, texts, kw...)
 end
 wrongval(v) = v isa AbstractString ? 7 : v isa AbstractVector ? "scalar" : "text"
 
@@ -110,9 +110,9 @@ end
     @test tj["le_floor"]["text"] == "0.0001" && tj["bootstrap_level"]["text"] == "0.95" && tj["bootstrap_resamples"]["text"] == "1000"
     gj = AN.p2_read_params(par; prereg = pre, p1_params = st.p1.params)
     @test all(k -> isequal(getfield(gj, k), getfield(got, k)), P2_PARAM_KEYS)
-    # the value is not matched to its text (A2): another value with the same text and quote is read as given
+    # a numeric text must equal its value (A2 with review finding 4): another value with the same text and quote is refused
     p2_write_params(f, st.p; edit = Dict(:ratio_threshold => Dict("value" => 7.5)))
-    @test p2_readp(st; params = f).ratio_threshold == 7.5
+    @test an_rejects(() -> p2_readp(st; params = f), ["ratio_threshold"])
     # bootstrap_seed must equal the seed of numerics-defaults.toml
     pre, par = p2_pair("seed", p2_params(bootstrap_seed = 1, panel_sha256 = st.p.panel_sha256))
     @test an_rejects(() -> AN.p2_read_params(par; prereg = pre), ["bootstrap_seed"])

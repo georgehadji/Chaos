@@ -44,9 +44,12 @@ function _p2_check_chunk_attrs(man, store, p)
     for c in man["chunks"]
         a = Experiments.read_chunk_attrs(chunk_path(store, c["ordinal"]))
         name = _chunk_name(c["ordinal"])
-        get(a, "plan_sha256", p.plan_sha256) == p.plan_sha256 || _fail("plan_sha256 of $name differs from the plan hash of the parameter table")
-        get(a, "status", "ok") == "ok" || _fail("chunk $name has status \"$(a["status"])\", not ok")
-        get(a, "study", P2_SLUG) == P2_SLUG || _fail("chunk $name belongs to study \"$(a["study"])\"")
+        for k in ("plan_sha256", "prereg_sha256", "panel_sha256", "status", "study")
+            haskey(a, k) || _fail("the attribute $k is missing from $name")
+        end
+        a["plan_sha256"] == p.plan_sha256 || _fail("plan_sha256 of $name differs from the plan hash of the parameter table")
+        a["status"] == "ok" || _fail("chunk $name has status \"$(a["status"])\", not ok")
+        a["study"] == P2_SLUG || _fail("chunk $name belongs to study \"$(a["study"])\"")
     end
 end
 
@@ -91,12 +94,16 @@ function _chk_points(it, p)
     drifted == ("drift" in it.flags) || _fail("drift flag of $(_lbl(it)) differs from the recomputation from the stored points")
 end
 
-const _P2_SECOND_BIT = Dict("frequency" => "degenerate", "phase_advance" => "undefined window", "birkhoff" => "zero")
+# The flag names the code reads, by kind and position (the bit of the j-th name has the value 2^(j-1), P34).
+const _P2_BITS = Dict("frequency" => ((2, "degenerate"), (3, "failed")), "phase_advance" => ((2, "undefined window"),), "birkhoff" => ((2, "zero"), (3, "reldig_undefined")))
 
 # A table of a window kind: finite unless the flag of the row says undefined (table E31 of D86); `complete` of a phase advance or Birkhoff item is 1.
 function _chk_window(it)
-    sec = _P2_SECOND_BIT[it.kind]
-    (length(it.bits) >= 2 && it.bits[2] == sec) || _fail("$(_lbl(it)): the second flag name is not \"$sec\"; the bit values cannot be read")
+    haskey(_P2_BITS, it.kind) || _fail("$(_lbl(it)): unknown indicator kind \"$(it.kind)\" (the kinds with flag tables are frequency, phase_advance and birkhoff)")
+    for (j, nm) in _P2_BITS[it.kind]
+        (length(it.bits) >= j && it.bits[j] == nm) || _fail("$(_lbl(it)): the flag name at position $j is not \"$nm\"; the bit values cannot be read")
+    end
+    sec = _P2_BITS[it.kind][1][2]
     for r in axes(it.final, 1)
         w = it.flagwords[r]
         any(isinf, view(it.final, r, :)) && _fail("non-finite (infinite) value in row $(it.rows[r]) of $(_lbl(it))")

@@ -15,12 +15,12 @@ function p2_t14(range, leaving, below, orb)
         push!(rows, Any["range", String(X), kidx, k, nothing, r === nothing ? 0 : r.n, r === nothing ? nothing : r.lo, r === nothing ? nothing : r.hi, r === nothing ? nothing : r.median, nothing])
     end
     for ((id, X), v) in sort!(collect(leaving); by = kv -> (kv[1][1], findfirst(==(kv[1][2]), P2_ALL)))
-        push!(rows, Any["leaving", String(X), orb[id].kindex, nothing, id, nothing, nothing, nothing, nothing, v])
+        push!(rows, Any["leaving", String(X), orb[id].K, nothing, id, nothing, nothing, nothing, nothing, v])
     end
     for ((X, kidx), v) in sort!(collect(below); by = kv -> (findfirst(==(kv[1][1]), P2_ALL), kv[1][2]))
         push!(rows, Any["below_median", String(X), kidx, nothing, nothing, nothing, nothing, nothing, nothing, v])
     end
-    return _tbl(["part", "indicator", "K index", "k", "orbit", "n", "lo", "hi", "median", "value"], rows)
+    return _tbl(["part", "indicator", "K", "k", "orbit", "n", "lo", "hi", "median", "value"], rows)
 end
 
 function p2_t15(byrho, p)
@@ -44,7 +44,8 @@ function p2_t16(flag_counts, omissions, controls, k0)
                         "exponent $(_fmt(c.exponent)); lambda_1(N_1) $(_fmt(c.lambda)); stored deviation $(_fmt(c.stored_deviation)); verdicts at the last budget: $(_vk(c.verdicts9))"])
     end
     for (W, d) in sort!(collect(k0); by = first)
-        push!(rows, Any["k0line", W, "largest circle distance of nu1 to p0 / (2 pi)", d.fq1, "pa1: $(_fmt(d.pa1))"])
+        push!(rows, Any["k0line", W, "largest circle distance of nu1 to p0 / (2 pi)", d.fq1,
+                        "pa1: $(_fmt(d.pa1)); orbits left out as non-finite: fq1 $(d.fq1_nonfinite), pa1 $(d.pa1_nonfinite)"])
     end
     return _tbl(["part", "key", "name", "value", "detail"], rows)
 end

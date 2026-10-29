@@ -320,7 +320,80 @@ function p2_ref_k0(st, ref, S)
     for (w, W) in enumerate(p.windows)
         f = [cd(ref.items[(id, "fq1", "Float64", p.N_c, 1)].indicators["fq1"].final[w, 1], p2_nu0(AN_ORBITS[id]["p0"])) for id in S.gate]
         g = [cd(ref.items[(id, "pa1", "Float64", p.N_c + 1, 1)].indicators["pa1"].final[w, 1], p2_nu0(AN_ORBITS[id]["p0"])) for id in S.gate]
-        out[W] = (fq1 = maximum(f), pa1 = maximum(g))
+        ff, gf = filter(isfinite, f), filter(isfinite, g)
+        out[W] = (fq1 = isempty(ff) ? nothing : maximum(ff), pa1 = isempty(gf) ? nothing : maximum(gf), fq1_nonfinite = length(f) - length(ff), pa1_nonfinite = length(g) - length(gf))
     end
     return out
 end
+
+
+# ---------------------------------------------------------------- pooling by K VALUE (E31, E24): the K index of a panel orbit and the K index of a grid orbit are not comparable,
+# two orbits have the same K iff their binary64 values are equal; the Y5 control (K absent) is left out
+p2_ref_Kvals(orbs, S) = sort!(unique(Float64(o.K) for o in orbs if o.id in S.E_all && o.K !== nothing))
+
+function p2_ref_ranges_K(st, ref, S)
+    p = st.p
+    orbs = p2_ref_orbits(st)
+    out = Dict{Tuple{Symbol, Float64, Int}, Any}()
+    for X in vcat(P2_X7, :STR), K in p2_ref_Kvals(orbs, S), k in 0:9
+        sc = Float64[ref.S[(o.id, X)][k + 1] for o in orbs if o.id in S.regular && o.K !== nothing && Float64(o.K) == K && haskey(ref.S, (o.id, X)) && ref.S[(o.id, X)][k + 1] !== nothing]
+        out[(X, K, k)] = length(sc) >= p.min_set ? (lo = p2ref_percentile(sc, p.range_lower_percentile / 100), hi = p2ref_percentile(sc, p.range_upper_percentile / 100),
+                                                    median = p2ref_median(sc), n = length(sc)) : nothing
+    end
+    return out
+end
+
+function p2_ref_auc_K(st, ref, S)
+    p = st.p
+    orbs = p2_ref_orbits(st)
+    out = Dict{Tuple{Symbol, Int, Float64, String}, Any}()
+    for X in vcat(P2_X8, :STR), k in 0:9, K in p2_ref_Kvals(orbs, S), src in ("pooled", "panel", "grid")
+        cs, rs = Float64[], Float64[]
+        for o in orbs
+            (o.id in S.E_all && o.K !== nothing && Float64(o.K) == K) || continue
+            (src == "pooled" || (src == "panel") == (o.source === :panel)) || continue
+            sc = get(ref.S, (o.id, X), nothing)
+            (sc === nothing || sc[k + 1] === nothing) && continue
+            o.rho === :C ? push!(cs, sc[k + 1]) : push!(rs, sc[k + 1])
+        end
+        out[(X, k, K, src)] = (n_C = length(cs), n_R = length(rs), auc = p2ref_auc(cs, rs; min_set = p.min_set))
+    end
+    return out
+end
+
+# leaving budget of the T_s orbits: the smallest k from which the score is strictly above the upper end of the regular range of its K for every later k; a budget without a range
+# counts as not above (E31, P25)
+function p2_ref_leaving_K(st, ref, S, ranges)
+    p = st.p
+    byid = Dict(o.id => o for o in p2_ref_orbits(st))
+    out = Dict{Tuple{Int, Symbol}, Any}()
+    for id in S.T_s, X in vcat(P2_X7, :STR)
+        haskey(ref.S, (id, X)) || continue
+        K = Float64(byid[id].K)
+        sc = ref.S[(id, X)]
+        want = nothing
+        for k in 0:9
+            if all(j -> (rg = ranges[(X, K, j)]; rg !== nothing && sc[j + 1] !== nothing && sc[j + 1] > rg.hi), k:9)
+                want = p.budgets[k + 1]; break
+            end
+        end
+        out[(id, X)] = want
+    end
+    return out
+end
+
+function p2_ref_below_K(st, ref, S, ranges)
+    byid = Dict(o.id => o for o in p2_ref_orbits(st))
+    out = Dict{Tuple{Symbol, Float64}, Any}()
+    for X in vcat(P2_X7, :STR), K in p2_ref_Kvals(p2_ref_orbits(st), S)
+        ids = [id for id in S.T_s if Float64(byid[id].K) == K && haskey(ref.S, (id, X)) && ref.S[(id, X)][10] !== nothing]
+        rg = ranges[(X, K, 9)]
+        out[(X, K)] = (rg === nothing || isempty(ids)) ? nothing : count(id -> ref.S[(id, X)][10] < rg.median, ids) / length(ids)
+    end
+    return out
+end
+
+# the tolerant accessor of the tests written before the review: a dictionary keyed by the K value (Float64) or, in the older form, by the K index of the default study
+p2_kget(d, mk, K, idx) = haskey(d, mk(K)) ? d[mk(K)] : d[mk(idx)]
+p2_kfield(t) = "K" in t.columns ? "K" : "K index"
+p2_klabel(t, K, idx) = "K" in t.columns ? K : idx

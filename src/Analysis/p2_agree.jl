@@ -100,20 +100,32 @@ function p2_auc(c::AbstractVector{<:Real}, r::AbstractVector{<:Real}; min_set::I
     return (_ksum(rk[1:nc]) - nc * (nc + 1) / 2) / (nc * nr)
 end
 
-# Percentile of a sorted vector, type 7; an exact order statistic is returned as it is (an infinite neighbour is not interpolated).
+# Percentile of a sorted vector, type 7. Equal neighbours give that value; with an infinite neighbour (RLI = 0 gives minus infinity) the order statistic nearer to h is
+# returned (the upper one at a tie), so the result is never NaN.
 function _p2_percentile(s::AbstractVector, q::Real)
     n = length(s)
     h = (n - 1) * q + 1
     lo = floor(Int, h)
     hi = min(lo + 1, n)
-    return h == lo ? s[lo] : s[lo] + (h - lo) * (s[hi] - s[lo])
+    (h == lo || s[lo] == s[hi]) && return s[lo]
+    (isinf(s[lo]) || isinf(s[hi])) && return h - lo < 0.5 ? s[lo] : s[hi]
+    return s[lo] + (h - lo) * (s[hi] - s[lo])
+end
+
+# Median of a sorted vector; two different middle values with an infinite one give the infinite one (never NaN).
+function _p2_median_sorted(s::AbstractVector)
+    n = length(s)
+    isodd(n) && return s[(n + 1) ÷ 2]
+    a, b = s[n ÷ 2], s[n ÷ 2 + 1]
+    a == b && return a
+    return isinf(a) ? a : isinf(b) ? b : (a + b) / 2
 end
 
 "Regular range of E31: `(lo, hi, median, n)` from the lower and upper percentile (in percent, type 7) of the scores; `nothing` below `min_set` scores."
 function p2_regular_range(scores::AbstractVector{<:Real}, p)
     length(scores) < p.min_set && return nothing
     s = sort(Float64.(scores))
-    return (lo = _p2_percentile(s, p.range_lower_percentile / 100), hi = _p2_percentile(s, p.range_upper_percentile / 100), median = _median_sorted(s), n = length(s))
+    return (lo = _p2_percentile(s, p.range_lower_percentile / 100), hi = _p2_percentile(s, p.range_upper_percentile / 100), median = _p2_median_sorted(s), n = length(s))
 end
 
 "The budget b_k of the smallest k from which the score is strictly above the upper percentile of the same budget up to k = 9; `nothing` if there is none."

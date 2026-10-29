@@ -66,14 +66,14 @@ const P2_SEC_ORDER = [:HYP, :H1, :H2, :H3, :H4, :H5, :H6, :PANEL, :RHO, :GRID, :
 
 # The text of a value as the section writes it (A2): the field `text` of the table, which must occur in the quote. It differs from Julia's string(value) for many keys
 # (1e-4, 0.20, -4, 10^3, 95 percent, 5th), so that a reader that matches string(value) is caught.
-function p2_texts(p; style = :section)
+function p2_texts(p; style = :section, texts = Dict{Symbol, String}())
     pow10(x) = (e = round(Int, log10(x)); x == 10^e ? "10^$e" : string(x))
     T = Dict{Symbol, String}()
     for k in P2_PARAM_KEYS
         v = getfield(p, k)
         T[k] = v isa AbstractVector ? join(v, k === :gate_classes ? " and " : ", ") : string(v)
     end
-    style === :julia && return T                      # the text is Julia's string(value) everywhere (a variant the reader must accept as well)
+    style === :julia && return merge(T, texts)                      # the text is Julia's string(value) everywhere (a variant the reader must accept as well)
     sci = Dict(:le_floor => "1e-4", :rli_threshold => "1e-7", :r2_sali_threshold => "1e-8", :label_rotation_tol => "1e-7", :label_estimator_bound => "1e-8")
     for (k, t) in sci
         parse(Float64, t) == getfield(p, k) && (T[k] = t)
@@ -90,12 +90,12 @@ function p2_texts(p; style = :section)
     T[:bootstrap_level] = p.bootstrap_level == 0.95 ? "95 percent" : string(p.bootstrap_level)
     T[:range_lower_percentile] = isinteger(p.range_lower_percentile) ? "$(Int(p.range_lower_percentile))th" : string(p.range_lower_percentile)
     T[:range_upper_percentile] = isinteger(p.range_upper_percentile) ? "$(Int(p.range_upper_percentile))th" : string(p.range_upper_percentile)
-    return T
+    return merge(T, texts)                            # `texts` overrides single texts (the quote follows the text)
 end
 
-function p2_quotes(p; style = :section)
+function p2_quotes(p; style = :section, texts = Dict{Symbol, String}())
     s = P2_SEC
-    T = p2_texts(p; style)
+    T = p2_texts(p; style, texts)
     q = Dict{Symbol, Tuple{String, Any, String}}()
     for k in P2_MACHINE
         q[k] = (k in (:N_1, :N_c, :N_dir, :windows, :directions) ? s.RUN : k === :drift_bound ? s.RUN : k === :panel_build_sha256 ? s.PANEL : s.A1, :machine, "")
@@ -152,8 +152,8 @@ function p2_quotes(p; style = :section)
 end
 
 # TOML text of the parameter table (one table per key: value, section, and machine or quote and text)
-function p2_write_params(path::AbstractString, p::NamedTuple; drop = Symbol[], extra = Dict{String, Any}(), edit = Dict{Symbol, Any}(), style = :section)
-    q = p2_quotes(p; style)
+function p2_write_params(path::AbstractString, p::NamedTuple; drop = Symbol[], extra = Dict{String, Any}(), edit = Dict{Symbol, Any}(), style = :section, texts = Dict{Symbol, String}())
+    q = p2_quotes(p; style, texts)
     d = Dict{String, Any}()
     for k in P2_PARAM_KEYS
         k in drop && continue
@@ -263,8 +263,8 @@ $(arm("d64_win", "S_L", ["fq1", "bk1"], "Double64", Nc))$(arm("d64_phase", "S_L"
 end
 
 # the fixture preregistration text with the SELF hash rule; returns (text, header hash)
-function p2_prereg_text(p; slug = P2_SLUG, hashrow = true, drop_sections = Symbol[], extra = "", amend_hash_row = false, style = :section)
-    q = p2_quotes(p; style)
+function p2_prereg_text(p; slug = P2_SLUG, hashrow = true, drop_sections = Symbol[], extra = "", amend_hash_row = false, style = :section, texts = Dict{Symbol, String}())
+    q = p2_quotes(p; style, texts)
     h4 = p2_h4_tables(p)
     body = IOBuffer()
     println(body, "# Preregistration: ", slug, "\n\n## Header\n")

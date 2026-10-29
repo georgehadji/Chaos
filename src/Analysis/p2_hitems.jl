@@ -1,5 +1,5 @@
 # Study p2-indicators (Amendment D89): the items of the hypotheses T3 to T8, the R2 version T10, the gate T12 and the extension T13 (E32, E33, E37).
-# A row is [source, K index, statistic, value, lower, upper]; the pooled rows come first, then the rows by source and by K index with counts and point values.
+# A row is [source, K index, statistic, value, lower, upper]; the pooled rows come first, then the rows by source and by K value with counts and point values.
 
 _vstr(v) = replace(string(v), "_" => " ")
 _row(name, v, lo = nothing, hi = nothing) = Any["all", "all", name, v, lo, hi]
@@ -90,7 +90,7 @@ end
 The items T3 to T8 (H1 to H6) of a set of decisions `dec`: the decision rows, then the rows by source and by K index.
 """
 function p2_hypothesis_items(p, orbits, S, vt, dec, I; rule = :R1, suffix = "")
-    cols = ["source", "K index", "statistic", "value", "lower", "upper"]
+    cols = ["source", "K", "statistic", "value", "lower", "upper"]
     tab(h) = _tbl(cols, vcat(_FLAT[h](dec[h], I), h === :H6 ? Vector{Any}[] : _break(h, orbits, S, vt, p, I, rule, suffix), _extra(h, S, vt, p, I, rule)))
     return (T3 = tab(:H1), T4 = tab(:H2), T5 = tab(:H3), T6 = tab(:H4), T7 = tab(:H5), T8 = tab(:H6))
 end
@@ -104,7 +104,7 @@ function p2_stacked(dec, I; robust = nothing)
         end
         robust === nothing || push!(rows, Any[string(h), "all", "all", "robust", _vstr(robust[h]), nothing, nothing])
     end
-    return _tbl(["hypothesis", "source", "K index", "statistic", "value", "lower", "upper"], rows)
+    return _tbl(["hypothesis", "source", "K", "statistic", "value", "lower", "upper"], rows)
 end
 
 function p2_t12(gate)

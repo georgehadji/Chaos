@@ -27,6 +27,16 @@ function p2_design(variant::Symbol = :default)
     ov = Dict{Tuple{Int, Symbol}, String}((9, :E1) => "cccrrrrrrr", (10, :SALI) => "uurrrrrrrr", (15, :E1) => "uuuuuuuuuu", (15, :WBA) => "uuuuuuuuuu",
         (16, :LE) => "rrrrrrrrrc", (28, :MEGNO) => "rrrrrrrrcc", (29, :FLI) => "rrrrrrrurr", (41, :SALI) => "ccrrrrrrrr")
     variant === :var && (ov[(10, :E1)] = "rrrrrrrrrc")
+    nan_nu = Dict{Int, Vector{Int}}()
+    if variant === :review
+        # review finding 5: at K = 0.5 (with the swapped grid K list) the regular set is {9, 10, 41, 42, 43}, five orbits = min_set; the FLI of 41 and 42 is undecided at k = 0, 1, 2 (no
+        # score), so the regular range of FLI does not exist at k = 0 .. 2 and exists from k = 3; the sticky orbit 39 has FLI chaotic from k = 3: leaving budget b_3
+        ov[(41, :FLI)] = ov[(42, :FLI)] = "uuurrrrrrr"
+        ov[(39, :FLI)] = "rrrccccccc"
+        # review finding 6: orbit 10 (a gate orbit) has E1 and E2 undecided at k = 4 (window 320) with nu1 = NaN, as the flags degenerate and undefined window allow
+        ov[(10, :E1)] = ov[(10, :E2)] = "rrrrurrrrr"
+        nan_nu[10] = [4]
+    end
     variant === :var && foreach(i -> ov[(i, :RLI)] = "rrrrrrrrcc", (1, 21, 22, 26))                  # late RLI onset on W2 orbits of E8: the extension differs
     rho = Dict{Int, Symbol}()
     for i in (1, 3, 4, 5, 6, 7, 8, 11, 12, 14, 18, 20, 21:26..., 33:40...); rho[i] = :C; end
@@ -59,7 +69,7 @@ function p2_design(variant::Symbol = :default)
     d64 = Dict{Tuple{Int, Symbol}, Symbol}((5, :E2) => :regular, (11, :LE) => :regular)               # Double64 verdict at k = 9 that differs from Float64
     dir = Dict{Tuple{Int, Symbol, Int}, Symbol}((7, :SALI, 3) => :regular, (12, :LE, 5) => :regular, (15, :FLI, 2) => :undecided)
     drift = variant === :var ? [8] : Int[]
-    return (variant = variant, prof = prof, rho = rho, lref = lref, lns = lns, V = seqs, d64 = d64, dir = dir, drift = drift)
+    return (variant = variant, prof = prof, rho = rho, lref = lref, lns = lns, V = seqs, d64 = d64, dir = dir, drift = drift, nan_nu = nan_nu)
 end
 
 # ---------------------------------------------------------------- stored numbers that realise a verdict (E26, E27)
@@ -115,7 +125,7 @@ end
 
 p2_nu0(p0) = mod(p0 / (2 * pi), 1.0)
 # frequency table (E1): 10 rows x 11 columns, flags with every kind of bit
-function p2_fq(id, V, p0; dshift = 0.0, odd = 0.0)
+function p2_fq(id, V, p0; dshift = 0.0, odd = 0.0, nan_rows = Int[])
     F = zeros(10, 11); fl = zeros(Int64, 10)
     for k in 0:9
         v = V[:E1][k + 1]
@@ -126,11 +136,12 @@ function p2_fq(id, V, p0; dshift = 0.0, odd = 0.0)
         F[k + 1, 11] = D + dshift + (isodd(k) ? odd : 0.0)
         fl[k + 1] = v === :undecided ? 2 + 1024 * (id % 2) : v === :regular ? (id % 3 == 0 ? 1 + 512 : 0) : (id % 2 == 0 ? 8 + 128 : 0)
         v === :undecided && (F[k + 1, 3:11] .= NaN)
+        k in nan_rows && v === :undecided && (F[k + 1, 1:2] .= NaN)
     end
     return F, fl
 end
 
-function p2_pa(id, V, p0; dshift = 0.0, odd = 0.0)
+function p2_pa(id, V, p0; dshift = 0.0, odd = 0.0, nan_rows = Int[])
     F = zeros(10, 4); fl = zeros(Int64, 10)
     for k in 0:9
         v = V[:E2][k + 1]
@@ -140,6 +151,7 @@ function p2_pa(id, V, p0; dshift = 0.0, odd = 0.0)
         F[k + 1, 4] = D + dshift + (isodd(k) ? odd : 0.0)
         fl[k + 1] = v === :undecided ? 2 : v === :regular && id % 2 == 1 ? 1 : 0
         v === :undecided && (F[k + 1, 3:4] .= NaN)
+        k in nan_rows && v === :undecided && (F[k + 1, 1:2] .= NaN)
     end
     return F, fl
 end
@@ -229,11 +241,11 @@ function p2_orbit_record(sp, info, design, p; flags = String[], extra = Dict{Str
         ind["st"] = AX._ind_nt(series = reshape(p2_strD(id, t, rho), :, 1), columns = ["stretching.D"], scalars = sc, scolumns = AX.IND_ST_SCALARS, range = [-0.48, 0.48])
     elseif role in (:fq1, :fq1_raw, :fq1_qp)
         F, fl = p2_fq(id, sp.precision == "Double64" ? merge(V, Dict(:E1 => (haskey(design.d64, (id, :E1)) ? vcat(V[:E1][1:9], design.d64[(id, :E1)]) : V[:E1]))) : V, info.p0;
-                      dshift = role === :fq1_raw ? 0.5 : role === :fq1_qp ? 0.0 : 0.0, odd = role === :fq1_qp ? -0.25 : 0.0)
+                      dshift = role === :fq1_raw ? 0.5 : role === :fq1_qp ? 0.0 : 0.0, odd = role === :fq1_qp ? -0.25 : 0.0, nan_rows = get(design.nan_nu, id, Int[]))
         ind[sp.id] = AX._ind_nt(final = F, rows = ["W=$w" for w in P2_WINDOWS], fcolumns = AX.IND_FREQ_COLUMNS, flags = fl, bits = AX.IND_FREQ_BITS)
     elseif role in (:pa1, :pa_planar)
         Vp = sp.precision == "Double64" && haskey(design.d64, (id, :E2)) ? merge(V, Dict(:E2 => vcat(V[:E2][1:9], design.d64[(id, :E2)]))) : V
-        F, fl = p2_pa(id, Vp, info.p0; odd = role === :pa_planar ? 0.1 : 0.0)
+        F, fl = p2_pa(id, Vp, info.p0; odd = role === :pa_planar ? 0.1 : 0.0, nan_rows = get(design.nan_nu, id, Int[]))
         ind[sp.id] = AX._ind_nt(final = F, rows = ["W=$w" for w in P2_WINDOWS], fcolumns = AX.IND_PA_COLUMNS, flags = fl, bits = AX.IND_PA_BITS,
                                 scalars = [1.0, 0.0, 1.0], scolumns = AX.IND_PA_SCALARS)
     elseif role === :bk1

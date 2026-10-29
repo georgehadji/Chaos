@@ -164,6 +164,7 @@ function write_chunk(path::AbstractString, attrs::AbstractDict, orbits::Abstract
     back = read_chunk(tmp)
     length(back.orbits) == length(orbits) && all(_same(a, b) for (a, b) in zip(orbits, back.orbits)) ||
         error("write_chunk: $tmp differs from the buffers after the write")
+    isequal(pooled_of(orbits), back.pooled) || error("write_chunk: pooled counts of $tmp differ from the buffers after the write")
     isequal(prov, get(back.attrs, "provenance", Dict{String, Any}())) || error("write_chunk: provenance of $tmp differs from the buffers after the write")
     bad = _attr_diff(want, Dict{String, Any}(k => v for (k, v) in back.attrs if k != "provenance"))
     isempty(bad) || error("write_chunk: root attributes of $tmp differ from the buffers after the write: " * join(bad, ", "))
@@ -213,7 +214,7 @@ function read_chunk(path::AbstractString)
         ids = sort!([parse(Int, k) for k in keys(og)])
         attrs = _read_attrs(f)
         haskey(f, "provenance") && (attrs["provenance"] = _read_provenance(f))
-        return (attrs = attrs, orbits = OrbitRecord[_read_orbit(HDF5.open_group(og, string(id)), id) for id in ids])
+        return (attrs = attrs, orbits = OrbitRecord[_read_orbit(HDF5.open_group(og, string(id)), id) for id in ids], pooled = _read_pooled(f))
     end
 end
 

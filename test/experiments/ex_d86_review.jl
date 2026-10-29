@@ -45,3 +45,45 @@ end
     end
     @test shared > 0 && mixed > 0
 end
+
+# Review of 2026-10-29, LOW findings R5, R8, R9 (fixed on the owner's order).
+@testset "D86 review R5 the derived range must exist for the map of the orbit" begin
+    spec = d86_spec("stretching")
+    y5 = last(ex_panel_orbits(:std))
+    @test y5["control_kind"] == "y5"
+    @test EX.ind_check_plan(spec, EX._panel_base(y5), 1, 100, "lifted") === nothing
+    r = try
+        EX.ind_check_plan(spec, EX._panel_base(merge(y5, Dict{String, Any}("mu" => 1.0))), 1, 100, "lifted")
+        nothing
+    catch e
+        e
+    end
+    @test r isa ArgumentError && occursin("`st`", r.msg) && occursin("orbit $(y5["id"])", r.msg)
+end
+
+@testset "D86 review R8 write_chunk reads the pooled groups back" begin
+    run = d86_run("review-d88", d86_one(d86_spec("stretching"; id = "st"); orbits = "S_D", horizon = 100))
+    files = ex_chunk_files(run.store)
+    ch = EX.read_chunk(first(files))
+    @test haskey(ch.pooled, "st") && ch.pooled["st"].orbits == length(ch.orbits)
+    # a pool that differs from the buffers is found by the comparison write_chunk makes
+    exp = Dict{String, NamedTuple}("st" => ch.pooled["st"])
+    @test isequal(exp, ch.pooled)
+    bad = Dict{String, NamedTuple}("st" => (orbits = exp["st"].orbits, counts = exp["st"].counts === nothing ? nothing : exp["st"].counts .+ 1, range = exp["st"].range))
+    @test !isequal(bad, ch.pooled)
+    # and the file written by the package holds exactly what pooled_of says of the buffers
+    tmp = ex_path("d86-review-r8.h5")
+    isfile(tmp) && rm(tmp)
+    EX.write_chunk(tmp, Dict{String, Any}(k => v for (k, v) in ch.attrs if k != "complete"), ch.orbits)
+    @test isequal(EX.read_chunk(tmp).pooled, EX.pooled_of(ch.orbits)) || isempty(EX.pooled_of(ch.orbits))
+end
+
+@testset "D86 review R9 the manifest table of the indicators is kept for the plan" begin
+    plan = d86_plan("review-r9", d86_one(d86_spec("tangent"), d86_spec("stretching"); orbits = "S_D", horizon = 100))
+    a = EX.indicator_manifest(plan)
+    @test EX.indicator_manifest(plan) === a
+    @test Set(keys(a)) == Set(["tg", "st"]) && a["tg"]["kind"] == "tangent" && a["st"]["bytes_per_orbit"]["total"] > 0
+    plan2 = d86_plan("review-r9b", d86_one(d86_spec("frequency"); orbits = "S_L", mode = "wrapped"))
+    b = EX.indicator_manifest(plan2)
+    @test Set(keys(b)) == Set(["fq"]) && b !== a && EX.indicator_manifest(plan) == a
+end

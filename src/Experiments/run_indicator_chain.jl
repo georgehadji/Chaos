@@ -147,8 +147,12 @@ function ind_check_plan(spec::AbstractDict, b, tau::Integer, N::Integer, mode::A
     kind, id = spec["kind"], spec["id"]
     fail(what) = throw(ArgumentError("indicator spec `$id`, orbit $(b.id): $what"))
     if kind == "stretching"
-        spec["range"] == "derived" && !(b.system in ("standard", "linear")) &&
-            fail("parameter `range` = \"derived\" is defined for the standard maps and 2 x 2 linear maps only, the system is $(b.system)")
+        if spec["range"] == "derived"
+            b.system in ("standard", "linear") ||
+                fail("parameter `range` = \"derived\" is defined for the standard maps and 2 x 2 linear maps only, the system is $(b.system)")
+            # the range itself must exist for the map of the orbit (a linear map without stretching has none), checked in Float64
+            _ind_try(fail, () -> stretching_range(first(_system_start(Float64, (id = b.id, system = b.system, param = b.param, x0 = b.x0, p0 = b.p0, coordinate_mode = mode)))))
+        end
         _ind_try(fail, () -> check_run(StretchingNumbers(; range = (-1.0, 1.0), bins = spec["bins"], interval = spec["interval"], min_per_cell = spec["min_per_cell"]), tau, N))
     end
     ind_window_kind(kind) || return nothing

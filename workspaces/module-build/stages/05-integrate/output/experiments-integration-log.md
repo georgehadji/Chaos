@@ -144,3 +144,128 @@ Short hashes are the commits on `main..module/experiments-runner` that touched t
 - `stages/04-verify/output/experiments-runner-verify-log.txt` (d6b78ca, 968ab29, 05792a3)
 - `stages/04-verify/output/gpu-rtx5060-d53-verify-log.txt` (9cd8df6, 4a4873b)
 - `workspaces/study/stages/01-design/output/p1-le-benchmark-preregistration.md` (d6b78ca, 4219a42, 77452d6)
+
+## Amendment D86 (stage 05)
+
+Date 2026-10-29. Third scope of the slug: recording of the six indicator kinds by the study runner (decisions D86, D87, D88; spec `experiments-spec.md`, "Amendment D86" and the sections after it). Worked on `main`, no branch yet (decision D47: one branch per change; the branch is made at the commit step). Milestone M3 (decision D49), stage 05 of `workspaces/module-build`, third integration of the slug. Commit SHA: (set when committed).
+
+### Catalog rows flipped
+
+None. The D86 recording adds no catalog row: `experiments` is not a catalog method or system, and the rows it records (I2, I5, I8, I9, I10, I12, I12b, I13) are already `verified` on their own module evidence, with no qualifier that this amendment changes (`_config/catalogs/indicators.md`). `_config/risks.md` is reviewed at the milestone exit, not here (D86z).
+
+Evidence: `stages/04-verify/output/experiments-d86-verification.md`, accepted at the stage 04 checkpoint (2026-10-29) after the review fixes F1, R1, R2 (D88), R3 and the owner decisions of D88. Decision rows: D86, D87, D88.
+
+### Evidence summary
+
+Quoted from the verification report; the numbers are those of the final code unless noted.
+
+| Item | Result |
+|------|--------|
+| CPU oracles, `verify/experiments-indicators.jl`, 23 threads | first full run PASS 113, FAIL 0, INFO 63 (on 5b1f91d with the F1 workaround); rerun on the fixed code PASS 113, FAIL 1 (the line that expected the F1 abort), INFO 62, 343 s, peak RSS 1.21 GiB; the reader accepts the D88 layout |
+| Device, `verify/experiments-indicators-device.jl`, RTX 5060 Laptop | PASS 32, FAIL 0, FALLBACK 4 (the Double64 passes), INFO 14; peak RSS 2.62 GiB |
+| Reduced campaign (D86y) | 2793 items, 352 chunks, 9 arms; 108.2 s for `run_campaign` (limit 900 s); peak host memory 1.01 GiB (limit 8 GB); failed chunks exactly the injected one; resume equals an uninterrupted run (0 differences); CPU rerun 180 of 180 bitwise |
+| Independent reader (O20) | 352 of 352 files in each of 4 stores, 0 failed checks; the module's `read_chunk` equals it on 47812 attributes and 33977 datasets, 0 differ; `h5dump` agrees on 49 datasets |
+| Plan stability (D86b) | plan hash 81b04cdf5fd6cfd2 equal for the code of ba21bcc and the current code; 15569 of 15569 item hashes and 1363 of 1363 chunk keys and hashes equal |
+| Package suites at the stage 04 checkpoint | experiments folder 6844 pass, 0 fail, 0 error; full `Pkg.test()` 1,400,156 pass, 0 fail, 0 error, 1 broken (outside experiments), 15 min |
+| Coverage | `src/Experiments` 96.1 percent of 3440 lines (quoted from the orchestrator, taken before the review fixes; new `run_indicator*.jl` files 94 to 100 percent) |
+| Review | 0 CRITICAL, 0 HIGH, 3 MEDIUM (R1, R2, R3: fixed), 9 LOW (R4 settled as D88; R5, R8, R9 fixed after the verification report; R6, R7, R10, R11, R12 open) |
+| Criteria D86a to D86y | all PASS or covered by the suite ((S) rows D86f, D86r, D86x); D86z is this stage |
+
+### Checks at integration
+
+| Check | Result |
+|-------|--------|
+| `Pkg.test()` after the fixes R5, R8, R9 (working tree, uncommitted) | 1,400,166 pass, 0 fail, 0 error, 1 broken (outside experiments); quality 12 of 12; 17 min |
+| experiments folder after the fixes R5, R8, R9 | 6854 pass, 0 fail, 0 error |
+| ICM validator | ALL CHECKS PASS (`python scripts/icm_validate.py`) |
+| Audit | status matches evidence: no catalog row changes and no open criterion beyond the LOW findings below; this log names the files (the commit SHA is set at the commit); `CHANGELOG.md` has the entry under Unreleased, Added |
+
+### Documents changed by this stage (D86z)
+
+- `schema/run-store.md`: section "Added by Amendment D86 (version stays 2)": root attributes of a spec file, `provenance/<member>`, the datasets under `indicators/<id>/`, `pooled/<id>` with `range` (D88), `lyap` optional, `kind` marks the new files; version decision P34 (additive, precedent D56).
+- `_config/architecture.md`, "Compute", GPU record: the per-spec entry `[<device>."Float64".recorder.<spec id>]` and its `spec_sha256` field.
+- `src/Experiments/CONTEXT.md`: section "Indicators in the runner (D86)" says what is implemented and in which files, the CPU-only kinds (sixth fallback reason) and the limits that remain. The heading "Obligations from the Indicators layer" named by D86z no longer exists there: stage 03 had already replaced it.
+- `src/Indicators/CONTEXT.md`: the Limits lines that named missing Experiments paths (chain recording, stretching workspace, naff-fma series feed) point to `src/Experiments/CONTEXT.md`.
+- `stages/01-spec/output/naff-fma-spec.md`: criterion 16 carries a status note, gated by D86j.
+- `CHANGELOG.md`: one entry under Unreleased, Added.
+
+### Open items
+
+- LOW review findings, not fixed: R6 and R7 (the per-spec cost report and the cost cap judge the first group of an arm only and pool precisions), R10 (the pilot report keeps the last group when a spec has several), R11 (`_stretch_D` restates the D formula of the reducer; guarded by the bitwise test D86i), R12 (the stretching workspace is allocated per orbit, not per slot: garbage, not wrong data).
+- Fixed by the orchestrator after the verification report and still uncommitted: R5 (plan-time check that the derived stretching range exists), R8 (the write-time read-back compares `/pooled/<id>`), R9 (the indicator manifest table is cached per plan); their suites were running when this log was written.
+- F2 (design limit): the pair on the Y5 control overflows near step 770 at N = 4000; the p2 preregistration must keep the pair horizon below about 700 for Y5 or leave Y5 out of the pair arm.
+- Double64 on the device is untested: all four device-capable kinds fall back to the CPU with reason 3, so only the fallback is exercised.
+- The device path was measured on the local RTX 5060 only; per-spec cost records vary between takes (tangent 1.4 to 3.1 times slower than the CPU, phase advance 0.6 to 1.1), so `auto` for phase advance is not stable and the study takes its own record.
+- Coverage was not rerun after the review fixes.
+- The independent reader is HDF5.jl in a separate process plus `h5dump`, not h5py; the command line entry (`bin/`) was not run for the new kinds.
+- Full-suite numbers of the final working tree: 1,400,166 pass, 1 broken (above).
+- `_config/risks.md` is reviewed at the milestone exit.
+
+### Files changed since the previous log
+
+Short hashes are the commits on `main` from 38eee93 to 366677f that touched the file: 38eee93 stage 01, ba21bcc stage 02, 2e1c100 and 5b1f91d stage 03, 62fd6c2 and 366677f stage 04. "working tree" means uncommitted at the time of writing (the review fixes R5, R8, R9 and this stage's documents); its commit SHA is set when committed. Stage paths are relative to `workspaces/module-build/`.
+
+- `CHANGELOG.md` (working tree)
+- `_config/architecture.md` (working tree)
+- `_config/decision-log.md` (38eee93, 5b1f91d, 366677f)
+- `bench/experiments.jl` (2e1c100)
+- `schema/run-store.md` (working tree)
+- `src/Experiments/CONTEXT.md` (2e1c100, working tree)
+- `src/Experiments/Experiments.jl` (2e1c100)
+- `src/Experiments/run_backend.jl` (2e1c100)
+- `src/Experiments/run_block.jl` (2e1c100)
+- `src/Experiments/run_campaign.jl` (2e1c100)
+- `src/Experiments/run_device.jl` (2e1c100)
+- `src/Experiments/run_groups.jl` (2e1c100)
+- `src/Experiments/run_health.jl` (2e1c100)
+- `src/Experiments/run_indicator.jl` (2e1c100)
+- `src/Experiments/run_indicator_chain.jl` (2e1c100, working tree)
+- `src/Experiments/run_indicator_device.jl` (2e1c100)
+- `src/Experiments/run_indicator_health.jl` (2e1c100)
+- `src/Experiments/run_indicator_record.jl` (2e1c100, 62fd6c2)
+- `src/Experiments/run_indicator_report.jl` (2e1c100, working tree)
+- `src/Experiments/run_indicator_store.jl` (2e1c100, 62fd6c2, 366677f, working tree)
+- `src/Experiments/run_manifest.jl` (2e1c100)
+- `src/Experiments/run_pilot.jl` (2e1c100)
+- `src/Experiments/run_plan.jl` (2e1c100, 62fd6c2)
+- `src/Experiments/run_record.jl` (2e1c100)
+- `src/Experiments/run_resume.jl` (2e1c100)
+- `src/Experiments/run_session.jl` (2e1c100)
+- `src/Experiments/run_store.jl` (2e1c100, working tree)
+- `src/Indicators/CONTEXT.md` (38eee93, working tree)
+- `test/experiments/ex_d86_chains.jl` (ba21bcc, 2e1c100)
+- `test/experiments/ex_d86_golden.jl` (ba21bcc)
+- `test/experiments/ex_d86_grammar.jl` (ba21bcc, 2e1c100)
+- `test/experiments/ex_d86_guards.jl` (ba21bcc)
+- `test/experiments/ex_d86_helpers.jl` (ba21bcc, 2e1c100, 62fd6c2)
+- `test/experiments/ex_d86_review.jl` (62fd6c2, 366677f, working tree)
+- `test/experiments/ex_d86_run.jl` (ba21bcc, 2e1c100)
+- `test/experiments/ex_d86_store.jl` (ba21bcc, 2e1c100, 366677f)
+- `test/experiments/ex_d86_windows.jl` (ba21bcc, 2e1c100, 366677f)
+- `test/experiments/ex_inputs.jl` (ba21bcc)
+- `test/experiments/runtests.jl` (ba21bcc, 62fd6c2)
+- `verify/experiments-indicators-block.toml` (62fd6c2)
+- `verify/experiments-indicators-campaign.jl` (62fd6c2)
+- `verify/experiments-indicators-closed.jl` (62fd6c2)
+- `verify/experiments-indicators-device.jl` (62fd6c2)
+- `verify/experiments-indicators-hash.jl` (62fd6c2)
+- `verify/experiments-indicators-memory.jl` (62fd6c2)
+- `verify/experiments-indicators-plan.jl` (62fd6c2)
+- `verify/experiments-indicators-prep.jl` (62fd6c2)
+- `verify/experiments-indicators-reader.jl` (62fd6c2, 366677f)
+- `verify/experiments-indicators-series.jl` (62fd6c2)
+- `verify/experiments-indicators-source.jl` (62fd6c2)
+- `verify/experiments-indicators.jl` (62fd6c2)
+- `stages/01-spec/output/experiments-spec.md` (38eee93, ba21bcc, 2e1c100, 5b1f91d, 366677f)
+- `stages/01-spec/output/naff-fma-spec.md` (working tree)
+- `stages/02-tests/output/experiments-test-plan.md` (ba21bcc, 2e1c100)
+- `stages/03-implement/output/experiments-d86-impl-notes.md` (2e1c100)
+- `stages/03-implement/output/weighted-birkhoff-impl-notes.md` (38eee93)
+- `stages/04-verify/output/experiments-d86-device.png` (62fd6c2, 366677f)
+- `stages/04-verify/output/experiments-d86-review.md` (62fd6c2)
+- `stages/04-verify/output/experiments-d86-verification.md` (62fd6c2, 366677f)
+- `stages/04-verify/output/experiments-d86-verify-log-fixed.txt` (62fd6c2, 366677f)
+- `stages/04-verify/output/experiments-d86-verify-log.txt` (62fd6c2)
+- `stages/04-verify/output/gpu-rtx5060-d86-verify-log-fixed.txt` (62fd6c2, 366677f)
+- `stages/04-verify/output/gpu-rtx5060-d86-verify-log.txt` (62fd6c2)
+- `stages/05-integrate/output/experiments-integration-log.md` (working tree)

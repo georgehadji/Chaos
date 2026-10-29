@@ -59,11 +59,13 @@ Layer 3, canonical. Shared contract between Julia (`Experiments`) and Python (`p
     t                          int64, recorded step counts, length n
     state                      n x 2, binary64; the recorded orbit point (lifted, or wrapped in wrapped mode)
     winding                    n x 2, int64; wrapped mode only
-    lyap/<method>              n x k finite-time exponents per method, binary64
-    indicators/<name>          n samples per indicator
+    lyap/<method>              n x k finite-time exponents per method, binary64; absent for the items of an indicator spec
+    indicators/<id>/           datasets of an indicator spec (Amendment D86, below)
     diagnostics/<name>         n running maxima, binary64
         attrs: threshold, first_exceedance_step
     cost/<method>              steps, vectors, wall seconds, thread seconds, resident bytes
+/provenance/<member>/         indicator specs only: one group per chain member (Amendment D86, below)
+/pooled/<id>/                  indicator specs only: stretching counts pooled over the orbits of the chunk (Amendment D86, below)
 /grid/                         grid scans only (not used by the study runner)
     attrs: system, params, axes
     <name>                     final values, shape (nx, ny)
@@ -92,3 +94,34 @@ N-body files use `system = "nbody:<name>"` and the same groups.
 Added by the D53 review fixes, while no study file exists: root attributes `dirty`, `session`, `control_stop`; the statements on axis order and on failed files above. The write now also compares the root attributes on the read-back and flushes the temporary file to the disk before the rename.
 
 - Added by Amendment D56 (version stays 2): orbit flag `breakdown_tau` with orbit attributes `breakdown_step` (int) and `breakdown_kind` (string) for an orthonormalisation breakdown in an arm marked `stop_exempt`; orbit attributes `control_scope` (`"bound"` or `"info"`) and `control_deviation` (float) for the controls of an `h1_check` arm when the run uses `control_scope = "exact_start"`.
+
+## Added by Amendment D86 (version stays 2)
+
+Recording of the six indicator kinds by the study runner (decisions D86, D87, D88; spec `experiments-spec.md`, R15). Version decision (P34): the store stays at version 2. The change is additive, as D56 was: a file of a catalog method is written and read as before, and a resume must equal an uninterrupted run (I14). Two rules change for readers: `lyap/` is optional (an orbit of an indicator spec has none) and the root attribute `kind` marks the files of the new kinds (absent in the files of the methods). `<id>` is the spec id; in a file of a spec the root `method` is the spec id, `direction` is absent when the item has none and `perturbation` stays absent. Shapes are Julia shapes (see Axis order).
+
+Root attributes of a chunk file of a spec (taken from the first item of the chunk):
+
+| Attribute | Type | Content |
+|-----------|------|---------|
+| `kind` | string | `tangent`, `pair`, `stretching`, `frequency`, `phase_advance` or `birkhoff` |
+| `spec`, `spec_sha256` | string | canonical text of the spec and its hash (the same `spec_sha256` as in the GPU record, `_config/architecture.md`, "Compute") |
+| `chain`, `members` | string list | the chain record (the form of each member) and the member names in order; a window kind holds its own name |
+| `observable_names` | string list | `birkhoff` only: one name per observable |
+| `windows`, `run_length` | int list, int | window kinds only |
+| `frame_source`, `direction_rule`, `separation` | string, string, float | `pair` only: the frame source, the direction rule, the nominal separation |
+
+Group `provenance/<member>`: one attribute per published key of that member's reducer (kept apart so that no key is overwritten); a value HDF5 does not write natively (Double64, BigFloat, a tuple) is stored as its exact text. Window kinds hold one group named by the kind.
+
+Datasets under `orbits/<n>/indicators/<id>/`:
+
+| Dataset | Type, shape | Attributes | Kinds |
+|---------|-------------|------------|-------|
+| `series` | binary64, n x c | `columns` | `tangent`, `pair`, `stretching` (at the recording grid) |
+| `final` | binary64, rows x columns | `columns`, `rows` (window or window-and-observable labels) | window kinds |
+| `flags` | int64, rows | `bits` (the bit names, in order) | window kinds; the tangent family and stretching have no flag word |
+| `scalars` | binary64 | `columns`; for `stretching` also `range` (two binary64, lo then hi: the range actually used, derived or given) | `stretching`, `phase_advance`, `birkhoff` |
+| `counts` | uint32, (bins + 2) x 2 | none | `stretching`, only for the orbits of the spec's `counts` subset |
+
+`t`, `state`, `winding`, `diagnostics/<name>` and `cost/<id>` are as for any method; `cost/<id>` of `frequency` has a sixth entry (transform seconds). A `pair` orbit has the attributes `Dx`, `Dx_r` (the realized separation), `mode`, `xi0` (two binary64); a failed pair stores `Dx_r = NaN`. Failed chunks follow the rule above (blank rows from the failure on).
+
+Group `pooled/<id>` (chunk level, `stretching` with a `counts` subset): attribute `orbits` (the number of orbits pooled) always; when all pooled orbits share one cell range (bitwise equal `range`), also `counts` (int64, (bins + 2) x 2: the exact integer sum of the orbits' counts at the last grid step) and the attribute `range` (two binary64). When they do not share it, the group holds `orbits` only (D88). The write compares the pooled and provenance groups on the read-back like the orbit data.

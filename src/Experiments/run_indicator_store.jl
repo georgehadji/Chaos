@@ -38,17 +38,39 @@ _read_provenance(f) = (pg = HDF5.open_group(f, "provenance"); Dict{String, Any}(
 # The pooled counts of a chunk (E29, D88): the exact integer sum over the orbits of the count of each cell at the last grid step, stored once per spec with the
 # range of the cells. Orbits that do not share one range (derived ranges of different K or of the linear control) have no common cells: the group then holds
 # the number of orbits and nothing else.
-function _put_pooled!(f, orbits)
+function pooled_of(orbits)
+    out = Dict{String, NamedTuple}()
     ids = sort!(unique(id for o in orbits for (id, t) in o.indicators if t.pool !== nothing))
     for id in ids
         ts = [o.indicators[id] for o in orbits if haskey(o.indicators, id) && o.indicators[id].pool !== nothing]
+        shared = all(t -> isequal(t.range, first(ts).range), ts)
+        out[id] = (orbits = length(ts), counts = shared ? reduce(+, (Int64.(t.pool) for t in ts)) : nothing, range = shared ? first(ts).range : nothing)
+    end
+    return out
+end
+
+function _put_pooled!(f, orbits)
+    for (id, p) in sort!(collect(pooled_of(orbits)); by = first)
         g = HDF5.create_group(f, "pooled/$id")
-        HDF5.write_attribute(g, "orbits", length(ts))
-        all(t -> isequal(t.range, first(ts).range), ts) || continue
-        _put_ds!(g, "counts", reduce(+, (Int64.(t.pool) for t in ts)))
-        HDF5.write_attribute(g, "range", first(ts).range)
+        HDF5.write_attribute(g, "orbits", p.orbits)
+        p.counts === nothing && continue
+        _put_ds!(g, "counts", p.counts)
+        HDF5.write_attribute(g, "range", p.range)
     end
     return nothing
+end
+
+# The pooled groups of a file, in the form of `pooled_of` (write_chunk compares the two after the write).
+function _read_pooled(f)
+    out = Dict{String, NamedTuple}()
+    haskey(f, "pooled") || return out
+    pg = HDF5.open_group(f, "pooled")
+    for id in keys(pg)
+        g = HDF5.open_group(pg, id)
+        out[id] = (orbits = Int(HDF5.read_attribute(g, "orbits")), counts = haskey(g, "counts") ? read(HDF5.open_dataset(g, "counts")) : nothing,
+                   range = haskey(HDF5.attributes(g), "range") ? HDF5.read_attribute(g, "range") : nothing)
+    end
+    return out
 end
 
 function _read_ds(g, name)

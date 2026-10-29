@@ -28,7 +28,21 @@ function indicator_entry!(e::AbstractDict, chunk, recs, plan)
 end
 
 # The table of R19: kind, canonical text, hash, chain record, windows, observables, budget lines and the terms of bytes(orbit) of the first item of the spec.
+# The table is a function of the plan alone and `write_manifest` asks for it at every chunk, so the last one is kept (R9 of the D86 review).
+const _IND_MANIFEST = Ref{Tuple{UInt, String, Dict{String, Any}}}((UInt(0), "", Dict{String, Any}()))
+const _IND_MANIFEST_LOCK = ReentrantLock()
 function indicator_manifest(plan::RunPlan)
+    key = (objectid(plan), plan.hash)
+    lock(_IND_MANIFEST_LOCK) do
+        c = _IND_MANIFEST[]
+        (c[1], c[2]) == key && return c[3]
+        t = _indicator_manifest(plan)
+        _IND_MANIFEST[] = (key..., t)
+        return t
+    end
+end
+
+function _indicator_manifest(plan::RunPlan)
     out = Dict{String, Any}()
     for spec in plan.block.raw["indicator"]
         id = spec["id"]

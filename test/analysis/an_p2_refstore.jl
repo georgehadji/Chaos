@@ -115,8 +115,8 @@ end
 function p2_ref_all(st)
     p, d = st.p, st.design
     items = p2_ref_items(st)
-    V1, V2, S, N, Det = Dict{Tuple{Int, Symbol}, Vector{Symbol}}(), Dict{Tuple{Int, Symbol}, Vector{Symbol}}(), Dict{Tuple{Int, Symbol}, Vector{Any}}(),
-                        Dict{Tuple{Int, Symbol}, Vector{Int}}(), Dict{Tuple{Int, Symbol}, Any}()
+    V1, V2, S, N, Det, Det2 = Dict{Tuple{Int, Symbol}, Vector{Symbol}}(), Dict{Tuple{Int, Symbol}, Vector{Symbol}}(), Dict{Tuple{Int, Symbol}, Vector{Any}}(),
+                              Dict{Tuple{Int, Symbol}, Vector{Int}}(), Dict{Tuple{Int, Symbol}, Any}(), Dict{Tuple{Int, Symbol}, Any}()
     for id in 1:44, X in P2_X8
         vals = [p2ref_value(items, p, id, X, k) for k in 0:9]
         any(isnothing, vals) && continue
@@ -125,7 +125,7 @@ function p2_ref_all(st)
         S[(id, X)] = Any[p2ref_score(X, v) for v in vals]
         N[(id, X)] = [haskey(v, :n) ? v.n : v.W for v in vals]
         rho = d.rho[id]
-        rho in (:C, :R) && (Det[(id, X)] = p2ref_detection(V1[(id, X)], rho, p))
+        rho in (:C, :R) && (Det[(id, X)] = p2ref_detection(V1[(id, X)], rho, p); Det2[(id, X)] = p2ref_detection(V2[(id, X)], rho, p))     # detection under R1 and under R2 (E33)
     end
     for id in 1:44
         sv = [p2ref_str(items, p, id, k) for k in 0:9]
@@ -133,24 +133,24 @@ function p2_ref_all(st)
         S[(id, :STR)] = Any[p2ref_score(:STR, v) for v in sv]
         N[(id, :STR)] = [v.n for v in sv]
     end
-    return (items = items, V1 = V1, V2 = V2, S = S, N = N, Det = Det)
+    return (items = items, V1 = V1, V2 = V2, S = S, N = N, Det = Det, Det2 = Det2)
 end
 
 # orbit records of the set statistics for a list of ids (rule :R1 or :R2)
 function p2_ref_recs(ref, ids, X_list; rule = :R1)
     V = rule === :R1 ? ref.V1 : ref.V2
     return [(id = id, V = Dict(X => V[(id, X)] for X in X_list if haskey(V, (id, X))),
-             T = Dict(X => ref.Det[(id, X)].censored for X in X_list if haskey(ref.Det, (id, X)))) for id in ids]
+             T = Dict(X => (rule === :R1 ? ref.Det : ref.Det2)[(id, X)].censored for X in X_list if haskey(ref.Det, (id, X)))) for id in ids]
 end
 
 # ---------------------------------------------------------------- expected decisions of the pipeline (E32, E33), computed from the designed study by the reference rules
 p2_lab(item, set, srule, rule, var) = "p2|$item|$set|$srule|$rule|$var"
 
-function p2_ref_h6(ref, p, ids_d, ids_l, I_dir, I_prec; E8 = false)
+function p2_ref_h6(ref, p, ids_d, ids_l, I_dir, I_prec; rule = :R1)
     items = ref.items
-    dirs = [(id = id, v = Dict(X => [(v = p2ref_value(items, p, id, X, 9; horizon = p.N_dir, dindex = d); p2ref_verdict(X, :R1, v, p)) for d in 1:5] for X in I_dir)) for id in ids_d]
-    prec = [(id = id, f64 = Dict(X => ref.V1[(id, X)][10] for X in I_prec),
-             d64 = Dict(X => p2ref_verdict(X, :R1, p2ref_value(items, p, id, X, 9; prec = "Double64", horizon = p.N_dir), p) for X in I_prec)) for id in ids_l]
+    dirs = [(id = id, v = Dict(X => [(v = p2ref_value(items, p, id, X, 9; horizon = p.N_dir, dindex = d); p2ref_verdict(X, rule, v, p)) for d in 1:5] for X in I_dir)) for id in ids_d]
+    prec = [(id = id, f64 = Dict(X => (rule === :R1 ? ref.V1 : ref.V2)[(id, X)][10] for X in I_prec),
+             d64 = Dict(X => p2ref_verdict(X, rule, p2ref_value(items, p, id, X, 9; prec = "Double64", horizon = p.N_dir), p) for X in I_prec)) for id in ids_l]
     function frac(rows, getA, getB, X)
         dec = [r for r in rows if getA(r, X) in (c_, r_) && getB(r, X) in (c_, r_)]
         return (length(dec) == 0 ? nothing : count(r -> getA(r, X) !== getB(r, X), dec) / length(dec), length(rows) - length(dec))
@@ -216,7 +216,7 @@ function p2_ref_hyp(st, ref, S, I; srule = "E_all", rule = :R1, var = "all", suf
         sd, sl = sel(S.S_D), sel(S.S_L)
         I_dir = [X for X in I if X in (:LE, :SALI, :FLI, :MEGNO)]
         I_prec = [X for X in I if X !== :RLI]
-        hh = p2_ref_h6(ref, p, sd, sl, I_dir, I_prec)
+        hh = p2_ref_h6(ref, p, sd, sl, I_dir, I_prec; rule = rule)
         out[:H6] = merge(hh, (verdict = p2ref_decide(:H6, hh, p),))
     end
     return NamedTuple(out)

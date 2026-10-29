@@ -71,7 +71,8 @@ function _p2_entry(path, k::Symbol, e)
     machine = get(e, "machine", false)
     machine isa Bool || _p2err(path, k, "has a machine field that is not true or false")
     (machine || (haskey(e, "quote") && e["quote"] isa AbstractString && !isempty(e["quote"]))) || _p2err(path, k, "has neither machine = true nor a quote")
-    return (value = _p2_value(path, k, e["value"]), raw = e["value"], section = String(e["section"]), machine = machine, qtext = machine ? "" : String(e["quote"]))
+    machine || (haskey(e, "text") && e["text"] isa AbstractString && !isempty(e["text"])) || _p2err(path, k, "has no text (the value as the section writes it)")
+    return (value = _p2_value(path, k, e["value"]), section = String(e["section"]), machine = machine, qtext = machine ? "" : String(e["quote"]), text = machine ? "" : String(e["text"]))
 end
 
 # Ranges (E22): finite reals, counts at least 1, a level strictly between 0 and 1, lists not empty.
@@ -145,9 +146,6 @@ function _p2_machine(path, p, rb)
         _p2err(path, :grid_orbit_count, "is not the product of the K count, grid_i_count and grid_j_count")
 end
 
-# The text that stands for a value in a quote (A2): Julia's `string` of the number, of each element of a list, or the text itself.
-_p2_texts(raw, v) = v isa AbstractVector ? [string(x) for x in v] : unique([string(raw), string(v)])
-
 function _p2_quotes(path, p, entries, text)
     secs = _p2_sections(text)
     for k in P2_PARAM_KEYS
@@ -155,9 +153,7 @@ function _p2_quotes(path, p, entries, text)
         e.machine && continue
         haskey(secs, e.section) || _p2err(path, k, "names the section \"$(e.section)\", which the preregistration does not have")
         occursin(replace(e.qtext, "\r\n" => "\n"), secs[e.section]) || _p2err(path, k, "has a quote that does not occur in the section \"$(e.section)\"")
-        v = getfield(p, k)
-        ok = v isa AbstractVector ? all(t -> occursin(t, e.qtext), _p2_texts(e.raw, v)) : any(t -> occursin(t, e.qtext), _p2_texts(e.raw, v))
-        ok || _p2err(path, k, "has the value $(repr(v)), whose text does not occur in its quote")
+        occursin(e.text, e.qtext) || _p2err(path, k, "has the text \"$(e.text)\", which does not occur in its quote")
     end
 end
 

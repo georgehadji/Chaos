@@ -1,14 +1,14 @@
 # D89b parameter table of study p2-indicators (E22, P9). Spec: analysis-spec.md, Amendment D89, E22, criterion D89b.
-# Reading pinned by the tests: a numeric `value` is found in its `quote` as the number written by Julia's `string` (the fixture quotes are written so);
-# the numeric-token reading of the real preregistration (1e-4, 10^4, 95 percent) is an open point of the plan.
+# Rule A2 (owner decision of the D89 stage 03 checkpoint): every key other than the 11 machine keys carries `quote` and `text`; `text` is the value as the section writes it
+# (1e-4, 0.20, 10^3, 95 percent), must occur in `quote`, and `quote` in the named section; the string form of `value` is not required to occur anywhere.
 
 p2_readp(st; params = st.params, kw...) = AN.p2_read_params(params; prereg = st.prereg, p1_params = st.p1.params, kw...)
 # a consistent prereg and table pair for the parameter set p (the quotes follow the values, the run blocks follow the windows)
-function p2_pair(tag, p; kw...)
+function p2_pair(tag, p; style = :section, kw...)
     dir = an_path("p2par-$tag"); mkpath(dir)
-    text, _ = p2_prereg_text(p)
+    text, _ = p2_prereg_text(p; style)
     pre = joinpath(dir, "prereg.md"); write(pre, text)
-    return pre, p2_write_params(joinpath(dir, "params.toml"), p; kw...)
+    return pre, p2_write_params(joinpath(dir, "params.toml"), p; style, kw...)
 end
 wrongval(v) = v isa AbstractString ? 7 : v isa AbstractVector ? "scalar" : "text"
 
@@ -26,14 +26,22 @@ end
     st = p2_cached("default")
     dir = an_path("p2par-each"); mkpath(dir)
     f = joinpath(dir, "t.toml")
-    miss = String[]; typ = String[]
+    miss = String[]; typ = String[]; notext = String[]; badtext = String[]; wrongtext = String[]
     for k in P2_PARAM_KEYS
         p2_write_params(f, st.p; drop = [k])
         an_rejects(() -> p2_readp(st; params = f), [string(k)]) || push!(miss, string(k))
         p2_write_params(f, st.p; edit = Dict(k => Dict("value" => wrongval(getfield(st.p, k)))))
         an_rejects(() -> p2_readp(st; params = f), [string(k)]) || push!(typ, string(k))
+        k in P2_MACHINE && continue
+        # A2: a missing `text`, a `text` of the wrong type and a `text` that is not in the quote are refused naming the key (47 keys each)
+        p2_write_params(f, st.p; edit = Dict(k => Dict("text" => nothing)))
+        an_rejects(() -> p2_readp(st; params = f), [string(k)]) || push!(notext, string(k))
+        p2_write_params(f, st.p; edit = Dict(k => Dict("text" => 7)))
+        an_rejects(() -> p2_readp(st; params = f), [string(k)]) || push!(wrongtext, string(k))
+        p2_write_params(f, st.p; edit = Dict(k => Dict("text" => "a text that is in no quote")))
+        an_rejects(() -> p2_readp(st; params = f), [string(k)]) || push!(badtext, string(k))
     end
-    @test isempty(miss) && isempty(typ)
+    @test isempty(miss) && isempty(typ) && isempty(notext) && isempty(wrongtext) && isempty(badtext) && length(P2_PARAM_KEYS) - length(P2_MACHINE) == 47
     # an unknown key, and a repeated key (a table defined twice), are refused naming the key
     p2_write_params(f, st.p; extra = Dict{String, Any}("bogus_key" => Dict("value" => 1, "section" => "x", "quote" => "1")))
     @test an_rejects(() -> p2_readp(st; params = f), ["bogus_key"])
@@ -78,29 +86,45 @@ end
     end
 end
 
-@testset "D89b quotes, sections, the seed and the label keys" begin
+@testset "D89b quotes, text, sections, the seed and the label keys" begin
     st = p2_cached("default")
     f = an_path("p2par-quote.toml")
-    for k in (:ratio_threshold, :min_set, :budgets, :h2_q_min, :censor_factor, :panel_sha256)
-        p2_write_params(f, st.p; edit = Dict(k => Dict("quote" => "text that is not in the section")))
+    sample = (:ratio_threshold, :min_set, :budgets, :h2_q_min, :censor_factor, :panel_sha256, :label_lambda_min, :label_rotation_tol)
+    for k in sample
+        # quote still checked: a quote (with a text that occurs in it) that is not in the section, and a section that does not exist
+        p2_write_params(f, st.p; edit = Dict(k => Dict("quote" => "text that is not in the section", "text" => "not in the")))
         @test an_rejects(() -> p2_readp(st; params = f), [string(k)])
         p2_write_params(f, st.p; edit = Dict(k => Dict("section" => "No such section")))
         @test an_rejects(() -> p2_readp(st; params = f), [string(k)])
-    end
-    # the value text must be in the quote
-    for (k, v) in ((:ratio_threshold, 7.5), (:gate_max_share, 0.5), (:h5_fmed_min, 0.33), (:b_primary, 5120))
-        p2_write_params(f, st.p; edit = Dict(k => Dict("value" => v)))
+        # the quote alone changed: the text is no longer in it
+        p2_write_params(f, st.p; edit = Dict(k => Dict("quote" => "text that is not in the section")))
         @test an_rejects(() -> p2_readp(st; params = f), [string(k)])
     end
+    # the text is the value as the section writes it: the fixture writes 1e-4, 0.20, -4, 10^3, 95 percent, 5th; Julia's string(value) is accepted as well when it is the text
+    got = p2_readp(st)
+    @test got.le_floor == 1e-4 && got.h1_u_min == 0.2 && got.e1_d_threshold == -4.0 && got.bootstrap_resamples == 1000 && got.bootstrap_level == 0.95 && got.range_lower_percentile == 5.0
+    tab = TOML.parsefile(st.params)
+    @test tab["le_floor"]["text"] == "1e-4" && occursin("1e-4", tab["le_floor"]["quote"]) && !occursin("0.0001", tab["le_floor"]["quote"])
+    pre, par = p2_pair("julia-text", merge(p2_params(), (; panel_sha256 = st.p.panel_sha256)); style = :julia)
+    tj = TOML.parsefile(par)
+    @test tj["le_floor"]["text"] == "0.0001" && tj["bootstrap_level"]["text"] == "0.95" && tj["bootstrap_resamples"]["text"] == "1000"
+    gj = AN.p2_read_params(par; prereg = pre, p1_params = st.p1.params)
+    @test all(k -> isequal(getfield(gj, k), getfield(got, k)), P2_PARAM_KEYS)
+    # the value is not matched to its text (A2): another value with the same text and quote is read as given
+    p2_write_params(f, st.p; edit = Dict(:ratio_threshold => Dict("value" => 7.5)))
+    @test p2_readp(st; params = f).ratio_threshold == 7.5
     # bootstrap_seed must equal the seed of numerics-defaults.toml
     pre, par = p2_pair("seed", p2_params(bootstrap_seed = 1, panel_sha256 = st.p.panel_sha256))
     @test an_rejects(() -> AN.p2_read_params(par; prereg = pre), ["bootstrap_seed"])
-    dflt = an_path("p2par-defaults.toml"); write(dflt, "seed = 1\n")
+    dflt = an_path("p2par-defaults.toml"); write(dflt, "seed = 1
+")
     @test an_rejects(() -> p2_readp(st; defaults = dflt), ["bootstrap_seed"])
-    write(dflt, "seed = $AN_SEED\n")
+    write(dflt, "seed = $AN_SEED
+")
     @test p2_readp(st; defaults = dflt).bootstrap_seed == AN_SEED
-    # a label key different from the P1 table key
+    # a label key different from the P1 table key (the four label keys carry a quote and a text of the P2 section that cites them)
     pre, par = p2_pair("label", p2_params(label_rotation_tol = 2e-7, panel_sha256 = st.p.panel_sha256))
     @test an_rejects(() -> AN.p2_read_params(par; prereg = pre, p1_params = st.p1.params), ["label_rotation_tol"])
     @test AN.p2_read_params(par; prereg = pre).label_rotation_tol == 2e-7
+    @test all(k -> haskey(tab[string(k)], "quote") && haskey(tab[string(k)], "text"), (:label_lambda_min, :label_growth_ratio, :label_rotation_tol, :label_estimator_bound))
 end

@@ -121,10 +121,27 @@ end
     # ROBUST iff the primary and the extension verdicts are both decidable and equal
     @test res.robust == (H1 = :ROBUST, H2 = :ROBUST, H3 = :ROBUST, H4 = :NOT_COMPARABLE, H5 = :ROBUST, H6 = :NOT_COMPARABLE)
     @test collect(keys(res.robust)) == [:H1, :H2, :H3, :H4, :H5, :H6]
-    # R2: the same statistics and decisions with verdicts of R2; the sets are those of E29; the primary decisions stay those of R1
+    # R2 (E33, owner decision of the stage 03 checkpoint): every statistic and decision of E32 recomputed with the verdicts of R2, the detection times (hence M_X, Q, R_X) and
+    # the H6 verdicts of the reference store included; the sets are those of E29; the primary decisions stay those of R1
     r2 = p2_ref_hyp(st, ref, S, P2_X7; rule = :R2)
-    @test p2_decision_diff(res.r2, r2) == String[] && res.decisions.H2.verdict === :supported
-    @test res.r2.H2.M != res.decisions.H2.M || res.r2.H1.A != res.decisions.H1.A || res.r2.H5.F != res.decisions.H5.F          # R2 changes at least one statistic
+    @test p2_decision_diff(res.r2, r2) == String[] && res.decisions.H2.verdict === :supported && collect(keys(res.r2)) == [:H1, :H2, :H3, :H4, :H5, :H6]
+    @test res.r2.H2.M != res.decisions.H2.M && res.r2.H3.R != res.decisions.H3.R && res.r2.H6.dir.delta != res.decisions.H6.dir.delta          # R2 changes the times and the H6 deltas
+    # independent hand computation of a few R2 numbers (design of an_p2_study.jl; R2: LE chaotic iff n lambda >= 3 ln n, SALI iff sali <= 1e-8).
+    # LE: the stored n lambda at n_k is r x 0.2 x n'_k, so R2 needs r >= 15 ln(n_k) / n'_k = 14.19, 7.46, 4.31, 2.51, 1.41, 0.77 at k = 0 .. 5: a chaotic row (r >= 8)
+    # is chaotic from k = 1 (8.4 < 14.19 at k = 0), a regular row (r about 1.2 to 1.45) from k = 5 (from k = 4 when id mod 5 = 4: 1.44 >= 1.405).
+    #   S2 (8 orbits): every LE onset is 1 in R2, t~ = b_1 = 80, M_LE(S2) = 80 (R1: 40). SALI: the regular rows of ids 12, 33, 36 (id mod 3 = 0) hold sali = 1e-9, chaotic under R2:
+    #   t~ = 40 for 11, 12, 33, 34, 35, 36 and 80 for 37, 38: the median is 40.
+    #   W2 (11 orbits), LE onsets in R2: 5 for 1, 3, 7, 8, 21, 22, 26 (W and W2 profiles), 5 for 5 and 23, 4 for 24 and 39 (id mod 5 = 4): t~ = 1280 nine times and 640 twice: M_LE(W2) = 1280.
+    #   R_LE = 1280 / 80 = 16 (R1: 2560 / 40 = 64).
+    @test res.r2.H2.M[:LE] == 80.0 && res.r2.H2.M[:SALI] == 40.0 && res.r2.H3.M_w[:LE] == 1280.0 && res.r2.H3.R[:LE] == 16.0 && res.decisions.H3.R[:LE] == 64.0
+    @test p2_str(res.verdicts[(11, :LE, :R2)]) == "rccccccccc" && p2_str(res.verdicts[(24, :LE, :R2)]) == "rrrrcccccc" && p2_str(res.verdicts[(36, :SALI, :R2)]) == "cccccccccc"
+    # H6 under R2 (verdicts at k = 9 of the direction and Double64 items): the regular LE row of orbit 12 in direction 5 is chaotic under R2 (r >= 1.2 > 0.067), so there is no flip,
+    # delta_dir(LE) = 0 (R1: 1/7); the SALI flip of orbit 7 in direction 3 stays (sali = 0.1, id mod 3 = 1): 1/7; the undecided FLI row of orbit 15 in direction 2 holds fli = 3,
+    # regular under R2: nothing dropped. Double64: the LE flip of orbit 11 disappears the same way (delta_prec(LE) = 0), the E2 flip of orbit 5 stays (D -1 against -9, same rule): 1/4.
+    @test res.r2.H6.dir.delta[:LE] == 0.0 && isapprox(res.r2.H6.dir.delta[:SALI], 1 / 7) && res.r2.H6.dir.dropped[:FLI] == 0 && res.r2.H6.prec.delta[:LE] == 0.0 && res.r2.H6.prec.delta[:E2] == 0.25
+    # the R2 version of the extension (I_8 on E8)
+    r2e = p2_ref_hyp(st, ref, S, P2_X8; rule = :R2, suffix = "_8", srule = "E8")
+    @test p2_decision_diff(res.r2_extension, r2e) == String[] && collect(keys(res.r2_extension)) == [:H1, :H2, :H3, :H4, :H5, :H6]
     # the gate: no gate orbit is chaotic at k = 9; RLI exists for 1 of the 2; no second version
     gate = p2_ref_gate(st, ref, S)
     @test p2_same(collect(res.gate), gate) && all(r -> !r.violated, res.gate) && isempty(res.second) && Set(r.X for r in res.gate) == Set(P2_X8)

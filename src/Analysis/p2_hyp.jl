@@ -3,10 +3,6 @@
 
 const P2_ALL = vcat(P2_I8, :STR)
 
-# E33 says the R2 version recomputes every statistic with the verdicts of R2. The stage 02 tests pin a narrower reading: under R2 only the verdict series change; the detection times
-# (M_X, Q, R_X) and the verdicts of H6 stay those of R1 (an_p2_refstore.jl, `p2_ref_recs` and `p2_ref_h6`). `true` gives the reading of the spec; see the implementation notes.
-const P2_R2_REDETECT = false
-
 """
     p2_verdict_tables(ctx, orbits, sets) -> NamedTuple
 
@@ -40,7 +36,7 @@ end
 
 # Records of E32 for a list of orbit ids: the verdicts of the rule and the censored detection times of that rule.
 function p2_records(vt, ids, I, rule)
-    det = (rule === :R1 || !P2_R2_REDETECT) ? vt.detection : vt.detection2
+    det = rule === :R1 ? vt.detection : vt.detection2
     return [(id = id, V = Dict{Symbol, Vector{Symbol}}(X => vt.verdicts[(id, X, rule)] for X in I if haskey(vt.verdicts, (id, X, rule))),
              T = Dict{Symbol, Int}(X => det[(id, X)].censored for X in I if haskey(det, (id, X)))) for id in ids]
 end
@@ -48,7 +44,6 @@ end
 # Rows of H6 (E32): the verdicts at the last budget in each direction (L1 and tangent items of horizon N_dir) and in the two precisions (Float64 primary against Double64).
 function p2_h6_rows(ctx, vt, ids_d, ids_l, I, rule)
     p = ctx.p
-    rule = P2_R2_REDETECT ? rule : :R1
     v9(id, X; kw...) = (vals = p2_values(ctx, id, X; kw...); p2_verdict(X, rule, vals[end], p))
     Idir = [X for X in I if X in (:LE, :SALI, :FLI, :MEGNO)]
     Iprec = [X for X in I if X !== :RLI]

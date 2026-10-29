@@ -506,3 +506,8 @@ Drafting checks on 2026-10-29. Read only; nothing was written under `data/`, not
 ### Owner decisions at the D89 checkpoint (2026-10-29)
 
 The spec is approved with all proposed readings of P9 to P34. The four the owner named: P13, lambda_ref and lambda at n_s of the panel come from the P2 wrapped L1 items, and the difference from the preregistration's statement (that they equal the P1 L1 values) is recorded as a deviation in the study findings; P17, an orbit undecided for E1 or WBA at every budget is undetected (censored) and stays in the regular set; P16, g_SALI = -L; P11, the figure drawers are a follow-up to the figures extension and the P2 run exits with code 2 (figures skipped) until they exist. The decision is D89 in `_config/decision-log.md`.
+
+### Owner decisions at the D89 stage 03 checkpoint (2026-10-29)
+
+- A2 (replaces the value-text rule of E22 (ii) and P9): each key other than the machine keys carries a required field `text`, the value written verbatim as the section writes it (for example `1e-4`, `10^4`, `95 percent`). `text` must occur inside `quote`, and `quote` inside the named section. The string form of `value` (Julia `string(value)`) is no longer required to occur in the quote. A missing `text`, or a `text` not in its quote, refuses and names the key. The four label keys get a `quote` and `text` from the P2 section that cites them.
+- E33 (reading confirmed): the R2 version recomputes every statistic and decision of E32 and the extension with verdicts of R2, including detection times and the H6 verdicts of the reference store; the first (R1) version stays the primary. The stage 02 tests that pinned R1 for the R2 version are wrong and are reworked.

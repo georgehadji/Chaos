@@ -24,12 +24,15 @@
             e["machine"] === true || push!(bad, "$k: machine")
         else
             occursin(e["quote"], sec) || push!(bad, "$k: quote not in section")
-            v = getfield(p, k)
-            vt = v isa AbstractVector ? join(v, ", ") : string(v)
-            k in (:gate_classes, :gate_size, :gate_k_index) ? true : (occursin(vt, e["quote"]) || push!(bad, "$k: value text $vt not in quote"))
+            haskey(e, "text") && e["text"] isa String || push!(bad, "$k: no text")
+            haskey(e, "text") && e["text"] isa String && !occursin(e["text"], e["quote"]) && push!(bad, "$k: text $(e["text"]) not in quote")
         end
     end
     @test isempty(bad)
+    # A2: the text is the value as the section writes it, often not Julia's string(value) (1e-4, 0.20, -4, 10^3, 95 percent, 5th)
+    differ = [k for k in P2_PARAM_KEYS if !(k in P2_MACHINE) && tab[string(k)]["text"] != (getfield(p, k) isa AbstractVector ? join(getfield(p, k), k === :gate_classes ? " and " : ", ") : string(getfield(p, k)))]
+    @test length(differ) >= 20 && all(k -> k in differ, (:le_floor, :bootstrap_resamples, :bootstrap_level, :h1_u_min, :e1_d_threshold, :range_lower_percentile))
+    @test tab["bootstrap_level"]["text"] == "95 percent" && tab["le_floor"]["text"] == "1e-4" && tab["bootstrap_resamples"]["text"] == "10^3" && tab["label_rotation_tol"]["text"] == "1e-7"
     # the Experiments run-block reader accepts the blocks and holds the values of the machine keys
     rb = AX.read_run_block(st.prereg)
     arm(n) = rb.raw["arm"][findfirst(a -> a["name"] == n, rb.raw["arm"])]

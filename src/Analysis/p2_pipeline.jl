@@ -1,7 +1,7 @@
 # Study p2-indicators (Amendment D89): the pipeline of the Algorithm of the amendment, in the order of its steps. Nothing is written before every check has passed.
 
 const P2_READINGS = [
-    "The parameter table holds a quote of the preregistration for every key that the run blocks do not hold, and the value is matched to the quote by Julia's string of the number (P9)",
+    "The parameter table holds a quote of the preregistration for every key that the run blocks do not hold, and the field text (the value as the section writes it) must occur in the quote and the quote in the section (P9, A2)",
     "Output of study p1-le-benchmark is unchanged except the header lines module version and git commit (P10)",
     "The figure drawers of study p2-indicators are a follow-up to the figures extension; the command writes the tables and exits with code 2 (figures skipped) (P11)",
     "The P1 labels of the panel orbits are computed in memory from the P1 reference inputs, designated by the options --p1-* or by the study layout (P12)",

@@ -1,0 +1,253 @@
+== TRANSCRIPTION ==
+E22 | table read by the module (checks of E22 i and ii, A2): keys | 58 | 58 | PASS
+E22 | keys marked machine (list) | N_1 N_c N_dir directions drift_bound grid_i_count grid_j_count grid_k_values grid_orbit_count panel_build_sha256 windows | the 11 of E22 | PASS
+T58 | b_primary = 12800 | section "M1 Budgets and horizons" | quote "Primary budget b_P = b_6 = 12800" | text "12800" | section, quote and text found; value equals the cited number | all | PASS
+T58 | bootstrap_level = 0.95 | section "M8 Sets, bootstrap, undecidable sets" | quote "the 95 percent interval is the percentile interval" | text "95 percent" | section, quote and text found; value equals the cited number | all | PASS
+T58 | bootstrap_resamples = 10000 | section "M8 Sets, bootstrap, undecidable sets" | quote "10^4 resamples of the orbits of the set" | text "10^4" | section, quote and text found; value equals the cited number | all | PASS
+T58 | bootstrap_seed = 20261012 | section "Open points for the owner at the checkpoint" | quote "the bootstrap settings (1e4 resamples, seed 20261012)" | text "20261012" | section, quote and text found; value equals the cited number | all | PASS
+T58 | budgets = [200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400] | section "M1 Budgets and horizons" | quote "Budget list B = {b_k = 200 x 2^k, k = 0 to 9} = 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400" | text "200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400" | section, quote and text found; value equals the cited number | all | PASS
+T58 | censor_factor = 2 | section "M4 Detection time and outcomes" | quote "2 N_c = 204800" | text "2" | section, quote and text found; value equals the cited number | all | PASS
+T58 | e1_d_threshold = -4.0 | section "M2 Verdicts: score and class rule of each indicator" | quote "D_E1 >= -4" | text "-4" | section, quote and text found; value equals the cited number | all | PASS
+T58 | e2_d_threshold = -4.0 | section "M2 Verdicts: score and class rule of each indicator" | quote "D_E2 >= -4" | text "-4" | section, quote and text found; value equals the cited number | all | PASS
+T58 | f_s = 0.2 | section "Weak-chaos set W2, strong-chaos set S2, sticky ensemble T_s (R4)" | quote "n_s = 1e5 and f_s = 0.2" | text "0.2" | section, quote and text found; value equals the cited number | all | PASS
+T58 | gate_classes = ["T", "R"] | section "Eligible sets" | quote "K = 0 gate set: the 80 orbits of the panel cells (K index 1, classes T and R)" | text "T and R" | section, quote and text found; value equals the cited number | all | PASS
+T58 | gate_k_index = 1 | section "Eligible sets" | quote "K = 0 gate set: the 80 orbits of the panel cells (K index 1, classes T and R)" | text "1" | section, quote and text found; value equals the cited number | all | PASS
+T58 | gate_max_share = 0.1 | section "Analysis plan" | quote "must be at most 0.10" | text "0.10" | section, quote and text found; value equals the cited number | all | PASS
+T58 | gate_size = 80 | section "Eligible sets" | quote "K = 0 gate set: the 80 orbits of the panel cells (K index 1, classes T and R)" | text "80" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h1_amin_max = 0.8 | section "H1 (claim C3, classification divergence at a fixed budget)" | quote "A_min(b_P) <= 0.80" | text "0.80" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h1_u_lower_min = 0.1 | section "H1 (claim C3, classification divergence at a fixed budget)" | quote "the lower end of its 95 percent bootstrap interval is >= 0.10" | text "0.10" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h1_u_min = 0.2 | section "H1 (claim C3, classification divergence at a fixed budget)" | quote "U(b_P) >= 0.20" | text "0.20" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h2_q_lower_gt = 3.0 | section "H2 (claim C3, detection-time divergence)" | quote "the lower end of the 95 percent bootstrap interval of Q is > 3" | text "3" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h2_q_min = 10.0 | section "H2 (claim C3, detection-time divergence)" | quote "Q >= 10" | text "10" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h3_count_min = 5 | section "H3 (detection latency, regime dependence)" | quote "for at least 5 of the 7 indicators" | text "5" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h3_r_lower_gt = 3.0 | section "H3 (detection latency, regime dependence)" | quote "the lower end of the 95 percent bootstrap interval of R_X is > 3" | text "3" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h3_r_min = 10.0 | section "H3 (detection latency, regime dependence)" | quote "R_X >= 10" | text "10" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h4_dphi_lower_min = 0.25 | section "H4 (claim C3, sticky orbits)" | quote "the lower end of its 95 percent bootstrap interval is >= 0.25" | text "0.25" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h4_dphi_min = 0.5 | section "H4 (claim C3, sticky orbits)" | quote "Delta_phi >= 0.50" | text "0.50" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h5_fmed_lower_min = 0.05 | section "H5 (classification stability over the budget)" | quote "the lower end of the 95 percent bootstrap interval of F_med is >= 0.05" | text "0.05" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h5_fmed_min = 0.1 | section "H5 (classification stability over the budget)" | quote "F_med >= 0.10" | text "0.10" | section, quote and text found; value equals the cited number | all | PASS
+T58 | h6_flip_min = 0.05 | section "H6 (classification stability under direction and precision)" | quote "max_X delta_dir(X) >= 0.05" | text "0.05" | section, quote and text found; value equals the cited number | all | PASS
+T58 | label_estimator_bound = 1.0e-8 | section "Reference class rho(o)" | quote "above the P1 H1a bound at N_1 gives U" | text "P1 H1a bound" | section, quote and text found | weak quote: no number of its own; value held by P1 key h1a_bound = 1.0e-8 and the P1 text "<= 1e-8" in section "H1" (equal) | INFO (weak quote)
+T58 | label_growth_ratio = 5.0 | section "Reference class rho(o)" | quote "the same two label rules (P1 "Label rules"" | text "Label rules" | section, quote and text found | weak quote: no number of its own; value held by P1 key growth_ratio = 5.0 and the P1 text "r(N) >= 5" in section "Label rules" (equal) | INFO (weak quote)
+T58 | label_lambda_min = 0.0001 | section "Reference class rho(o)" | quote "the same two label rules (P1 "Label rules"" | text "Label rules" | section, quote and text found | weak quote: no number of its own; value held by P1 key lambda_threshold = 0.0001 and the P1 text "1e-4" in section "Label rules" (equal) | INFO (weak quote)
+T58 | label_rotation_tol = 1.0e-7 | section "Reference class rho(o)" | quote "structure axis from the rotation numbers of the recorded orbit points" | text "rotation numbers" | section, quote and text found | weak quote: no number of its own; value held by P1 key rotation_tol = 1.0e-7 and the P1 text "1e-7" in section "Label rules" (equal) | INFO (weak quote)
+T58 | le_floor = 0.0001 | section "M2 Verdicts: score and class rule of each indicator" | quote "lambda_1(n) >= 1e-4 and r_LE >= 5" | text "1e-4" | section, quote and text found; value equals the cited number | all | PASS
+T58 | min_set = 20 | section "M8 Sets, bootstrap, undecidable sets" | quote "A set with fewer than 20 orbits" | text "20" | section, quote and text found; value equals the cited number | all | PASS
+T58 | n_s = 100000 | section "Weak-chaos set W2, strong-chaos set S2, sticky ensemble T_s (R4)" | quote "n_s = 1e5 and f_s = 0.2" | text "1e5" | section, quote and text found; value equals the cited number | all | PASS
+T58 | panel_sha256 = "881874d26aa8883caa0545331ba167a3f2c9e3c249cdb6ba32ad39c98ad348d5" | section "Panel P (reused by reference)" | quote "SHA-256 `881874d26aa8883caa0545331ba167a3f2c9e3c249cdb6ba32ad39c98ad348d5`" | text "881874d26aa8883caa0545331ba167a3f2c9e3c249cdb6ba32ad39c98ad348d5" | section, quote and text found; value equals the cited number | all | PASS
+T58 | persist_divisor = 4 | section "M4 Detection time and outcomes" | quote "b_k <= N_c / 4" | text "4" | section, quote and text found; value equals the cited number | all | PASS
+T58 | plan_sha256 = "3823fa4a89fee047ab1f9ca63fee3d4e2dafa372c50b1d63c6de244fa8a18a81" | section "Amendment A2 (2026-10-29)" | quote "the plan hash of the pilot (3823fa4a89fee047ab1f9ca63fee3d4e2dafa372c50b1d63c6de244fa8a18a81) is the plan hash of the run" | text "3823fa4a89fee047ab1f9ca63fee3d4e2dafa372c50b1d63c6de244fa8a18a81" | section, quote and text found; value equals the cited number | all | PASS
+T58 | r2_fli_factor = 3.0 | section "M2 Verdicts: score and class rule of each indicator" | quote "FLI: fli(n) >= 3 ln n" | text "3" | section, quote and text found; value equals the cited number | all | PASS
+T58 | r2_le_factor = 3.0 | section "M2 Verdicts: score and class rule of each indicator" | quote "LE: n lambda_1(n) >= 3 ln n" | text "3" | section, quote and text found; value equals the cited number | all | PASS
+T58 | r2_megno_threshold = 2.5 | section "M2 Verdicts: score and class rule of each indicator" | quote "MEGNO: Ybar20_1(n) >= 2.5" | text "2.5" | section, quote and text found; value equals the cited number | all | PASS
+T58 | r2_sali_threshold = 1.0e-8 | section "M2 Verdicts: score and class rule of each indicator" | quote "SALI: SALI(n) <= 1e-8" | text "1e-8" | section, quote and text found; value equals the cited number | all | PASS
+T58 | range_lower_percentile = 5.0 | section "M10 Regular range of sticky orbits (naff-fma R4, weighted-birkhoff R4)" | quote "from the 5th to the 95th percentile" | text "5th" | section, quote and text found; value equals the cited number | all | PASS
+T58 | range_upper_percentile = 95.0 | section "M10 Regular range of sticky orbits (naff-fma R4, weighted-birkhoff R4)" | quote "from the 5th to the 95th percentile" | text "95th" | section, quote and text found; value equals the cited number | all | PASS
+T58 | ratio_threshold = 5.0 | section "M2 Verdicts: score and class rule of each indicator" | quote "r_SALI >= 5" | text "5" | section, quote and text found; value equals the cited number | all | PASS
+T58 | rli_threshold = 1.0e-7 | section "M2 Verdicts: score and class rule of each indicator" | quote "RLI >= 1e-7" | text "1e-7" | section, quote and text found; value equals the cited number | all | PASS
+T58 | s2_lambda_min = 1.0 | section "Weak-chaos set W2, strong-chaos set S2, sticky ensemble T_s (R4)" | quote "S2 (strong chaos): lambda_ref >= 1.0" | text "1.0" | section, quote and text found; value equals the cited number | all | PASS
+T58 | w2_lambda_max = 0.1 | section "Weak-chaos set W2, strong-chaos set S2, sticky ensemble T_s (R4)" | quote "W2 (weak chaos): lambda_ref <= 0.1" | text "0.1" | section, quote and text found; value equals the cited number | all | PASS
+T58 | wba_digits_threshold = 6.0 | section "M2 Verdicts: score and class rule of each indicator" | quote "dig_min < 6" | text "6" | section, quote and text found; value equals the cited number | all | PASS
+T58 | keys with a quote checked (sections, quotes, texts, values); failures; weak quotes | 47 keys; 0 failures; 4 weak | 0 failures | PASS
+T58 | machine key N_1 = 10000000 against the run blocks (10000000) | true | equal | PASS
+T58 | machine key N_c = 102400 against the run blocks (102400) | true | equal | PASS
+T58 | machine key N_dir = 1000000 against the run blocks (1000000) | true | equal | PASS
+T58 | machine key directions = ["pi/4", "0.3", "0.3 + pi/5", "0.3 + 2pi/5", "0.3 + 3pi/5"] against the run blocks (["pi/4", "0.3", "0.3 + pi/5", "0.3 + 2pi/5", "0.3 + 3pi/5"]) | true | equal | PASS
+T58 | machine key drift_bound = 1.0e6 against the run blocks (1.0e6) | true | equal | PASS
+T58 | machine key grid_i_count = 24 against the run blocks (24) | true | equal | PASS
+T58 | machine key grid_j_count = 12 against the run blocks (12) | true | equal | PASS
+T58 | machine key grid_k_values = ["0.5", "0.75", "0.971635406", "1.25", "1.5707963267948966", "2", "3", "6.2831853071795865"] against the run blocks (["0.5", "0.75", "0.971635406", "1.25", "1.5707963267948966", "2", "3", "6.2831853071795865"]) | true | equal | PASS
+T58 | machine key grid_orbit_count = 2304 against the run blocks (2304) | true | equal | PASS
+T58 | machine key panel_build_sha256 = "650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46" against the run blocks ("650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46") | true | equal | PASS
+T58 | machine key windows = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200] against the run blocks ([100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200]) | true | equal | PASS
+T58 | windows equal in every window spec of the run block; budgets = 2 x windows; N_c = 2 x largest window = last budget; b_primary = element 7 of budgets (b_6) | true | true | PASS
+T58 | grid_orbit_count = K count x grid_i_count x grid_j_count = number of [[run.h4]] tables | true | true | PASS
+T58 | bootstrap_seed equals seed of numerics-defaults.toml | true | true | PASS
+T58 | the four label keys equal the P1 table keys lambda_threshold, growth_ratio, rotation_tol, h1a_bound | true | true | PASS
+T58 | P1 parameter table still has exactly 37 keys (D89a V) | 37 | 37 | PASS
+T58 | typo edits of the table made by this verification (quotes or sections) | 0 | list every edit | INFO
+T58 | total failures of the transcription | 0 | 0 | PASS
+== RUN ==
+D89r | inputs fingerprinted before the run (SHA-256): files in all, of them in the P2 store | 2066 (695 P2 chunks, 1363 P1 chunks, manifests, panel, preregistrations, tables, defaults) | 695 P2 chunks | PASS
+D89r | listing of the data tree before the run: files, SHA-256 of (path, size, mtime) | 3374 files, fb9f38c118749f0388cfc3a1140cb26f0929d168a11a5257cb21658eb8f5e20a | - | INFO
+D89x | wall time of analyze on the real P2 and P1 stores, 23 threads, first call included (s) | 50.9959 | <= 900 s | PASS
+D89x | peak resident memory of the process after the run at 23 threads (GiB) | 1.842 | <= 8 GiB | PASS
+D89x | allocated by analyze (GiB), garbage-collector time (s) | 34.7, 2.8 | - | INFO
+D89x | status of the run and the exit code it stands for | figures_skipped, exit code 2 | 0 or 2 | PASS
+D89p | the tables file is the only file in --out | p2-indicators-tables.md | p2-indicators-tables.md | PASS
+D89r | inputs unchanged after run 1 (SHA-256 of all files) | true | true | PASS
+D89r | data tree listing unchanged after run 1 | true | true | PASS
+D89u | digest lines of F1 to F6 in the tables file equal the digests of the data tables | true | true | PASS
+D89q | tables file at 23 threads against 1 thread: byte-identical (1-thread run 38.2 s, status figures_skipped) | true | true | PASS
+D89r | inputs unchanged after run 2 (1 thread) | true | true | PASS
+D89q | tables file at 23 threads against 4 threads: byte-identical (4-thread run 29.2 s) | true | true | PASS
+D89r | inputs unchanged after run 3 (4 threads) | true | true | PASS
+D89r | data tree listing unchanged after run 3 | true | true | PASS
+D89x | peak resident memory of the process after all three runs (GiB, cumulative maximum) | 2.21958 | - | INFO
+D89r | --out inside data/ refused and the folder not created | true | true | PASS
+D89r | inputs and data tree unchanged after the refusal | true | true | PASS
+== REPORT ==
+D89x | size of E_all | total 2974, panel 789, grid 2185; by K: 0.0=80 0.5=425 0.75=258 0.971635406=442 1.25=265 1.5707963267948966=454 2.0=279 3.0=286 6.283185307179586=405 10.0=80 | - | INFO
+D89x | size of E8 | total 2236, panel 51, grid 2185; by K: 0.0=8 0.5=275 0.75=258 0.971635406=276 1.25=265 1.5707963267948966=283 2.0=279 3.0=286 6.283185307179586=298 10.0=8 | - | INFO
+D89x | size of W2 | total 214, panel 125, grid 89; by K: 0.5=99 0.75=23 0.971635406=83 1.25=1 1.5707963267948966=5 2.0=2 6.283185307179586=1 | - | INFO
+D89x | size of S2 | total 448, panel 161, grid 287; by K: 6.283185307179586=368 10.0=80 | - | INFO
+D89x | size of T_s | total 30, panel 15, grid 15; by K: 0.5=8 0.75=2 0.971635406=12 1.25=1 1.5707963267948966=5 2.0=2 | - | INFO
+D89x | size of T_s^design | total 96, panel 96, grid 0; by K: 0.5=21 0.971635406=37 1.5707963267948966=37 6.283185307179586=1 | - | INFO
+D89x | size of regular set | total 1159, panel 315, grid 844; by K: 0.0=80 0.5=326 0.75=224 0.971635406=189 1.25=86 1.5707963267948966=126 2.0=61 3.0=31 6.283185307179586=36 | - | INFO
+D89x | size of gate set | total 80, panel 80, grid 0; by K: 0.0=80 | - | INFO
+D89x | size of S_D* | total 109, panel 109, grid 0; by K: 0.0=14 0.5=19 0.971635406=21 1.5707963267948966=22 6.283185307179586=19 10.0=14 | - | INFO
+D89x | size of S_L* | total 51, panel 51, grid 0; by K: 0.0=8 0.5=7 0.971635406=8 1.5707963267948966=10 6.283185307179586=10 10.0=8 | - | INFO
+D89x | size of W2_8 | total 90, panel 1, grid 89; by K: 0.5=6 0.75=23 0.971635406=57 1.25=1 1.5707963267948966=1 2.0=2 | - | INFO
+D89x | size of S2_8 | total 303, panel 16, grid 287; by K: 6.283185307179586=295 10.0=8 | - | INFO
+D89x | size of T_s_8 | total 15, panel 0, grid 15; by K: 0.5=1 0.75=2 0.971635406=8 1.25=1 1.5707963267948966=1 2.0=2 | - | INFO
+D89x | W2 and S2 overlap; dropped orbits (reasons) | 0; 213 (control: 13, unresolved: 200) | - | INFO
+D89x | T_s against min_set = 20 | decidable (30 orbits) | - | INFO
+D89x | W2 against min_set | decidable (214) | - | INFO
+D89x | S2 against min_set | decidable (448) | - | INFO
+D89x | T_s^design against min_set | decidable (96) | - | INFO
+D89x | S_D* against min_set | decidable (109) | - | INFO
+D89x | S_L* against min_set | decidable (51) | - | INFO
+D89x | reference class counts C, R, U: panel (883 orbits), grid (2304 orbits) | panel [475, 315, 93], grid [1341, 844, 119] | - | INFO
+D89x | PRIMARY (R1, I_7, E_all) H1: orbits 214, decided for all 214, dropped 0; U 0.3037383178 interval [0.2429906542, 0.3644859813]; A_min 0.7570093458; U on S2 0; mean kappa 0.4804289178 | SUPPORTED | - | INFO
+D89x | PRIMARY (R1, I_7, E_all) H1 A_XY: LE-SALI=0.9953271028 LE-FLI=0.9672897196 LE-MEGNO=0.9252336449 LE-E1=0.8130841121 LE-E2=0.8364485981 LE-WBA=0.8785046729 SALI-FLI=0.9719626168 SALI-MEGNO=0.9205607477 SALI-E1=0.8177570093 SALI-E2=0.8411214953 SALI-WBA=0.8831775701 FLI-MEGNO=0.9112149533 FLI-E1=0.8364485981 FLI-E2=0.8598130841 FLI-WBA=0.8831775701 MEGNO-E1=0.7570093458 MEGNO-E2=0.7803738318 MEGNO-WBA=0.8317757009 E1-E2=0.9205607477 E1-WBA=0.8411214953 E2-WBA=0.8644859813 |  | - | INFO
+D89x | PRIMARY (R1, I_7, E_all) H2: orbits S2 448; M_X LE=200 SALI=200 FLI=200 MEGNO=200 E1=200 E2=200 WBA=200; Q 1 interval [1, 1] | NOT SUPPORTED | - | INFO
+D89x | PRIMARY (R1, I_7, E_all) H3: orbits W2 214, S2 448; M_W2 LE=1600 SALI=1600 FLI=3200 MEGNO=3200 E1=2400 E2=400 WBA=200; M_S2 LE=200 SALI=200 FLI=200 MEGNO=200 E1=200 E2=200 WBA=200; R_X [lo, hi] LE=8 [8, 16] SALI=8 [4, 16] FLI=16 [8, 16] MEGNO=16 [8, 16] E1=12 [4, 32] E2=2 [1, 4] WBA=1 [1, 1]; indicators passing 3 | NOT SUPPORTED | - | INFO
+D89x | PRIMARY (R1, I_7, E_all) H4: orbits T_s 30; phi_X SALI=0.2 FLI=0.2666666667 MEGNO=0.2333333333 E1=0.7 E2=0.6333333333 WBA=0.06666666667; decided SALI=30 FLI=30 MEGNO=30 E1=30 E2=30 WBA=30; Delta_phi 0.6333333333 interval [0.4666666667, 0.8] | SUPPORTED | - | INFO
+D89x | PRIMARY (R1, I_7, E_all) H4 on T_s^design: orbits 96; phi_X SALI=0.05208333333 FLI=0.05208333333 MEGNO=0.0625 E1=0.2291666667 E2=0.07291666667 WBA=0.01041666667; Delta_phi 0.21875 interval [0.1354166667, 0.3020833333] | NOT SUPPORTED (statistic of record) | - | INFO
+D89x | PRIMARY (R1, I_7, E_all) H5: orbits W2 214; F_X LE=0.1775700935 SALI=0.1822429907 FLI=0.2056074766 MEGNO=0.2394366197 E1=0.2009345794 E2=0.08411214953 WBA=0.02803738318; F_med 0.1822429907 interval [0.1308411215, 0.2289719626] | SUPPORTED | - | INFO
+D89x | PRIMARY (R1, I_7, E_all) H6: orbits S_D* 109, S_L* 51; delta_dir LE=0 (dropped 7) SALI=0.04587155963 (dropped 0) FLI=0 (dropped 0) MEGNO=0 (dropped 9); delta_prec LE=0 (dropped 3) SALI=0 (dropped 0) FLI=0 (dropped 0) MEGNO=0 (dropped 4) E1=0.01960784314 (dropped 0) E2=0 (dropped 0) WBA=0 (dropped 0) | NOT SUPPORTED | - | INFO
+D89x | ROBUST flags H1..H6 (primary against the I_8 extension) | H1=ROBUST H2=ROBUST H3=ROBUST H4=NOT COMPARABLE H5=ROBUST H6=NOT ROBUST | - | INFO
+D89x | EXTENSION (R1, I_8, E8) H1: orbits 90, decided for all 90, dropped 0; U 0.2777777778 interval [0.1888888889, 0.3777777778]; A_min 0.7666666667; U on S2 0; mean kappa 0.4749949865 | SUPPORTED | - | INFO
+D89x | EXTENSION (R1, I_8, E8) H1 A_XY: LE-SALI=1 LE-FLI=0.9888888889 LE-MEGNO=0.9111111111 LE-E1=0.8555555556 LE-E2=0.8777777778 LE-WBA=0.9111111111 LE-RLI=0.9 SALI-FLI=0.9888888889 SALI-MEGNO=0.9111111111 SALI-E1=0.8555555556 SALI-E2=0.8777777778 SALI-WBA=0.9111111111 SALI-RLI=0.9 FLI-MEGNO=0.9 FLI-E1=0.8666666667 FLI-E2=0.8888888889 FLI-WBA=0.9222222222 FLI-RLI=0.8888888889 MEGNO-E1=0.7666666667 MEGNO-E2=0.7888888889 MEGNO-WBA=0.8666666667 MEGNO-RLI=0.8777777778 E1-E2=0.9555555556 E1-WBA=0.8333333333 E1-RLI=0.8 E2-WBA=0.8777777778 E2-RLI=0.8444444444 WBA-RLI=0.9666666667 |  | - | INFO
+D89x | EXTENSION (R1, I_8, E8) H2: orbits S2 303; M_X LE=200 SALI=200 FLI=200 MEGNO=200 E1=200 E2=200 WBA=200 RLI=200; Q 1 interval [1, 1] | NOT SUPPORTED | - | INFO
+D89x | EXTENSION (R1, I_8, E8) H3: orbits W2 90, S2 303; M_W2 LE=1600 SALI=1600 FLI=1600 MEGNO=3200 E1=3200 E2=400 WBA=200 RLI=400; M_S2 LE=200 SALI=200 FLI=200 MEGNO=200 E1=200 E2=200 WBA=200 RLI=200; R_X [lo, hi] LE=8 [4, 16] SALI=8 [4, 16] FLI=8 [4, 32] MEGNO=16 [8, 32] E1=16 [3, 576] E2=2 [1, 4] WBA=1 [1, 1] RLI=2 [2, 4]; indicators passing 1 | NOT SUPPORTED | - | INFO
+D89x | EXTENSION (R1, I_8, E8) H4: orbits T_s 15; phi_X SALI=0.2 FLI=0.2666666667 MEGNO=0.2666666667 E1=0.4666666667 E2=0.5333333333 WBA=0.06666666667 RLI=0; decided SALI=15 FLI=15 MEGNO=15 E1=15 E2=15 WBA=15 RLI=15; Delta_phi 0.5333333333 interval [0.3333333333, 0.8] | NOT DECIDABLE | - | INFO
+D89x | EXTENSION (R1, I_8, E8) H4 on T_s^design: orbits 96; phi_X SALI=0.05208333333 FLI=0.05208333333 MEGNO=0.0625 E1=0.2291666667 E2=0.07291666667 WBA=0.01041666667 RLI=0; Delta_phi 0.2291666667 interval [undefined, undefined] | NOT DECIDABLE (statistic of record) | - | INFO
+D89x | EXTENSION (R1, I_8, E8) H5: orbits W2 90; F_X LE=0.1888888889 SALI=0.1888888889 FLI=0.1777777778 MEGNO=0.2333333333 E1=0.2333333333 E2=0.07777777778 WBA=0.03333333333 RLI=0.02222222222; F_med 0.1833333333 interval [0.1111111111, 0.25] | SUPPORTED | - | INFO
+D89x | EXTENSION (R1, I_8, E8) H6: orbits S_D* 51, S_L* 51; delta_dir LE=0 (dropped 6) SALI=0.07843137255 (dropped 0) FLI=0 (dropped 0) MEGNO=0 (dropped 7); delta_prec LE=0 (dropped 3) SALI=0 (dropped 0) FLI=0 (dropped 0) MEGNO=0 (dropped 4) E1=0.01960784314 (dropped 0) E2=0 (dropped 0) WBA=0 (dropped 0) | SUPPORTED | - | INFO
+D89x | R2 (I_7, E_all) H1: orbits 214, decided for all 214, dropped 0; U 0.2289719626 interval [0.1728971963, 0.285046729]; A_min 0.7990654206; U on S2 0; mean kappa 0.3763112002 | SUPPORTED | - | INFO
+D89x | R2 (I_7, E_all) H1 A_XY: LE-SALI=0.9579439252 LE-FLI=0.9906542056 LE-MEGNO=0.9672897196 LE-E1=0.8411214953 LE-E2=0.8644859813 LE-WBA=0.9813084112 SALI-FLI=0.9672897196 SALI-MEGNO=0.9906542056 SALI-E1=0.7990654206 SALI-E2=0.8224299065 SALI-WBA=0.9579439252 FLI-MEGNO=0.976635514 FLI-E1=0.8317757009 FLI-E2=0.8551401869 FLI-WBA=0.9813084112 MEGNO-E1=0.808411215 MEGNO-E2=0.8317757009 MEGNO-WBA=0.9672897196 E1-E2=0.9205607477 E1-WBA=0.8411214953 E2-WBA=0.8644859813 |  | - | INFO
+D89x | R2 (I_7, E_all) H2: orbits S2 448; M_X LE=200 SALI=200 FLI=200 MEGNO=200 E1=200 E2=200 WBA=200; Q 1 interval [1, 1] | NOT SUPPORTED | - | INFO
+D89x | R2 (I_7, E_all) H3: orbits W2 214, S2 448; M_W2 LE=400 SALI=200 FLI=400 MEGNO=200 E1=2400 E2=400 WBA=200; M_S2 LE=200 SALI=200 FLI=200 MEGNO=200 E1=200 E2=200 WBA=200; R_X [lo, hi] LE=2 [1, 2] SALI=1 [1, 1] FLI=2 [1, 2] MEGNO=1 [1, 2] E1=12 [4, 32] E2=2 [1, 4] WBA=1 [1, 1]; indicators passing 1 | NOT SUPPORTED | - | INFO
+D89x | R2 (I_7, E_all) H4: orbits T_s 30; phi_X SALI=0 FLI=0 MEGNO=0 E1=0.7 E2=0.6333333333 WBA=0.06666666667; decided SALI=30 FLI=30 MEGNO=30 E1=30 E2=30 WBA=30; Delta_phi 0.7 interval [0.5666666667, 0.8666666667] | SUPPORTED | - | INFO
+D89x | R2 (I_7, E_all) H4 on T_s^design: orbits 96; phi_X SALI=0 FLI=0 MEGNO=0 E1=0.2291666667 E2=0.07291666667 WBA=0.01041666667; Delta_phi 0.2291666667 interval [0.1458333333, 0.3125] | NOT SUPPORTED (statistic of record) | - | INFO
+D89x | R2 (I_7, E_all) H5: orbits W2 214; F_X LE=0.04205607477 SALI=0.004672897196 FLI=0.03271028037 MEGNO=0.009345794393 E1=0.2009345794 E2=0.08411214953 WBA=0.02803738318; F_med 0.03271028037 interval [0.01401869159, 0.06074766355] | NOT SUPPORTED | - | INFO
+D89x | R2 (I_7, E_all) H6: orbits S_D* 109, S_L* 51; delta_dir LE=0 (dropped 0) SALI=0.06422018349 (dropped 0) FLI=0 (dropped 0) MEGNO=0 (dropped 0); delta_prec LE=0 (dropped 0) SALI=0 (dropped 0) FLI=0 (dropped 0) MEGNO=0 (dropped 0) E1=0.01960784314 (dropped 0) E2=0 (dropped 0) WBA=0 (dropped 0) | SUPPORTED | - | INFO
+D89x | R2 extension (I_8, E8) H1: orbits 90, decided for all 90, dropped 0; U 0.2222222222 interval [0.1444444444, 0.3111111111]; A_min 0.7777777778; U on S2 0; mean kappa 0.3900355859 | SUPPORTED | - | INFO
+D89x | R2 extension (I_8, E8) H1 A_XY: LE-SALI=0.9555555556 LE-FLI=0.9888888889 LE-MEGNO=0.9777777778 LE-E1=0.8222222222 LE-E2=0.8666666667 LE-WBA=0.9888888889 LE-RLI=0.9777777778 SALI-FLI=0.9666666667 SALI-MEGNO=0.9777777778 SALI-E1=0.7777777778 SALI-E2=0.8222222222 SALI-WBA=0.9444444444 SALI-RLI=0.9777777778 FLI-MEGNO=0.9888888889 FLI-E1=0.8111111111 FLI-E2=0.8555555556 FLI-WBA=0.9777777778 FLI-RLI=0.9888888889 MEGNO-E1=0.8 MEGNO-E2=0.8444444444 MEGNO-WBA=0.9666666667 MEGNO-RLI=1 E1-E2=0.9555555556 E1-WBA=0.8333333333 E1-RLI=0.8 E2-WBA=0.8777777778 E2-RLI=0.8444444444 WBA-RLI=0.9666666667 |  | - | INFO
+D89x | R2 extension (I_8, E8) H2: orbits S2 303; M_X LE=200 SALI=200 FLI=200 MEGNO=200 E1=200 E2=200 WBA=200 RLI=200; Q 1 interval [1, 1] | NOT SUPPORTED | - | INFO
+D89x | R2 extension (I_8, E8) H3: orbits W2 90, S2 303; M_W2 LE=400 SALI=200 FLI=400 MEGNO=400 E1=3200 E2=400 WBA=200 RLI=400; M_S2 LE=200 SALI=200 FLI=200 MEGNO=200 E1=200 E2=200 WBA=200 RLI=200; R_X [lo, hi] LE=2 [2, 4] SALI=1 [1, 2] FLI=2 [2, 4] MEGNO=2 [2, 2] E1=16 [3, 576] E2=2 [1, 4] WBA=1 [1, 1] RLI=2 [2, 4]; indicators passing 0 | NOT SUPPORTED | - | INFO
+D89x | R2 extension (I_8, E8) H4: orbits T_s 15; phi_X SALI=0 FLI=0 MEGNO=0 E1=0.4666666667 E2=0.5333333333 WBA=0.06666666667 RLI=0; decided SALI=15 FLI=15 MEGNO=15 E1=15 E2=15 WBA=15 RLI=15; Delta_phi 0.5333333333 interval [0.2666666667, 0.8] | NOT DECIDABLE | - | INFO
+D89x | R2 extension (I_8, E8) H4 on T_s^design: orbits 96; phi_X SALI=0 FLI=0 MEGNO=0 E1=0.2291666667 E2=0.07291666667 WBA=0.01041666667 RLI=0; Delta_phi 0.2291666667 interval [undefined, undefined] | NOT DECIDABLE (statistic of record) | - | INFO
+D89x | R2 extension (I_8, E8) H5: orbits W2 90; F_X LE=0.04444444444 SALI=0 FLI=0.03333333333 MEGNO=0.02222222222 E1=0.2333333333 E2=0.07777777778 WBA=0.03333333333 RLI=0.02222222222; F_med 0.03333333333 interval [0.005555555556, 0.06666666667] | NOT SUPPORTED | - | INFO
+D89x | R2 extension (I_8, E8) H6: orbits S_D* 51, S_L* 51; delta_dir LE=0 (dropped 0) SALI=0.07843137255 (dropped 0) FLI=0 (dropped 0) MEGNO=0 (dropped 0); delta_prec LE=0 (dropped 0) SALI=0 (dropped 0) FLI=0 (dropped 0) MEGNO=0 (dropped 0) E1=0.01960784314 (dropped 0) E2=0 (dropped 0) WBA=0 (dropped 0) | SUPPORTED | - | INFO
+D89x | R2 verdicts H1..H6 (reported, not decisive) | H1=SUPPORTED H2=NOT SUPPORTED H3=NOT SUPPORTED H4=SUPPORTED H5=NOT SUPPORTED H6=SUPPORTED | - | INFO
+D89x | gate T12 LE: decided 80, chaotic 0, undecided 0, not applicable 0, share chaotic 0, limit 0.1 | not violated | - | INFO
+D89x | gate T12 SALI: decided 80, chaotic 0, undecided 0, not applicable 0, share chaotic 0, limit 0.1 | not violated | - | INFO
+D89x | gate T12 FLI: decided 80, chaotic 0, undecided 0, not applicable 0, share chaotic 0, limit 0.1 | not violated | - | INFO
+D89x | gate T12 MEGNO: decided 80, chaotic 0, undecided 0, not applicable 0, share chaotic 0, limit 0.1 | not violated | - | INFO
+D89x | gate T12 E1: decided 75, chaotic 0, undecided 5, not applicable 0, share chaotic 0, limit 0.1 | not violated | - | INFO
+D89x | gate T12 E2: decided 80, chaotic 0, undecided 0, not applicable 0, share chaotic 0, limit 0.1 | not violated | - | INFO
+D89x | gate T12 WBA: decided 75, chaotic 0, undecided 5, not applicable 0, share chaotic 0, limit 0.1 | not violated | - | INFO
+D89x | gate T12 RLI: decided 8, chaotic 0, undecided 0, not applicable 72, share chaotic 0, limit 0.1 | not violated | - | INFO
+D89x | second versions produced (violating indicators) | none | - | INFO
+D89x | extension H6(b): indicators with a Double64 item (RLI has none) | E1 FLI MEGNO LE E2 WBA SALI | - | INFO
+D89v | K = 0 line (T16), window 100: largest circle distance of nu1 to p0/(2 pi): fq1; pa1; non-finite left out (fq1, pa1) | 8.775008181e-06; 2.220446049e-16; 5, 0 | tabulated, no gate | INFO
+D89v | K = 0 line (T16), window 200: largest circle distance of nu1 to p0/(2 pi): fq1; pa1; non-finite left out (fq1, pa1) | 4.501250755e-07; 2.220446049e-16; 5, 0 | tabulated, no gate | INFO
+D89v | K = 0 line (T16), window 400: largest circle distance of nu1 to p0/(2 pi): fq1; pa1; non-finite left out (fq1, pa1) | 1.779706599e-08; 2.220446049e-16; 5, 0 | tabulated, no gate | INFO
+D89v | K = 0 line (T16), window 800: largest circle distance of nu1 to p0/(2 pi): fq1; pa1; non-finite left out (fq1, pa1) | 1.559941065e-10; 1.110223025e-16; 5, 0 | tabulated, no gate | INFO
+D89v | K = 0 line (T16), window 1600: largest circle distance of nu1 to p0/(2 pi): fq1; pa1; non-finite left out (fq1, pa1) | 1.141137185e-11; 1.110223025e-16; 5, 0 | tabulated, no gate | INFO
+D89v | K = 0 line (T16), window 3200: largest circle distance of nu1 to p0/(2 pi): fq1; pa1; non-finite left out (fq1, pa1) | 5.050404539e-13; 1.110223025e-16; 5, 0 | tabulated, no gate | INFO
+D89v | K = 0 line (T16), window 6400: largest circle distance of nu1 to p0/(2 pi): fq1; pa1; non-finite left out (fq1, pa1) | 1.665334537e-16; 2.220446049e-16; 5, 0 | tabulated, no gate | INFO
+D89v | K = 0 line (T16), window 12800: largest circle distance of nu1 to p0/(2 pi): fq1; pa1; non-finite left out (fq1, pa1) | 5.551115123e-17; 2.220446049e-16; 5, 0 | tabulated, no gate | INFO
+D89v | K = 0 line (T16), window 25600: largest circle distance of nu1 to p0/(2 pi): fq1; pa1; non-finite left out (fq1, pa1) | 5.551115123e-17; 2.220446049e-16; 5, 0 | tabulated, no gate | INFO
+D89v | K = 0 line (T16), window 51200: largest circle distance of nu1 to p0/(2 pi): fq1; pa1; non-finite left out (fq1, pa1) | 5.551115123e-17; 2.220446049e-16; 5, 0 | tabulated, no gate | INFO
+D89v | control_deviation stored against recomputed over 10 controls: largest difference (E36 n) | 0 | <= 1e-12 | PASS
+D89v | omissions recomputed from the store (spec: orbits), equal to the manifest not_applicable; flag counts equal the manifest per chunk (E36 p, g: the run did not refuse) | bk1: 883; fq1: 883 | equal | PASS
+D89x | header of the tables file: chunks, items, seed, module version, commit | 695 chunks, 26964 items, seed 20261012, module 0.1.2, commit b7927243f44454f78bee207664a946b1959d8c82 | 695 chunks, 26964 items | PASS
+== COMPARE ==
+D89w | independent results file: lines, SHA-256 of the file | 14180, ef2f1714be4b7614ddd07635037052c2718162b4ccc664a8df8f1a793af513a7 | - | INFO
+D89w | family Fb: compared / equal / not in the module | 320 / 320 / 0 | all equal | PASS
+D89w | family Phi: compared / equal / not in the module | 116 / 116 / 0 | all equal | PASS
+D89w | family R1: compared / equal / not in the module | 6 / 6 / 0 | all equal | PASS
+D89w | family R1.I7: compared / equal / not in the module | 162 / 162 / 0 | all equal | PASS
+D89w | family R1.I8: compared / equal / not in the module | 181 / 170 / 0 | all equal | FAIL
+D89w | family R2: compared / equal / not in the module | 6 / 6 / 0 | all equal | PASS
+D89w | family R2.I7: compared / equal / not in the module | 162 / 160 / 0 | all equal | FAIL
+D89w | family R2.I8: compared / equal / not in the module | 181 / 173 / 0 | all equal | FAIL
+D89w | family T11: compared / equal / not in the module | 200 / 200 / 0 | all equal | PASS
+D89w | family T15: compared / equal / not in the module | 45 / 45 / 0 | all equal | PASS
+D89w | family T16: compared / equal / not in the module | 33 / 33 / 0 | all equal | PASS
+D89w | family agree: compared / equal / not in the module | 784 / 784 / 0 | all equal | PASS
+D89w | family auc: compared / equal / not in the module | 4680 / 4680 / 0 | all equal | PASS
+D89w | family ctrl: compared / equal / not in the module | 117 / 117 / 0 | all equal | PASS
+D89w | family det: compared / equal / not in the module | 400 / 400 / 0 | all equal | PASS
+D89w | family drop: compared / equal / not in the module | 5 / 5 / 0 | all equal | PASS
+D89w | family gate: compared / equal / not in the module | 48 / 48 / 0 | all equal | PASS
+D89w | family k0line: compared / equal / not in the module | 20 / 20 / 0 | all equal | PASS
+D89w | family label: compared / equal / not in the module | 47 / 47 / 0 | all equal | PASS
+D89w | family leave: compared / equal / not in the module | 192 / 192 / 0 | all equal | PASS
+D89w | family leavek: compared / equal / not in the module | 112 / 112 / 0 | all equal | PASS
+D89w | family meankappa: compared / equal / not in the module | 4 / 4 / 0 | all equal | PASS
+D89w | family rho: compared / equal / not in the module | 48 / 48 / 0 | all equal | PASS
+D89w | family rhocell: compared / equal / not in the module | 87 / 87 / 0 | all equal | PASS
+D89w | family rng: compared / equal / not in the module | 2880 / 2880 / 0 | all equal | PASS
+D89w | family sdim: compared / equal / not in the module | 2 / 2 / 0 | all equal | PASS
+D89w | family size: compared / equal / not in the module | 150 / 150 / 0 | all equal | PASS
+D89w | family spearman: compared / equal / not in the module | 112 / 112 / 0 | all equal | PASS
+D89w | family step: compared / equal / not in the module | 60 / 60 / 0 | all equal | PASS
+D89w | family tdet: compared / equal / not in the module | 426 / 426 / 0 | all equal | PASS
+D89w | family vcount: compared / equal / not in the module | 2560 / 2560 / 0 | all equal | PASS
+D89w | TOTAL compared (all quantities), equal; of them interval ends (within 0.05 of the width) compared, equal | 14146, 14125; 100, 93 | all equal | FAIL
+D89w | independent lines skipped (selfchecks, reader checks, U_repdrop, chunk flag totals), by family | R1.I7 1, R1.I8 1, R2.I7 1, R2.I8 1, T16 2, reader 11, selfcheck 16, selfcheck_summary 1 | - | INFO
+D89w | independent names with no module counterpart (not compared) | none | none | PASS
+DIFF | R1.I8 | R1.I8|H1|U_hi: independent 0.36666666666666664, module 0.37777777777777777
+DIFF | R1.I8 | R1.I8|H4design|n_Ts: independent 2, module 96
+DIFF | R1.I8 | R1.I8|H4design|phi|SALI: independent 0.0, module 0.052083333333333336
+DIFF | R1.I8 | R1.I8|H4design|phi|FLI: independent 0.0, module 0.052083333333333336
+DIFF | R1.I8 | R1.I8|H4design|phi|MEGNO: independent 0.0, module 0.0625
+DIFF | R1.I8 | R1.I8|H4design|phi|E1: independent 0.0, module 0.22916666666666666
+DIFF | R1.I8 | R1.I8|H4design|phi|E2: independent 0.0, module 0.072916666666666671
+DIFF | R1.I8 | R1.I8|H4design|phi|WBA: independent 0.0, module 0.010416666666666666
+DIFF | R1.I8 | R1.I8|H4design|dphi: independent 0.0, module 0.22916666666666666
+DIFF | R1.I8 | R1.I8|H4design|dphi_lo: independent 0.0, module NaN
+DIFF | R1.I8 | R1.I8|H4design|dphi_hi: independent 0.0, module NaN
+DIFF | R2.I7 | R2.I7|H3|npass: independent 0, module 1
+DIFF | R2.I7 | R2.I7|H4|dphi_lo: independent 0.5333333333333333, module 0.56666666666666665
+DIFF | R2.I8 | R2.I8|H1|U_lo: independent 0.13333333333333333, module 0.14444444444444443
+DIFF | R2.I8 | R2.I8|H4design|n_Ts: independent 2, module 96
+DIFF | R2.I8 | R2.I8|H4design|phi|E1: independent 0.0, module 0.22916666666666666
+DIFF | R2.I8 | R2.I8|H4design|phi|E2: independent 0.0, module 0.072916666666666671
+DIFF | R2.I8 | R2.I8|H4design|phi|WBA: independent 0.0, module 0.010416666666666666
+DIFF | R2.I8 | R2.I8|H4design|dphi: independent 0.0, module 0.22916666666666666
+DIFF | R2.I8 | R2.I8|H4design|dphi_lo: independent 0.0, module NaN
+DIFF | R2.I8 | R2.I8|H4design|dphi_hi: independent 0.0, module NaN
+D89w | module names (in the naming of the independent file) that the independent file lacks, by family |  | - | INFO
+D89w | K values with an incomplete regular range (independent prints 'no range'; module leaving budget for those, not compared) | none | - | INFO
+D89p | T1: orbits over the rows (source, K index) = orbits of P and G; rho counts C + R + U = orbits | 3187 (3187) | 3187 | PASS
+D89p | T2 (I17): pooled rows checked, rows whose chaotic + regular + undecided + not applicable differ from the set size; by-source and by-K row groups that do not sum to the set size | 320, 0; 0 | 0, 0 | PASS
+D89w | mean kappa of H1 (module statistic, Kahan sum) against the independent mean kappa W2 b_P | 5.55112e-17 | <= 1e-12 | PASS
+O10 | panel orbits per cell and label pair, module (P1 labelling inside the P2 run) against T6 of the accepted P1 tables: cells, orbits, cells that differ | 47 vs 47, 883 vs 883, 0 | 0 differ | PASS
+O7/O8 | independent self checks (kappa and AUC closed forms, exact bootstrap, Spearman against scipy, pilot rule check of 192 verdicts) | 16 PASS of 16 | all PASS | PASS
+D89v | independent reader: O10 panel label counts per (K index, class, instability, structure) equal T6 of the P1 tables | PASS cells 47 vs T6 47, orbits 883 vs 883 | PASS | PASS
+D89v | independent reader: O10 final labels equal those of the D60 independent recomputation (analysis-independent-results.txt) | PASS listed 883, differing 0 | PASS | PASS
+D89v | independent reader: E24 [[run.h4]] table count equals grid_orbit_count | PASS 2304 | PASS | PASS
+D89v | independent reader: E24 all grid orbits: stored params and ic equal the table K, x0, p0; K index and label recovered | PASS bad 0 | PASS | PASS
+D89v | independent reader: E24 all panel orbits: stored ic equals panel decimal texts, params equals panel K | PASS bad 0 | PASS | PASS
+D89v | independent reader: O9a prefix consistency (L1 and tangent chain, horizon 1e6 against 1e7) for S_D orbits | PASS orbits 172, values compared 340560, differences 0 | PASS | PASS
+D89v | independent reader: O9b flag counts recomputed from the stored flag words equal the manifest indicator_flags per chunk | PASS window chunks 213, with listed flags 136, differing 0 | PASS | PASS
+D89v | independent reader: O9c omissions recomputed from the store equal the manifest not_applicable; E25 item presence for orbit sets | PASS fq1 omitted [883] manifest [883]; bk1 omitted [883] manifest [883] | PASS | PASS
+D89v | independent reader: O9d stored control_deviation equals its recomputation to 1e-12 | PASS controls with the attribute 10, largest difference 0.0 | PASS | PASS
+D89v | independent reader: E36k drift flags equal the recomputation from the stored points (max |p| above drift_bound) | PASS flagged orbits [881] | PASS | PASS
+D89v | independent reader: files, series items, window items, anomalies | {"k": "meta", "files": 695, "series_items": 16165, "window_items": 10111, "anomalies": 0} | anomalies 0 | INFO
+== P1UNCH ==
+D89a | P1 analyze on the real P1 inputs: status, time (s); lines in the new and in the accepted tables file | ok, 26.9; 18103 and 18103 | status ok | PASS
+D89a | lines that differ from the accepted p1-le-benchmark-tables.md (all must be the two header lines module version and git commit) | 2: line 10: "- module version: 0.0.1" -> "- module version: 0.1.2"; line 11: "- git commit: d31b655d0c33e2f2f1a67bbbdeba9c8c8a3fd036" -> "- git commit: b7927243f44454f78bee207664a946b1959d8c82" | <= 2, header lines only | PASS
+D89a | figure data digests F1 to F7 equal the accepted ones | 7 digests, equal true | equal | PASS
+== CLI ==
+D89s | bin/chaoslab.jl analyze on the real P2 inputs (P1 reference inputs by the study layout): exit code; says figures skipped | 2; true | 2; true | PASS
+D89s | tables file of the command (default P1 designation) against the file of the API run with explicit P1 options: byte-identical; only file in --out | true | true | PASS
+D89s | unknown option and too few arguments: exit code | 1 | 1 | PASS
+D89s | --p1-store with the P1 preregistration: usage error, exit code, nothing written | 1, false | 1, false | PASS
+D89a | P1 parameter table given with the P2 preregistration: refused, exit code, nothing written | 1, false | 1, false | PASS
+TOTAL | PASS 133 | FAIL 4 | INFO 88 | 2026-10-29 23:37

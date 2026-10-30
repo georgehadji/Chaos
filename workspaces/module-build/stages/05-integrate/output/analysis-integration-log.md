@@ -76,3 +76,97 @@ Short hashes are the commits above that touched the file. Stage paths are relati
 - `stages/04-verify/output/analysis-verification.md` (687dfdf)
 - `stages/04-verify/output/analysis-verify-log.txt` (687dfdf)
 - `stages/05-integrate/output/analysis-integration-log.md` (this log)
+
+## Amendment D89 (fourth scope: study p2-indicators), stage 05
+
+Branch: `main` (commits pushed, no force-push). Decisions D89 (spec, stage 01) and D90 (stage 04 checkpoint).
+
+### Catalog rows flipped
+
+None, as for the base module: `analysis` is not a catalog method or system.
+
+Evidence: `stages/04-verify/output/analysis-verification.md` (section "Amendment D89 (stage 04)"), accepted at the stage 04 checkpoint (2026-10-30) with the two owner readings of D90. After the rework: verify log PASS 137, FAIL 0, INFO 88; 14,146 of 14,146 quantities equal to the independent HDF5-only implementation (one count, R2 I_7 H3 `npass`, differs by the one lower end that moved and is a tolerated count); analysis folder suite 1214 pass; full `Pkg.test()` passes; real run 48.8 s at 23 threads, 1.88 GiB peak (limits 15 min and 8 GB); the P1 `analyze` tables file differs from the accepted one in the two header lines only; independent review closed (0 CRITICAL, 1 HIGH fixed, 7 MEDIUM, 4 LOW).
+
+Updated in this stage: `CHANGELOG.md` (entry for the amendment and the schema note), `_config/decision-log.md` (D90), `schema/run-store.md` (P34: the value of a flag bit is 2^(j-1) for the name at position j of `bits`; no change of format), `src/Analysis/CONTEXT.md` (stage 03).
+
+### Open (not verified or deferred)
+
+- The figure drawers for the P2 figures F1 to F6 (P11): `analyze` writes the figure data and exits with code 2, status `figures_skipped`, until the extension has them (decision D89, follow-up).
+- Not verified: the input changed during the run (E36 o) beyond a before and after hash; cold-cache timing; draw-by-draw equality of the bootstrap generators (they differ by design); the pilot-store half of D89y (P30: that store is not in the repository); the second versions of T3 to T8, per-orbit values, most by-source and by-K point values, F5, F6, T17 and the layout and digests of the tables file on the independent side.
+- The comparison tolerance and the T_s^design reading were settled after the first comparison showed the differences, so the pass after them is not a blind test of those two.
+- Unexplained: an `InterruptException` appeared in one analysis folder-suite run of the module-build session and once in a subagent's run; reruns were clean. Nothing in the code raises interrupts.
+- Follow-ups for the owner: U1 (runner accepts a subset of the grid), U2 (the P1 labels are not a tracked file), U3 (T_s size risk), the P2 figure drawers; M4 exit tasks (results accepted, `_config/risks.md` review, minor release); the LOW findings of D86 (R6, R7, R10, R11, R12, F2); CI for recent commits has not been checked.
+
+### Commits (stage paths relative to `workspaces/module-build/`)
+
+- `f7f0df2` stage 01: D89 in the decision log, owner decisions of the checkpoint appended to the spec
+- `99905e9` stage 02: tests (19 files), plan with criterion map, owner decisions A1 and A2
+- `a3ca6dd` stage 03: implementation (p2 files in `src/Analysis`, dispatch on the study slug, p2 CLI options), A1 slug rename in 3 P1 test files
+- `9ed8855` stage 02/03 rework: A2 `text` field per parameter key, E33 R2 version recomputed with R2 verdicts
+- `b792724` stage 04 (part): independent review fixes (K pooling by K value and others), review tests, independent implementation and results, draft parameter table
+- `c3288a3` stage 04: verification (real-store run, transcription of the 58-key table, comparison, report)
+- `03a2519` stage 04 rework: T_s^design intersected with E8 in the extension, D89w tolerance, re-verification
+- (this log) `analysis integration log (D89)`: the commit that adds this section, with the changelog, decision-log and schema edits.
+
+### Files changed on `main` for D89 (short hashes of the commits above that touched the file)
+
+- `_config/decision-log.md` (f7f0df2, this log)
+- `bench/analysis.jl` (a3ca6dd)
+- `src/Analysis/Analysis.jl` (a3ca6dd)
+- `src/Analysis/CONTEXT.md` (a3ca6dd)
+- `src/Analysis/cli.jl` (a3ca6dd)
+- `src/Analysis/p2_agree.jl` (a3ca6dd, b792724)
+- `src/Analysis/p2_boot.jl` (a3ca6dd)
+- `src/Analysis/p2_check.jl` (a3ca6dd, b792724)
+- `src/Analysis/p2_dispatch.jl` (a3ca6dd)
+- `src/Analysis/p2_hitems.jl` (a3ca6dd, b792724)
+- `src/Analysis/p2_hyp.jl` (a3ca6dd, 9ed8855, 03a2519)
+- `src/Analysis/p2_items.jl` (a3ca6dd, b792724)
+- `src/Analysis/p2_orbits.jl` (a3ca6dd)
+- `src/Analysis/p2_params.jl` (a3ca6dd, 9ed8855, b792724)
+- `src/Analysis/p2_pipeline.jl` (a3ca6dd, 9ed8855, b792724, 03a2519)
+- `src/Analysis/p2_render.jl` (a3ca6dd)
+- `src/Analysis/p2_report.jl` (a3ca6dd, b792724)
+- `src/Analysis/p2_ritems.jl` (a3ca6dd, b792724)
+- `src/Analysis/p2_rules.jl` (a3ca6dd, b792724)
+- `src/Analysis/p2_sets.jl` (a3ca6dd)
+- `src/Analysis/p2_stat.jl` (a3ca6dd)
+- `src/Analysis/p2_store.jl` (a3ca6dd)
+- `src/Analysis/pipeline.jl` (a3ca6dd)
+- `test/analysis/an_cli.jl` (a3ca6dd)
+- `test/analysis/an_helpers.jl` (a3ca6dd)
+- `test/analysis/an_p2_agreement.jl` (99905e9)
+- `test/analysis/an_p2_bootstrap.jl` (99905e9)
+- `test/analysis/an_p2_build.jl` (99905e9, b792724)
+- `test/analysis/an_p2_detection.jl` (99905e9)
+- `test/analysis/an_p2_dispatch.jl` (99905e9)
+- `test/analysis/an_p2_fixture.jl` (99905e9, 9ed8855)
+- `test/analysis/an_p2_helpers.jl` (99905e9, 9ed8855, b792724)
+- `test/analysis/an_p2_output.jl` (99905e9, b792724)
+- `test/analysis/an_p2_params.jl` (99905e9, 9ed8855, b792724)
+- `test/analysis/an_p2_pipeline.jl` (99905e9, 9ed8855, b792724, 03a2519)
+- `test/analysis/an_p2_ref.jl` (99905e9)
+- `test/analysis/an_p2_refstore.jl` (99905e9, 9ed8855, b792724, 03a2519)
+- `test/analysis/an_p2_refusals.jl` (99905e9)
+- `test/analysis/an_p2_reported.jl` (99905e9, b792724)
+- `test/analysis/an_p2_review.jl` (b792724)
+- `test/analysis/an_p2_sets.jl` (99905e9)
+- `test/analysis/an_p2_stats.jl` (99905e9)
+- `test/analysis/an_p2_study.jl` (99905e9, b792724)
+- `test/analysis/an_p2_variant.jl` (99905e9)
+- `test/analysis/an_p2_verdicts.jl` (99905e9)
+- `test/analysis/an_pipeline.jl` (a3ca6dd)
+- `test/analysis/runtests.jl` (99905e9, b792724)
+- `verify/analysis-p2-decision.py` (b792724)
+- `verify/analysis-p2-independent.jl` (b792724)
+- `verify/analysis-p2.jl` (c3288a3, 03a2519)
+- `workspaces/module-build/stages/01-spec/output/analysis-spec.md` (f7f0df2, 9ed8855, 03a2519)
+- `workspaces/module-build/stages/02-tests/output/analysis-test-plan.md` (99905e9, 9ed8855, b792724, 03a2519)
+- `workspaces/module-build/stages/03-implement/output/analysis-d89-impl-notes.md` (a3ca6dd, 9ed8855, b792724, 03a2519)
+- `workspaces/module-build/stages/04-verify/output/analysis-p2-independent-results.txt` (b792724)
+- `workspaces/module-build/stages/04-verify/output/analysis-p2-verify-log.txt` (c3288a3, 03a2519)
+- `workspaces/module-build/stages/04-verify/output/analysis-verification.md` (c3288a3, 03a2519)
+- `workspaces/study/stages/04-analyze/references/p2-indicators-analysis-parameters.toml` (b792724)
+- `CHANGELOG.md` (this log)
+- `schema/run-store.md` (this log)
+- `workspaces/module-build/stages/05-integrate/output/analysis-integration-log.md` (this log)

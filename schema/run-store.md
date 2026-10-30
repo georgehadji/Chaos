@@ -118,7 +118,7 @@ Datasets under `orbits/<n>/indicators/<id>/`:
 |---------|-------------|------------|-------|
 | `series` | binary64, n x c | `columns` | `tangent`, `pair`, `stretching` (at the recording grid) |
 | `final` | binary64, rows x columns | `columns`, `rows` (window or window-and-observable labels) | window kinds |
-| `flags` | int64, rows | `bits` (the bit names, in order) | window kinds; the tangent family and stretching have no flag word |
+| `flags` | int64, rows | `bits` (the bit names, in order; the name at 1-based position j has the value 2^(j-1), so the first name is 1, the second 2, and a word is the sum of the values of its set bits; stored words fit this, for example a `mirror1` word 128 and a `degenerate` + `refined1` + `refined2` word 1538 = 2 + 512 + 1024; fixed by P34 of Amendment D89, no change of the format) | window kinds; the tangent family and stretching have no flag word |
 | `scalars` | binary64 | `columns`; for `stretching` also `range` (two binary64, lo then hi: the range actually used, derived or given) | `stretching`, `phase_advance`, `birkhoff` |
 | `counts` | uint32, (bins + 2) x 2 | none | `stretching`, only for the orbits of the spec's `counts` subset |
 

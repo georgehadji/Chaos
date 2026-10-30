@@ -37,3 +37,4 @@ include(joinpath(@__DIR__, "an_p2_variant.jl"))      # drift orbit, sticky orbit
 include(joinpath(@__DIR__, "an_p2_reported.jl"))     # T11, T15, T16, T17
 include(joinpath(@__DIR__, "an_p2_output.jl"))       # D89p, D89q, D89r, D89s, D89u
 include(joinpath(@__DIR__, "an_p2_review.jl"))       # review findings of stage 04 (K value pooling, infinite percentiles, stripped attributes, text against value, ...)
+include(joinpath(@__DIR__, "an_p2_figures.jl"))      # D91 (module side of the figure drawers: a fake FIGURE_DRAWER, status, command lines, layering); the pictures are verify/analysis-p2-figures.jl

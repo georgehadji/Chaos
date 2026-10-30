@@ -396,3 +396,69 @@ The 79 new tests: 31 pass (guards and unchanged behaviour listed in the table), 
 
 - E8 extension: T_s^design is intersected with E8. Tests: `an_p2_pipeline.jl` ("D89 default scenario: extension ...", design n 2 in the primary, 1 in the extension and in its R2 version) and the test-side reference `p2_ref_hyp` (`sel(S.T_s_design)`). Before the reading the reference used the whole ensemble.
 - D89w tolerance (real-store comparison only, `verify/analysis-p2.jl`, no suite test): max(0.05 of the width, one lattice step) for U, Delta_phi and F_med ends; the count R2 H3 `npass` may differ by the number of moved lower ends.
+
+## Amendment D91 (stage 02)
+
+Spec: `analysis-spec.md`, Amendment D91 (E38 to E45, I22 to I29, criteria D91a to D91o, owner decisions at the D91 stage 01 checkpoint: P35 to P42 approved as drafted). Tests: new file `test/analysis/an_p2_figures.jl`, registered last in `test/analysis/runtests.jl`. `src/`, `ext/`, `data/`, the spec and the frozen preregistration are untouched.
+
+CairoMakie is not a test dependency, so the package suite (tag S) tests only what the analysis layer does around a drawer. The pictures (files, text, plotted numbers, layout, determinism, edge cases, the owner check) are tag V and belong to the stage 04 verify script `verify/analysis-p2-figures.jl`. The drawer in the suite is a FAKE assigned to `Chaoslab.Analysis.FIGURE_DRAWER[]` (the previous value is restored in `finally`; no plotting package is loaded). The fake writes nothing, records each call (the result, the output folder, the tables file as it was at call time, a copy of the received tables with their digests) and raises a given message when asked. Reused, not copied: the P2 fixture (`p2_cached("default")`, `p2_run`, `p2_cli_args`), the P1 fixture (`an_cached("default")`, `an_run`, `an_cli_args`), the independent `p2_digest(cols, rows)` of `an_p2_ref.jl` next to the module's `p2_digest(t)`, `an_files`, `an_path`. No random draw, so no seed: every value is the fixture's own and no regression number is written in the tests.
+
+### Contract proposed by the tests (where the spec fixes the behaviour but not the form)
+
+- The drawer is called as the P1 drawer is, `FIGURE_DRAWER[](res, out)`, once, after the tables file `<out>/p2-indicators-tables.md` is complete (E45: "after the tables file is written"). The test reads the tables file at call time and compares it with the final file.
+- `res.study == "p2-indicators"` and `res.figures` is keyed by the strings "F1" to "F6" (as `res.figures["F7"]` of P1); each value has `.columns` and `.rows`, equal to the table `res.items.F1` to `res.items.F6`. The module's `p2_digest` of the received table and the independent `p2_digest(cols, rows)` both equal `res.digests[k]` and the `digest:` line of the block "## Fk data" of the tables file. For P1 the keys are exactly "F1" to "F7".
+- The status is `:ok` (drawer returned), `:figures_failed` (drawer raised) or `:figures_skipped` (no drawer). The command prints `tables written: ...` and then one of: a last line beginning `figures written in` (exit 0); a line beginning `figures failed` that contains the exception text of the drawer verbatim (exit 2); a line beginning `figures skipped` that names the plotting package ("plotting package" or "CairoMakie") and the verify environment and does not say "not built yet" (exit 2). For P2 the old text "see the warning above" does not appear. For P1 the two old lines are pinned word for word: `figures failed: the tables are written, see the warning above` and `figures skipped: the plotting package is not loaded (run under the verify environment)`.
+
+### Criterion to test
+
+| Criterion | Tag | Test (testset of `an_p2_figures.jl`) | What it pins, or why it is not a suite test |
+|-----------|-----|--------------------------------------|---------------------------------------------|
+| D91a Files | V | stage 04 verify script. Module-side hook: "D91b I22 O11: ..." and "D91o I26: ..." | the six PDF files, the signature "%PDF-", sizes and one page need a real drawer and the plotting package. The suite pins only that the hook is called once, with the output folder, and that a drawer which writes nothing leaves the tables file alone |
+| D91b Digests | S, V | "D91b I22 O11: the drawer is called once, after the tables file, with F1 to F6 equal to the items; the digests agree ..." (22 tests) | one call; `.study`; keys F1 to F6; columns and rows of each equal to `res.items.Fk`; module digest, independent digest, `res.digests[k]` and the digest line of the block in the tables file equal; the tables file complete at call time. The row counts 112, 528, 320, 2700, 2304, 489 and the digest recomputed by a script that shares no code are V (real tables file) |
+| D91c Tables unchanged | S, V | "D91c I23: the tables file with a drawer equals, byte for byte, the file of a run without figures; the drawer is not called without figures" | fixture: the tables file (and the digests) of the run with the fake drawer, by the command too, equals the file of the run with `figures = false`, which does not call the drawer. The six literal digests of D91c, the accepted file of stage 04 and the two header lines are V (real inputs) |
+| D91d Status | S, V | "D91d E45: status ok and exit code 0 ..."; "D91d E45: a drawer that raises ..."; "D91d E45: no drawer loaded ..." | ok: status `:ok`, exit 0, last line `figures written in`. Raising drawer (`F6 row 12: step value 0 cannot be drawn on a logarithmic axis`): status `:figures_failed`, tables file intact and equal to the run without figures, line `figures failed` containing the message, no "see the warning above", exit 2. No drawer: `:figures_skipped`, line `figures skipped` naming the plotting package and the verify environment, no "not built yet", exit 2, no PDF. V: the real drawer on a fixture block with a non-positive D_str names F6 and the row, and the real inputs give exit 0 |
+| D91e P1 unchanged | S, V | "D91e I24: P1 with a drawer ..."; "D91e I24: P1 messages and exit codes unchanged ..."; and the existing guard "D89a P1 path unchanged" (`an_p2_dispatch.jl`: golden hash of the P1 tables file, the seven digests, exit codes, refusal messages) | P1 fixture: the fake gets `.figures` keyed exactly F1 to F7 and the study p1-le-benchmark; tables file and digests equal to the run without figures; failing and missing drawer lines word for word, exit 2. V: real P1 inputs, the eleven files and their renders |
+| D91f Layout | V | stage 04 verify script | page size, smallest text scaled to 504 pt, one page: read from the PDF |
+| D91g Text content | V | stage 04 verify script | text of the page: read from the PDF |
+| D91h Plotted numbers | V | stage 04 verify script | re-read of 20 points per figure and of all cells of F1 and F5 from the PDF |
+| D91i Counts of the drawing | V | stage 04 verify script | panels, lines, cells and gaps counted on the page |
+| D91j Cost | V | stage 04 verify script | wall time of the figure step, file sizes, peak memory: measured on the real run (the suite has no real drawer to time) |
+| D91k Determinism | V | stage 04 verify script. The tables part is already pinned by "D89r read-only ...; D89q determinism ..." (`an_p2_output.jl`) and by D91c above | two renders of each PDF are equal: needs the real drawer |
+| D91l Owner visual check | V, human | stage 04 checkpoint | a human judgement, not a measurement |
+| D91m Edge cases | V | stage 04 verify script | fixture blocks drawn by the real drawer (no RLI, an all-nothing K, minimum set, single K index, changing count, single budget): needs the plotting package |
+| D91n Layering and dependencies | S | "D91n I29: the analysis layer loads no plotting package, the figures layer imports the analysis layer and the plotting package only"; "D91n I29: the dependency lists are unchanged ..."; and the existing "AC20 layering ..." (`an_cli.jl`), "D89t layering and dependencies" (`an_p2_dispatch.jl`), `test/layering.jl` | only what was missing was added: comment-stripped code of `src/Analysis` names no plotting package (Makie of any kind, Plots, PyPlot, Gadfly, PlotlyJS, UnicodePlots, VegaLite, Gnuplot), has no `Base.require`, `@eval using`, `Requires`, `Pkg.add`, and nothing in `src/Analysis` assigns `FIGURE_DRAWER[]` (only the extension does); every `using` and `import` of the CairoMakie extension names only Chaoslab and CairoMakie; `[weakdeps]` is exactly CairoMakie and CUDA, `[extensions]` is exactly the two known, `[compat]` CairoMakie is "0.15" (CUDA "6"), neither is a hard dependency, `[deps]` is exactly the eleven of today |
+| D91o Read-only | S, V | "D91o I26: a drawer that writes nothing leaves the output folder with the tables file only" | with the fake drawer the output folder holds exactly the tables file (analyze and command). Hashes of inputs and of the data tree, and the six PDF files of a real drawer, are V. The fingerprints of inputs and data tree are already pinned for P2 by "D89r read-only ..." (`an_p2_output.jl`) |
+
+### What the tests cannot cover, and readings
+
+- The drawing criteria D91a, D91f to D91m (tag V in the spec) are not suite tests, by design.
+- E45 "names the figure and the row or the cause". At the module level the cause is the exception text of the drawer. The test pins that the command line contains that text verbatim. That the real drawer's message names F6 and the row is V (D91d, D91m). How the module carries the text from the exception to the command (a field of the result) is not named by the spec and not pinned.
+- The wording of the skipped line for P2 is a reading: it must name the plotting package ("plotting package" or "CairoMakie") and the verify environment, and not say "not built yet". The exact text is open (the P1 text satisfies all three).
+- "After the tables file is written" (E45) is read as: the file is complete when the drawer is called. The order F1 to F6 of drawing is the drawer's matter (V).
+- I29 "imports the analysis layer and the plotting package only" is read strictly: the extension may import only Chaoslab and CairoMakie. If stage 03 needs a standard-library import in the extension (Printf, Statistics) the test must be widened by decision, not silently. `verify/Project.toml` is not pinned (it is the verification environment, not the dependency list of the package).
+- Not pinned: whether `res.figures` exists when `figures = false`; whether the objects of `res.figures` are the same objects as those of `res.items`.
+
+### RED log (2026-10-30)
+
+Only the new file was run, with `julia --project -t 4 --check-bounds=yes` on a driver in the scratchpad folder that includes the helpers as `runtests.jl` does (`an_helpers`, `an_p2_ref`, `an_p2_helpers`, `an_p2_study`, `an_p2_build`, `an_p2_refstore`) and then the new file inside one testset. The one-line `an_cli_args` of `an_cli.jl` (included earlier by `runtests.jl`) is defined in the driver, because including `an_cli.jl` would run its testsets. The full suite was not run. Time of the file: 67 s.
+
+| Run | Pass | Fail | Error | Total |
+|-----|------|------|-------|-------|
+| `an_p2_figures.jl` against the module at HEAD c2f01e6 | 40 | 33 | 0 | 73 |
+
+Ten testsets. The 33 failures are all caused by the missing D91 behaviour (the P2 pipeline never calls the drawer: status stays `:figures_skipped`, the line says "not built yet"); there is no parse error, no error in a helper, no UndefVarError:
+
+| Testset | Pass | Fail | Why it fails now |
+|---------|------|------|------------------|
+| D91b I22 O11 | 0 | 22 | the drawer is not called (no call, so no study, no `.figures`, no tables at call time, no digests received) |
+| D91d status ok, exit 0 | 0 | 4 | status is `:figures_skipped`, the drawer is not called, exit code 2, no "figures written in" line |
+| D91d raising drawer | 3 | 4 | drawer not called; status `:figures_skipped` not `:figures_failed`; no line "figures failed", the line "figures skipped" appears. (Passing: tables intact, exit 2, only the tables file) |
+| D91d no drawer | 6 | 3 | the line says "the figure drawers of study p2-indicators are not built yet": no plotting package named, no verify environment, "not built yet" present. (Passing: status, tables, exit 2, no PDF, drawer restored, figures=false gives `:ok`) |
+| D91o read-only | 3 | 0 | guard: a drawer that writes nothing leaves the tables file only (passes now because the drawer is not called) |
+| D91c tables unchanged | 3 | 0 | guard: passes now and must stay |
+| D91e P1 with a drawer | 7 | 0 | guard: P1 behaviour of the base module |
+| D91e P1 messages | 5 | 0 | guard |
+| D91n layering | 7 | 0 | guard: the layering holds before the drawers exist and must hold after |
+| D91n dependency lists | 6 | 0 | guard |
+
+After stage 03 implements the P2 drawer hook (and the drawers in the extension) the expected result is 73 of 73.

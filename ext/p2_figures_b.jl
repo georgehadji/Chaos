@@ -12,7 +12,10 @@ function p2f4_rows(t)
         return (x = p2indicator("F4", r, row[c["indicator"]], vcat(P2_I8, "STR")), k = p2num("F4", r, "k", row[c["k"]]; lo = 0), K = row[c["K"]],
                 nC = p2num("F4", r, "n_C", row[c["n_C"]]; lo = 0), nR = p2num("F4", r, "n_R", row[c["n_R"]]; lo = 0), auc = auc)
     end)
-    return filter(!isnothing, rows)
+    rows = filter(!isnothing, rows)
+    keys_ = [(r.x, r.k, r.K) for r in rows]
+    length(unique(keys_)) == length(keys_) || throw(ErrorException("F4: an indicator, budget index and K appear in more than one pooled row"))
+    return rows
 end
 
 function p2f4_panel!(ax, sel, ks)
@@ -27,19 +30,27 @@ function p2f4_panel!(ax, sel, ks)
     end
 end
 
+# The fourth title line: the indicators with no AUC in the panel (an AUC the block marks as not computed leaves a gap in its line)
+function p2f4_missing(sel, inds)
+    miss = [x for x in inds if !any(r -> r.x == x && isfinite(r.auc), sel)]
+    isempty(miss) && return "AUC of every indicator"
+    length(miss) == length(inds) && return "no AUC at all"
+    return length(miss) > 3 ? "no AUC: $(length(miss)) of $(length(inds))" : "no AUC: " * join(miss, ", ")
+end
+
 function p2f4(res, t, out)
     rows = p2f4_rows(t)
+    inds = [x for x in vcat(P2_I8, "STR") if any(r.x == x for r in rows)]
     Ks = sort(unique([r.K for r in rows]); by = p2kval); ks = sort(unique([r.k for r in rows]))
     nr = cld(length(Ks), 5)
-    fig = Figure(size = (1000, 360 * nr + 110), figure_padding = 12)
+    fig = Figure(size = (1000, 380 * nr + 110), figure_padding = 12)
     for (i, K) in enumerate(Ks)
         sel = [r for r in rows if r.K == K]
-        ax = Axis(fig[fld(i - 1, 5) + 1, mod(i - 1, 5) + 1]; title = "K = $(p2ktext(K))\nn_C $(p2range([r.nC for r in sel]))\nn_R $(p2range([r.nR for r in sel]))", xticks = (ks, p2klabels(res, ks)),
+        ax = Axis(fig[fld(i - 1, 5) + 1, mod(i - 1, 5) + 1]; title = "K = $(p2ktext(K))\nn_C $(p2range([r.nC for r in sel]))\nn_R $(p2range([r.nR for r in sel]))\n$(p2f4_missing(sel, inds))", xticks = (ks, p2klabels(res, ks)),
                   xticklabelrotation = pi / 2, xlabel = "budget b_k", ylabel = mod(i - 1, 5) == 0 ? "AUC" : "", limits = ((-0.4, maximum(ks) + 0.4), (-0.03, 1.03)))
         mod(i - 1, 5) > 0 && (ax.yticklabelsvisible = false)
         p2f4_panel!(ax, sel, ks)
     end
-    inds = [x for x in vcat(P2_I8, "STR") if any(r.x == x for r in rows)]
     el, nm = p2legend_entries(inds)
     Legend(fig[nr + 1, 1:min(5, length(Ks))], vcat(el, [[LineElement(color = :gray40, linestyle = :dash, linewidth = 1)]]), vcat(nm, "chance level (AUC = 0.5)"); orientation = :horizontal, nbanks = 2, tellwidth = false)
     return p2save(fig, out, "F4")
@@ -161,14 +172,26 @@ function p2f6(res, t, out)
     return p2save(fig, out, "F6")
 end
 
+# All six pages are drawn to temporary files first; a failure in any figure leaves the output folder as it was (the files of an earlier run stay whole) and names the figure.
 function draw_p2_figures(res, out)
     f = res.figures
-    paths = String[]
-    with_theme(P2_THEME) do
-        for (id, draw) in (("F1", p2f1), ("F2", p2f2), ("F3", p2f3), ("F4", p2f4), ("F5", p2f5), ("F6", p2f6))
-            haskey(f, id) || throw(ErrorException("$id: the result holds no figure table $id"))
-            push!(paths, draw(res, f[id], out))
+    tmps = String[]
+    try
+        with_theme(P2_THEME) do
+            for (id, draw) in (("F1", p2f1), ("F2", p2f2), ("F3", p2f3), ("F4", p2f4), ("F5", p2f5), ("F6", p2f6))
+                haskey(f, id) || throw(ErrorException("$id: the result holds no figure table $id"))
+                try
+                    push!(tmps, draw(res, f[id], out))
+                catch e
+                    msg = e isa ErrorException ? e.msg : sprint(showerror, e)
+                    startswith(msg, id) ? rethrow() : throw(ErrorException("$id: $msg"))
+                end
+            end
         end
+        paths = [chopsuffix(t, ".tmp.pdf") * ".pdf" for t in tmps]
+        foreach((t, p) -> mv(t, p; force = true), tmps, paths)
+        return paths
+    finally
+        foreach(t -> rm(t; force = true), tmps)
     end
-    return paths
 end

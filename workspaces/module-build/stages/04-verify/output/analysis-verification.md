@@ -242,3 +242,60 @@ The independent author's own list of 12 items is not in the repository (the resu
 - The independent side did not compute the items listed under "Not compared" above.
 - The pilot store (P30): the (V) half of D89y.
 - Coverage of the new files under the suite was not re-measured; the GPU does not apply (no device path in the module).
+
+## Amendment D91: figure drawers F1 to F6 of study p2-indicators (stage 04)
+
+Verify scripts: `verify/analysis-p2-figures.jl` and `verify/analysis-p2-figures.py` (independent author, written from the spec only; no file of `src/`, `ext/` or `test/` was read). Raw output: `analysis-d91-verify-log.txt` (final run 2026-10-30 17:36, 23 threads, after the review fixes below: PASS 143, FAIL 6, INFO 18). Contact sheets for the owner visual check: `analysis-d91-F1.png` to `analysis-d91-F6.png` (72 dpi). Real P2 command under the verify project: exit 0, six PDF files, tables equal the accepted stage 04 file except the git commit line, 94.7 s whole command, 3.21 GB peak, figure step 24.0 s cold (0.9 s warm).
+
+### Evidence per criterion
+
+| Criterion | Evidence | Result |
+|-----------|----------|--------|
+| D91a command, six files | exit 0, six PDFs with `%PDF-` signature and one page, no skipped or failed line | pass |
+| D91b figure is the block, digests | digests recomputed by own code from the accepted file, the rows the drawer received and the digest lines agree for F1 to F6 | pass |
+| D91c tables unchanged, digests | tables file equals the accepted file except the git commit line (with and without figures); six digest lines equal the D91c values | pass |
+| D91d failing drawer | non-positive and zero D_str: exception names figure and row ("F6 row 100: ..."); after the fix no figure file is written or replaced | pass |
+| D91e P1 unchanged | P1 digests F1 to F7 equal the accepted ones; P1 tables differ only in the version and git commit lines; a copy of the tree before D91 (fc4cace) gives all 11 P1 files pixel-identical to the current module; the paper-folder copies of F3 to F7 and F1a to F2b are pixel-identical. The six tracked study-folder files `p1-le-benchmark-fig-F1` to `F6.pdf` are not (see finding V1) | 6 FAIL against the stale tracked files; pass against the pre-D91 tree |
+| D91f layout | widths 991 to 1000 pt, heights at most 1.3 times the width, smallest text scaled to 504 pt 8.06 to 8.14 pt | pass |
+| D91g text | all names, titles, N ranges, notes and legends present once as specified | pass |
+| D91h plotted numbers | all F5 cells, 2445 F6 points, 320 F3 points, 700 F4 points, 200 F4 gaps empty, F1 cell colours decoded within 0.0049 of the colour bar span (limit 0.005; thin margin) | pass |
+| D91i drawing counts | panels, lines and markers per figure as specified; the F4 chance-level line is absent in the two empty panels (E42: such a panel shows no lines) | pass, 1 INFO |
+| D91j time and memory | 24.0 s cold figure step (bound 120 s), 3.21 GB (bound 8 GB) | pass |
+| D91k determinism | two runs: tables byte-identical, six digests equal, rendered pixels of the six PDFs equal (raw bytes differ in embedded metadata) | pass |
+| D91l owner visual check | contact sheets written | open: the owner decides |
+| D91m edge fixtures | seven fixtures (no RLI in S2, no RLI anywhere, three K with all AUC nothing, 30-orbit set, one K index, class count changing with the step, one budget in F1) draw six files each | pass |
+| D91n layering (S) | folder suite 1287 of 1287 after the fixes (3 min); dependency files unchanged | pass |
+| D91o read-only | SHA-256 of 2436 data files, 28 other inputs and the tree listing equal before and after | pass |
+| I22 to I29 | figure is the block, one encoding (indicator colours and markers equal in F2 to F4), no silent alteration, dependency files unchanged | pass |
+
+### Independent code review (fresh Sonnet subagent, spec and code)
+
+0 CRITICAL, 0 HIGH, 2 MEDIUM, 10 LOW.
+
+| Finding | Disposition |
+|---------|-------------|
+| M1 a failure in figure k left F1 to F(k-1) of the new run beside F(k+1) to F6 of an earlier run | fixed: the six pages are drawn to temporary files and moved into place only when all six are drawn; a failure leaves the folder as it was; re-verified (failed-figure run writes only the tables file) |
+| M2 F4: RLI has no AUC at K = 0.5 and K = 6.28 (and every AUC is nothing at K = 0 and 10); the missing line was not stated on the figure | fixed: a fourth title line in every panel ("AUC of every indicator", "no AUC: RLI", "no AUC at all"); F4 page 1000 x 870 pt |
+| L1 every error names its figure | fixed: any error of a drawer is rethrown as "F<n>: ..." |
+| L2 duplicate rows were summed (F2) or the first taken (F3, F4) | fixed: refused with a named error |
+| L3 axis labels missing (F1 matrices, F2 bottom row y axis) | fixed ("indicator"); F1 matrix size reduced to keep the page under 1000 pt |
+| L4 a `nothing` cell in F1, F3, F6 or "n.a." in F5 raises | kept: the real block has none; the error names figure and row (E38 b) |
+| L5 E42 text is set with hard line breaks | kept: a text check must normalise white space (done in the verify script) |
+| L6 F2 "N differs from the set size" test uses the maximum N | kept: the label compares with the largest N of the set, equal to the set size in the real block |
+| L7 grey-scale: T_s (grey) against R (blue) are close, `:vik` has two dark ends | open for the owner visual check (D91l) |
+| L8 `p2order` appends unknown sets in dictionary order | kept: the real block holds only the four known sets |
+
+No test changed. The fixes live in `ext/p2_figures.jl` and `ext/p2_figures_b.jl` only; the package suite does not load them except for the layering checks.
+
+### Findings of the verification
+
+V1. **Tracked P1 study-folder figures are stale (LOW, no D91 cause).** The tracked `p1-le-benchmark-fig-F1` to `F6.pdf` in `workspaces/study/stages/04-analyze/output` date from 91abcfa (2026-10-20), before the figure redraw (caaf95a, 812d484); F3 has another page size (480 x 315 against 615 x 360 pt). D91 did not change P1 (pre-D91 tree gives identical pictures). The six FAIL lines of D91e are this and nothing else. Owner decision: refresh the tracked files from a P1 run (a P1 change, not D91), or accept; the criterion D91e is met in substance by the comparison with the tree before D91.
+V2. **F4 holds nine lines in six panels only (INFO).** The spec's "nine lines each" holds in six of ten panels; two panels have eight (RLI has no AUC), two none; each panel now says so in its title.
+V3. **Kappa decode margin (INFO).** The largest F1 colour error is 0.0049 of the span against the limit 0.005; the render at 4 px/pt, not the figure, limits it.
+
+## Not verified (D91)
+
+- D91l: the look of the figures, colour-vision and grey-scale legibility (owner).
+- The full package suite was not rerun after the review fixes (17 min); only the analysis folder suite (1287 of 1287). The fixes are in the extension, which the package suite does not load; the base run at b2d7ebe passed.
+- Aqua, JET, coverage and bench for the extension files.
+- The P11 reading text in `P2_READINGS` still says that the figure drawers do not exist; it sits in the accepted stage 04 tables file and is left unchanged (owner decision).

@@ -76,19 +76,18 @@ function p2legend_entries(names)
     return elems, collect(names)
 end
 
-# The file is written whole or not at all (E38 b); the page must sit inside the bounds of E38 e.
+# The page must sit inside the bounds of E38 e. It is drawn to a temporary file; draw_p2_figures moves the six into place only when all six are drawn (E38 b: whole or not at all).
 function p2save(fig, out, id)
     w, h = size(fig.scene)
     (w <= 1000 && h <= 1.3 * w) || throw(ErrorException("$id: the page $w x $h pt is outside the bounds (width 1000, height 1.3 x width)"))
-    final = joinpath(out, "$(Analysis.P2_SLUG)-fig-$id.pdf")
     tmp = joinpath(out, "$(Analysis.P2_SLUG)-fig-$id.tmp.pdf")
     try
         save(tmp, fig; pt_per_unit = 1)
-        mv(tmp, final; force = true)
-    finally
+    catch
         rm(tmp; force = true)
+        rethrow()
     end
-    return final
+    return tmp
 end
 
 # ---------------------------------------------------------------- F1 (E39)
@@ -122,7 +121,7 @@ function p2f1(res, t, out)
     rows = p2f1_rows(t)
     sets = p2order([r.set for r in rows], ["W2", "S2"])
     cols = [(s, b) for s in sets for b in sort(unique([r.budget for r in rows if r.set == s]))]
-    ps = min(185, (1000 - 200) / length(cols) - 12)
+    ps = min(185, (1000 - 240) / length(cols) - 12)
     names = [x == "RLI" ? "RLI*" : x for x in P2_I8]
     fig = Figure(figure_padding = 12)
     for (c, (s, b)) in enumerate(cols)
@@ -130,7 +129,7 @@ function p2f1(res, t, out)
         ns = isempty(ns) ? [r.N for r in rows if r.set == s && r.budget == b] : ns
         for (ri, field, cm, lim) in ((1, :A, :viridis, (0, 1)), (2, :kappa, :vik, (-1, 1)))
             ax = Axis(fig[ri, c]; width = ps, height = ps, yreversed = true, xticks = (1:8, names), yticks = (1:8, names), xticklabelrotation = pi / 2, xgridvisible = false, ygridvisible = false,
-                      title = ri == 1 ? "$s, $(p2budget(res, b))\nN = $(p2range(ns))" : "")
+                      xlabel = ri == 2 ? "indicator" : "", ylabel = c == 1 ? "indicator" : "", title = ri == 1 ? "$s, $(p2budget(res, b))\nN = $(p2range(ns))" : "")
             hm = heatmap!(ax, 1:8, 1:8, permutedims(p2f1_matrix(rows, s, b, field)); colormap = cm, colorrange = lim, nan_color = :transparent)
             c > 1 && (ax.yticklabelsvisible = false)
             c == length(cols) && Colorbar(fig[ri, length(cols) + 1], hm; label = field == :A ? "A_XY" : "kappa_XY", height = ps)
@@ -148,9 +147,13 @@ const P2_OUTCOME_GREY = [to_color("#2B2B2B"), to_color("#8C8C8C"), to_color("#D9
 # t_det counts by (set, indicator) as (budget, count) pairs, and the three outcome counts by (set, indicator)
 function p2f2_data(t)
     det, outc = Dict{Tuple{String, String}, Vector{Tuple{Float64, Float64}}}(), Dict{Tuple{String, String}, Dict{String, Float64}}()
+    seen = Set{Tuple}()
     p2rows(t, "F2", ("set", "indicator", "kind", "value", "count"), function (r, row, c)
         key = (String(row[c["set"]]), p2indicator("F2", r, row[c["indicator"]], P2_I8))
         n, kind = p2num("F2", r, "count", row[c["count"]]; lo = 0), row[c["kind"]]
+        id = (key, kind, string(row[c["value"]]))
+        id in seen && p2fail("F2", r, "the row $(key[1]) $(key[2]) $kind $(row[c["value"]]) appears twice")
+        push!(seen, id)
         kind == "t_det" && push!(get!(det, key, Tuple{Float64, Float64}[]), (p2num("F2", r, "t_det value", row[c["value"]]; pos = true), n))
         kind == "outcome" && (get!(outc, key, Dict{String, Float64}())[string(row[c["value"]])] = n)
         kind in ("t_det", "outcome", "t_censored") || p2fail("F2", r, "kind $kind is not t_det, t_censored or outcome")
@@ -180,7 +183,7 @@ function p2f2(res, t, out)
         for (rk, x) in enumerate(inds)
             p2series!(top, sh[x][1], sh[x][2], x, rk; steps = true)
         end
-        p2f2_bars!(Axis(fig[2, c]; xlabel = "share of the N orbits", limits = ((0, 1), nothing)), inds, sh, outc, s)
+        p2f2_bars!(Axis(fig[2, c]; xlabel = "share of the N orbits", ylabel = c == 1 ? "indicator" : "", limits = ((0, 1), nothing)), inds, sh, outc, s)
     end
     Legend(fig[3, 1:length(sets)], p2legend_entries(P2_I8)..., "indicator (top row)"; orientation = :horizontal, tellwidth = false, titleposition = :left)
     Legend(fig[4, 1:length(sets)], [PolyElement(color = g) for g in P2_OUTCOME_GREY], P2_OUTCOMES, "outcome of N (bottom row)"; orientation = :horizontal, tellwidth = false, titleposition = :left)
@@ -202,6 +205,8 @@ end
 function p2f3(res, t, out)
     rows = p2rows(t, "F3", ("set", "indicator", "k", "decided", "fraction"), (r, row, c) -> (set = String(row[c["set"]]), x = p2indicator("F3", r, row[c["indicator"]], P2_I8),
                   k = p2num("F3", r, "k", row[c["k"]]; lo = 0), dec = p2num("F3", r, "decided", row[c["decided"]]; lo = 0), y = p2num("F3", r, "fraction", row[c["fraction"]]; lo = 0, hi = 1)))
+    keys_ = [(r.set, r.x, r.k) for r in rows]
+    length(unique(keys_)) == length(keys_) || throw(ErrorException("F3: a set, indicator and budget index appear in more than one row"))
     sets = p2order([r.set for r in rows], P2_SET_ORDER); ks = sort(unique([r.k for r in rows]))
     bud = p2param(res, :budgets)
     marks = bud === nothing ? [] : [(findfirst(==(v), bud), nm, ls) for (v, nm, ls) in ((p2param(res, :b_primary), "b_P", :dash), (p2param(res, :N_c), "N_c", :dot)) if v in bud]

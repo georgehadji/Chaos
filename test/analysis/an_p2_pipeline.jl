@@ -117,6 +117,8 @@ end
     st = p2_cached("default"); res = p2_res("default", st); (; ref, S) = p2_refs("default", st)
     ext = p2_ref_hyp(st, ref, S, P2_X8; suffix = "_8", srule = "E8")
     @test p2_decision_diff(res.extension, ext) == String[] && collect(keys(res.extension)) == [:H1, :H2, :H3, :H4, :H5, :H6]
+    # owner reading (D89 stage 04 checkpoint): T_s^design is intersected with E8 in the extension (orbit 5 is in E8, orbit 6 is not), not in the primary
+    @test res.decisions.H4.design.n == 2 && res.extension.H4.design.n == 1 && res.r2_extension.H4.design.n == 1
     @test length(res.extension.H1.A) == 28 && !haskey(res.extension.H4.phi, :LE) && length(res.extension.H4.phi) == 7 && res.extension.H1.n == 8 && res.extension.H2.n == 7
     # ROBUST iff the primary and the extension verdicts are both decidable and equal
     @test res.robust == (H1 = :ROBUST, H2 = :ROBUST, H3 = :ROBUST, H4 = :NOT_COMPARABLE, H5 = :ROBUST, H6 = :NOT_COMPARABLE)

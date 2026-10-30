@@ -174,7 +174,7 @@ function p2_ref_hyp(st, ref, S, I; srule = "E_all", rule = :R1, var = "all", suf
     p = st.p
     rec(ids_) = p2_ref_recs(ref, ids_, I; rule = rule)
     sel(v) = suffix == "" ? v : sort!(intersect(v, S.E8))
-    W2, S2, Ts, Td = sel(S.W2), sel(S.S2), sel(S.T_s), S.T_s_design
+    W2, S2, Ts, Td = sel(S.W2), sel(S.S2), sel(S.T_s), sel(S.T_s_design)   # D89 stage 04 owner reading: T_s_design is restricted to E8 in the extension
     rW, rS, rT, rD = rec(W2), rec(S2), rec(Ts), rec(Td)
     nm(x) = x * suffix
     out = Dict{Symbol, Any}()

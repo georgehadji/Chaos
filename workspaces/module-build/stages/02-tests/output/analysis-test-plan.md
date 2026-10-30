@@ -391,3 +391,8 @@ RED log (`julia --project -t 4 --check-bounds=yes -e 'using Test, Chaoslab; @tes
 | After (new file added, four old testsets made tolerant of the K key form) | 1165 | 46 | 2 | 1213 |
 
 The 79 new tests: 31 pass (guards and unchanged behaviour listed in the table), 46 fail and 2 error, all in `an_p2_review.jl` and for the reasons of the table. All 1134 old tests pass; the testset "D89 default scenario: AUC, regular range, leaving budget" keeps its 24 tests. After stage 03 fixes the findings the expected result is the full suite green (1213).
+
+### Owner reading at the stage 04 checkpoint (2026-10-30)
+
+- E8 extension: T_s^design is intersected with E8. Tests: `an_p2_pipeline.jl` ("D89 default scenario: extension ...", design n 2 in the primary, 1 in the extension and in its R2 version) and the test-side reference `p2_ref_hyp` (`sel(S.T_s_design)`). Before the reading the reference used the whole ensemble.
+- D89w tolerance (real-store comparison only, `verify/analysis-p2.jl`, no suite test): max(0.05 of the width, one lattice step) for U, Delta_phi and F_med ends; the count R2 H3 `npass` may differ by the number of moved lower ends.

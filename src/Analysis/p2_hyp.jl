@@ -61,7 +61,7 @@ function p2_decisions(ctx, vt, S, I; srule = "E_all", rule = :R1, var = "all", s
     p = ctx.p
     sel(v) = isempty(suffix) ? v : sort!(intersect(v, S.E8))
     rW, rS, rT = (p2_records(vt, sel(x), I, rule) for x in (S.W2, S.S2, S.T_s))
-    rD = p2_records(vt, S.T_s_design, I, rule)
+    rD = p2_records(vt, sel(S.T_s_design), I, rule)
     lab(item, set) = p2_label(item, set * suffix, srule, rule, var)
     jobs = [(:H1, (rW,), lab(:H1, "W2")), (:H2, (rS,), lab(:H2, "S2")), (:H3, (rW, rS), (lab(:H3, "W2"), lab(:H3, "S2"))), (:H4, (rT,), lab(:H4, "T_s")),
             (:H4, (rD,), lab(:H4design, "T_s_design")), (:H5, (rW,), lab(:H5, "W2"))]

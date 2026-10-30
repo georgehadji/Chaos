@@ -561,6 +561,13 @@ function build_mod(res, info)
 end
 
 const SKIP = r"^(selfcheck|reader)|U_repdrop$|^T16\|flagchunks"
+# D89w as settled at the stage 04 checkpoint: an interval end agrees within max(0.05 of the width, one lattice step 1/n), n the size of the set of the statistic (U, Delta_phi and F_med only; the ratios Q and R_X keep 0.05 of the width).
+function lattice_step(MOD, name)
+    p = split(name, "|")
+    occursin(r"^(U|dphi|Fmed)_", p[3]) || return 0.0       # the ratios Q and R_X are not on a lattice
+    ns = [MOD[k] for k in ("$(p[1])|$(p[2])|n_W2", "$(p[1])|$(p[2])|n_S2", "$(p[1])|$(p[2])|n_Ts") if haskey(MOD, k) && MOD[k] > 0]
+    return isempty(ns) ? 0.0 : 1 / minimum(ns)
+end
 isinterval(name) = occursin(r"\|(U|Q|R|dphi|Fmed)_(lo|hi)(\||$)", name)
 family(name) = (f = split(name, '|')[1]; startswith(name, "T16|") ? "T16" : f)
 
@@ -587,6 +594,7 @@ section("COMPARE") do
         push!(ind, l[1:(first(i) - 1)] => l[(last(i) + 1):end])
     end
     emit("D89w", "independent results file: lines, SHA-256 of the file", "$(length(ind)), $(bytes2hex(sha256(read(IND))))", "-", "INFO")
+    indd = Dict(ind)
     fams = Dict{String, Vector{Int}}()          # family => [compared, equal, missing in module]
     diffs = Dict{String, Vector{String}}()
     notfound = String[]
@@ -610,11 +618,16 @@ section("COMPARE") do
             lo, hi = MOD[replace(name, r"_(lo|hi)" => "_lo")], MOD[replace(name, r"_(lo|hi)" => "_hi")]
             wid = (isfinite(lo) && isfinite(hi)) ? hi - lo : 0.0
             x = tryparse(Float64, val)
-            ok = x !== nothing && (isnan(x) || isnan(m) ? (isnan(x) && isnan(m)) : abs(x - m) <= 0.05 * wid + 1e-15)
+            ok = x !== nothing && (isnan(x) || isnan(m) ? (isnan(x) && isnan(m)) : abs(x - m) <= max(0.05 * wid, lattice_step(MOD, name)) + 1e-15)
             nint[1] += 1; nint[2] += ok
         elseif startswith(name, "k0line|")
             x = tryparse(Float64, val)
             ok = x !== nothing && (abs(x - m) <= 1e-15 + 1e-12 * max(abs(x), abs(m)))
+        elseif endswith(name, "|H3|npass")
+            # D89w (stage 04 checkpoint): a count that follows from an interval end within the lattice tolerance may differ by the number of such ends that moved (the rule is `> h3_r_lower_gt`)
+            moved = count(k -> startswith(k, replace(name, "npass" => "R_lo|")) && abs(parse(Float64, indd[k]) - MOD[k]) > 1e-12, keys(indd))
+            ok = same(val, m) || abs(parse(Float64, val) - m) <= moved
+            ok && !same(val, m) && push!(get!(diffs, "tolerated count", String[]), "$name: independent $val, module $m (moved lower ends: $moved)")
         else
             ok = same(val, m)
         end
@@ -626,7 +639,7 @@ section("COMPARE") do
         c = fams[f]
         emit("D89w", "family $f: compared / equal / not in the module", "$(c[1]) / $(c[2]) / $(c[3])", "all equal", pf(c[1] == c[2] && c[3] == 0))
     end
-    emit("D89w", "TOTAL compared (all quantities), equal; of them interval ends (within 0.05 of the width) compared, equal", "$total, $eq; $(nint[1]), $(nint[2])", "all equal", pf(total == eq))
+    emit("D89w", "TOTAL compared (all quantities), equal; of them interval ends (within max(0.05 of the width, one lattice step)) compared, equal", "$total, $eq; $(nint[1]), $(nint[2])", "all equal", pf(total == eq))
     emit("D89w", "independent lines skipped (selfchecks, reader checks, U_repdrop, chunk flag totals), by family", join(["$k $v" for (k, v) in sort(collect(skipped))], ", "), "-", "INFO")
     emit("D89w", "independent names with no module counterpart (not compared)", isempty(notfound) ? "none" : "$(length(notfound)): " * join(first(notfound, 12), "; "), "none", pf(isempty(notfound)))
     write(joinpath(SCR, "compare-diffs.txt"), join(["$f\n  " * join(v, "\n  ") for (f, v) in sort(collect(diffs))], "\n"))

@@ -25,7 +25,7 @@ const P2_READINGS = [
     "Pooling by K (AUC, regular range, leaving budget, share below the median, the rows by K) is by the binary64 K value, panel and grid together; the Y5 control has no K and is in no such row (E24, E31)",
     "The share 0.05 of dropped bootstrap replicates (E34) and the design class S of T_s^design (E29) are constants of the module, not keys of the 58 (a gap of the spec)",
     "The 5 percent rule of dropped replicates is applied jointly to the statistics of a label, not per statistic; with the real sets it cannot be reached (P20)",
-    "In the E8 extension T_s^design is not intersected with E8 (the spec is silent)",
+    "In the E8 extension T_s^design is intersected with E8 like the other sets (owner decision, stage 04 checkpoint)",
     "The verdict series of table R2 give their own detection times, flip counts and direction and precision verdicts in the R2 version (E33)"]
 
 # The P1 reference inputs by option or by the study layout next to the P2 inputs (P12).

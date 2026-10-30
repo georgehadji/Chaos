@@ -1,7 +1,8 @@
 """
     ChaoslabCairoMakieExt
 
-The Figures layer of the analysis (decision D60): draws F1 to F7 as PDF files `<study>-fig-F<k>.pdf` from the figure tables of `Chaoslab.Analysis.analyze`.
+The Figures layer of the analysis (decision D60): draws F1 to F7 as PDF files `<study>-fig-F<k>.pdf` from the figure tables of `Chaoslab.Analysis.analyze`;
+for study p2-indicators (decision D91) it draws F1 to F6 with the drawers of `p2_figures.jl` and `p2_figures_b.jl`.
 Loaded when CairoMakie is present (the verify environment); the analysis itself never needs it.
 """
 module ChaoslabCairoMakieExt
@@ -159,8 +160,12 @@ function f7(t, out, study)
     return savefig(fig, out, study, "F7")
 end
 
+include("p2_figures.jl")
+include("p2_figures_b.jl")
+
 function draw_figures(res, out)
     mkpath(out)
+    res.study == Analysis.P2_SLUG && return draw_p2_figures(res, out)   # D91: study p2-indicators, six figures of its own
     f = res.figures
     paths = [f1(f["F1"], out, res.study), f2(f["F2"], out, res.study), f3(f["F3"], out, res.study), f4(f["F4"], out, res.study),
              f5(f["F5"], out, res.study), f6(f["F6"], out, res.study), f7(f["F7"], out, res.study)]

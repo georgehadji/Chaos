@@ -5,7 +5,7 @@
 # The drawer here is a FAKE assigned to FIGURE_DRAWER[] (the previous value is restored in `finally`). No random draw: every value is the fixture's own (no seed needed).
 # Reused: the P2 fixture (`p2_cached("default")`, `p2_run`, `p2_cli_args`), the P1 fixture (`an_cached("default")`, `an_run`, `an_cli_args`), `p2_digest(cols, rows)` of the
 # independent reference (an_p2_ref.jl), `an_files`, `an_path`.
-import Logging
+const Logging = Base.CoreLogging   # the Logging stdlib is not a test dependency; with_logger and NullLogger live here
 
 # ---------------------------------------------------------------- fakes and runners
 const FIG_MSG = "F6 row 12: step value 0 cannot be drawn on a logarithmic axis"

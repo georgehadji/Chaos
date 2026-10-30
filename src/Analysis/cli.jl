@@ -50,9 +50,8 @@ function _run(pos, opt, io)
     res = analyze(; prereg, manifest, panel, params, store, out, figures = true, threads = nt, kw...)
     res.status === :control_defect && (println(io, "control defect: ", join(["control $(d.id) $(d.method)" for d in res.defects], "; "), "; report ", res.tables); return 1)
     println(io, "tables written: ", res.tables)
-    res.status === :figures_skipped && (println(io, res.study == P2_SLUG ? "figures skipped: the figure drawers of study $P2_SLUG are not built yet" :
-                                                  "figures skipped: the plotting package is not loaded (run under the verify environment)"); return 2)
-    res.status === :figures_failed && (println(io, "figures failed: the tables are written, see the warning above"); return 2)
+    res.status === :figures_skipped && (println(io, "figures skipped: the plotting package is not loaded (run under the verify environment)"); return 2)
+    res.status === :figures_failed && (println(io, res.study == P2_SLUG ? "figures failed: $(res.figures_error)" : "figures failed: the tables are written, see the warning above"); return 2)
     println(io, "figures written in ", out)
     return 0
 end

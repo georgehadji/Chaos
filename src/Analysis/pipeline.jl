@@ -156,15 +156,18 @@ function analyze_p1(; prereg, manifest, panel, params, store, out, figures::Bool
 end
 
 # Draw the figures when asked: `:ok`, `:figures_skipped` (no plotting package loaded) or `:figures_failed` (the drawer raised; the tables are written).
-function _figures(res, out, wanted::Bool)
-    wanted || return :ok
-    figures_available() || return :figures_skipped
+_figures(res, out, wanted::Bool) = _draw_figures(res, out, wanted).status
+
+# The same with the message of the exception, which the command of study p2-indicators prints (E45); `error` is empty unless the drawer raised.
+function _draw_figures(res, out, wanted::Bool)
+    wanted || return (status = :ok, error = "")
+    figures_available() || return (status = :figures_skipped, error = "")
     try
         FIGURE_DRAWER[](res, out)
-        return :ok
+        return (status = :ok, error = "")
     catch e
         @warn "drawing the figures failed" exception = (e, catch_backtrace())
-        return :figures_failed
+        return (status = :figures_failed, error = sprint(showerror, e))
     end
 end
 

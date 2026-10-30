@@ -116,8 +116,9 @@ end
 """
     analyze_p2(; prereg, manifest, panel, params, store, out, figures, threads, p1_prereg, p1_manifest, p1_params, p1_store) -> NamedTuple
 
-The analysis of study `p2-indicators` (Amendment D89). Every input is checked before anything is written; `<out>/p2-indicators-tables.md` is the only file written. Status `:ok`, or
-`:figures_skipped` when figures are wanted (no drawer exists for the study, P11).
+The analysis of study `p2-indicators` (Amendments D89 and D91). Every input is checked before anything is written; `<out>/p2-indicators-tables.md` is written first. When `figures` is
+true the drawer of the plotting extension, if loaded, gets the result (`figures` holds F1 to F6, each the table of the item) and writes the figure files. Status `:ok`,
+`:figures_skipped` (no drawer loaded) or `:figures_failed` (the drawer raised; the tables stay and `figures_error` holds the message).
 """
 function analyze_p2(; prereg, manifest, panel, params, store, out, figures::Bool = false, threads::Integer = Threads.nthreads(), p1_prereg = nothing, p1_manifest = nothing,
                     p1_params = nothing, p1_store = nothing)
@@ -143,7 +144,7 @@ function analyze_p2(; prereg, manifest, panel, params, store, out, figures::Bool
     h = merge(c.hashes, (p1_prereg_header_sha256 = lab.hashes.prereg_header_sha256, p1_manifest_sha256 = lab.hashes.manifest_sha256, p1_params_sha256 = lab.hashes.params_sha256,
                          chunks = length(man["chunks"]), items = length(items), seed = p.bootstrap_seed, module_version = string(package_version()),
                          git_sha = git_state(pkgdir(parentmodule(@__MODULE__))::String).sha))
-    res = (status = figures ? :figures_skipped : :ok, study = P2_SLUG, tables = nothing, header = h, params = p, items = its, second_items = second, digests = digests,
+    res = (status = :ok, study = P2_SLUG, tables = nothing, header = h, params = p, items = its, second_items = second, digests = digests,
            rho = Dict(o.id => o.rho for o in d.orbits), lambda_ref = Dict(o.id => o.lambda_ref for o in d.orbits), lambda_ns = Dict(o.id => o.lambda_ns for o in d.orbits),
            p1_labels = lab.labels, grid = d.grid_rows, sets = d.S, verdicts = d.vt.verdicts, scores = d.vt.scores, steps = d.vt.steps, detection = d.vt.detection,
            decisions = d.hyp.decisions, extension = d.hyp.extension, r2 = d.hyp.r2, r2_extension = d.hyp.r2_extension, robust = d.hyp.robust, gate = d.hyp.gate, second = d.hyp.second,
@@ -151,5 +152,7 @@ function analyze_p2(; prereg, manifest, panel, params, store, out, figures::Bool
            omissions = omissions, controls_table = d.rep.controls, k0line = d.rep.k0line, cost = d.rep.cost, readings = P2_READINGS, deviations = _deviations(man, p))
     recheck_inputs(c.raw, prereg, manifest, panel, params)
     recheck_inputs(lab.raw, d1.prereg, d1.manifest, d1.params)
-    return merge(res, (tables = p2_write_tables(out, res),))
+    res = merge(res, (tables = p2_write_tables(out, res), figures = Dict{String, Any}("F$i" => getproperty(its, Symbol("F$i")) for i in 1:6)))
+    d = _draw_figures(res, out, figures)
+    return merge(res, (status = d.status, figures_error = d.error))
 end

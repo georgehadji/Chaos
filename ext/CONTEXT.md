@@ -45,6 +45,8 @@ The per-machine record is `data/gpu-benchmark.toml` (git-ignored), written by `v
 
 Second extension, decision D60: draws the figures F1 to F7 of `Chaoslab.Analysis.analyze` as `<study>-fig-F<k>.pdf`. Weak dependency `CairoMakie` (compat `0.15`) in `Project.toml`; loaded by `bin/chaoslab.jl` under `julia --project=verify`. It exports nothing and fills one hook: `Analysis.FIGURE_DRAWER[]` in `__init__`. Without it `analyze` writes the tables and reports `:figures_skipped` (exit code 2). If drawing raises, the tables stay and the status is `:figures_failed`. The numbers it draws are the figure tables of the result, whose digests are in the tables file. Not reachable from the unit suite (CairoMakie is not a test dependency); drawn on the real store by `verify/analysis.jl`. Module notes: `src/Analysis/CONTEXT.md`.
 
+Study `p2-indicators` (Amendment D91): `draw_figures` dispatches on `res.study == Analysis.P2_SLUG` to `draw_p2_figures`. `p2_figures.jl` holds the shared helpers (colours, markers, theme, the checks of a number, row and indicator, the budget labels, `p2save`) and F1 to F3; `p2_figures_b.jl` holds F4 to F6 and the driver. The six pages are drawn to temporary files and moved into place only when all six are drawn; any error is rethrown naming its figure (`F<n>: ...`). A value that cannot be drawn (non-finite, not positive on a logarithmic axis, outside its axis range, a duplicate row) raises instead of being altered or clipped. Drawn on the real store by `verify/analysis-p2-figures.jl` (independent script, PDF measurements in `verify/analysis-p2-figures.py`); the package suite tests the module side with a fake drawer (`test/analysis/an_p2_figures.jl`).
+
 ## Deferred
 
 | Item | Where |

@@ -170,3 +170,65 @@ Updated in this stage: `CHANGELOG.md` (entry for the amendment and the schema no
 - `CHANGELOG.md` (this log)
 - `schema/run-store.md` (this log)
 - `workspaces/module-build/stages/05-integrate/output/analysis-integration-log.md` (this log)
+
+## Amendment D91 (figure drawers F1 to F6 of study p2-indicators), stage 05
+
+Branch: `main` (commits pushed, no force-push). Decision D91 (stage 01; owner decisions P35 to P42 approved as proposed).
+
+### Catalog rows flipped
+
+None, as for the base module.
+
+Evidence: `stages/04-verify/output/analysis-verification.md` (section "Amendment D91: figure drawers F1 to F6 of study p2-indicators (stage 04)"), accepted at the stage 04 checkpoint (2026-10-30) including the owner visual check D91l of the six figures. Verify log PASS 143, FAIL 6, INFO 18: the six fails are the comparison with the tracked study-folder files `p1-le-benchmark-fig-F1` to `F6.pdf`, which date from before the P1 figure redraw (91abcfa, 2026-10-20); a copy of the tree before D91 gives the same P1 pictures as the current module, so D91 does not change P1 (criterion D91e met in substance). Analysis folder suite 1287 pass; full `Pkg.test()` passed at b2d7ebe (stage 03); real P2 command exit 0, 94.7 s, 3.21 GB, figure step 24.0 s cold; independent code review closed (0 CRITICAL, 0 HIGH, 2 MEDIUM fixed, LOW findings fixed or kept as listed in the report).
+
+Updated in this stage: `CHANGELOG.md` (entry for the amendment), `src/Analysis/CONTEXT.md` (exit code 2, result fields, the open P11 reading), `ext/CONTEXT.md` (the P2 drawers).
+
+### Open (not verified or deferred)
+
+- The full `Pkg.test()` was not rerun after the stage 04 review fixes (17 min); they are confined to `ext/p2_figures.jl` and `ext/p2_figures_b.jl`, which the package suite does not load except for the layering checks (folder suite 1287 pass).
+- Aqua, JET, coverage and bench for the extension files.
+- The reading P11 in the accepted P2 tables file still says that the drawers do not exist (owner decision; the file is accepted).
+- The tracked P1 figure files `p1-le-benchmark-fig-F1` to `F6.pdf` in `workspaces/study/stages/04-analyze/output` are stale (V1 of the report); refreshing them is a P1 change for the owner to decide.
+- Still to do in the study: draw the P2 figures with the real command into `workspaces/study/stages/04-analyze/output` (study stage 04, audit "regenerable"), then study stage 05.
+- Follow-ups for the owner: U1, U2, U3, M4 exit tasks (results accepted, `_config/risks.md` review, minor release), the LOW findings of D86, CI for recent commits has not been checked.
+
+### Commits
+
+- `c2f01e6` stage 01: D91 spec, decision log row, owner decisions
+- `72e4463` stage 02: tests (module side, fake drawer, 10 testsets), plan with criterion map
+- `b2d7ebe` stage 03: module side, drawers F1 to F6, one test import fixed
+- `8ece640` stage 04: verification (independent script, log, contact sheets, report), review fixes in the drawers
+- (this log) `analysis integration log (D91)`: the commit that adds this section and the documentation edits.
+
+### Files changed on `main` for D91 (short hashes of the commits above that touched the file)
+
+- `_config/decision-log.md` (c2f01e6)
+- `src/Analysis/cli.jl` (b2d7ebe)
+- `src/Analysis/p2_pipeline.jl` (b2d7ebe)
+- `src/Analysis/pipeline.jl` (b2d7ebe)
+- `src/Analysis/CONTEXT.md` (this log)
+- `ext/ChaoslabCairoMakieExt.jl` (b2d7ebe)
+- `ext/p2_figures.jl` (b2d7ebe, 8ece640)
+- `ext/p2_figures_b.jl` (b2d7ebe, 8ece640)
+- `ext/CONTEXT.md` (this log)
+- `test/analysis/an_p2_figures.jl` (72e4463, b2d7ebe)
+- `test/analysis/runtests.jl` (72e4463)
+- `verify/analysis-p2-figures.jl` (8ece640)
+- `verify/analysis-p2-figures.py` (8ece640)
+- `workspaces/module-build/stages/01-spec/output/analysis-spec.md` (c2f01e6)
+- `workspaces/module-build/stages/02-tests/output/analysis-test-plan.md` (72e4463)
+- `workspaces/module-build/stages/03-implement/output/analysis-d91-impl-notes.md` (b2d7ebe)
+- `workspaces/module-build/stages/03-implement/output/analysis-d91-drawers-notes.md` (b2d7ebe)
+- `workspaces/module-build/stages/04-verify/output/analysis-d91-verify-log.txt` (8ece640)
+- `workspaces/module-build/stages/04-verify/output/analysis-d91-F1.png` to `analysis-d91-F6.png` (8ece640)
+- `workspaces/module-build/stages/04-verify/output/analysis-verification.md` (8ece640)
+- `CHANGELOG.md` (this log)
+- `workspaces/module-build/stages/05-integrate/output/analysis-integration-log.md` (this log)
+
+### Audit
+
+| Check | Result |
+|-------|--------|
+| Status matches evidence (no catalog row; no open D91 criterion except the stated one: D91e fails only against stale tracked P1 files, see above) | pass, with that note |
+| Log names the commit SHAs and every file changed | pass |
+| `CHANGELOG.md` has an entry for the amendment | pass |

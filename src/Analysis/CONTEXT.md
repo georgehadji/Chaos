@@ -42,7 +42,7 @@ The plotting is `ext/ChaoslabCairoMakieExt.jl` (CairoMakie as a weak dependency,
 
 ## Second study: p2-indicators (Amendment D89)
 
-`analyze` reads the single header row "Study slug" of the preregistration (`p2_dispatch.jl`) and runs the pipeline of that study: `p1-le-benchmark` is `analyze_p1` (unchanged, `pipeline.jl`), `p2-indicators` is `analyze_p2` (`p2_pipeline.jl`); any other slug is refused. The command gains the options `--p1-store`, `--p1-preregistration`, `--p1-manifest`, `--p1-parameters` (the P1 reference inputs of the labels; a usage error for any other study). Exit code 2 means "figures skipped": the drawers of the six figures are a follow-up to the figures extension (P11). Spec: "Amendment D89" of the analysis spec; parameter table of 58 keys (E22); output `<out>/p2-indicators-tables.md`.
+`analyze` reads the single header row "Study slug" of the preregistration (`p2_dispatch.jl`) and runs the pipeline of that study: `p1-le-benchmark` is `analyze_p1` (unchanged, `pipeline.jl`), `p2-indicators` is `analyze_p2` (`p2_pipeline.jl`); any other slug is refused. The command gains the options `--p1-store`, `--p1-preregistration`, `--p1-manifest`, `--p1-parameters` (the P1 reference inputs of the labels; a usage error for any other study). Exit code 2 means "figures skipped" (the plotting package is not loaded) or "figures failed" (a drawer raised; the message names the figure and row). The result carries `status` (`:ok`, `:figures_skipped`, `:figures_failed`), `figures_error` and the `figures` dictionary F1 to F6 handed to the drawers (Amendment D91, `p2_pipeline.jl`, `pipeline.jl`: `_draw_figures`); the drawers are in `ext/p2_figures.jl` and `ext/p2_figures_b.jl`. Spec: "Amendment D89" of the analysis spec; parameter table of 58 keys (E22); output `<out>/p2-indicators-tables.md`.
 
 | File | Holds |
 |------|-------|
@@ -67,3 +67,4 @@ The plotting is `ext/ChaoslabCairoMakieExt.jl` (CairoMakie as a weak dependency,
 | Chunks that failed twice are refused, not analysed | spec corrections, item 3; the study has none |
 | The reader keeps every item in memory and reads files serially | measured on the real store: 54 s, 2.45 GiB |
 | Real-store results are in the tables file of study stage 04, not here | `workspaces/study/stages/04-analyze/` |
+| The reading P11 in the accepted P2 tables file still says that the figure drawers do not exist | owner decision: the file is accepted; changing `P2_READINGS` changes its bytes |

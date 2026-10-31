@@ -232,3 +232,63 @@ Updated in this stage: `CHANGELOG.md` (entry for the amendment), `src/Analysis/C
 | Status matches evidence (no catalog row; no open D91 criterion except the stated one: D91e fails only against stale tracked P1 files, see above) | pass, with that note |
 | Log names the commit SHAs and every file changed | pass |
 | `CHANGELOG.md` has an entry for the amendment | pass |
+
+## Amendment D93 (calibration of study p3-abstention), stage 05
+
+Branch: `main` (commits pushed, no force-push). Decision D93 (stage 01; owner decisions P43 to P68 approved as proposed, P61 accepted as an audit exception).
+
+### Catalog rows flipped
+
+None, as for the base module.
+
+Evidence: `stages/04-verify/output/analysis-verification.md` (section "Amendment D93: calibration of study p3-abstention (stage 04)"), accepted at the stage 04 checkpoint (2026-10-31). Criteria D93a to D93r pass. Real runs on the P1 and p2 stores (outputs in the scratchpad, not in the repository): O15 233 of 233 quantities equal to an independent Python oracle, O19 pass, byte-identical record and tables at 1, 4 and 23 threads, 105 to 222 s, at most 2.45 GB, data tree listing hash unchanged; O16 49 of 50 (finding V1). Full `Pkg.test()` after the review fixes 1401609 pass, 0 fail, 1 broken (existing); independent code review: 0 CRITICAL, 0 HIGH, MEDIUM and LOW fixed or recorded.
+
+Updated in this stage: `CHANGELOG.md` (entry for the amendment), `src/Analysis/CONTEXT.md` (D93 section rewritten as prose: file list, invariants of `calibrate`, measured cost, limits V1 to V4, the D35 overrun; the file is back under the 80-line limit of `icm_validate.py`, which it exceeded since 076ae64).
+
+### Open (not verified or deferred)
+
+- V1: the plug-in HC test rejects at 0.0527 at AUC 0.5 and n_f = 30; recorded, no change (owner decision at stage 04).
+- V2: PP for HB at most 0.360, targets at the cap (285 T_s, 1235 W2); for the owner at Amendment A1, before any test data.
+- V3: no refusal test of the chunk-file guard. V4: verdicts on the real stores checked indirectly.
+- No run on a clean committed tree yet: the A1 freeze run happens on committed code.
+- Byte identity across machines (P58); the analysis folder suite is over the D35 ceiling.
+- Not done here: Amendment A1, the Experiments amendment (panel builder, run blocks), the test-side analysis HA to HC; `_config/risks.md` review is due at the M4 exit, not at this amendment; CI for recent commits not checked.
+
+### Commits
+
+- `b2bd5cf` stage 01: D93 spec, decision log row, owner decisions
+- `94bea67` stage 02: failing tests (11 files), plan, owner decisions
+- `076ae64` stage 03: `calibrate`, 17 `p3_*` files, GREEN, recorded test rework, impl notes
+- `71b11d4` stage 04: verification on the real stores, review fixes, oracle and O16 scripts, parameter table
+- (this log) `analysis integration log (D93)`: the commit that adds this section and the documentation edits.
+
+### Files changed on `main` for D93 (short hashes of the commits above that touched the file)
+
+- `_config/decision-log.md` (b2bd5cf)
+- `workspaces/module-build/stages/01-spec/output/analysis-spec.md` (b2bd5cf)
+- `test/analysis/an_p3_dispatch.jl`, `an_p3_fixture.jl`, `an_p3_params.jl`, `an_p3_pipeline.jl`, `an_p3_pp.jl`, `an_p3_ref.jl`, `an_p3_rule.jl`, `an_p3_select.jl`, `an_p3_sets.jl` (94bea67)
+- `test/analysis/an_p3_helpers.jl`, `an_p3_refusals.jl`, `runtests.jl` (94bea67, 076ae64)
+- `test/analysis/an_p3_gate.jl` (076ae64)
+- `workspaces/module-build/stages/02-tests/output/analysis-test-plan.md` (94bea67, 076ae64)
+- `src/Analysis/p3_c7.jl`, `p3_json.jl`, `p3_label.jl`, `p3_params.jl`, `p3_pp.jl`, `p3_select.jl`, `p3_stat.jl`, `p3_tables.jl`, `p3_verdict.jl`, `p3_hb.jl`, `p3_rule.jl` (076ae64)
+- `src/Analysis/p3_hc.jl`, `p3_pipeline.jl`, `p3_read.jl`, `p3_record.jl`, `p3_rng.jl`, `p3_sets.jl` (076ae64, 71b11d4)
+- `src/Analysis/Analysis.jl`, `cli.jl`, `p2_dispatch.jl` (076ae64)
+- `src/Analysis/CONTEXT.md` (076ae64, this log)
+- `bin/chaoslab.jl` (076ae64)
+- `bench/analysis.jl` (076ae64)
+- `verify/analysis-p3.jl` (076ae64)
+- `verify/analysis-p3-export.jl`, `analysis-p3-oracle.py`, `analysis-p3-compare.py`, `analysis-p3-o16.jl` (71b11d4)
+- `workspaces/module-build/stages/03-implement/output/analysis-d93-impl-notes.md` (076ae64)
+- `workspaces/module-build/stages/04-verify/output/analysis-d93-verify-log.txt`, `analysis-d93-o16-log.txt`, `analysis-d93-suite-full-log.txt` (71b11d4)
+- `workspaces/module-build/stages/04-verify/output/analysis-verification.md` (71b11d4)
+- `workspaces/study/stages/01-design/references/p3-abstention-calibration-parameters.toml` (71b11d4)
+- `CHANGELOG.md` (this log)
+- `workspaces/module-build/stages/05-integrate/output/analysis-integration-log.md` (this log)
+
+### Audit
+
+| Check | Result |
+|-------|--------|
+| Status matches evidence (no catalog row; no open D93 criterion; findings V1 to V4 recorded) | pass |
+| Log names the commit SHAs and every file changed | pass |
+| `CHANGELOG.md` has an entry for the amendment | pass |

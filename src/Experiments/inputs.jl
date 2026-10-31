@@ -3,7 +3,8 @@
 const _REQUIRED = ("K", "n_c", "grid_side", "N_scr", "alpha", "theta_T", "g_T", "r_T", "theta_C", "r_C", "theta_S", "w", "f_S",
                    "L_S", "log10_r", "q_max", "rho", "delta_R", "newton_max", "delta_dup", "n_ctrl_max", "mu", "s_D", "cap_D",
                    "s_L", "cap_L")
-const _OPTIONAL = ("tau", "seed", "bigfloat_bits")
+const _OPTIONAL = ("tau", "seed", "bigfloat_bits", "screen_source", "screen_points", "r_max", "gate_rounds", "quota", "d_fraction", "db_size",
+                   "newton_grid_side", "controls")
 const Q_MAX_SUPPORTED = 12          # Newton search range: the conditioning of a period-q solve grows like exp(q lambda)
 
 _bad(keys, msg) = throw(ArgumentError("panel input " * join(("`$k`" for k in keys), " / ") * ": " * msg))
@@ -50,6 +51,7 @@ end
 function _int(key, v; min = 1)
     (v isa Integer && !(v isa Bool)) || _bad((key,), "must be an integer, got $(repr(v))")
     v >= min || _bad((key,), "must be at least $min, got $v")
+    v <= typemax(Int) || _bad((key,), "is above the supported range (at most $(typemax(Int))), got $v")
     return Int(v)
 end
 
@@ -68,13 +70,14 @@ function _check_keys(d)
     for k in keys(d)
         k in _REQUIRED || k in _OPTIONAL || _bad((k,), "unknown key")
     end
+    haskey(d, "quota") && haskey(d, "n_c") && _bad(("quota", "n_c"), "`quota` replaces `n_c`: a repeated definition")
     for k in _REQUIRED
-        haskey(d, k) || _bad((k,), "missing key")
+        (k == "n_c" && haskey(d, "quota")) || haskey(d, k) || _bad((k,), "missing key")
     end
 end
 
 function _check_integers(d, tau)
-    n_c, ng, N, w = _int("n_c", d["n_c"]), _int("grid_side", d["grid_side"]), _int("N_scr", d["N_scr"]), _int("w", d["w"])
+    n_c, ng, N, w = (haskey(d, "n_c") ? _int("n_c", d["n_c"]) : 0), _int("grid_side", d["grid_side"]), _int("N_scr", d["N_scr"]), _int("w", d["w"])
     qm = _int("q_max", d["q_max"])
     qm <= Q_MAX_SUPPORTED || _bad(("q_max",), "beyond the supported range 1 to $Q_MAX_SUPPORTED, got $qm")
     nm = _int("newton_max", d["newton_max"])
@@ -144,9 +147,10 @@ function panel_inputs(d::AbstractDict)
     sub = _check_subsets(d)
     th = _check_thresholds(d, bits)
     sp = _check_special(d, bits)
+    rd = _check_rounds(d, sp.K, ints.n_c, ints.grid_side)
     src(k) = haskey(d, k) ? "preregistration" : "default"
     sources = Dict("tau" => src("tau"), "seed" => src("seed"), "bigfloat_bits" => src("bigfloat_bits"))
     return (; sp.K, ints.n_c, ints.grid_side, ints.N_scr, sp.alpha, th.theta_T, th.g_T, th.r_T, th.theta_C, th.r_C, th.theta_S, ints.w,
             th.f_S, ints.L_S, sp.log10_r, ints.q_max, th.rho, th.delta_R, ints.newton_max, th.delta_dup, sub.n_ctrl_max, sp.mu,
-            sub.s_D, sub.cap_D, sub.s_L, sub.cap_L, tau, seed, bigfloat_bits = bits, raw = Dict{String, Any}(d), sources)
+            sub.s_D, sub.cap_D, sub.s_L, sub.cap_L, tau, seed, bigfloat_bits = bits, rd..., raw = Dict{String, Any}(d), sources)
 end

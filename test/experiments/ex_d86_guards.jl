@@ -135,7 +135,7 @@ end
     usage = String(take!(uio))
     opts = sort(unique(String[m.match for m in eachmatch(r"--[a-z-]+", usage)]))
     @test opts == sort(["--out", "--store", "--manifest", "--threads", "--thread-override", "--allow-dirty", "--repo", "--code-version", "--capacity", "--cap-override", "--stale",
-                        "--retry-failed", "--retry-control-stop", "--backend-override", "--manifest-reset", "--prior-record"])
+                        "--retry-failed", "--retry-control-stop", "--backend-override", "--manifest-reset", "--prior-record", "--round-log"])
     cli = read(joinpath(dir, "run_cli.jl"), String)
     @test !occursin(r"SALI|FLI|MEGNO|RLI|Stretching|Birkhoff|PhaseAdvance|frequency_map|Indicators|indicator", replace(cli, r"#[^\n]*" => ""))
     # every stop status is nonzero

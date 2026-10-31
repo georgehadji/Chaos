@@ -1,10 +1,10 @@
 # The command-line entry point (D16, D49, D53): argument parsing only; every command calls the module. `bin/chaoslab.jl` passes ARGS.
 
 const CLI_USAGE = "usage: chaoslab panel <prereg> --out <file> | run <prereg> <panel> [--store <dir>] [--manifest <file>] | pilot <prereg> <panel> --out <dir>; " *
-                  "options: --threads N --thread-override --allow-dirty --repo <dir> --code-version <text> --capacity N --cap-override a,b --stale move --retry-failed --retry-control-stop --backend-override --manifest-reset --prior-record <file>"
+                  "options: --threads N --thread-override --allow-dirty --repo <dir> --code-version <text> --capacity N --cap-override a,b --stale move --retry-failed --retry-control-stop --backend-override --manifest-reset --prior-record <file> --round-log <file>"
 
 const CLI_FLAGS = ("--thread-override", "--allow-dirty", "--retry-failed", "--retry-control-stop", "--backend-override", "--manifest-reset")
-const CLI_VALUES = ("--out", "--store", "--manifest", "--threads", "--repo", "--code-version", "--capacity", "--cap-override", "--stale", "--prior-record")
+const CLI_VALUES = ("--out", "--store", "--manifest", "--threads", "--repo", "--code-version", "--capacity", "--cap-override", "--stale", "--prior-record", "--round-log")
 
 function _cli_parse(args)
     pos, opt = String[], Dict{String, Any}()
@@ -61,6 +61,7 @@ function _cli_run(pos, opt, io)
     kw[:retry_control_stop] = haskey(opt, "--retry-control-stop")
     kw[:backend_override] = haskey(opt, "--backend-override")
     kw[:manifest_reset] = haskey(opt, "--manifest-reset")
+    haskey(opt, "--round-log") && (kw[:round_log] = opt["--round-log"])
     res = run_campaign(prereg, panel; kw...)
     println(io, "status: ", res.status)
     foreach(r -> println(io, "  ", r), res.reasons)

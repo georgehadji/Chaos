@@ -63,7 +63,7 @@ function _begin!(s::Session, stale_mode, retry; retry_control_stop = false, back
     plan = s.ctx.plan
     keep = Dict{Int, String}()
     if isdir(s.store)
-        keep, stale, halted = classify_store(plan, s.store)
+        keep, stale, halted = classify_store(plan, s.store; hooks = s.hooks)
         check_backends!(s, keep, backend_override)
         retry_control_stop || refuse_halted(halted)
         handle_stale!(s, stale, stale_mode)
@@ -112,10 +112,12 @@ function run_campaign(prereg::AbstractString, panel::AbstractString; store::Abst
                       code_version = nothing, defaults = nothing, capacity = nothing, free_bytes = nothing, order::Symbol = :plan,
                       stale::Symbol = :stop, retry_failed::Bool = false, cap_override = String[], device_record = nothing,
                       prior_record = nothing, hooks::RunHooks = RunHooks(), retry_control_stop::Bool = false, backend_override::Bool = false,
-                      manifest_reset::Bool = false)
-    plan = plan_run(prereg, panel; code_version = code_version, defaults = defaults)
+                      manifest_reset::Bool = false, round_log = nothing, arms = nothing, up_to = nothing)
+    plan = plan_run(prereg, panel; code_version = code_version, defaults = defaults, round_log = round_log)
     unknown = setdiff(String.(cap_override), [a["name"] for a in plan.block.raw["arm"]])
     isempty(unknown) || throw(ArgumentError("cap_override names no arm of the plan: $(join(unknown, ", "))"))
+    _check_request(plan, arms, up_to)
+    selected = _selected(plan, arms, up_to)
     over_threads = _check_threads(plan, threads, thread_override)
     git, dirty = _check_tree(repo === nothing ? _root() : repo, allow_dirty)
     rec = device_record === nothing ? gpu_record() : device_record
@@ -128,7 +130,8 @@ function run_campaign(prereg::AbstractString, panel::AbstractString; store::Abst
     order === :reverse && reverse!(groups)
     if !_failed_stop!(s)   # the failed fraction may already be over the stop value at the start of a resumed session
         for (gi, g) in groups
-            run_group!(s, gi, order === :reverse ? reverse(g.chunks) : g.chunks) && break
+            chunks = selected === nothing ? g.chunks : filter(in(selected), g.chunks)
+            run_group!(s, gi, order === :reverse ? reverse(chunks) : chunks) && break
         end
     end
     s.now = _now(hooks, :session_end)

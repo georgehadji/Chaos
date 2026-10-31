@@ -40,6 +40,7 @@ Controls (E19): the exact fixed points by K index (0, 0) before (pi, 0), then th
 representative); the first `n_ctrl_max` of that list, then the Y5 control.
 """
 function _controls(inp, psets)
+    inp.controls == "none" && return Dict{String, Any}[]          # D94: a panel may ask for no controls at all
     fixed, newton = Tuple{Int, PeriodicOrbit}[], Tuple{Int, PeriodicOrbit}[]
     for (i, ps) in enumerate(psets), o in ps.orbits
         push!(o.grid_id == -1 && o.q == 1 ? fixed : newton, (i, o))

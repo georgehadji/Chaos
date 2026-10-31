@@ -105,7 +105,8 @@ function _write_result!(s::Session, chunk, recs, status, attempt, first_reasons,
     s.hooks.observe === nothing || s.hooks.observe((ordinal = chunk.ordinal, attempt = attempt), attrs, recs)
     path = chunk_path(s.store, chunk.ordinal)
     ispath(path) && move_aside!(s.store, path, "aside")
-    write_chunk(path, attrs, recs; hook = pt -> _kill(s.hooks, pt, (ordinal = chunk.ordinal, path = path, chunks_done = length(s.ran))))
+    write_chunk(path, attrs, recs; hook = pt -> _kill(s.hooks, pt, (ordinal = chunk.ordinal, path = path, chunks_done = length(s.ran))),
+                onread = kind -> _read_hook(s.hooks, kind, path * ".tmp"))
     push!(s.ran, chunk.ordinal)
     status == "failed" && final_failed && push!(s.failed, chunk.ordinal)
     s.entries[chunk.ordinal] = chunk_entry(chunk, attrs, recs; plan = s.ctx.plan)

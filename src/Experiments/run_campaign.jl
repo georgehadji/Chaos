@@ -4,14 +4,15 @@
 import Dates
 
 """
-    RunHooks(; clock, kill, mutate, observe, frame, series)
+    RunHooks(; clock, kill, mutate, observe, frame, series, read)
 
 Test hooks of the runner; every field is optional and the module calls a hook only through this struct. `clock(event, info)` is the
 only source of time (seconds since the Unix epoch); `kill(point, info)` is called at group and writer points and its exceptions
 propagate unchanged; `mutate(info, orbits)` runs after a chunk attempt is computed, before the checks; `observe(info, attrs, orbits)`
 runs after the checks, just before the write; `frame(kind, info, W)` returns the frame to use in place of `W` before the frame checks of the indicator
 specs (`kind` is `:frame` for a deviation frame, `:pair_frame` for the block frame of a pair); `series(info, orbit, buffer)` runs on the series buffer of
-the frequency kind after the orbit pass and before the transforms (D86).
+the frequency kind after the orbit pass and before the transforms (D86); `read(kind, path)` is called for every read of a chunk file by the
+runner, the resume scan and the read-back of a file just written (`kind` is `:attrs` for the root attributes only, `:datasets` for a full read) (D94).
 """
 Base.@kwdef struct RunHooks
     clock::Any = nothing
@@ -20,6 +21,7 @@ Base.@kwdef struct RunHooks
     observe::Any = nothing
     frame::Any = nothing
     series::Any = nothing
+    read::Any = nothing
 end
 
 const NS_PER_S = 10^9          # nanoseconds per second
@@ -35,6 +37,7 @@ end
 
 _now(h::RunHooks, event, info = nothing) = h.clock === nothing ? real_now() : Float64(h.clock(event, info))
 _kill(h::RunHooks, point, info) = (h.kill === nothing || h.kill(point, info); nothing)
+_read_hook(h::RunHooks, kind, path) = (h.read === nothing || h.read(kind, path); nothing)
 
 _utc(t::Real) = Dates.format(Dates.unix2datetime(t), "yyyy-mm-ddTHH:MM:SS") * "Z"
 

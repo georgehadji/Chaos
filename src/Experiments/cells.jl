@@ -81,11 +81,10 @@ function _elliptic_points(ps, pids)
     return pts, refs
 end
 
-function _draw_R(inp, i, ps, pids)
-    rng = cell_rng(inp.seed, i, "R")
+function _draw_R(inp, i, ps, pids; rng = cell_rng(inp.seed, i, "R"), n = inp.n_c)
     orbs = Dict{String, Any}[]
     if inp.K[i] == 0
-        for t in 1:inp.n_c
+        for t in 1:n
             r = place_R0(rng, inp.q_max)
             d = _with_start!(_drawn_base(inp, i, "R", t), BigFloat(r.x), r.pb)
             d["a"], d["b"] = r.a, r.b
@@ -94,7 +93,7 @@ function _draw_R(inp, i, ps, pids)
         return (class = "R", qualifying = 0, orbits = orbs, grid_ids = Int[])
     end
     pts, refs = _elliptic_points(ps, pids)
-    for t in 1:(isempty(pts) ? 0 : inp.n_c)
+    for t in 1:(isempty(pts) ? 0 : n)
         r = place_R(rng, pts, inp.delta_R)
         d = _with_start!(_drawn_base(inp, i, "R", t), r.xb, r.pb)
         d["source_orbit"], d["source_point"], d["phi"] = refs[r.index][1], refs[r.index][2], r.phi
@@ -103,9 +102,8 @@ function _draw_R(inp, i, ps, pids)
     return (class = "R", qualifying = length(pts), orbits = orbs, grid_ids = Int[])
 end
 
-function _draw_X(inp, i)
-    rng = cell_rng(inp.seed, i, "X")
-    orbs = map(1:inp.n_c) do t
+function _draw_X(inp, i; rng = cell_rng(inp.seed, i, "X"), n = inp.n_c)
+    orbs = map(1:n) do t
         r = place_X(rng, inp.log10_r[1], inp.log10_r[2])
         d = _with_start!(_drawn_base(inp, i, "X", t), r.x, r.p)
         d["r"], d["phi"] = r.r, r.phi

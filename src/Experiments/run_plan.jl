@@ -23,6 +23,7 @@ struct RunPlan
     prereg_header::String
     not_applicable::Dict{String, Vector{Int}}                   # D86: orbits without an item for a spec, by spec id
     omitted_cells::Dict{String, Vector{Tuple{Int, String}}}     # the same with the panel cell of each orbit
+    rounds::Any                                                 # D94: nothing, or the rounds the log releases (`R_plan`, `closed`, ...)
 end
 
 const _ITEM_FIELDS = (:orbit, :system, :param, :x0, :p0, :run_seed, :orbit_seed, :method, :precision, :horizon, :tau, :eps,
@@ -53,7 +54,7 @@ function _read_panel(path, rb)
     accepted = rb.raw["panel_prereg_sha256_accepted"]
     built in accepted || throw(ArgumentError("$path: built under preregistration hash $built, which is not in panel_prereg_sha256_accepted"))
     orbits = sort!(Dict{String, Any}[o for o in t["orbit"]]; by = o -> o["id"])
-    return (orbits = orbits, sha256 = bytes2hex(sha256(bytes)), build_hash = built)
+    return (orbits = orbits, sha256 = bytes2hex(sha256(bytes)), build_hash = built, man = get(t, "manifest", Dict{String, Any}()))
 end
 
 function _read_defaults(path)
@@ -102,13 +103,14 @@ function _panel_base(o)
             p0 = p0, run_seed = String(o["run_seed"]), orbit_seed = String(o["orbit_seed"]),
             design_class = ctrl ? "control" : String(o["class"]), setup_class = _setup_class(o),
             cell = ctrl ? "controls" : "k$(o["k_index"]):$(o["class"])", exponent = ctrl ? Float64(o["exponent"]) : nothing,
-            in_SD = Bool(o["in_SD"]), in_SL = Bool(o["in_SL"]), k_index = Int(get(o, "k_index", 0)), control_exact = _exact_start(o, param, x0, p0))
+            in_SD = Bool(o["in_SD"]), in_SL = Bool(o["in_SL"]), k_index = Int(get(o, "k_index", 0)), control_exact = _exact_start(o, param, x0, p0),
+            round = Int(get(o, "round", 0)), in_D = Bool(get(o, "in_D", false)))
 end
 
 function _h4_base(h, id, seed)
     return (id = id, system = "standard", param = _decimal_text(h["K"]), x0 = _decimal_text(h["x0"]), p0 = _decimal_text(h["p0"]),
             run_seed = string(seed), orbit_seed = string(orbit_seed(seed, id)), design_class = "h4", setup_class = "h4", cell = "h4",
-            exponent = nothing, in_SD = false, in_SL = false, k_index = 0, control_exact = false)
+            exponent = nothing, in_SD = false, in_SL = false, k_index = 0, control_exact = false, round = 0, in_D = false)
 end
 
 # ---------------------------------------------------------------- work items
@@ -153,11 +155,12 @@ function _arm_products(arm, prec, prim, subset, specs = Dict{String, Any}())
     return out
 end
 
-function _build_items(rb, bases, ctx)
+function _build_items(rb, bases, ctx; passes = nothing)
     raw = rb.raw
     prim = raw["primary"]
     subsets = Dict("P" => [b.id for b in bases if b.design_class != "h4"], "S_D" => [b.id for b in bases if b.in_SD], "S_L" => [b.id for b in bases if b.in_SL],
-                   "h4" => [b.id for b in bases if b.design_class == "h4"])
+                   "h4" => [b.id for b in bases if b.design_class == "h4"], "D" => [b.id for b in bases if b.in_D], "D_B" => Int[])
+    passes === nothing && (passes = [(arms = Set(a["name"] for a in raw["arm"]), subsets = subsets)])      # D94: a plan with rounds runs one pass per phase and round
     byid = Dict(b.id => b for b in bases)
     specs = Dict{String, Any}(s["id"] => s for s in get(raw, "indicator", Dict{String, Any}[]))
     items, index = NamedTuple[], Dict{Tuple, Int}()
@@ -165,9 +168,9 @@ function _build_items(rb, bases, ctx)
     pre_steps = Dict{String, Int}(p => 0 for p in PRECISION_ORDER)
     omitted = Dict{String, Vector{Tuple{Int, String}}}()
     checked = Set{Tuple}()
-    for prec in PRECISION_ORDER, arm in raw["arm"]
-        prec in arm["precisions"] || continue
-        for key in _arm_products(arm, prec, prim, subsets[arm["orbits"]], specs)
+    for pass in passes, prec in PRECISION_ORDER, arm in raw["arm"]
+        (prec in arm["precisions"] && arm["name"] in pass.arms) || continue
+        for key in _arm_products(arm, prec, prim, pass.subsets[arm["orbits"]], specs)
             spec = get(specs, key[2], nothing)
             b = byid[key[1]]
             if spec !== nothing
@@ -271,10 +274,11 @@ function _steps(items, before, pre_steps, rb)
 end
 
 "Canonical bytes of a plan: counts, step counts, chunk table with hashes, panel and block hashes, defaults, code version."
-function _plan_text(chunks, items, steps, rb, df, panel, study, cv, omitted = Dict{String, Vector{Tuple{Int, String}}}())
+function _plan_text(chunks, items, steps, rb, df, panel, study, cv, omitted = Dict{String, Vector{Tuple{Int, String}}}(); extra = "")
     io = IOBuffer()
     println(io, "chaoslab-plan 1\nstudy=", study, "\nblock_sha256=", block_hash(rb), "\npanel_sha256=", panel.sha256, "\ncode_version=", cv)
     println(io, "hash_version=", HASH_VERSION)
+    print(io, extra)
     foreach(k -> println(io, "default ", k, "=", repr(df[k])), sort!(collect(keys(df))))
     println(io, "items=", length(items), " chunks=", length(chunks), " steps_before=", steps.total_before, " steps_after=", steps.total_after)
     for a in rb.raw["arm"]
@@ -298,13 +302,18 @@ plan_text(plan::RunPlan) = plan.text
 
 # ---------------------------------------------------------------- the plan
 """
-    plan_run(prereg, panel; code_version = nothing, defaults = nothing, ntasks = nothing) -> RunPlan
+    plan_run(prereg, panel; code_version = nothing, defaults = nothing, ntasks = nothing, round_log = nothing, check = false) -> RunPlan
 
 Build the run plan. Refuses (`ArgumentError`, nothing computed) on a preregistration hash different from its header, a panel built
 under a hash outside `panel_prereg_sha256_accepted`, a malformed block or a plan without items. `ntasks` is accepted for symmetry
 with the panel builder; planning is sequential and never depends on it.
+
+A block whose arms have `release` keys (Amendment D94) is planned in rounds: `round_log` is the path of the round log, which decides the rounds
+and the arms the plan holds (`plan.rounds` has `R_plan` and `closed`); it is checked entry by entry and never written. Without a log the plan is
+refused, unless `check = true`, which gives a dry plan that holds no round.
 """
-function plan_run(prereg::AbstractString, panel::AbstractString; code_version = nothing, defaults = nothing, ntasks = nothing)
+function plan_run(prereg::AbstractString, panel::AbstractString; code_version = nothing, defaults = nothing, ntasks = nothing,
+                  round_log = nothing, check::Bool = false)
     chk = check_prereg(prereg)
     rb = read_run_block(prereg)
     pnl = _read_panel(panel, rb)
@@ -314,24 +323,27 @@ function plan_run(prereg::AbstractString, panel::AbstractString; code_version = 
     seed = df["seed"]
     nP = isempty(pnl.orbits) ? 0 : maximum(Int(o["id"]) for o in pnl.orbits)
     bases = vcat([_panel_base(o) for o in pnl.orbits], [_h4_base(h, nP + i, seed) for (i, h) in enumerate(rb.raw["h4"])])
+    rs = _round_setup(rb, pnl, bases, round_log, check)         # D94: nothing for a block without release keys
+    rs === nothing || (bases = rs.bases)
     ctx = (grids = Dict{Tuple{Int, Int}, NamedTuple}(), grid = rb.raw["grid"], bits = df["bigfloat_bits"], cv = cv)
-    items, before, pre_steps, omitted = _build_items(rb, bases, ctx)
+    items, before, pre_steps, omitted = _build_items(rb, bases, ctx; passes = rs === nothing ? nothing : rs.passes)
     for (id, os) in omitted        # an arm that selects no orbit for a spec is an error naming the spec (R12 item 2)
         any(it -> it.method == id, items) || throw(ArgumentError("indicator spec `$id` is undefined for every orbit its arms select (orbits $(join(sort!(first.(os)), ", ")))"))
     end
     for spec in get(rb.raw, "indicator", [])    # a spec whose arms select no orbit at all is an error naming the spec (R12 item 2)
         any(it -> it.method == spec["id"], items) || throw(ArgumentError("indicator spec `$(spec["id"])` is selected by no orbit of the panel (the arms that hold it select an empty subset)"))
     end
-    isempty(items) && throw(ArgumentError("run plan holds zero items: the arms select no orbit of the panel"))
+    isempty(items) && !(rs !== nothing && rs.dry) && throw(ArgumentError("run plan holds zero items: the arms select no orbit of the panel"))
     for it in items
         it.method == "L6" && _label(it.precision) != "Float64" &&
             throw(ArgumentError("run plan has method L6 at $(it.precision): L6 (library QR) runs in Float64 only"))
     end
     chunks = _build_chunks(items, rb, df)
+    rounds = rs === nothing ? nothing : _round_finish(rs, rb, pnl, chk, chunks, round_log)
     steps = _steps(items, before, pre_steps, rb)
-    text = _plan_text(chunks, items, steps, rb, df, pnl, study, cv, omitted)
+    text = _plan_text(chunks, items, steps, rb, df, pnl, study, cv, omitted; extra = rounds === nothing ? "" : _rounds_text(rounds, chunks, rb))
     return RunPlan(items, chunks, (items = length(items), chunks = length(chunks)), steps, bytes2hex(sha256(text)), text, rb, df, pnl,
-                   study, cv, chk.header_sha256, Dict{String, Vector{Int}}(id => sort!(first.(os)) for (id, os) in omitted), omitted)
+                   study, cv, chk.header_sha256, Dict{String, Vector{Int}}(id => sort!(first.(os)) for (id, os) in omitted), omitted, rounds)
 end
 
 _code_version_default() = code_version()

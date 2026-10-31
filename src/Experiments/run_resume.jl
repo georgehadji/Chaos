@@ -22,10 +22,15 @@ _chunk_files(store) = sort!(filter(f -> occursin(r"^chunk-\d{5}\.h5$", basename(
 
 # Files of the store by kind: `keep` (complete, chunk hash and panel file equal to the plan's), `halted` (kept but written by a
 # control-bound stop, H1) and `stale` (everything else). A different panel file is stale even when the chunk hash is equal (M6).
-function classify_store(plan::RunPlan, store)
+function classify_store(plan::RunPlan, store; hooks::RunHooks = RunHooks())
     keep, halted, stale = Dict{Int, String}(), Dict{Int, String}(), String[]
     for f in _chunk_files(store)
         ord = parse(Int, string(match(r"chunk-(\d{5})\.h5", basename(f)).captures[1]))
+        if !(1 <= ord <= plan.counts.chunks)         # D94: a file beyond the plan (a closure arm before closure) is stale and is not opened
+            push!(stale, f)
+            continue
+        end
+        _read_hook(hooks, :attrs, f)
         a = try
             read_chunk_attrs(f)
         catch
@@ -74,10 +79,12 @@ function check_backends!(s::Session, keep::Dict{Int, String}, override::Bool)
     problems = String[]
     if !isempty(old)
         for k in sort!(collect(union(keys(old), keys(now))))
+            s.ctx.plan.rounds !== nothing && !haskey(old, k) && continue      # D94: a later round or the closure brings run types the earlier plan did not have
             get(old, k, nothing) == get(now, k, nothing) || push!(problems, "$(k[1]) $(k[2]): was $(get(old, k, "absent")), now $(get(now, k, "absent"))")
         end
     end
     for o in sort!(collect(keys(keep)))
+        _read_hook(s.hooks, :attrs, keep[o])
         a = read_chunk_attrs(keep[o])
         row = _row(s, s.ctx.plan.items[first(s.ctx.plan.chunks[o].items)])
         b = get(a, "backend", "")
@@ -119,6 +126,7 @@ function load_entries!(s::Session, keep::Dict{Int, String}, retry::Bool)
     s.entries = Dict{String, Any}[]
     for c in plan.chunks
         if haskey(keep, c.ordinal)
+            _read_hook(s.hooks, :datasets, keep[c.ordinal])
             ch = read_chunk(keep[c.ordinal])
             e = chunk_entry(c, ch.attrs, ch.orbits; plan = plan)
             failed = e["status"] == "failed"

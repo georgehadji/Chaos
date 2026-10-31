@@ -3,7 +3,8 @@
 
 const RB_METHODS = ("L1", "L2", "L3", "L4", "L4b", "L5", "L5b", "L6", "L9")
 const RB_PRECISIONS = ("Float64", "Double64", "BigFloat")
-const RB_SUBSETS = ("P", "S_D", "S_L", "h4")
+const RB_SUBSETS = ("P", "S_D", "S_L", "h4", "D", "D_B")
+const RB_RELEASES = ("each_round", "closure")      # D94: when the round log releases an arm
 const RB_MODES = ("lifted", "wrapped")
 const RB_REQUESTS = ("auto", "gpu", "cpu")
 const RB_CLASSES = ("T", "R", "C", "S", "X", "control_elliptic", "control_hyperbolic", "h4")
@@ -68,7 +69,7 @@ function _rb_primary(p)
 end
 
 const _ARM_REQUIRED = ("name", "orbits", "precisions", "horizons")
-const _ARM_OPTIONAL = ("methods", "indicators", "tau", "eps", "direction", "coordinate_mode", "h1_check", "stop_exempt")
+const _ARM_OPTIONAL = ("methods", "indicators", "tau", "eps", "direction", "coordinate_mode", "h1_check", "stop_exempt", "release")
 const RB_CONTROL_SCOPES = ("all", "exact_start")
 
 function _rb_arm(a, path)
@@ -84,6 +85,7 @@ function _rb_arm(a, path)
     haskey(a, "direction") && (out["direction"] = _rb_list(a["direction"], "$path.direction", _rb_direction))
     haskey(a, "coordinate_mode") &&
         (out["coordinate_mode"] = _rb_list(a["coordinate_mode"], "$path.coordinate_mode", (x, p) -> _rb_str(x, p, RB_MODES)))
+    haskey(a, "release") && (out["release"] = _rb_str(a["release"], "$path.release", RB_RELEASES))
     for k in ("h1_check", "stop_exempt")
         haskey(a, k) || continue
         a[k] isa Bool || _rb_err("$path.$k", "must be true or false, got $(repr(a[k]))")
@@ -115,6 +117,8 @@ function _rb_arms(v, prim, has_h4)
     names = [a["name"] for a in arms]
     allunique(names) || _rb_err("arm.name", "duplicate arm name $(repr(first(n for n in names if count(==(n), names) > 1)))")
     for (i, a) in enumerate(arms)
+        a["orbits"] == "D_B" && get(a, "release", "") == "each_round" &&
+            _rb_err("arm[$i].release", "arm `$(a["name"])` has orbits D_B, which does not exist before closure: release each_round is refused")
         a["orbits"] == "h4" && !has_h4 && _rb_err("h4", "arm `$(a["name"])` uses the subset h4 but the block lists no [[run.h4]] start")
         for N in a["horizons"], tau in _rb_taus(a, prim)
             N % tau == 0 || _rb_err("arm[$i].horizons", "horizon $N is not a multiple of tau = $tau")

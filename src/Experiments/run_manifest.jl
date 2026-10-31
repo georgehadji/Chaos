@@ -72,6 +72,7 @@ function _static(s::Session)
         "launch" => Dict{String, Any}("free_bytes" => s.free_bytes, "f" => s.f, "capacity" => s.capacity),
         "removed_temporaries" => s.removed)
     plan_has_specs(plan) && (d["indicators"] = indicator_manifest(plan))
+    plan.rounds === nothing || (d["rounds"] = _rounds_manifest(plan.rounds))
     return d
 end
 
@@ -109,7 +110,8 @@ function _arm_entries(s::Session)
         es = [e for e in s.entries if arm["name"] in e["arms"]]
         steps = sum(e["steps"] for e in es; init = 0)
         thr = sum(e["thread_seconds"] for e in es; init = 0.0)
-        status = arm["name"] in s.paused ? "paused: cost cap" : all(e -> e["status"] in ("ok", "failed"), es) ? "complete" : "pending"
+        status = arm["name"] in s.paused ? "paused: cost cap" : (isempty(es) && s.ctx.plan.rounds !== nothing) ? "not released" :
+                 all(e -> e["status"] in ("ok", "failed"), es) ? "complete" : "pending"
         out[arm["name"]] = Dict{String, Any}("steps" => steps, "wall_seconds" => sum(e["wall_seconds"] for e in es; init = 0.0),
             "thread_seconds" => thr, "cost_ns_per_orbit_step" => steps > 0 ? NS_PER_S * thr / steps : 0.0, "budget_ns" => budget_line_ns(rb, arm),
             "status" => status)

@@ -170,3 +170,41 @@ end
 for (name, spec) in IND_SPECS
     SUITE["run indicator $name"] = ind_item_bench(spec)
 end
+
+# Amendment D94: the random screening points and the pool draw at the study size (M = 262144 points per K, r_max = 4, quota 250), the subsets D
+# and D_B, and the plan of a hand-made panel of 3000 orbits in three rounds with an empty round log (so R_plan = 1).
+const POOL_M = 262144
+const POOL_BITS = UInt8[(j % 7 == 0 ? 0x01 : 0x00) | (j % 11 == 0 ? 0x02 : 0x00) | (j % 13 == 0 ? 0x04 : 0x00) for j in 1:POOL_M]
+const DB_POOL = NamedTuple{(:id, :k_index), Tuple{Int, Int}}[(id = j, k_index = 1 + j % 5) for j in 1:1300]
+SUITE["random_screen_points M = 262144"] = @benchmarkable EXP.random_screen_points(20261012, 2, $POOL_M) samples = 3 evals = 1
+SUITE["draw_pool_rounds M = 262144, r_max 4, quota 250"] = @benchmarkable EXP.draw_pool_rounds(20261012, 2, $POOL_BITS; quota = Dict("T" => 250, "C" => 250, "S" => 25), r_max = 4) samples = 3 evals = 1
+SUITE["d_indices n = 250 and db_subset |D| = 1300"] = @benchmarkable (EXP.d_indices(20261012, 2, 2, "T", 250, 7 // 20); EXP.db_subset(20261012, 4, $DB_POOL, 100))
+
+function rounds_bench_panel(path)
+    orbs = [Dict{String, Any}("id" => j, "class" => "T", "control" => false, "control_kind" => "none", "k_index" => 1 + j % 5, "K_text" => "1.5", "K" => 1.5,
+                              "system" => "standard", "x0" => 0.001j, "p0" => 0.002j, "x0_dec" => string(0.001j), "p0_dec" => string(0.002j), "draw_index" => j,
+                              "run_seed" => "1", "orbit_seed" => string(EXP.orbit_seed(1, j)), "in_SD" => false, "in_SL" => false, "round" => 1 + (j - 1) ÷ 1000,
+                              "in_D" => j % 4 == 0) for j in 1:3000]
+    man = Dict{String, Any}("format_version" => 1, "controls" => Int[], "r_max" => 3, "db_size" => 100,
+                            "prereg" => Dict{String, Any}("header_sha256" => PANEL_HASH, "computed_sha256" => PANEL_HASH))
+    open(io -> TOML.print(io, Dict{String, Any}("manifest" => man, "orbit" => orbs)), path, "w")
+    return path
+end
+
+const ROUNDS_PANEL = rounds_bench_panel(joinpath(DIR, "rounds-panel.toml"))
+const ROUNDS_LOG = joinpath(DIR, "rounds.log")
+write(ROUNDS_LOG, "")
+
+function bench_rounds_prereg(dir)
+    block = replace(RUN_BLOCK, "orbits = \"S_L\"\nmethods = [\"L5\"]" => "release = \"each_round\"\norbits = \"P\"\nmethods = [\"L5\"]")
+    block *= "\n[[run.arm]]\nname = \"closure\"\nrelease = \"closure\"\norbits = \"D\"\nmethods = [\"L4\"]\nprecisions = [\"Float64\"]\nhorizons = [10000]\n"
+    text = replace(replace(read(PREREG, String), "\r\n" => "\n"), "|-------|-------|\n" => "|-------|-------|\n| Study slug | bench |\n"; count = 1)
+    text *= "\n## Amendment A4\n\n```toml\n" * block * "```\n"
+    path = joinpath(dir, "bench-rounds-prereg.md")
+    row = r"(?m)^(\| SHA-256 of this file[^|]*\|)[^|\n]*\|"
+    write(path, replace(text, row => m -> match(r"^\| SHA-256 of this file[^|]*\|", m).match * " " * prereg_hash(text) * " |"))
+    return path
+end
+
+const ROUNDS_PREREG = bench_rounds_prereg(DIR)
+SUITE["plan_run in rounds, 3000 orbits, R_plan 1"] = @benchmarkable plan_run($ROUNDS_PREREG, $ROUNDS_PANEL; code_version = "bench", round_log = $ROUNDS_LOG) samples = 3 evals = 1

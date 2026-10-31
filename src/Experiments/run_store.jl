@@ -142,9 +142,10 @@ end
 
 Write a chunk file atomically: under `path * ".tmp"` with `complete` false, orbit groups, close, read back and compare bit for bit (root
 attributes included), set `complete`, flush to the disk, rename to `path` (a file already there is moved to `<path>.old<k>` first; the
-rename retries while another process holds a file). `attrs` are the root attributes, `orbits` the orbit records.
+rename retries while another process holds a file). `attrs` are the root attributes, `orbits` the orbit records. `onread(kind)` is called before
+each read-back of the temporary file (`:datasets` or `:attrs`).
 """
-function write_chunk(path::AbstractString, attrs::AbstractDict, orbits::AbstractVector; hook = _nohook)
+function write_chunk(path::AbstractString, attrs::AbstractDict, orbits::AbstractVector; hook = _nohook, onread = _nohook)
     tmp = path * ".tmp"
     mkpath(dirname(abspath(path)))
     want = merge(Dict{String, Any}(attrs), Dict{String, Any}("complete" => false))
@@ -161,6 +162,7 @@ function write_chunk(path::AbstractString, attrs::AbstractDict, orbits::Abstract
         end
         _put_pooled!(f, orbits)
     end
+    onread(:datasets)
     back = read_chunk(tmp)
     length(back.orbits) == length(orbits) && all(_same(a, b) for (a, b) in zip(orbits, back.orbits)) ||
         error("write_chunk: $tmp differs from the buffers after the write")
@@ -173,6 +175,7 @@ function write_chunk(path::AbstractString, attrs::AbstractDict, orbits::Abstract
         HDF5.delete_attribute(f, "complete")
         HDF5.write_attribute(f, "complete", true)
     end
+    onread(:attrs)
     read_chunk_attrs(tmp)["complete"] === true || error("write_chunk: $tmp does not read back complete")
     _fsync(tmp)
     hook(:before_rename)

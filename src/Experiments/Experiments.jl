@@ -34,10 +34,12 @@ export run_block, read_run_block, block_text, block_hash, plan_run, plan_text, c
 export deviation_frame, launch_capacity, launch_groups, resolve_run_backend, backend_table, cpu_only_method, code_version, orbit_bytes, group_capacity
 export run_campaign, RunHooks, read_chunk, write_chunk, chunk_layout, read_json, run_pilot, rerun_check, exit_status, cli
 export default_store, hot_loop_bytes
+export random_screen_points, draw_pool_rounds, d_size, d_indices, db_allocation, db_subset, read_round_log, check_round_log
 
 include("parallel.jl")
 include("geometry.jl")
 include("inputs.jl")
+include("inputs_rounds.jl")
 include("prereg.jl")
 include("periodic.jl")
 include("newton.jl")
@@ -50,12 +52,16 @@ include("subsets.jl")
 include("provenance.jl")
 include("cells.jl")
 include("panel_tables.jl")
+include("rounds_streams.jl")
+include("rounds_panel.jl")
 include("panel.jl")
 include("portrait.jl")
 include("run_block.jl")
 include("run_indicator.jl")
 include("run_grid.jl")
 include("run_plan.jl")
+include("round_log.jl")
+include("run_rounds.jl")
 include("run_indicator_chain.jl")
 include("run_backend.jl")
 include("run_record.jl")

@@ -87,4 +87,14 @@ function _p3_verdict_requirements(p, ids)
 end
 
 "The SHA-256 of every input file (E55), by name, for the fingerprints and for the check that nothing changed during the run (E48 j)."
-_p3_hashes(files) = Dict(f => bytes2hex(sha256(read(f))) for f in files if isfile(f))
+_p3_hashes(files) = Dict(f => open(io -> bytes2hex(sha256(io)), f) for f in files if isfile(f))
+
+# The chunk files a manifest lists, in the store; none if the manifest cannot be read (the checks that follow refuse it).
+function _p3_chunk_files(manifest, store)
+    isfile(manifest) || return String[]
+    try
+        return String[chunk_path(store, c["ordinal"]) for c in read_json(manifest)["chunks"]]
+    catch
+        return String[]
+    end
+end

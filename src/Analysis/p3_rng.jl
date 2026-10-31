@@ -46,7 +46,8 @@ p3_stream_seed(test_seed::Integer, purpose::AbstractString, unit) = stream_seed(
 p3_stream(test_seed::Integer, purpose::AbstractString, unit) = p3_generator(p3_splitmix_state(p3_stream_seed(test_seed, purpose, unit)))
 
 "A uniform `(k + 1/2) / 2^53` with `k` the top 53 bits of an output; it lies in the open unit interval."
-p3_uniform!(g::P3Gen) = (Float64(p3_u64!(g) >> 11) + 0.5) / 2.0^53
+# the clamp: k = 2^53 - 1 rounds (k + 1/2) / 2^53 to exactly 1.0 in binary64, which the open interval excludes; no other value changes.
+p3_uniform!(g::P3Gen) = min((Float64(p3_u64!(g) >> 11) + 0.5) / 2.0^53, prevfloat(1.0))
 
 "An integer in 1 to `m`, unbiased: `x mod m + 1` for the first output `x <= 2^64 - 1 - (2^64 mod m)`."
 function p3_randint!(g::P3Gen, m::Integer)

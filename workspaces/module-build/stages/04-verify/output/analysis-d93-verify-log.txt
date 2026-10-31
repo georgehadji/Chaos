@@ -1,0 +1,466 @@
+# D93 stage 04 verify log (2026-10-31). Real stores read only; outputs under the scratchpad, not in the repo.
+## calibrate runs before review fixes (commit 076ae64): driver lines
+t23a: exit 0 threads 23 elapsed_s 169.6 maxrss_GB 2.33
+t23b: exit 0 threads 23 elapsed_s 184.3 maxrss_GB 2.24
+t1: exit 0 threads 1 elapsed_s 221.7 maxrss_GB 2.3
+t4: exit 0 threads 4 elapsed_s 216.3 maxrss_GB 2.4
+run1 (default threads): 4 min 37 s, exit 0
+## SHA-256 of outputs before fixes
+6d45932b96480142de011df411933f1729c636c0939d417a87804e31e6172b36  run1/p3-abstention-calibration-record.json
+cb9415526b1e12471c480e0b3f67af81fbd55ac39d233c2021403c43ee47af9f  run1/p3-abstention-calibration-tables.md
+6d45932b96480142de011df411933f1729c636c0939d417a87804e31e6172b36  t23a/p3-abstention-calibration-record.json
+cb9415526b1e12471c480e0b3f67af81fbd55ac39d233c2021403c43ee47af9f  t23a/p3-abstention-calibration-tables.md
+6d45932b96480142de011df411933f1729c636c0939d417a87804e31e6172b36  t23b/p3-abstention-calibration-record.json
+cb9415526b1e12471c480e0b3f67af81fbd55ac39d233c2021403c43ee47af9f  t23b/p3-abstention-calibration-tables.md
+6d45932b96480142de011df411933f1729c636c0939d417a87804e31e6172b36  t1/p3-abstention-calibration-record.json
+cb9415526b1e12471c480e0b3f67af81fbd55ac39d233c2021403c43ee47af9f  t1/p3-abstention-calibration-tables.md
+6d45932b96480142de011df411933f1729c636c0939d417a87804e31e6172b36  t4/p3-abstention-calibration-record.json
+cb9415526b1e12471c480e0b3f67af81fbd55ac39d233c2021403c43ee47af9f  t4/p3-abstention-calibration-tables.md
+## calibrate runs after review fixes (uncommitted fixes on 076ae64)
+fix1: exit 0 threads 23 elapsed_s 139.5 maxrss_GB 2.45
+fix2: exit 0 threads 1 elapsed_s 105.0 maxrss_GB 2.45
+adc43d25b92276244ab27d95745e9f77f7cc073bbd37c8bb06d67826a9ee4ffb  fix1/p3-abstention-calibration-record.json
+5b0355d72b44fc11ba3c13d3c4e1aba571b80b7f68eded6dcf5616b6ccb9cffd  fix1/p3-abstention-calibration-tables.md
+adc43d25b92276244ab27d95745e9f77f7cc073bbd37c8bb06d67826a9ee4ffb  fix2/p3-abstention-calibration-record.json
+5b0355d72b44fc11ba3c13d3c4e1aba571b80b7f68eded6dcf5616b6ccb9cffd  fix2/p3-abstention-calibration-tables.md
+## data tree listing SHA-256 (2436 files): before 10a9c50df6e1069e8c4c344db69d0dbdb1e4c908ceb3c4d31e9a115826a165a7, after all runs 10a9c50df6e1069e8c4c344db69d0dbdb1e4c908ceb3c4d31e9a115826a165a7
+## O19 (independent export)
+{"P1_duplicate_keys":[],"anomalies":[],"checks":[{"detail":"","name":"E48 p2 manifest study and status","ok":true},{"detail":"","name":"E48 P1 manifest study and status","ok":true},{"detail":"p2 695 P1 1363","name":"E48 every chunk of both manifests ok","ok":true},{"detail":"881874d26aa8883caa0545331ba167a3f2c9e3c249cdb6ba32ad39c98ad348d5","name":"E48 panel hash in the P1 manifest equals the p2 manifest's and the panel file's","ok":true},{"detail":"2304","name":"E24 [[run.h4]] table count","ok":true},{"detail":"bad 0","name":"E24 grid identity (params, ic, K index)","ok":true},{"detail":"bad 0","name":"E24 panel identity (ic, params)","ok":true},{"detail":"non-control panel orbits 870, with a missing item or step: 0","name":"O19a P1 store holds the L5 and L1 items (Float64, N_1, lifted, direction pi/4) and the steps N_1/10, N_1/2, N_1 for every non-control panel orbit","ok":true},{"detail":"","name":"O19b p2 store holds the L1 item (Float64, N_1, wrapped) for all 883 panel and 2304 grid orbits","ok":true},{"detail":"","name":"O19b p2 store holds the L5 item (Float64, N_1, wrapped) for the 2304 grid orbits","ok":true},{"detail":"","name":"O19b p2 store holds no such L5 item for the panel orbits (as the coordinator reported)","ok":true},{"detail":"items with the flag: 0","name":"O19c no L1 or L5 item of the P1 store carries \"diagnostics exceeded\"","ok":true},{"detail":"items with the flag: 0","name":"O19c no L1 or L5 item of the p2 store carries \"diagnostics exceeded\"","ok":true},{"detail":"P1 0 p2 0","name":"no duplicate item keys among the items read (P1 lifted items kept; p2 series, windows)","ok":true}],"grid_missing_ids":[],"panel_missing_ids":[]}
+
+## O15 compare against fix1 record
+EQUAL outcome.selection
+EQUAL relabelling.rho_new by (source, K index, rho)
+EQUAL relabelling.axes (instability, structure) pooled
+EQUAL relabelling.change table panel by (K index, old, new)
+EQUAL relabelling.change table grid by (K index, old, new)
+EQUAL relabelling.panel_changed
+EQUAL relabelling.grid_changed (D93d: 0 against D89 E23 b)
+EQUAL relabelling.missing data
+EQUAL dropped.total
+EQUAL dropped.by_reason
+EQUAL dropped rows (id, source, K index, reason)
+EQUAL sets.cal.pooled
+EQUAL sets.cal.panel
+EQUAL sets.cal.grid
+EQUAL sets.S2.pooled
+EQUAL sets.S2.panel
+EQUAL sets.S2.grid
+EQUAL sets.T_s.pooled
+EQUAL sets.T_s.panel
+EQUAL sets.T_s.grid
+EQUAL sets.W2.pooled
+EQUAL sets.W2.panel
+EQUAL sets.W2.grid
+EQUAL sets.R_W.pooled
+EQUAL sets.R_W.panel
+EQUAL sets.R_W.grid
+EQUAL sets.regular.pooled
+EQUAL sets.regular.panel
+EQUAL sets.regular.grid
+EQUAL sets.gate.pooled
+EQUAL sets.gate.panel
+EQUAL sets.gate.grid
+EQUAL sets.overlap S2 with W2
+EQUAL sets.cal by source and K index
+EQUAL theta_space.size
+EQUAL theta_space.F1..F6 alone
+EQUAL theta_space.first failing item counts (0 = feasible, 1..6)
+EQUAL theta_space.cost cap of F1
+EQUAL theta_space.sizes Cal, S2, T_s, W2
+EQUAL selection.|F|
+EQUAL selection.|Theta_tol|
+EQUAL selection.J_min
+EQUAL selection.theta* index
+EQUAL selection.theta* (V, qC, qR, w, v)
+EQUAL selection.theta* cost C_R(theta*, b_P)
+EQUAL matched budget SALI (b, capped, round-down, round-down none)
+EQUAL matched budget FLI (b, capped, round-down, round-down none)
+EQUAL matched budget MEGNO (b, capped, round-down, round-down none)
+EQUAL matched budget E1 (b, capped, round-down, round-down none)
+EQUAL matched budget E2 (b, capped, round-down, round-down none)
+EQUAL matched budget WBA (b, capped, round-down, round-down none)
+EQUAL matched budget LE (b, capped, round-down, round-down none)
+EQUAL LE read budget
+EQUAL LE cost-unmatched flag
+EQUAL Double64 costs pair
+EQUAL Double64 costs float_votes
+EQUAL Double64 costs ratio
+EQUAL F1 data block rows (index, C_R, FR(W2), FR(T_s), J, in Theta_tol, theta*), 382 rows
+EQUAL F1 data block digest = SHA-256 of the table lines (header, separator, rows) joined by LF (independent recomputation)
+EQUAL c7.top 20 of Theta_tol (indices in the order of C6)
+EQUAL c7.hb T_s comparators
+EQUAL c7.hb T_s SALI b, capped, cost-unmatched
+EQUAL c7.hb T_s SALI cost
+EQUAL c7.hb T_s SALI FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb T_s SALI exact McNemar p
+EQUAL c7.hb T_s FLI b, capped, cost-unmatched
+EQUAL c7.hb T_s FLI cost
+EQUAL c7.hb T_s FLI FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb T_s FLI exact McNemar p
+EQUAL c7.hb T_s MEGNO b, capped, cost-unmatched
+EQUAL c7.hb T_s MEGNO cost
+EQUAL c7.hb T_s MEGNO FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb T_s MEGNO exact McNemar p
+EQUAL c7.hb T_s E1 b, capped, cost-unmatched
+EQUAL c7.hb T_s E1 cost
+EQUAL c7.hb T_s E1 FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb T_s E1 exact McNemar p
+EQUAL c7.hb T_s E2 b, capped, cost-unmatched
+EQUAL c7.hb T_s E2 cost
+EQUAL c7.hb T_s E2 FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb T_s E2 exact McNemar p
+EQUAL c7.hb T_s WBA b, capped, cost-unmatched
+EQUAL c7.hb T_s WBA cost
+EQUAL c7.hb T_s WBA FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb T_s WBA exact McNemar p
+EQUAL c7.hb W2 comparators
+EQUAL c7.hb W2 LE b, capped, cost-unmatched
+EQUAL c7.hb W2 LE cost
+EQUAL c7.hb W2 LE FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb W2 LE exact McNemar p
+EQUAL c7.hb W2 SALI b, capped, cost-unmatched
+EQUAL c7.hb W2 SALI cost
+EQUAL c7.hb W2 SALI FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb W2 SALI exact McNemar p
+EQUAL c7.hb W2 FLI b, capped, cost-unmatched
+EQUAL c7.hb W2 FLI cost
+EQUAL c7.hb W2 FLI FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb W2 FLI exact McNemar p
+EQUAL c7.hb W2 MEGNO b, capped, cost-unmatched
+EQUAL c7.hb W2 MEGNO cost
+EQUAL c7.hb W2 MEGNO FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb W2 MEGNO exact McNemar p
+EQUAL c7.hb W2 E1 b, capped, cost-unmatched
+EQUAL c7.hb W2 E1 cost
+EQUAL c7.hb W2 E1 FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb W2 E1 exact McNemar p
+EQUAL c7.hb W2 E2 b, capped, cost-unmatched
+EQUAL c7.hb W2 E2 cost
+EQUAL c7.hb W2 E2 FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb W2 E2 exact McNemar p
+EQUAL c7.hb W2 WBA b, capped, cost-unmatched
+EQUAL c7.hb W2 WBA cost
+EQUAL c7.hb W2 WBA FR_X, FR_rule, n10, n01, coverage, margin
+EQUAL c7.hb W2 WBA exact McNemar p
+EQUAL c7.e
+EQUAL c7.u_cal
+EQUAL c7.u_s2
+EQUAL c7.g
+EQUAL c7.J
+EQUAL c7.cost
+EQUAL c7.risk_coverage family points (record = cross: q_C and q_R varied one at a time; oracle also computed the grid)
+EQUAL c7.risk_coverage family 1,2 (coverage, e)
+EQUAL c7.risk_coverage family 1,3 (coverage, e)
+EQUAL c7.risk_coverage family 2,3 (coverage, e)
+EQUAL c7.risk_coverage single LE (b, coverage, e)
+EQUAL c7.risk_coverage single SALI (b, coverage, e)
+EQUAL c7.risk_coverage single FLI (b, coverage, e)
+EQUAL c7.risk_coverage single MEGNO (b, coverage, e)
+EQUAL c7.risk_coverage single E1 (b, coverage, e)
+EQUAL c7.risk_coverage single E2 (b, coverage, e)
+EQUAL c7.risk_coverage single WBA (b, coverage, e)
+EQUAL c7.by_source panel (n, FR T_s, FR W2, decided T_s, decided W2)
+EQUAL c7.by_source grid (n, FR T_s, FR W2, decided T_s, decided W2)
+EQUAL c7.K > 0 (n, e, u)
+EQUAL r_ab rows (id, output) on the Cal orbits with Double64 items
+EQUAL optimism.used, skipped
+EQUAL outcome.optimism_skipped
+EQUAL optimism.theta_b (index of the element chosen on each resample)
+EQUAL optimism(T_s)  [1e-12 relative]
+EQUAL optimism(W2)  [1e-12 relative]
+EQUAL pp_hb.r(theta*, T_s)  [1e-12 relative]
+EQUAL pp_hb.r(theta*, W2)  [1e-12 relative]
+EQUAL pp_hb.r_corr T_s  [1e-12 relative]
+EQUAL pp_hb.r_corr W2  [1e-12 relative]
+EQUAL pp_hb.r_corr R_W  [1e-12 relative]
+EQUAL pp_hb.p_rule T_s  [1e-12 relative]
+EQUAL pp_hb.p_rule R_W  [1e-12 relative]
+EQUAL pp_hb.d(T_s)  [1e-12 relative]
+EQUAL pp_hb.p_X(T_s) X=LE  [equal to 12 significant digits]
+EQUAL pp_hb.s_X(T_s) X=LE  [1e-12 relative]
+EQUAL pp_hb.p_X(T_s) X=SALI  [1e-12 relative]
+EQUAL pp_hb.s_X(T_s) X=SALI  [1e-12 relative]
+EQUAL pp_hb.p_X(T_s) X=FLI  [equal to 12 significant digits]
+EQUAL pp_hb.s_X(T_s) X=FLI  [1e-12 relative]
+EQUAL pp_hb.p_X(T_s) X=MEGNO  [1e-12 relative]
+EQUAL pp_hb.s_X(T_s) X=MEGNO  [1e-12 relative]
+EQUAL pp_hb.p_X(T_s) X=E1  [1e-12 relative]
+EQUAL pp_hb.s_X(T_s) X=E1  [1e-12 relative]
+EQUAL pp_hb.p_X(T_s) X=E2  [1e-12 relative]
+EQUAL pp_hb.s_X(T_s) X=E2  [1e-12 relative]
+EQUAL pp_hb.p_X(T_s) X=WBA  [equal to 12 significant digits]
+EQUAL pp_hb.s_X(T_s) X=WBA  [1e-12 relative]
+EQUAL pp_hb.d(R_W)  [1e-12 relative]
+EQUAL pp_hb.p_X(R_W) X=LE  [1e-12 relative]
+EQUAL pp_hb.s_X(R_W) X=LE  [1e-12 relative]
+EQUAL pp_hb.p_X(R_W) X=SALI  [1e-12 relative]
+EQUAL pp_hb.s_X(R_W) X=SALI  [1e-12 relative]
+EQUAL pp_hb.p_X(R_W) X=FLI  [1e-12 relative]
+EQUAL pp_hb.s_X(R_W) X=FLI  [1e-12 relative]
+EQUAL pp_hb.p_X(R_W) X=MEGNO  [equal to 12 significant digits]
+EQUAL pp_hb.s_X(R_W) X=MEGNO  [1e-12 relative]
+EQUAL pp_hb.p_X(R_W) X=E1  [equal to 12 significant digits]
+EQUAL pp_hb.s_X(R_W) X=E1  [1e-12 relative]
+EQUAL pp_hb.p_X(R_W) X=E2  [equal to 12 significant digits]
+EQUAL pp_hb.s_X(R_W) X=E2  [1e-12 relative]
+EQUAL pp_hb.p_X(R_W) X=WBA  [equal to 12 significant digits]
+EQUAL pp_hb.s_X(R_W) X=WBA  [1e-12 relative]
+EQUAL pp_hb.path sizes (j, rho, nT, nRW, nW, allowed), 17 points
+EQUAL pp_hb.path point 3 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 4 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 5 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 6 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 7 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 8 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 9 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 10 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 11 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 12 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 13 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 14 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 15 power counts (successes of 20000 runs)
+EQUAL pp_hb.path point 16 power counts (successes of 20000 runs)
+EQUAL pp_hb.targets outcome, cap flag
+EQUAL pp_hb.targets n_T, n_W
+EQUAL pp_hb.targets point of the cap (j; rho* is null in the cap case, D93 review fix)
+EQUAL pp_hb.targets power at the cap  [1e-12 relative]
+EQUAL pp_hb.type-I joint rate X=LE  [1e-12 relative]
+EQUAL pp_hb.type-I single-comparison rate X=LE (reading: comparisons of X alone, coverage ignored)  [1e-12 relative]
+EQUAL pp_hb.type-I joint rate X=SALI  [1e-12 relative]
+EQUAL pp_hb.type-I single-comparison rate X=SALI (reading: comparisons of X alone, coverage ignored)  [1e-12 relative]
+EQUAL pp_hb.type-I joint rate X=FLI  [1e-12 relative]
+EQUAL pp_hb.type-I single-comparison rate X=FLI (reading: comparisons of X alone, coverage ignored)  [1e-12 relative]
+EQUAL pp_hb.type-I joint rate X=MEGNO  [1e-12 relative]
+EQUAL pp_hb.type-I single-comparison rate X=MEGNO (reading: comparisons of X alone, coverage ignored)  [1e-12 relative]
+EQUAL pp_hb.type-I joint rate X=E1  [1e-12 relative]
+EQUAL pp_hb.type-I single-comparison rate X=E1 (reading: comparisons of X alone, coverage ignored)  [1e-12 relative]
+EQUAL pp_hb.type-I joint rate X=E2  [1e-12 relative]
+EQUAL pp_hb.type-I single-comparison rate X=E2 (reading: comparisons of X alone, coverage ignored)  [1e-12 relative]
+EQUAL pp_hb.type-I joint rate X=WBA  [1e-12 relative]
+EQUAL pp_hb.type-I single-comparison rate X=WBA (reading: comparisons of X alone, coverage ignored)  [1e-12 relative]
+EQUAL pp_hb.type-I max joint rate  [1e-12 relative]
+EQUAL pp_hc.failures, non-failures
+EQUAL pp_hc.AUC_I_cal  [1e-12 relative]
+EQUAL pp_hc.AUC_I_used  [1e-12 relative]
+EQUAL pp_hc.AUC_P  [1e-12 relative]
+EQUAL pp_hc.true difference  [equal to 12 significant digits]
+EQUAL pp_hc.d(AUC_I_used)  [1e-12 relative]
+EQUAL pp_hc.d(AUC_P)  [equal to 12 significant digits]
+EQUAL pp_hc.deliverable failures expected, worst
+EQUAL pp_hc.n_f list
+EQUAL pp_hc.power counts n_f=20 (successes of 20000 runs)  [equal counts]
+EQUAL pp_hc.power counts n_f=25 (successes of 20000 runs)  [equal counts]
+EQUAL pp_hc.power counts n_f=30 (successes of 20000 runs)  [equal counts]
+EQUAL pp_hc.power counts n_f=35 (successes of 20000 runs)  [equal counts]
+EQUAL pp_hc.power counts n_f=40 (successes of 20000 runs)  [equal counts]
+EQUAL pp_hc.power counts n_f=45 (successes of 20000 runs)  [equal counts]
+EQUAL pp_hc.power counts n_f=50 (successes of 20000 runs)  [equal counts]
+EQUAL pp_hc.power counts n_f=55 (successes of 20000 runs)  [equal counts]
+EQUAL pp_hc.power counts n_f=60 (successes of 20000 runs)  [equal counts]
+EQUAL pp_hc.power counts n_f=65 (successes of 20000 runs)  [equal counts]
+EQUAL pp_hc.power at the expected deliverable number n_f=49  [equal counts]
+EQUAL pp_hc.target n_f (a check, not exact by the spec)
+EQUAL pp_hc.underpowered flag
+
+233 quantities compared, 0 DIFF
+## fix1 tables file
+# Calibration tables: p3-abstention
+
+record SHA-256: adc43d25b92276244ab27d95745e9f77f7cc073bbd37c8bb06d67826a9ee4ffb
+
+## Header
+
+- preregistration header SHA-256 (recomputed under the rule of the SELF cell): de9490168d609f6e56ebc12edb2b088a115477b8481c6dd633a45d5723fb303a
+- p2 manifest SHA-256: cdef3cf423e16a0b54e81e96fd460f4cb32d7b788325ffbf4e0581f1db27acce
+- P1 manifest SHA-256: ae6ec80eb08fbd6e98aeef1fbf840a567a03102ab943f2ae0aaf2b3e367f191d
+- panel file SHA-256: 881874d26aa8883caa0545331ba167a3f2c9e3c249cdb6ba32ad39c98ad348d5
+- p3 parameter table SHA-256: 69965ec24cee507d76924423745cf332ecbb6c003880e5fb4b1036a60fc6a5e1
+- p2 parameter table SHA-256: f5278e0f5c499f06674cc23cbe93d7d0a23720f4e4f77ece6ab48c4659063099
+- P1 parameter table SHA-256: a544130bc56dc66d8b1f7ec5d1e54197306f14dc19c7cd22fdbd94e4534b7282
+- p2 preregistration SHA-256: a69bddb2a9045f8aac25ba7771fe7e5d90e70f9ff63203646e3684c8e19efff4
+- P1 preregistration SHA-256: 62011ba5af514da4f1238aef9ae6cb35ca21093c4343b71dd696df360b9994bf
+- module version: 0.1.2
+- git commit: 076ae64baa70c3a5604e671a6c42259d2c898c77
+- git working tree clean: false (not a freeze run)
+- generator: xoshiro256++ seeded by SplitMix64 from the first 8 bytes, big-endian, of SHA-256 over chaoslab-analysis-1|<test_seed>|p3|<purpose>|<unit>
+- quantile function: AS241 (PPND16)
+
+## Table T1
+
+### Relabelling C0 and the drops
+
+| K index | old | new | count |
+|---|---|---|---|
+| 1 | R | R | 80 |
+| 2 | C | C | 93 |
+| 2 | R | R | 63 |
+| 2 | R | U | 1 |
+| 2 | U | C | 12 |
+| 2 | U | R | 3 |
+| 2 | U | U | 13 |
+| 3 | C | C | 107 |
+| 3 | R | R | 65 |
+| 3 | R | U | 2 |
+| 3 | U | C | 11 |
+| 3 | U | R | 2 |
+| 3 | U | U | 13 |
+| 4 | C | C | 112 |
+| 4 | R | R | 67 |
+| 4 | R | U | 2 |
+| 4 | U | C | 8 |
+| 4 | U | R | 4 |
+| 4 | U | U | 7 |
+| 5 | C | C | 82 |
+| 5 | R | R | 35 |
+| 5 | U | C | 4 |
+| 5 | U | R | 3 |
+| 5 | U | U | 1 |
+| 6 | C | C | 80 |
+
+Panel: 52 orbits changed class; grid: 0. Dropped: 171 (control 13, unresolved 158); relabelling data missing: 0.
+
+### Sets of Cal (pooled, panel, grid)
+
+| set | pooled | panel | grid |
+|---|---|---|---|
+| cal | 3016 | 831 | 2185 |
+| S2 | 452 | 165 | 287 |
+| T_s | 31 | 16 | 15 |
+| W2 | 228 | 139 | 89 |
+| R_W | 197 | 123 | 74 |
+| regular | 1166 | 322 | 844 |
+| gate | 80 | 80 | 0 |
+
+### Feasible set F and the selection
+
+- elements of Theta: 2088; cost cap of F1: 185395200/1 (1.85395e8)
+- elements satisfying F1 to F6 alone: 690, 2018, 2088, 2088, 1897, 1177
+- |F| = 382; outcome: selected
+- J_min: 0/1 (0.0); |Theta_tol| = 20
+- theta* (index 371): V = SALI, FLI, WBA; qC = 1, qR = 3, w = 2, v = 0; C_R = 72430080/1 (7.24301e7)
+- calibration error e = 7/1432 (0.00488827); unresolved share on Cal 19/377 (0.0503979), on S2 0/1 (0.0); gate count 0; J = 259/14136 (0.018322)
+
+
+### HB analogue on Cal at theta* (C7)
+
+Set T_s:
+
+| X | b | cost | capped | cost-unmatched | FR_X | FR_rule | n10 | n01 | p | margin | coverage |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SALI | 51200 | 136089600/1 | false | false | 8/31 | 1/31 | 1 | 8 | 5/256 (0.0195312) | true | 25/31 |
+| FLI | 51200 | 136089600/1 | false | false | 12/31 | 1/31 | 1 | 12 | 7/4096 (0.00170898) | true | 25/31 |
+| MEGNO | 51200 | 136089600/1 | false | false | 7/31 | 1/31 | 1 | 7 | 9/256 (0.0351562) | true | 25/31 |
+| E1 | 6400 | 107842560/1 | false | false | 25/31 | 1/31 | 0 | 24 | 1/16777216 (5.96046e-8) | true | 25/31 |
+| E2 | 51200 | 92697600/1 | false | false | 23/31 | 1/31 | 0 | 22 | 1/4194304 (2.38419e-7) | true | 25/31 |
+| WBA | 25600 | 76815360/1 | false | false | 4/31 | 1/31 | 1 | 4 | 3/16 (0.1875) | true | 25/31 |
+
+Set W2:
+
+| X | b | cost | capped | cost-unmatched | FR_X | FR_rule | n10 | n01 | p | margin | coverage |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| LE | 102400 | 21258240/1 | true | true | 3/38 | 1/228 | 1 | 18 | 5/131072 (3.8147e-5) | true | 109/114 |
+| SALI | 51200 | 136089600/1 | false | false | 11/114 | 1/228 | 1 | 22 | 3/1048576 (2.86102e-6) | true | 109/114 |
+| FLI | 51200 | 136089600/1 | false | false | 9/76 | 1/228 | 1 | 27 | 29/268435456 (1.08033e-7) | true | 109/114 |
+| MEGNO | 51200 | 136089600/1 | false | false | 29/228 | 1/228 | 1 | 29 | 31/1073741824 (2.8871e-8) | true | 109/114 |
+| E1 | 6400 | 107842560/1 | false | false | 23/114 | 1/228 | 0 | 45 | 1/35184372088832 (2.84217e-14) | true | 109/114 |
+| E2 | 51200 | 92697600/1 | false | false | 5/38 | 1/228 | 0 | 29 | 1/536870912 (1.86265e-9) | true | 109/114 |
+| WBA | 25600 | 76815360/1 | false | false | 1/38 | 1/228 | 1 | 6 | 1/16 (0.0625) | true | 109/114 |
+
+Risk and coverage of the rule family around theta* and of the single indicators:
+
+| qC | qR | coverage | e |
+|---|---|---|---|
+| 1 | 2 | 2985/3016 | 4/597 |
+| 1 | 3 | 358/377 | 7/1432 |
+| 2 | 3 | 95/104 | 1/2755 |
+
+| X | b | coverage | e |
+|---|---|---|---|
+| LE | 102400 | 375/377 | 9/1000 |
+| SALI | 51200 | 1/1 | 5/377 |
+| FLI | 51200 | 1/1 | 4/377 |
+| MEGNO | 51200 | 2973/3016 | 113/2973 |
+| E1 | 6400 | 3011/3016 | 82/3011 |
+| E2 | 51200 | 1/1 | 17/1508 |
+| WBA | 25600 | 3011/3016 | 9/3011 |
+
+First 20 elements of Theta_tol in the order of C6: 371, 407, 443, 372, 408, 444, 971, 972, 587, 659, 588, 660, 1163, 1211, 1259, 1164, 1212, 1260, 1637, 1638
+
+
+### PP for HB and HC
+
+- optimism: used 200, skipped 0; r_corr T_s 0.0591379262614, W2 0.00890288810764, R_W 0.000997882103743
+- rule rates: T_s 0.0591379262614, R_W 0.01; targets: cap, cap true, n_T 285, n_W 1235
+
+| j | rho | nT | nRW | nW | allowed | successes | runs | power | se |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | 1/1 | 57 | 190 | 247 | false | undefined | 20000 | undefined | undefined |
+| 1 | 5/4 | 71 | 238 | 309 | false | undefined | 20000 | undefined | undefined |
+| 2 | 3/2 | 86 | 285 | 371 | false | undefined | 20000 | undefined | undefined |
+| 3 | 7/4 | 100 | 333 | 433 | true | 6250 | 20000 | 0.3125 | 0.0032775276505317237 |
+| 4 | 2/1 | 114 | 380 | 494 | true | 6604 | 20000 | 0.3302 | 0.003325416966336703 |
+| 5 | 9/4 | 128 | 428 | 556 | true | 6950 | 20000 | 0.3475 | 0.003367074026510258 |
+| 6 | 5/2 | 143 | 475 | 618 | true | 7180 | 20000 | 0.359 | 0.003392042157756887 |
+| 7 | 11/4 | 157 | 523 | 680 | true | 7204 | 20000 | 0.3602 | 0.003394524708998301 |
+| 8 | 3/1 | 171 | 570 | 741 | true | 7037 | 20000 | 0.35185 | 0.0033767704800593125 |
+| 9 | 13/4 | 185 | 618 | 803 | true | 7057 | 20000 | 0.35285 | 0.0033789560333037775 |
+| 10 | 7/2 | 200 | 665 | 865 | true | 6855 | 20000 | 0.34275 | 0.0033561319811652225 |
+| 11 | 15/4 | 214 | 713 | 927 | true | 6842 | 20000 | 0.3421 | 0.0033546057145363594 |
+| 12 | 4/1 | 228 | 760 | 988 | true | 6629 | 20000 | 0.33145 | 0.003328595030189164 |
+| 13 | 17/4 | 242 | 808 | 1050 | true | 6448 | 20000 | 0.3224 | 0.00330498290464565 |
+| 14 | 9/2 | 257 | 855 | 1112 | true | 6403 | 20000 | 0.32015 | 0.0032988935834609764 |
+| 15 | 19/4 | 271 | 903 | 1174 | true | 6282 | 20000 | 0.3141 | 0.0032820815803389163 |
+| 16 | 5/1 | 285 | 950 | 1235 | true | 6163 | 20000 | 0.30815 | 0.0032649163656975964 |
+
+Type-I check (joint and single rejection rates): maximum joint 0.0005
+
+- HC: AUC_I_cal 0.9146362184388487 (failures 51, non-failures 2885), AUC_I_used 0.7073181092194243, target n_f 45, underpowered false
+
+
+## F1 data
+
+| index | theta | C_R | FR(W2; theta) | FR(T_s; theta) | J | in Theta_tol | theta* |
+|---|---|---|---|---|---|---|---|
+| 3 | V = SALI, FLI, MEGNO; qC = 1, qR = 2, w = 1, v = 0 | 34022400/1 | 5/76 | 5/31 | 535/4712 | false | false |
+| 4 | V = SALI, FLI, MEGNO; qC = 1, qR = 2, w = 1, v = 1 | 34022400/1 | 3/38 | 7/31 | 359/2356 | false | false |
+| 5 | V = SALI, FLI, MEGNO; qC = 1, qR = 2, w = 2, v = 0 | 34022400/1 | 3/76 | 4/31 | 397/4712 | false | false |
+| 6 | V = SALI, FLI, MEGNO; qC = 1, qR = 2, w = 2, v = 1 | 34022400/1 | 7/114 | 8/31 | 1129/7068 | false | false |
+| 9 | V = SALI, FLI, MEGNO; qC = 1, qR = 3, w = 1, v = 0 | 34022400/1 | 7/114 | 4/31 | 673/7068 | false | false |
+| 10 | V = SALI, FLI, MEGNO; qC = 1, qR = 3, w = 1, v = 1 | 34022400/1 | 7/114 | 4/31 | 673/7068 | false | false |
+| 11 | V = SALI, FLI, MEGNO; qC = 1, qR = 3, w = 2, v = 0 | 34022400/1 | 1/38 | 2/31 | 107/2356 | false | false |
+| 12 | V = SALI, FLI, MEGNO; qC = 1, qR = 3, w = 2, v = 1 | 34022400/1 | 1/38 | 2/31 | 107/2356 | false | false |
+| 13 | V = SALI, FLI, MEGNO; qC = 2, qR = 2, w = 0, v = 0 | 34022400/1 | 23/228 | 6/31 | 2081/14136 | false | false |
+| 14 | V = SALI, FLI, MEGNO; qC = 2, qR = 2, w = 0, v = 1 | 34022400/1 | 11/76 | 13/31 | 1329/4712 | false | false |
+| 15 | V = SALI, FLI, MEGNO; qC = 2, qR = 2, w = 1, v = 0 | 34022400/1 | 5/76 | 5/31 | 535/4712 | false | false |
+| 16 | V = SALI, FLI, MEGNO; qC = 2, qR = 2, w = 1, v = 1 | 34022400/1 | 11/114 | 11/31 | 1595/7068 | false | false |
+| 19 | V = SALI, FLI, MEGNO; qC = 2, qR = 3, w = 0, v = 0 | 34022400/1 | 23/228 | 6/31 | 2081/14136 | false | false |
+| 20 | V = SALI, FLI, MEGNO; qC = 2, qR = 3, w = 0, v = 1 | 34022400/1 | 23/228 | 6/31 | 2081/14136 | false | false |
+| 21 | V = SALI, FLI, MEGNO; qC = 2, qR = 3, w = 1, v = 0 | 34022400/1 | 7/114 | 4/31 | 673/7068 | false | false |
+| 22 | V = SALI, FLI, MEGNO; qC = 2, qR = 3, w = 1, v = 1 | 34022400/1 | 7/114 | 4/31 | 673/7068 | false | false |
+| 25 | V = SALI, FLI, MEGNO; qC = 3, qR = 2, w = 0, v = 0 | 34022400/1 | 23/228 | 6/31 | 2081/14136 | false | false |
+| 26 | V = SALI, FLI, MEGNO; qC = 3, qR = 2, w = 0, v = 1 | 34022400/1 | 11/76 | 13/31 | 1329/4712 | false | false |
+| 28 | V = SALI, FLI, MEGNO; qC = 3, qR = 2, w = 1, v = 1 | 34022400/1 | 11/114 | 11/31 | 1595/7068 | false | false |
+| 31 | V = SALI, FLI, MEGNO; qC = 3, qR = 3, w = 0, v = 0 | 34022400/1 | 23/228 | 6/31 | 2081/14136 | false | false |
+| 32 | V = SALI, FLI, MEGNO; qC = 3, qR = 3, w = 0, v = 1 | 34022400/1 | 23/228 | 6/31 | 2081/14136 | false | false |
+| 145 | V = SALI, FLI, E2; qC = 1, qR = 2, w = 0, v = 0 | 57196800/1 | 1/12 | 11/31 | 163/744 | false | false |
+| 146 | V = SALI, FLI, E2; qC = 1, qR = 2, w = 0, v = 1 | 57196800/1 | 1/12 | 11/31 | 163/744 | false | false |
+| 147 | V = SALI, FLI, E2; qC = 1, qR = 2, w = 1, v = 0 | 57196800/1 | 17/228 | 10/31 | 2807/14136 | false | false |
+| 148 | V = SALI, FLI, E2; qC = 1, qR = 2, w = 1, v = 1 | 57196800/1 | 5/57 | 13/31 | 448/1767 | false | false |
+| 149 | V = SALI, FLI, E2; qC = 1, qR = 2, w = 2, v = 0 | 57196800/1 | 4/57 | 10/31 | 347/1767 | false | false |
+| 150 | V = SALI, FLI, E2; qC = 1, qR = 2, w = 2, v = 1 | 57196800/1 | 1/12 | 13/31 | 187/744 | false | false |
+| 151 | V = SALI, FLI, E2; qC = 1, qR = 3, w = 0, v = 0 | 57196800/1 | 1/12 | 11/31 | 163/744 | false | false |
+| 152 | V = SALI, FLI, E2; qC = 1, qR = 3, w = 0, v = 1 | 57196800/1 | 1/12 | 11/31 | 163/744 | false | false |
+| 153 | V = SALI, FLI, E2; qC = 1, qR = 3, w = 1, v = 0 | 57196800/1 | 7/114 | 9/31 | 1243/7068 | false | false |
+| 154 | V = SALI, FLI, E2; qC = 1, qR = 3, w = 1, v = 1 | 57196800/1 | 7/114 | 9/31 | 1243/7068 | false | false |
+| 155 | V = SALI, FLI, E2; qC = 1, qR = 3, w = 2, v = 0 | 57196800/1 | 1/19 | 7/31 | 82/589 | false | false |
+| 156 | V = SALI, FLI, E2; qC = 1, qR = 3, w = 2, v = 1 | 57196800/1 | 1/19 | 7/31 | 82/589 | false | false |
+| 157 | V = SALI, FLI, E2; qC = 2, qR = 2, w = 0, v = 0 | 57196800/1 | 1/12 | 11/31 | 163/744 | false | false |
+| 158 | V = SALI, FLI, E2; qC = 2, qR = 2, w = 0, v = 1 | 57196800/1 | 3/19 | 17/31 | 208/589 | false | false |
+| 159 | V = SALI, FLI, E2; qC = 2, qR = 2, w = 1, v = 0 | 57196800/1 | 17/228 | 10/31 | 2807/14136 | false | false |
+| 160 | V = SALI, FLI, E2; qC = 2, qR = 2, w = 1, v = 1 | 57196800/1 | 9/76 | 15/31 | 1419/4712 | false | false |
+| 161 | V = SALI, FLI, E2; qC = 2, qR = 2, w = 2, v = 0 | 57196800/1 | 4/57 | 10/31 | 347/1767 | false | false |
+| 162 | V = SALI, FLI, E2; qC = 2, qR = 2, w = 2, v = 1 | 57196800/1 | 7/76 | 14/31 | 1281/4712 | false | false |
+| 163 | V = SALI, FLI, E2; qC = 2, qR = 3, w = 0, v = 0 | 57196800/1 | 1/12 | 11/31 | 163/744 | false | false |
+| 164 | V = SALI, FLI, E2; qC = 2, qR = 3, w = 0, v = 1 | 57196800/1 | 1/12 | 11/31 | 163/744 | false | false |
+| 165 | V = SALI, FLI, E2; qC = 2, qR = 3, w = 1, v = 0 | 57196800/1 | 7/114 | 9/31 | 1243/7068 | false | false |
+| 166 | V = SALI, FLI, E2; qC = 2, qR = 3, w = 1, v = 1 | 57196800/1 | 7/114 | 9/31 | 1243/7068 | false | false |

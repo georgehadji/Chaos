@@ -67,7 +67,7 @@ function _p3_hb_block(res)
     res.hb === nothing && return nothing
     h = res.hb
     return (rates = h.rates, model = h.model, path = [(j = x.j, rho = x.rho, nT = x.nT, nRW = x.nRW, nW = x.nW, allowed = x.allowed, successes = x.successes, runs = x.runs, power = x.power, se = x.se) for x in h.path],
-            targets = h.targets, type1 = h.type1)
+            targets = h.targets.cap ? merge(h.targets, (rho_star = nothing,)) : h.targets, type1 = h.type1)    # PP step 5: in the cap case no rho* exists
 end
 
 function _p3_hc_block(res)

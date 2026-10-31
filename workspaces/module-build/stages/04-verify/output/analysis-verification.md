@@ -299,3 +299,67 @@ V3. **Kappa decode margin (INFO).** The largest F1 colour error is 0.0049 of the
 - The full package suite was not rerun after the review fixes (17 min); only the analysis folder suite (1287 of 1287). The fixes are in the extension, which the package suite does not load; the base run at b2d7ebe passed.
 - Aqua, JET, coverage and bench for the extension files.
 - The P11 reading text in `P2_READINGS` still says that the figure drawers do not exist; it sits in the accepted stage 04 tables file and is left unchanged (owner decision).
+
+## Amendment D93: calibration of study p3-abstention (stage 04)
+
+Verify scripts: `verify/analysis-p3.jl` (the D93 test files at full size, all refusal cases), `verify/analysis-p3-export.jl` and `verify/analysis-p3-oracle.py` with `verify/analysis-p3-compare.py` (O15 and O19: independent author, written from the spec and `schema/run-store.md`; no file of `src/Analysis/p3_*` or `test/analysis/an_p3_ref.jl` was read), `verify/analysis-p3-o16.jl` (O16, exact power in exact rationals and an own simulation). Raw output: `analysis-d93-verify-log.txt` (real runs, hashes, O19, the O15 comparison, the tables file), `analysis-d93-o16-log.txt` (50 checks), `analysis-d93-suite-full-log.txt` (590 assertions). Parameter table of the runs: `workspaces/study/stages/01-design/references/p3-abstention-calibration-parameters.toml` (71 keys, written at this stage from the preregistration, accepted by the reader on the first run). All calibration outputs of this stage are under the scratchpad, not in the repository: they are verification runs, not the record of Amendment A1.
+
+### Evidence per criterion
+
+| Criterion | Evidence | Result |
+|-----------|----------|--------|
+| D93a dispatch, other pipelines | (S) in the suite; (V) `analyze` on the real inputs: p2 tables file equal to the accepted one except the git commit line; P1 tables file equal except the module version and git commit lines (14114 and 18103 lines) | pass |
+| D93b parameter table | (S) 96 assertions, 444 malformed files; the real 71-key table read on the first run | pass |
+| D93c refusals | 54 cases at full size (`verify/analysis-p3.jl`), 30 in the package suite; each refuses for its own cause (messages in the test plan); the new guard of all chunk files (review M1) has no refusal test (finding V3) | pass |
+| D93d relabelling C0 | (V) no panel orbit missing data (870 non-control panel orbits); grid 0 changes of 2304; panel 52 changes (R to U 5, U to C 35, U to R 12), by K index equal in module and oracle (the oracle recomputes the old P1 labels itself) | pass |
+| D93e Cal and sets | Cal 3016 (panel 831, grid 2185), S2 452, T_s 31, W2 228, R_W 197, regular 1166, gate 80; dropped 171 (13 controls, 158 unresolved); equal in module and oracle by source | pass |
+| D93f verdicts | (S) equal to D89; (V) not in the record, compared through every quantity that depends on them (2088 rule outputs via the F counts, C7 counts, risk-coverage), all equal; the oracle keeps a verdict digest | pass (indirect, finding V4) |
+| D93g rule evaluator | (S) exhaustive and random cases, 87 assertions | pass |
+| D93h search space | 2088 = 720 + 720 + 540 + 108, order of E52 | pass |
+| D93i cost and budgets | 690 elements satisfy F1 alone (drafting value 690); matched budgets SALI, FLI, MEGNO, E2 51200, WBA 25600, E1 6400, LE read at 102400, capped and cost-unmatched; equal in the oracle | pass |
+| D93j C3 to C8 | F1 to F6 alone 690, 2018, 2088, 2088, 1897, 1177; cumulative 690, 660, 660, 660, 598, 382; J_min 0, Theta_tol 20; theta* index 371 = (V = SALI, FLI, WBA; q_C 1, q_R 3, w 2, v 0), C_R 72430080; e = 7/1432, unresolved 19/377, on S2 0, gate 0; all C7 items equal in the oracle | pass |
+| D93k PP for HB | optimism 200 used, 0 skipped; p_rule T_s 0.0591, R_W 0.01 (floor); 17 path points, 14 allowed; power 0.308 to 0.360, never p_hb; cap targets n_T 285, n_W 1235, no rho*; type-I maximum joint 0.0005; all counts equal in the oracle with an independent generator; O16 (a) 16 of 16 sets within 3 SE of the exact power, (b) 3 models within the bounds, (c) 6 type-I settings below alpha_hb | pass |
+| D93l PP for HC | AUC_I_cal 26915/29427 = 0.9146 (51 failures, 2885 non-failures), used 0.7073; n_f target 45 (power 0.816), power at the expected deliverable 49 is 0.844, not underpowered; HC success counts equal in the oracle at every n_f (exact, stronger than 3 SE); O16 (d) power 6 of 6, null 3 of 4 (finding V1) | pass, 1 finding |
+| D93m streams | (S) stored constants; the independent generator reproduces them and the real optimism and PP integers | pass |
+| D93n output | 71 keys, E58 items, F1 block of 382 rows, digest recomputed independently, record hash equal to the SHA-256 of the record file | pass |
+| D93o determinism | before the fixes: five runs (default, 23, 23, 1, 4 threads, five folders) give byte-identical record and tables; after the fixes: 23 and 1 threads byte-identical | pass |
+| D93p read-only | data tree listing SHA-256 equal before and after all seven runs (2436 files) | pass |
+| D93q layering | layering test and D93q pass; no new package | pass |
+| D93r real run | exit 0, outcome selected; wall 105 to 222 s, peak 2.24 to 2.45 GB at 1 to 23 threads (bounds 30 min, 8 GB); O15 233 quantities, 0 DIFF; O16 49 of 50 (finding V1) | pass, 1 finding |
+
+Suite after the review fixes: whole package 1401609 pass, 0 fail, 0 error, 1 broken (existing, weighted-birkhoff); quality 12 (Aqua, JET clean), layering 2, analysis 1877.
+
+### Independent code review (fresh Sonnet subagent, spec and code)
+
+No CRITICAL or HIGH finding. Fixed at this stage (code only, no test changed; the analysis suite and the full suite pass after the fixes):
+- M1 (E48 j, I30): the input hashes were taken after the reads and covered only the nine input files. Now taken first, over the nine files and every chunk listed in both manifests, and checked again before writing (about 6 s added). The record still lists the nine file hashes.
+- M2 (P59): the clean flag ignored untracked files. Now `git status` over `src`, `ext`, `bin`, `Project.toml`, `Manifest.toml` including untracked files; the Experiments function is unchanged.
+- L3 (E55): u = (k + 1/2) / 2^53 rounds to 1.0 at k = 2^53 - 1 in binary64; clamped to the largest double below 1 (one value in 2^53 changes; the stored constants are unchanged).
+- L4 (I32): the HC point condition was a binary64 difference; now exact on the doubled Mann-Whitney counts against the rational delta_c. The HC success counts changed by 2 at n_f = 50 and by 1 at n_f = 65 (runs at an exact tie); the target is unchanged.
+- L5: binary64 comparisons of the stored lambda values with the set thresholds are kept as the stated reading of D89 E29 (comment added; the exact variant of the oracle gives the same sets).
+- Found by the O15 comparison: the record named rho* = 5 in the cap case, where the preregistration says no rho* exists; now null (record only; the function output pinned by the tests is unchanged).
+
+### Findings of the verification
+
+- V1 (statistics, for the owner). O16 (d) at a true AUC difference of zero with both AUCs 0.5 and n_f = 30: the HC decision rejects at 0.0527 against the bound alpha_ci + 3 SE = 0.0515. An independent simulation gives 0.0528, so the module is right and the plug-in Hanley-McNeil test of the preregistration is slightly anti-conservative at AUC 0.5. At AUC 0.55 (the register value of AUC_P) the three null points give 0.026 to 0.049. The test is frozen in the preregistration; proposed: record it, no change.
+- V2 (science, for Amendment A1, not a module defect). PP for HB does not reach p_hb at any allowed point (power at most 0.360, and 0.308 at the cap of 5 rounds), so the targets are the cap and HB is expected to be underpowered. The binding comparison is the cheap comparator WBA (decision D4): the rule-rate floor of 0.01 on R_W is above half of the R_W rate of WBA (2/197), so more rounds lower the power. HC is powered (n_f 45). The owner decides at A1, before any test data, whether to run as frozen (NEGATIVE allowed) or to amend.
+- V3. The chunk-file guard of M1 has no refusal test (no fixture changes a chunk during a run).
+- V4. Verdict equality on the real stores (D93f V) is indirect: the record holds no verdicts; every dependent quantity is equal.
+
+### Audit
+
+| Check | Pass condition | Result |
+|-------|----------------|--------|
+| Evidence | Every acceptance criterion has a number or a plot | pass (table above) |
+| Review closed | No open CRITICAL or HIGH review finding | pass (none found; MEDIUM and LOW fixed or recorded) |
+
+## Not verified (D93)
+
+- Byte identity across machines (one machine only, P58).
+- The chunk-guard refusal path (V3).
+- The verdicts themselves on the real stores (V4).
+- A real run on a clean tree: the review fixes are not committed yet, so the runs after the fixes carry "not a freeze run"; the A1 freeze run happens on committed code.
+
+### Owner decisions at the D93 stage 04 checkpoint (2026-10-31)
+
+The owner accepted stage 04: the six review fixes stand; V1 (the HC test slightly anti-conservative at AUC 0.5) is recorded with no change to the frozen test; V2 (HB expected underpowered at the cap) goes to the decision on Amendment A1, before any test data; V3 and V4 stay as stated limits.

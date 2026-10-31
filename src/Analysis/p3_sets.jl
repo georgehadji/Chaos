@@ -35,6 +35,7 @@ function p3_sets(orbits, q, p2)
     keep = [o for o in orbits if isempty(_p3_drop_reason(o))]
     ids(f, os = keep) = sort!(Int[o.id for o in os if f(o)])
     chaotic = [o for o in keep if o.rho === :C]
+    # The comparisons of the stored lambda values with the thresholds are in binary64: the stated reading, shared with D89 E29.
     Ts = ids(o -> o.lambda_ns <= q.f_s * o.lambda_ref, chaotic)
     W2 = sort!(unique(vcat(ids(o -> o.lambda_ref <= q.lam_w2, chaotic), Ts)))
     S2 = ids(o -> o.lambda_ref >= q.lam_s2, chaotic)

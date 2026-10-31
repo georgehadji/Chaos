@@ -1,22 +1,24 @@
 # Study p3-abstention (Amendment D93): PP for HC (E57). The two predictors are independent binormal samples; every run owns a named stream (pp-hc, (n_f, run)); the decision uses the
 # Hanley and McNeil variances at the empirical AUCs (P64). The platform logarithm enters the normal variates (E55): byte identity across machines is not claimed.
 
-# One run: the AUCs of the two predictors from the draws in the order of E57 (failures of I, non-failures of I, failures of P, non-failures of P).
+# One run: the doubled Mann-Whitney counts of the two predictors from the draws in the order of E57 (failures of I, non-failures of I, failures of P, non-failures of P), and their common denominator.
 function _p3_hc_run(g, dI, dP, nf, nn)
     fI = [dI + p3_normal!(g) for _ in 1:nf]; nI = [p3_normal!(g) for _ in 1:nn]
     fP = [dP + p3_normal!(g) for _ in 1:nf]; nP = [p3_normal!(g) for _ in 1:nn]
-    d = 2 * nf * nn
-    return _p3_auc_count(fI, nI) / d, _p3_auc_count(fP, nP) / d
+    return _p3_auc_count(fI, nI), _p3_auc_count(fP, nP), 2 * nf * nn
 end
 
 function _p3_hc_chunk(q, dI, dP, nf, runs_range)
     nn = q.nonfail_per_fail * nf
     ok = 0
+    dc = p3_rat(q.delta_c)
     for i in runs_range
-        AI, AP = _p3_hc_run(p3_stream(q.test_seed, "pp-hc", (nf, i)), dI, dP, nf, nn)
+        cI, cP, d = _p3_hc_run(p3_stream(q.test_seed, "pp-hc", (nf, i)), dI, dP, nf, nn)
+        AI, AP = cI / d, cP / d
         Delta = AI - AP
         SE = sqrt(p3_hanley_mcneil(AI, nf, nn) + p3_hanley_mcneil(AP, nf, nn))
-        (Delta >= q.delta_c && Delta - q.z_one_sided * SE > 0) && (ok += 1)
+        # Delta >= delta_c exactly: both AUCs share the denominator d, so (cI - cP) / d >= delta_c is an integer against a rational.
+        ((cI - cP) * denominator(dc) >= numerator(dc) * d && Delta - q.z_one_sided * SE > 0) && (ok += 1)
     end
     return ok
 end

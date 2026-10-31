@@ -1,0 +1,425 @@
+[budgets]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "12800, 102400, 1e7, 200 x 2^k (k = 0 to 9)"
+text = "200 x 2^k (k = 0 to 9)"
+value = [200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400]
+
+[b_primary]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "12800, 102400, 1e7, 200 x 2^k (k = 0 to 9)"
+text = "12800"
+value = 12800
+
+[N_c]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "12800, 102400, 1e7, 200 x 2^k (k = 0 to 9)"
+text = "102400"
+value = 102400
+
+[N_1]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "12800, 102400, 1e7, 200 x 2^k (k = 0 to 9)"
+text = "1e7"
+value = 10000000
+
+[n_s]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "0.1, 1.0, 1e5, 0.2"
+text = "1e5"
+value = 100000
+
+[f_s]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "0.1, 1.0, 1e5, 0.2"
+text = "0.2"
+value = 0.2
+
+[lam_w2]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "0.1, 1.0, 1e5, 0.2"
+text = "0.1"
+value = 0.1
+
+[lam_s2]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "0.1, 1.0, 1e5, 0.2"
+text = "1.0"
+value = 1.0
+
+[min_set]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "min_set | 20 | generic floor"
+text = "20"
+value = 20
+
+[gate_size]
+section = "Sets (this study's own definitions; the parameters are in the register, marked as p2 mirrors)"
+quote = "Gate set: the 80 K = 0 orbits of round 1."
+text = "80"
+value = 80
+
+[indicators_i7]
+section = "Methods"
+quote = "I_7 = {LE, SALI, FLI, MEGNO, E1, E2, WBA}"
+text = "LE, SALI, FLI, MEGNO, E1, E2, WBA"
+value = ["LE", "SALI", "FLI", "MEGNO", "E1", "E2", "WBA"]
+
+[voter_bits]
+section = "Methods"
+quote = "bit 0 SALI, 1 FLI, 2 MEGNO, 3 E1, 4 E2, 5 WBA"
+text = "bit 0 SALI, 1 FLI, 2 MEGNO, 3 E1, 4 E2, 5 WBA"
+value = ["SALI", "FLI", "MEGNO", "E1", "E2", "WBA"]
+
+[w_range]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "{0, 1, 2}, {0, 1}"
+text = "{0, 1, 2}"
+value = [0, 1, 2]
+
+[v_range]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "{0, 1, 2}, {0, 1}"
+text = "{0, 1}"
+value = [0, 1]
+
+[min_voters]
+section = "The rule R"
+quote = "V a subset of I_6 with |V| >= 3"
+text = "3"
+value = 3
+
+[cost_l1]
+section = "Cost model and matched budget"
+quote = "L1 (LE; comparator only) | 207.6 |"
+text = "207.6"
+value = 207.6
+
+[cost_tg]
+section = "Cost model and matched budget"
+quote = "tg (SALI, FLI, MEGNO; one run gives all three) | 2658.0 |"
+text = "2658.0"
+value = 2658.0
+
+[cost_pa1]
+section = "Cost model and matched budget"
+quote = "pa1 (E2) | 1810.5 |"
+text = "1810.5"
+value = 1810.5
+
+[cost_bk1]
+section = "Cost model and matched budget"
+quote = "bk1 (WBA) | 3000.6 |"
+text = "3000.6"
+value = 3000.6
+
+[cost_fq1]
+section = "Cost model and matched budget"
+quote = "fq1 (E1) | 16850.4 |"
+text = "16850.4"
+value = 16850.4
+
+[ratio_d64_tg]
+section = "Cost model and matched budget"
+quote = "tg 10.5, fq1 1.38, pa1 7.28, bk1 6.56"
+text = "10.5"
+value = 10.5
+
+[ratio_d64_fq1]
+section = "Cost model and matched budget"
+quote = "tg 10.5, fq1 1.38, pa1 7.28, bk1 6.56"
+text = "1.38"
+value = 1.38
+
+[ratio_d64_pa1]
+section = "Cost model and matched budget"
+quote = "tg 10.5, fq1 1.38, pa1 7.28, bk1 6.56"
+text = "7.28"
+value = 7.28
+
+[ratio_d64_bk1]
+section = "Cost model and matched budget"
+quote = "tg 10.5, fq1 1.38, pa1 7.28, bk1 6.56"
+text = "6.56"
+value = 6.56
+
+[spec_of]
+section = "Indicator verdicts (unchanged from p2)"
+quote = "tg for SALI, FLI, MEGNO; fq1 for E1; pa1 for E2; bk1 for WBA; L1 for LE"
+text = "tg for SALI, FLI, MEGNO; fq1 for E1; pa1 for E2; bk1 for WBA; L1 for LE"
+value = { LE = "l1", SALI = "tg", FLI = "tg", MEGNO = "tg", E1 = "fq1", E2 = "pa1", WBA = "bk1" }
+
+[e_cal]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "e_cal | 0.02 |"
+text = "0.02"
+value = 0.02
+
+[e_max]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "e_max | 0.03 |"
+text = "0.03"
+value = 0.03
+
+[a_cal]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "a_cal | 0.10 |"
+text = "0.10"
+value = 0.1
+
+[a_max]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "a_max | 0.15 |"
+text = "0.15"
+value = 0.15
+
+[s_cal]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "s_cal | 0.02 |"
+text = "0.02"
+value = 0.02
+
+[delta_a]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "delta_a | 0.10 |"
+text = "0.10"
+value = 0.1
+
+[alpha_ci]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "alpha_CI | 0.05 (one-sided bounds)"
+text = "0.05"
+value = 0.05
+
+[g_max]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "g_max | 1 (of 80 K = 0 orbits)"
+text = "1"
+value = 1
+
+[c_min]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "c_min | 0.5 |"
+text = "0.5"
+value = 0.5
+
+[alpha_hb]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "alpha_HB | 0.05 per comparison"
+text = "0.05"
+value = 0.05
+
+[rho_hb]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "rho_HB | 0.5 |"
+text = "0.5"
+value = 0.5
+
+[n_t_min]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "n_T^min, n_W^min | 100, 300 |"
+text = "100"
+value = 100
+
+[n_w_min]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "n_T^min, n_W^min | 100, 300 |"
+text = "300"
+value = 300
+
+[p_hb]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "p_HB, p_HC | 0.80, 0.80"
+text = "0.80"
+value = 0.8
+
+[p_hc]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "p_HB, p_HC | 0.80, 0.80"
+text = "0.80"
+value = 0.8
+
+[delta_c]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "delta_C | 0.10 |"
+text = "0.10"
+value = 0.1
+
+[delta_tol]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "delta_tol | 0.02 |"
+text = "0.02"
+value = 0.02
+
+[b_opt]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "B_opt | 200 |"
+text = "200"
+value = 200
+
+[rule_rate_floor]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "rule-rate floor, factor in PP | 0.01, 2"
+text = "0.01"
+value = 0.01
+
+[rule_rate_factor]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "rule-rate floor, factor in PP | 0.01, 2"
+text = "2"
+value = 2.0
+
+[auc_shrink]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "AUC_I shrinkage | 0.5 + 0.5 (AUC_I_cal - 0.5)"
+text = "0.5"
+value = 0.5
+
+[auc_p]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "AUC_P in PP | 0.55 |"
+text = "0.55"
+value = 0.55
+
+[nonfail_per_fail]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "non-failures per failure in PP | 20 |"
+text = "20"
+value = 20
+
+[pp_runs]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "PP simulation runs | 20000 |"
+text = "20000"
+value = 20000
+
+[test_seed]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "test_seed | 20261030 |"
+text = "20261030"
+value = 20261030
+
+[r_max]
+section = "Budget"
+quote = "Worst case over R_max = 5 rounds"
+text = "5"
+value = 5.0
+
+[rho_path_start]
+section = "Test draw size and power calculation (procedure PP, frozen in Amendment A1)"
+quote = "rounds rho_r in {1, 1.25, ..., R_max}"
+text = "1"
+value = 1.0
+
+[rho_path_second]
+section = "Test draw size and power calculation (procedure PP, frozen in Amendment A1)"
+quote = "rounds rho_r in {1, 1.25, ..., R_max}"
+text = "1.25"
+value = 1.25
+
+[y_t]
+section = "Test draw size and power calculation (procedure PP, frozen in Amendment A1)"
+quote = "so about 7 + 25 + 25 + 0 = 57 T_s per round (y_T = 57)"
+text = "57"
+value = 57
+
+[y_w]
+section = "Test draw size and power calculation (procedure PP, frozen in Amendment A1)"
+quote = "so about 146 + 88 + 11 + 1 = 247 W2 per round (y_W = 247, T_s included)"
+text = "247"
+value = 247
+
+[nf_start]
+section = "Test draw size and power calculation (procedure PP, frozen in Amendment A1)"
+quote = "For n_f in {20, 25, ...}"
+text = "20"
+value = 20
+
+[nf_second]
+section = "Test draw size and power calculation (procedure PP, frozen in Amendment A1)"
+quote = "For n_f in {20, 25, ...}"
+text = "25"
+value = 25
+
+[ceil_step]
+section = "Test draw size and power calculation (procedure PP, frozen in Amendment A1)"
+quote = "Targets n_T = ceil5(y_T rho*)"
+text = "5"
+value = 5
+
+[z_one_sided]
+section = "Test draw size and power calculation (procedure PP, frozen in Amendment A1)"
+quote = "Delta_AUC_hat - 1.645 SE > 0"
+text = "1.645"
+value = 1.645
+
+[shared_default]
+section = "Test draw size and power calculation (procedure PP, frozen in Amendment A1)"
+quote = "s_X = 0.5 if the rule has none"
+text = "0.5"
+value = 0.5
+
+[d_expected_total]
+section = "Budget"
+quote = "N = 5960, |D| = 1048"
+text = "1048"
+value = 1048
+
+[d_worst_total]
+section = "Budget"
+quote = "N = 5 x 1470 + 80 = 7430 orbits, |D| = 1309"
+text = "1309"
+value = 1309
+
+[screening_points_per_axis]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "512 x 512 per K"
+text = "512"
+value = 512
+
+[d_frac_high]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "0.30 (S, and C at K = 0.5 and K_c) and 0.05 (other cells), 100"
+text = "0.30"
+value = 0.3
+
+[d_frac_low]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "0.30 (S, and C at K = 0.5 and K_c) and 0.05 (other cells), 100"
+text = "0.05"
+value = 0.05
+
+[d_b_size]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "0.30 (S, and C at K = 0.5 and K_c) and 0.05 (other cells), 100"
+text = "100"
+value = 100
+
+[safety_float]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "2 (Float64), 3 (Double64, BigFloat), 12 h"
+text = "2"
+value = 2.0
+
+[safety_dd]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "2 (Float64), 3 (Double64, BigFloat), 12 h"
+text = "3"
+value = 3.0
+
+[wall_cap_hours]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "2 (Float64), 3 (Double64, BigFloat), 12 h"
+text = "12"
+value = 12.0
+
+[bootstrap_resamples]
+section = "Thresholds register (single home; all set at the checkpoint, 2026-10-30)"
+quote = "10^4 resamples (HA, HC)"
+text = "10^4"
+value = 10000
+
+[p2_manifest_sha256]
+section = "Calibration data (read only)"
+quote = "SHA-256 cdef3cf423e16a0b54e81e96fd460f4cb32d7b788325ffbf4e0581f1db27acce"
+text = "cdef3cf423e16a0b54e81e96fd460f4cb32d7b788325ffbf4e0581f1db27acce"
+value = "cdef3cf423e16a0b54e81e96fd460f4cb32d7b788325ffbf4e0581f1db27acce"

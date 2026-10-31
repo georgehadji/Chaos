@@ -1,0 +1,55 @@
+# O16 a: exact power of one comparison (one stratum, every orbit decided), simulated power at 400000 runs, 23 threads
+O16a-1 | n=12 p=1//20 pX=3//5 s=1//2: exact 0.80483, simulated 0.80434, z = (sim - exact) / SE | -0.79 | |z| <= 3 | PASS
+O16a-2 | n=16 p=1//10 pX=1//2 s=1//2: exact 0.66827, simulated 0.66805, z = (sim - exact) / SE | -0.30 | |z| <= 3 | PASS
+O16a-3 | n=20 p=0//1 pX=1//4 s=1//2: exact 0.58516, simulated 0.58566, z = (sim - exact) / SE | 0.65 | |z| <= 3 | PASS
+O16a-4 | n=25 p=1//20 pX=2//5 s=1//2: exact 0.88619, simulated 0.88613, z = (sim - exact) / SE | -0.11 | |z| <= 3 | PASS
+O16a-5 | n=30 p=1//10 pX=1//2 s=1//4: exact 0.91982, simulated 0.92001, z = (sim - exact) / SE | 0.44 | |z| <= 3 | PASS
+O16a-6 | n=40 p=1//10 pX=1//4 s=1//2: exact 0.48289, simulated 0.48234, z = (sim - exact) / SE | -0.69 | |z| <= 3 | PASS
+O16a-7 | n=40 p=1//10 pX=3//10 s=1//2: exact 0.68802, simulated 0.69000, z = (sim - exact) / SE | 2.70 | |z| <= 3 | PASS
+O16a-8 | n=50 p=1//5 pX=1//2 s=1//2: exact 0.79626, simulated 0.79644, z = (sim - exact) / SE | 0.28 | |z| <= 3 | PASS
+O16a-9 | n=70 p=1//5 pX=2//5 s=1//2: exact 0.53321, simulated 0.53257, z = (sim - exact) / SE | -0.81 | |z| <= 3 | PASS
+O16a-10 | n=80 p=1//10 pX=3//10 s=0//1: exact 0.86050, simulated 0.86132, z = (sim - exact) / SE | 1.50 | |z| <= 3 | PASS
+O16a-11 | n=100 p=1//5 pX=3//10 s=1//2: exact 0.12531, simulated 0.12535, z = (sim - exact) / SE | 0.07 | |z| <= 3 | PASS
+O16a-12 | n=110 p=1//5 pX=2//5 s=1//4: exact 0.52469, simulated 0.52397, z = (sim - exact) / SE | -0.91 | |z| <= 3 | PASS
+O16a-13 | n=120 p=3//10 pX=1//2 s=1//2: exact 0.15742, simulated 0.15760, z = (sim - exact) / SE | 0.30 | |z| <= 3 | PASS
+O16a-14 | n=120 p=1//10 pX=1//5 s=1//2: exact 0.53449, simulated 0.53452, z = (sim - exact) / SE | 0.04 | |z| <= 3 | PASS
+O16a-15 | n=120 p=1//10 pX=1//4 s=1//2: exact 0.81367, simulated 0.81385, z = (sim - exact) / SE | 0.29 | |z| <= 3 | PASS
+O16a-16 | n=120 p=1//20 pX=1//5 s=1//2: exact 0.97860, simulated 0.97827, z = (sim - exact) / SE | -1.41 | |z| <= 3 | PASS
+O16a | parameter sets with exact power in [0.1, 0.99], n up to 120 | 16 of 16 | >= 12 | PASS
+# O16 b: joint power of the 13 comparisons (six of I_6 on T_s, seven of I_7 on W2) against min single and Bonferroni, same models
+O16b-A | 13 comparisons, nT=30 nRW=40: joint simulated 0.91967 (SE 0.00043), min single 0.94452 | 0.91967 | <= 0.94581 | PASS
+O16b-A | Bonferroni 1 - sum(1 - single) = 0.90852 over 13 comparisons | 0.91967 | >= 0.90723 | PASS
+O16b-B | 13 comparisons, nT=40 nRW=40: joint simulated 0.57950 (SE 0.00078), min single 0.68802 | 0.57950 | <= 0.69036 | PASS
+O16b-B | Bonferroni 1 - sum(1 - single) = 0.25281 over 13 comparisons | 0.57950 | >= 0.25047 | PASS
+O16b-C | 13 comparisons, nT=24 nRW=24: joint simulated 0.92052 (SE 0.00043), min single 0.96532 | 0.92052 | <= 0.96660 | PASS
+O16b-C | Bonferroni 1 - sum(1 - single) = 0.90558 over 13 comparisons | 0.92052 | >= 0.90429 | PASS
+# O16 c: type I, rule rate equal to the comparator rate
+O16c-1 | n=20 p=pX=1//5 s=1//2: single-comparison rejection rate 0.00846 (exact 0.00851) | 0.00846 | < alpha_hb = 0.05 | PASS
+O16c-1 | same rate against the exact rejection probability, in SE | -0.33 | |z| <= 3 | PASS
+O16c-2 | n=40 p=pX=1//10 s=1//2: single-comparison rejection rate 0.00836 (exact 0.00841) | 0.00836 | < alpha_hb = 0.05 | PASS
+O16c-2 | same rate against the exact rejection probability, in SE | -0.36 | |z| <= 3 | PASS
+O16c-3 | n=60 p=pX=3//10 s=1//4: single-comparison rejection rate 0.01353 (exact 0.01383) | 0.01353 | < alpha_hb = 0.05 | PASS
+O16c-3 | same rate against the exact rejection probability, in SE | -1.63 | |z| <= 3 | PASS
+O16c-4 | n=120 p=pX=1//20 s=1//2: single-comparison rejection rate 0.01457 (exact 0.01454) | 0.01457 | < alpha_hb = 0.05 | PASS
+O16c-4 | same rate against the exact rejection probability, in SE | 0.18 | |z| <= 3 | PASS
+O16c-5 | n=120 p=pX=1//5 s=0//1: single-comparison rejection rate 0.01247 (exact 0.01234) | 0.01247 | < alpha_hb = 0.05 | PASS
+O16c-5 | same rate against the exact rejection probability, in SE | 0.76 | |z| <= 3 | PASS
+O16c-6 | n=12 p=pX=1//2 s=1//2: single-comparison rejection rate 0.01585 (exact 0.01627) | 0.01585 | < alpha_hb = 0.05 | PASS
+O16c-6 | same rate against the exact rejection probability, in SE | -2.12 | |z| <= 3 | PASS
+O16c-J | 13-comparison model B, rule rate set to each X in turn: max joint rejection rate 0.00020 | 0.00020 | <= 0.05103 | PASS
+# O16 d: PP for HC, 200000 runs per point
+O16d-0-1 | true AUC difference 0 (AUC 0.55 both), n_f=20: rate of the decision | 0.04911 | <= alpha_ci + 3 SE = 0.05146 | PASS
+O16d-0x-1 | same point, module rate 0.04911 against the independent simulation 0.04976 (Xoshiro, randn) | 0.00064 | <= 3 SE = 0.00206 | PASS
+O16d-0-2 | true AUC difference 0 (AUC 0.55 both), n_f=49: rate of the decision | 0.04550 | <= alpha_ci + 3 SE = 0.05146 | PASS
+O16d-0x-2 | same point, module rate 0.04550 against the independent simulation 0.04534 (Xoshiro, randn) | 0.00016 | <= 3 SE = 0.00198 | PASS
+O16d-0-3 | true AUC difference 0 (AUC 0.55 both), n_f=65: rate of the decision | 0.02622 | <= alpha_ci + 3 SE = 0.05146 | PASS
+O16d-0x-3 | same point, module rate 0.02622 against the independent simulation 0.02644 (Xoshiro, randn) | 0.00021 | <= 3 SE = 0.00152 | PASS
+O16d-0-4 | true AUC difference 0 (AUC 0.5 both), n_f=30: rate of the decision | 0.05269 | <= alpha_ci + 3 SE = 0.05146 | FAIL
+O16d-0x-4 | same point, module rate 0.05269 against the independent simulation 0.05276 (Xoshiro, randn) | 0.00007 | <= 3 SE = 0.00212 | PASS
+O16d-p-1 | AUC 0.8 against 0.5, n_f=6: module power 0.59220, independent simulation 0.59165 (Xoshiro, randn) | 0.00055 | <= 3 SE = 0.00466 | PASS
+O16d-p-2 | AUC 0.8 against 0.5, n_f=10: module power 0.77265, independent simulation 0.77150 (Xoshiro, randn) | 0.00114 | <= 3 SE = 0.00398 | PASS
+O16d-p-3 | AUC 0.8 against 0.5, n_f=15: module power 0.90026, independent simulation 0.90068 (Xoshiro, randn) | 0.00043 | <= 3 SE = 0.00284 | PASS
+O16d-p-4 | AUC 0.7 against 0.55, n_f=49: module power 0.81043, independent simulation 0.80939 (Xoshiro, randn) | 0.00104 | <= 3 SE = 0.00372 | PASS
+O16d-p-5 | AUC 0.7 against 0.55, n_f=65: module power 0.84474, independent simulation 0.84525 (Xoshiro, randn) | 0.00051 | <= 3 SE = 0.00343 | PASS
+O16d-p-6 | AUC 0.75 against 0.55, n_f=30: module power 0.85091, independent simulation 0.85225 (Xoshiro, randn) | 0.00135 | <= 3 SE = 0.00337 | PASS
+# O16 done: 1 FAIL

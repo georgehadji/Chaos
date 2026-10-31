@@ -82,6 +82,9 @@ orbits of the p2 panel and grid (C0), builds Cal and the sets, computes the verd
 """
 function calibrate(; prereg, params, out = nothing, threads::Integer = Threads.nthreads(), kw...)
     i = _p3_inputs(prereg, params, out, kw)
+    files = [i.prereg, i.params, i.p2_prereg, i.p2_manifest, i.p2_params, i.panel, i.p1_prereg, i.p1_manifest, i.p1_params]
+    guard = vcat(files, _p3_chunk_files(i.p2_manifest, i.p2_store), _p3_chunk_files(i.p1_manifest, i.p1_store))
+    raw = _p3_hashes(guard)    # E48 j, I30: the first step, before any read
     _p3_check_out(i.out)
     slug = study_slug(prereg)
     slug == P3_SLUG || _fail("calibrate is the command of study $P3_SLUG; this preregistration is of study \"$slug\"")
@@ -91,20 +94,28 @@ function calibrate(; prereg, params, out = nothing, threads::Integer = Threads.n
     c2 = p2_check_inputs(i.p2_prereg, i.p2_manifest, i.panel, i.p2_params, i.p2_store, i.p1_params)
     c1 = _p3_check_p1(i, c2.man)
     p1 = _p3_p1_old(c1, i)
-    files = [i.prereg, i.params, i.p2_prereg, i.p2_manifest, i.p2_params, i.panel, i.p1_prereg, i.p1_manifest, i.p1_params]
-    raw = _p3_hashes(files)
     prep = _p3_prepare(i, q, p2, c2, p1)
     sel = p3_select(prep.rows, q)
     pp = _p3_pp(prep, q, sel, threads)
-    return _p3_finish(i, q, c2, c1, ph, raw, files, prep, sel, pp)
+    return _p3_finish(i, q, c2, c1, ph, raw, guard, prep, sel, pp)
+end
+
+# Clean means: no change and no untracked file under the code of the library (src, ext, bin, Project.toml, Manifest.toml); false if git cannot be run, as `git_state`.
+function _p3_git_clean(dir)
+    try
+        return isempty(strip(read(`git -C $dir status --porcelain --untracked-files=all -- src ext bin Project.toml Manifest.toml`, String)))
+    catch
+        return false
+    end
 end
 
 # The fingerprints of C1 (E55): the hashes of the inputs, the commit of the library and whether its working tree was clean.
 function _p3_fingerprints(i, c2, c1, ph, raw)
-    g = git_state(pkgdir(parentmodule(@__MODULE__))::String)
+    dir = pkgdir(parentmodule(@__MODULE__))::String
+    g = git_state(dir)
     return (preregistration = ph, p2_manifest = c2.hashes.manifest_sha256, p1_manifest = c1.hashes.manifest_sha256, panel = c2.hashes.panel_sha256, p3_parameters = raw[i.params],
             p2_parameters = c2.hashes.params_sha256, p1_parameters = c1.hashes.params_sha256, p2_preregistration = c2.hashes.prereg_header_sha256,
-            p1_preregistration = c1.hashes.prereg_header_sha256, git_commit = g.sha, git_clean = !g.dirty)
+            p1_preregistration = c1.hashes.prereg_header_sha256, git_commit = g.sha, git_clean = _p3_git_clean(dir))
 end
 
 const P3_PROGRAM = (name = "Chaoslab.Analysis.calibrate", generator = "xoshiro256++ seeded by SplitMix64 from the first 8 bytes, big-endian, of SHA-256 over chaoslab-analysis-1|<test_seed>|p3|<purpose>|<unit>",
@@ -123,8 +134,8 @@ function _p3_finish(i, q, c2, c1, ph, raw, files, prep, sel, pp)
     text = p3_json(rec)
     sha = bytes2hex(sha256(codeunits(text)))
     tables = p3_render(res, q, rec, fp, program, sha, res.f1)
-    for f in files
-        isfile(f) && bytes2hex(sha256(read(f))) == raw[f] || _fail("input file $f changed during the run")
+    for f in files    # the 9 input files and the listed chunk files
+        isfile(f) && bytes2hex(sha256(read(f))) == get(raw, f, nothing) || _fail("input file $f changed during the run")
     end
     mkpath(i.out)
     rp, tp = joinpath(i.out, P3_SLUG * "-calibration-record.json"), joinpath(i.out, P3_SLUG * "-calibration-tables.md")

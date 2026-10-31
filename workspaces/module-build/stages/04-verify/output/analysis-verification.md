@@ -363,3 +363,5 @@ No CRITICAL or HIGH finding. Fixed at this stage (code only, no test changed; th
 ### Owner decisions at the D93 stage 04 checkpoint (2026-10-31)
 
 The owner accepted stage 04: the six review fixes stand; V1 (the HC test slightly anti-conservative at AUC 0.5) is recorded with no change to the frozen test; V2 (HB expected underpowered at the cap) goes to the decision on Amendment A1, before any test data; V3 and V4 stay as stated limits.
+
+Owner decision on V2 (2026-10-31, after stage 05): run as frozen. No register change; Amendment A1 records the cap targets, the power at the cap and the expected-underpowered flag for HB (NEGATIVE allowed).

@@ -68,3 +68,21 @@ The plotting is `ext/ChaoslabCairoMakieExt.jl` (CairoMakie as a weak dependency,
 | The reader keeps every item in memory and reads files serially | measured on the real store: 54 s, 2.45 GiB |
 | Real-store results are in the tables file of study stage 04, not here | `workspaces/study/stages/04-analyze/` |
 | The reading P11 in the accepted P2 tables file still says that the figure drawers do not exist | owner decision: the file is accepted; changing `P2_READINGS` changes its bytes |
+
+## Third study: p3-abstention (Amendment D93)
+
+The command `calibrate <preregistration> <parameters> [options]` (`calibrate` in Julia; exit code 0 the record was written, also for "no feasible rule" and "sets too small", 1 refusal or usage) computes, from the stored p2 and P1 runs only, the calibration C0 to C10 and the power procedure PP of study `p3-abstention` and writes `<out>/p3-abstention-calibration-record.json` and `<out>/p3-abstention-calibration-tables.md` (table T1 and the data of figure F1 with its digest). `analyze` given the preregistration of this study is refused (the test-side analysis is a later amendment). Spec: "Amendment D93"; parameter table of 71 keys (E47, `p3_params.jl`); nothing under `data/` is written.
+
+| File | Holds |
+|------|-------|
+| `p3_params.jl` | `P3_PARAM_KEYS`, `p3_rat` (exact decimal rational), `p3_read_params` (E47: quote and text, ranges, mirrors of the p2 table, hash of the p2 manifest) |
+| `p3_rule.jl` | `p3_stable`, `p3_evidence`, `p3_rule_a`, `p3_rule_ab`, `p3_enumerate`, `p3_space_size`, `p3_rule_cost`, `p3_cost_cap`, `p3_matched`, `p3_d64_costs` (E51 to E53) |
+| `p3_sets.jl` | `p3_relabel` (E49 c), `p3_sets` (E50) |
+| `p3_select.jl` | `p3_select` (C3 to C8, bit masks of the votes, exact rationals), `p3_choose` (order of C6) |
+| `p3_rng.jl` | the named streams of E55: SplitMix64, xoshiro256++, `p3_stream`, `p3_uniform!`, `p3_randint!`, `p3_normal_quantile` (AS241) |
+| `p3_stat.jl` | exact McNemar tail and critical values, rounding, Hanley and McNeil variance, AUC, binormal shift, votes of HC |
+| `p3_hb.jl`, `p3_pp.jl`, `p3_hc.jl` | PP for HB (path, simulation, targets, type-I check; optimism, rates, model) and PP for HC (E56, E57) |
+| `p3_read.jl`, `p3_label.jl`, `p3_verdict.jl`, `p3_c7.jl` | the inputs and their checks (E48), C0 on the stores and the change counts (E49), verdicts, rows and R_ab, the items C7 and the votes of HC |
+| `p3_json.jl`, `p3_record.jl`, `p3_tables.jl`, `p3_pipeline.jl` | the record, the tables file, `calibrate` |
+
+Cost (23 threads, estimate from `bench/analysis.jl`): the selection C3 to C6 is 46 ms, an optimism resample 46 ms, a path point of 1235 orbits 34 microseconds per run; the calibration of the real study is dominated by the serial reading of the stores.

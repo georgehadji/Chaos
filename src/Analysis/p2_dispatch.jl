@@ -50,6 +50,7 @@ reference inputs `p1_*` (default: the files of study `p1-le-benchmark` by the st
 function analyze(; prereg, manifest, panel, params, store, out, figures::Bool = false, threads::Integer = Threads.nthreads(), seed::Union{Nothing, Integer} = nothing,
                  p1_prereg = nothing, p1_manifest = nothing, p1_params = nothing, p1_store = nothing)
     slug = study_slug(prereg)
+    slug == P3_SLUG && _fail("study $P3_SLUG: the analysis of test data is a later amendment; the command calibrate is the command of this study (calibrate <preregistration> <parameters>)")
     if slug == P2_SLUG
         return analyze_p2(; prereg, manifest, panel, params, store, out, figures, threads, p1_prereg, p1_manifest, p1_params, p1_store)
     elseif slug == P1_SLUG

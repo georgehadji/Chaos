@@ -8,4 +8,4 @@ try
     @eval using CairoMakie     # the Figures extension of the analysis; present under the verify environment (D60)
 catch
 end
-exit(!isempty(ARGS) && ARGS[1] == "analyze" ? Chaoslab.Analysis.cli(ARGS) : Chaoslab.Experiments.cli(ARGS))
+exit(!isempty(ARGS) && ARGS[1] in ("analyze", "calibrate") ? Chaoslab.Analysis.cli(ARGS) : Chaoslab.Experiments.cli(ARGS))

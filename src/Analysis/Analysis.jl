@@ -12,7 +12,7 @@ using SHA
 using StableRNGs
 using TOML
 
-export analyze, read_params, read_store
+export analyze, calibrate, read_params, read_store
 
 include("params.jl")
 include("stats.jl")
@@ -43,6 +43,23 @@ include("p2_ritems.jl")
 include("p2_render.jl")
 include("p2_pipeline.jl")
 include("p2_dispatch.jl")
+include("p3_params.jl")
+include("p3_rule.jl")
+include("p3_sets.jl")
+include("p3_select.jl")
+include("p3_rng.jl")
+include("p3_stat.jl")
+include("p3_hb.jl")
+include("p3_pp.jl")
+include("p3_hc.jl")
+include("p3_read.jl")
+include("p3_label.jl")
+include("p3_verdict.jl")
+include("p3_c7.jl")
+include("p3_json.jl")
+include("p3_record.jl")
+include("p3_tables.jl")
+include("p3_pipeline.jl")
 include("cli.jl")
 
 end

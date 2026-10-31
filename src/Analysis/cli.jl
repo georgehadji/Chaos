@@ -1,17 +1,22 @@
-# The command `analyze` (entry point: `bin/chaoslab.jl` routes it here). Exit codes: 0 done, 1 refusal or usage, 2 tables written but figures skipped.
+# The commands `analyze` and `calibrate` (entry point: `bin/chaoslab.jl` routes them here). Exit codes: 0 done, 1 refusal or usage, 2 (analyze) tables written but figures skipped.
 
 const CLI_USAGE = "usage: chaoslab analyze <preregistration> <manifest> <panel> <parameters> [--store <dir>] [--out <dir>] [--threads N]" *
                   " [--p1-store <dir>] [--p1-preregistration <file>] [--p1-manifest <file>] [--p1-parameters <file>]  (the --p1-* options are for study p2-indicators only)"
 const CLI_P1_OPTIONS = ("--p1-store", "--p1-preregistration", "--p1-manifest", "--p1-parameters")
 const CLI_VALUE_OPTIONS = ("--store", "--out", "--threads", CLI_P1_OPTIONS...)
+const CLI_CALIBRATE_OPTIONS = ("--out", "--threads", "--p2-store", "--p2-manifest", "--p2-preregistration", "--p2-parameters", "--panel", "--p1-store", "--p1-manifest", "--p1-preregistration",
+                               "--p1-parameters")
+const CLI_CALIBRATE_USAGE = "usage: chaoslab calibrate <preregistration> <parameters> [--out <dir>] [--threads N] [--p2-store <dir>] [--p2-manifest <file>] [--p2-preregistration <file>]" *
+                            " [--p2-parameters <file>] [--panel <file>] [--p1-store <dir>] [--p1-manifest <file>] [--p1-preregistration <file>] [--p1-parameters <file>]" *
+                            "  (study p3-abstention only; the files of the other studies default to the study layout)"
 
-function _parse(args)
+function _parse(args, valid = CLI_VALUE_OPTIONS)
     pos, opt = String[], Dict{String, String}()
     i = 1
     while i <= length(args)
         a = String(args[i])
         if startswith(a, "--")
-            a in CLI_VALUE_OPTIONS || throw(ArgumentError("unknown option $a"))
+            a in valid || throw(ArgumentError("unknown option $a"))
             i < length(args) || throw(ArgumentError("option $a needs a value"))
             opt[a] = String(args[i + 1])
             i += 2
@@ -56,16 +61,41 @@ function _run(pos, opt, io)
     return 0
 end
 
+# `calibrate <preregistration> <parameters> [options]` (E46): the two positional arguments, the eleven options as keywords; the thread count does not change a number (I31).
+function _run_calibrate(pos, opt, io)
+    length(pos) == 2 || throw(ArgumentError("calibrate needs 2 arguments (preregistration, parameters), got $(length(pos))"))
+    key(o) = Symbol(replace(replace(o[3:end], "preregistration" => "prereg", "parameters" => "params"), '-' => '_'))
+    kw = Dict{Symbol, Any}(key(o) => v for (o, v) in opt if o != "--out" && o != "--threads")
+    res = calibrate(; prereg = pos[1], params = pos[2], out = get(opt, "--out", nothing), threads = _threads(opt), kw...)
+    println(io, "record written: ", res.record, "
+tables written: ", res.tables, "
+outcome: ", res.outcome)
+    return 0
+end
+
 """
     cli(args; io = stdout) -> Int
 
 `analyze <preregistration> <manifest> <panel> <parameters> [--store dir] [--out dir] [--threads N] [--p1-store dir] [--p1-preregistration file] [--p1-manifest file]
-[--p1-parameters file]`, `analyze --help`. Returns the exit code.
+[--p1-parameters file]`, `analyze --help`, and `calibrate <preregistration> <parameters> [options]`, `calibrate --help` (Amendment D93). Returns the exit code.
 """
 function cli(args; io::IO = stdout)
     a = String.(args)
+    if !isempty(a) && a[1] == "calibrate"
+        ("--help" in a || "-h" in a) && (println(io, CLI_CALIBRATE_USAGE); return 0)
+        try
+            pos, opt = _parse(a[2:end], CLI_CALIBRATE_OPTIONS)
+            return _run_calibrate(pos, opt, io)
+        catch e
+            e isa ArgumentError || rethrow()
+            println(io, "error: ", e.msg, "
+", CLI_CALIBRATE_USAGE)
+            return 1
+        end
+    end
     if isempty(a) || a[1] != "analyze"
-        println(io, CLI_USAGE)
+        println(io, CLI_USAGE, "
+", CLI_CALIBRATE_USAGE)
         return 1
     end
     ("--help" in a || "-h" in a) && (println(io, CLI_USAGE); return 0)

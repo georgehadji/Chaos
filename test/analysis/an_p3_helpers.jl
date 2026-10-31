@@ -10,6 +10,13 @@
 
 p3_seed(letter::Char, sub::Integer = 0) = AN_SEED + 34000 + 50 * (letter - 'a' + 1) + sub      # D93<letter> draws use 34000 + 50 n + sub, sub < 50
 const P3_SLUG = "p3-abstention"
+
+# Stage 03, owner decision 2 of the stage 02 checkpoint (D38): the package suite carries 30 of the 52 refusal cases of D93c (the criterion asks for at least 30, one for each rule a to k and each
+# sub-cause); verify/analysis-p3.jl sets P3_FULL_RUN = 1 and runs all 52 with the same assertions (test plan, "Rework at stage 03").
+const P3_FULL = get(ENV, "P3_FULL_RUN", "") == "1"
+const P3_CASE_SAMPLE = ["slug-absent", "slug-invalid", "hash-row-absent", "hash-row-repeated", "hash-wrong", "param-missing", "param-unknown", "param-quote", "param-range", "param-mirror", "param-voters",
+    "p2-param-missing", "p2-manifest-hash", "p2-study", "p2-prereg-header", "p2-status", "p2-chunk-failed", "p2-pilot", "p2-nan-series", "p2-drift-unflagged", "p1-prereg", "p1-status", "p1-chunk-hash",
+    "p1-study", "id-grid-ic", "id-p1-ic", "item-missing-cal", "item-missing-gate", "item-listed-exists", "step-missing"]
 const P3_I7 = ["LE", "SALI", "FLI", "MEGNO", "E1", "E2", "WBA"]
 const P3_PARAM_KEYS = [:budgets, :b_primary, :N_c, :N_1, :n_s, :f_s, :lam_w2, :lam_s2, :min_set, :gate_size,
     :indicators_i7, :voter_bits, :w_range, :v_range, :min_voters,

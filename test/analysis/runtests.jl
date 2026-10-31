@@ -52,3 +52,4 @@ include(joinpath(@__DIR__, "an_p3_params.jl"))       # D93b
 include(joinpath(@__DIR__, "an_p3_dispatch.jl"))     # D93a, D93q
 include(joinpath(@__DIR__, "an_p3_refusals.jl"))     # D93c, D93p after refusals
 include(joinpath(@__DIR__, "an_p3_pipeline.jl"))     # D93d to D93f, D93j to D93l, D93n to D93p end to end
+include(joinpath(@__DIR__, "an_p3_gate.jl"))         # D93c P68: a gate orbit outside Cal with a missing verdict item (stage 03 rework, owner decision 3)

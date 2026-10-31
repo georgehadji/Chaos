@@ -607,3 +607,76 @@ The owner delegated the choices to the coordinator, who set them as follows.
 3. Stage 03 adds one fixture case the stage 02 fixture cannot reach: a gate orbit outside Cal (rho = U) with a missing verdict item, which must refuse (P68).
 4. The 52 refusal cases were exercised only against a stub; stage 03 runs them against the module and each must refuse for its own cause, with the cause named in the message; a case that refuses for another cause is a defect of the module or of the case and is fixed at stage 03.
 Audit of 2026-10-31: Coverage of spec (every criterion D93a to D93r maps to tests or to a stage 04 script), RED (191 UndefVarError and 7 dispatch failures from the missing command, no parse or helper error, existing suites pass), Reproducible (every random draw in the new files uses a StableRNG with a recorded seed), No memory values (no bibliography regression value; the expected values are by construction, by hand or computed by an independent reference in the test files): pass.
+
+### Rework at stage 03 (2026-10-31)
+
+Written at stage 03 (implement until GREEN) of Amendment D93. Only the three things below touch the test directory; no assertion of a stage 02 test was weakened, deleted or changed, and no test was found wrong against the spec.
+
+1. Added (owner decision 3 of the stage 02 checkpoint). New file `test/analysis/an_p3_gate.jl` (1 testset, 3 assertions), registered last in `test/analysis/runtests.jl` (one added line, comment "D93c P68"). Fixture: a copy of the default study in which the L5 item that C0 reads for orbit 9 (P1 store, chunk 5) carries the flag "diagnostics exceeded"; orbit 9 is a gate orbit (K index 1, class T), so its reference class is unresolved by the diagnostics condition of E49 c: it leaves Cal (reason "unresolved") and stays in the gate set (E50: not intersected with Cal). With every item the run is accepted (orbit 9 dropped, in the gate set, its verdicts read). With the pa1 item of orbit 9 removed (chunk 14, manifest count and p3 table resynchronised as in `an_p3_refusals.jl`) the run is refused naming `pa1` and the orbit 9, the output folder is not created and every input is byte-equal (P68, E48 h). A second copy shows that the same missing item for an orbit that is neither in Cal nor in the gate set (orbit 13) is not a refusal.
+2. Moved to `verify/analysis-p3.jl` by D38 (owner decision 2). The D93 part of the analysis suite takes 2 min 41 s (analysis suite 6 min 05 s; the part before D93 takes 3 min 24 s for 1287 assertions, measured on the same module with the D93 files left out; whole `Pkg.test()` 23 min 14 s on one thread, below the 30 min ceiling). The D35 ceiling of 3 min per slug was exceeded by the D89 part before this amendment; the D93 part alone is below it. The refusal loop of `an_p3_refusals.jl` is the one place where cases can move without breaking a count of the criteria: the package suite keeps 30 of its 54 cases (criterion D93c asks for at least 30, one for each rule a to k of E48 and each sub-cause), chosen by the constant `P3_CASE_SAMPLE` in `an_p3_helpers.jl` (lines added: `P3_FULL`, `P3_CASE_SAMPLE`; one line in the loop of `an_p3_refusals.jl` skips the others unless `P3_FULL_RUN = 1`); `verify/analysis-p3.jl` sets `P3_FULL_RUN = 1` and runs every D93 test file with all 54 cases and the same assertions. This saved 17 s (85 s to 68 s). Not moved: the 444 malformed parameter files (D93b asks for at least 2 x 71 + 12 in the package; they cost 6 s), the five missing-data fixtures (D93d asks for each cause), the 14 power sets of O16 (2 s). What remains is the cost of the fixtures themselves (the p3 study and its P1 reference, 35 s; a copy of the study for each refusal case and each malformed-input case): a further reduction needs a decision of the owner on the pipeline and refusal files.
+3. Count of refusal cases. The plan says 52; `p3_refusal_cases` holds 54 (slug 3, header hash 3, parameter table 8, p2 manifest hash 1, p2 inputs 21, P1 inputs 7, identity 5, items 4, steps and windows 2). All 54 are exercised (the package suite 30, `verify/analysis-p3.jl` all).
+
+Owner decision 4 (each refusal case refuses for its own cause, named in the message). The 54 cases were run against the module (a script that runs each mutation and prints the message of the `ArgumentError`, scratch area, not part of the repository). Every case is refused, each message names its own cause and contains the words the test requires; no case refused for another cause and none had to be fixed. Messages (paths and hashes shortened):
+
+| Case | Message |
+|------|---------|
+| slug-absent | preregistration p3-abstention-preregistration.md has 0 header rows "Study slug", expected exactly one |
+| slug-several | preregistration p3-abstention-preregistration.md has 2 header rows "Study slug", expected exactly one |
+| slug-invalid | the study slug "P3 Abstention" of p3-abstention-preregistration.md is not made of lowercase letters, digits and hyphens |
+| hash-row-absent | preregistration check failed: p3-abstention-preregistration.md: expected exactly one header row "SHA-256 of this file", found 0 |
+| hash-row-repeated | preregistration check failed: p3-abstention-preregistration.md: expected exactly one header row "SHA-256 of this file", found 2 |
+| hash-wrong | preregistration check failed: p3-abstention-preregistration.md: header SHA-256 <hash> differs from the computed feac331f8731f4381d0bd58fd785dd06cbd7b8 |
+| param-missing | parameter file p3-abstention-calibration-parameters.toml: missing key budgets |
+| param-unknown | parameter file p3-abstention-calibration-parameters.toml: unknown key bogus_key |
+| param-quote | parameter file p3-abstention-calibration-parameters.toml: key min_set has a quote that does not occur in the section "Thresholds register (single home |
+| param-text | parameter file p3-abstention-calibration-parameters.toml: key cost_tg has the text "text that is not in the quote", which does not occur in its quote |
+| param-mirror | parameter file p3-abstention-calibration-parameters.toml: key n_s is 801, but n_s of the p2 parameter table is 800 (a p2 mirror) |
+| param-range | parameter file p3-abstention-calibration-parameters.toml: key e_cal must lie in the closed unit interval, got 1.5 |
+| param-voters | parameter file p3-abstention-calibration-parameters.toml: key voter_bits must equal indicators_i7 without its first element, got ["WBA", "E2", "E1", " |
+| p2-param-missing | parameter file p2-indicators-analysis-parameters.toml: missing key ratio_threshold |
+| p2-manifest-hash | parameter file p3-abstention-calibration-parameters.toml: key p2_manifest_sha256 is <hash>, but the SHA-256 of the p2 manifest is 581f42ec1302b53e1fb7 |
+| p2-study | manifest study "p3-abstention" differs from the preregistration slug "p2-indicators" |
+| p2-prereg-header | manifest prereg header hash <hash> differs from the preregistration header hash <hash> |
+| p2-prereg-start | manifest prereg sha256_start hash <hash> differs from the preregistration header hash <hash> |
+| p2-prereg-end | manifest prereg sha256_end hash <hash> differs from the preregistration header hash <hash> |
+| p2-chunk-prereg | prereg_sha256 of chunk-00005.h5 differs from the preregistration hash |
+| p2-manifest-schema | manifest has schema_version 3, not 2 |
+| p2-status | manifest status is "running", not complete |
+| p2-chunk-failed | chunk 3 has status "failed" in the manifest; chunks that failed twice are not analysed by this version (the study has none) |
+| p2-git-dirty | the manifest says the git tree of the run was not clean (git.clean is not true) |
+| p2-control-stops | the manifest lists control stops: 1 |
+| p2-plan-manifest | plan hash <hash> of the manifest differs from plan_sha256 of the parameter table |
+| p2-panel-file | panel file hash <hash> differs from the hash in the manifest |
+| p2-panel-manifest | panel file hash <hash> differs from the hash in the manifest |
+| p2-chunk-missing | chunk file chunk-00005.h5 is missing from the store store |
+| p2-pilot | chunk-00005.h5 is a pilot file |
+| p2-incomplete | chunk-00005.h5 is not complete |
+| p2-chunk-hash | chunk_hash of chunk-00005.h5 differs from the manifest |
+| p2-nan-series | non-finite value in the series of chunk-00002.h5, orbit 3, spec tg |
+| p2-nan-frequency | non-finite value in row W=20, column D of chunk-00010.h5, orbit 3, spec fq1 without the flag degenerate |
+| p2-drift-unflagged | drift flag of chunk-00001.h5, orbit 6, spec L1 differs from the recomputation from the stored points |
+| p2-drift-spurious | drift flag of chunk-00001.h5, orbit 6, spec L1 differs from the recomputation from the stored points |
+| p1-prereg | preregistration check failed: p1/p1-le-benchmark-preregistration.md: header SHA-256 <hash> differs from the computed d0368e6e867e18888570a6029ab5505cd |
+| p1-status | manifest status is "running", not complete |
+| p1-chunk-failed | chunk 5 has status "failed" in the manifest; chunks that failed twice are not analysed by this version (the study has none) |
+| p1-chunk-missing | chunk file chunk-00005.h5 is missing from the store p1/store |
+| p1-chunk-hash | chunk_hash of chunk-00005.h5 differs from the manifest |
+| p1-study | the P1 manifest study "p2-indicators" is not "p1-le-benchmark" |
+| p1-panel | panel file hash <hash> differs from the hash in the manifest |
+| id-grid-params | chunk-00003.h5, orbit 21, spec L1: stored params "0.75" differs from the K "0.5" of its h4 table |
+| id-grid-ic | chunk-00003.h5, orbit 22, spec L1: stored ic "0.1,0.2" differs from "1.0471975511965976,1.1780972450961724" of its h4 table |
+| id-panel-ic | chunk-00001.h5, orbit 3, spec L1: stored ic "0.5,0.9" differs from the start of the panel file "0.5,0.30000000000000004" |
+| id-panel-params | chunk-00001.h5, orbit 4, spec L1: stored params "0.6" differs from the K 0.5 of the panel file |
+| id-p1-ic | P1 chunk chunk-00005.h5, orbit 3, method L5: stored ic "0.5,0.9" differs from the start of the panel file "0.5,0.30000000000000004" |
+| item-missing-cal | item missing from the store: orbit 3, spec pa1, Float64, horizon 20481, direction nothing; the manifest does not list it in not_applicable |
+| item-missing-gate | item missing from the store: orbit 9, spec pa1, Float64, horizon 20481, direction nothing; the manifest does not list it in not_applicable |
+| item-missing-grid | item missing from the store: orbit 22, spec L1, Float64, horizon 80000, direction pi/4; the manifest does not list it in not_applicable |
+| item-listed-exists | the manifest lists orbit 5, spec fq1, Float64, horizon 20480, direction nothing in not_applicable but the store has its item |
+| step-missing | chunk-00002.h5, orbit 7, spec tg: 31 recorded steps but steps_recorded is 32; a recorded step is missing |
+| window-missing | window row W=1280 is missing in chunk-00010.h5, orbit 7, spec fq1 |
+
+Readings made at stage 03 where the spec and the tests meet (none is a deviation of a test):
+
+- `item-missing-grid` (the p2 L1 item of grid orbit 22 removed) is refused naming `L1` and the orbit. E49 e would read the missing L1 item of a grid orbit as relabelling data missing (the orbit leaves Cal, a count); the test and E49 d ("lambda_ref for every orbit of both sources, from the p2 wrapped L1 item") are met by requiring the p2 L1 item of every non-control orbit of P and G (D89 E25 coverage rule: missing and not listed in `not_applicable`, or listed and present, refuses) and by counting a missing p2 L5 item, a missing recorded step N_1 / 10, N_1 / 2 or N_1 of an L5 item and a missing P1 L5 or L1 item as relabelling data missing. For the owner: E48 h and E49 e can be read the other way for the p2 L1 item; the test pins the refusal.
+- An item that the manifest lists in `not_applicable` and that a Cal orbit lacks gives undecided verdicts at the ten budgets (the spec says nothing).
+- The P1 items are not checked for finite values (E48 f names only the manifest, the chunk files and hashes, the study, the panel hash and the preregistration hash); the P1 base labelling of the change counts runs in memory and an orbit for which it cannot compute a label (a missing recorded step) has the old class `missing` in the change table. The test `D93c things that are not refusals` (the cause "L5 step N_1") needs this: removing the last recorded step of a P1 item would otherwise be refused by the base check of the horizon.

@@ -82,6 +82,7 @@ end
     @test length(cases) >= 30 && allunique(c[1] for c in cases)
     failed = String[]
     for (i, (tag, words, _)) in enumerate(cases)
+        (P3_FULL || tag in P3_CASE_SAMPLE) || continue                          # the other cases: verify/analysis-p3.jl (D38)
         st = p3_copy(base, "refuse-$tag")                                    # a fresh copy of the study for every case
         (_, _, mutate) = p3_refusal_cases(st)[i]
         pre = p3_fingerprint(st)

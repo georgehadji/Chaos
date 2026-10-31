@@ -38,3 +38,17 @@ include(joinpath(@__DIR__, "an_p2_reported.jl"))     # T11, T15, T16, T17
 include(joinpath(@__DIR__, "an_p2_output.jl"))       # D89p, D89q, D89r, D89s, D89u
 include(joinpath(@__DIR__, "an_p2_review.jl"))       # review findings of stage 04 (K value pooling, infinite percentiles, stripped attributes, text against value, ...)
 include(joinpath(@__DIR__, "an_p2_figures.jl"))      # D91 (module side of the figure drawers: a fake FIGURE_DRAWER, status, command lines, layering); the pictures are verify/analysis-p2-figures.jl
+
+# D93 stage 02 (Amendment D93, study p3-abstention). The module has no D93 functionality yet: the files below are RED, except the fixture self-test and the guards of the P1 and P2 paths
+# (an_p3_dispatch.jl). Helpers first, then one file per theme.
+include(joinpath(@__DIR__, "an_p3_ref.jl"))          # independent reference implementation of the calibration layer (exact rationals, generators, the HB simulation)
+include(joinpath(@__DIR__, "an_p3_helpers.jl"))      # parameter table of 71 keys, preregistration text, designed study, P1 reference with N_1 = 80000, prescribed tables
+include(joinpath(@__DIR__, "an_p3_fixture.jl"))      # fixture self-test: passes before the module exists
+include(joinpath(@__DIR__, "an_p3_rule.jl"))         # D93g, D93h, D93i
+include(joinpath(@__DIR__, "an_p3_sets.jl"))         # D93d (the rule), D93e
+include(joinpath(@__DIR__, "an_p3_select.jl"))       # D93j (O18 a to e, the order of C6)
+include(joinpath(@__DIR__, "an_p3_pp.jl"))           # D93k, D93l, D93m
+include(joinpath(@__DIR__, "an_p3_params.jl"))       # D93b
+include(joinpath(@__DIR__, "an_p3_dispatch.jl"))     # D93a, D93q
+include(joinpath(@__DIR__, "an_p3_refusals.jl"))     # D93c, D93p after refusals
+include(joinpath(@__DIR__, "an_p3_pipeline.jl"))     # D93d to D93f, D93j to D93l, D93n to D93p end to end

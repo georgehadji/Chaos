@@ -57,6 +57,7 @@ function read_round_log(path::AbstractString)
     isfile(path) || throw(ArgumentError("round log $path does not exist"))
     bytes = read(path)
     text = String(copy(bytes))
+    isvalid(text) || throw(ArgumentError("round log $path: the file is not valid UTF-8"))
     ents = _split_entries(text, path)
     return (sha256 = bytes2hex(sha256(bytes)), entries = [_parse_entry(e, n, path) for (n, e) in enumerate(ents)])
 end

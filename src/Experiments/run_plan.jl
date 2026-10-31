@@ -300,6 +300,20 @@ end
 "Canonical text of a plan (the bytes behind `plan.hash`)."
 plan_text(plan::RunPlan) = plan.text
 
+# R12 item 2 for the arms planned in this phase (`planned` = nothing: all arms): a spec they hold must have an item. An arm not released yet (D94,
+# C1) is only checked structurally: its specs exist; the full check comes with the phase that plans it.
+function _check_specs(rb, items, planned)
+    specs = Set(String(s["id"]) for s in get(rb.raw, "indicator", []))
+    for a in rb.raw["arm"], id in get(a, "indicators", String[])
+        id in specs || throw(ArgumentError("run block arm `$(a["name"])`: the indicator spec `$id` is not defined in the block"))
+    end
+    for spec in get(rb.raw, "indicator", [])
+        held = [a for a in rb.raw["arm"] if spec["id"] in get(a, "indicators", String[])]
+        (planned === nothing || isempty(held) || any(a -> a["name"] in planned, held)) || continue
+        any(it -> it.method == spec["id"], items) || throw(ArgumentError("indicator spec `$(spec["id"])` is selected by no orbit of the panel (the arms that hold it select an empty subset)"))
+    end
+end
+
 # ---------------------------------------------------------------- the plan
 """
     plan_run(prereg, panel; code_version = nothing, defaults = nothing, ntasks = nothing, round_log = nothing, check = false) -> RunPlan
@@ -330,9 +344,7 @@ function plan_run(prereg::AbstractString, panel::AbstractString; code_version = 
     for (id, os) in omitted        # an arm that selects no orbit for a spec is an error naming the spec (R12 item 2)
         any(it -> it.method == id, items) || throw(ArgumentError("indicator spec `$id` is undefined for every orbit its arms select (orbits $(join(sort!(first.(os)), ", ")))"))
     end
-    for spec in get(rb.raw, "indicator", [])    # a spec whose arms select no orbit at all is an error naming the spec (R12 item 2)
-        any(it -> it.method == spec["id"], items) || throw(ArgumentError("indicator spec `$(spec["id"])` is selected by no orbit of the panel (the arms that hold it select an empty subset)"))
-    end
+    _check_specs(rb, items, rs === nothing ? nothing : union!(Set{String}(), (p.arms for p in rs.passes)...))
     isempty(items) && !(rs !== nothing && rs.dry) && throw(ArgumentError("run plan holds zero items: the arms select no orbit of the panel"))
     for it in items
         it.method == "L6" && _label(it.precision) != "Float64" &&

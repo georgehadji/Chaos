@@ -3,19 +3,30 @@
 const _CLASS5 = ("T", "R", "C", "S", "X")
 const _ZERO_UNDEFINED = ("C", "S", "X")       # classes that do not exist at K = 0
 
+# Plain upper limits (L6): far above any study value, below what memory and Int hold.
+const SCREEN_POINTS_MAX = 2^30
+const R_MAX_MAX = 1000
+const FRACTION_EXPONENT_MAX = 1000
+
+function _bounded(key, v, hi)
+    n = _int(key, v)
+    n <= hi || _bad((key,), "must be at most $hi, got $n")
+    return n
+end
+
 function _check_source(d)
     src = get(d, "screen_source", "lattice")
     (src isa AbstractString && src in ("lattice", "random")) || _bad(("screen_source",), "must be \"lattice\" or \"random\", got $(repr(src))")
     if src == "random"
         haskey(d, "screen_points") || _bad(("screen_points",), "is required with screen_source = \"random\"")
-        return String(src), _int("screen_points", d["screen_points"])
+        return String(src), _bounded("screen_points", d["screen_points"], SCREEN_POINTS_MAX)
     end
     haskey(d, "screen_points") && _bad(("screen_points",), "is refused with screen_source = \"lattice\"")
     return String(src), 0
 end
 
 function _check_rounds_keys(d)
-    r_max = haskey(d, "r_max") ? _int("r_max", d["r_max"]) : 1
+    r_max = haskey(d, "r_max") ? _bounded("r_max", d["r_max"], R_MAX_MAX) : 1
     for k in ("d_fraction", "db_size")
         haskey(d, k) && !haskey(d, "r_max") && _bad((k, "r_max"), "`$k` needs `r_max` (rounds are asked for explicitly)")
     end
@@ -45,15 +56,18 @@ function _table_rows(key, t, nK)
         for c in keys(row)
             c in _CLASS5 || _bad((key,), "unknown class $(repr(c)) at K index $i")
         end
+        haskey(rows, i) && _bad((key,), "K index $i is given twice (key $(repr(ks)) repeats an earlier key)")
         rows[i] = Dict{String, Any}(String(c) => v for (c, v) in row)
     end
     return rows
 end
 
 # The size table: by K index and class; a class that exists at the K is required, an undefined class may be absent or 0.
+_exists(K, i, c) = !(K[i] == 0 && c in _ZERO_UNDEFINED)
+
 function _check_quota(d, K, n_c)
     nK = length(K)
-    exists(i, c) = !(K[i] == 0 && c in _ZERO_UNDEFINED)
+    exists(i, c) = _exists(K, i, c)
     haskey(d, "quota") || return Dict{Int, Dict{String, Int}}(i => Dict(c => n_c for c in _CLASS5 if exists(i, c)) for i in 1:nK)
     rows = _table_rows("quota", d["quota"], nK)
     out = Dict{Int, Dict{String, Int}}()
@@ -88,17 +102,24 @@ function _ratio(where, v)
     m = match(r"^(-?)(\d+)(?:\.(\d+))?(?:[eE]([+-]?\d+))?$", s)
     m === nothing && _bad(("d_fraction",), "$where must be a rational (decimal or a/b), got $(repr(v))")
     frac = m.captures[3] === nothing ? "" : string(m.captures[3])
-    ex = m.captures[4] === nothing ? 0 : parse(Int, m.captures[4])
+    ex = m.captures[4] === nothing ? 0 : something(tryparse(Int, m.captures[4]), typemax(Int))
+    abs(ex) <= FRACTION_EXPONENT_MAX || _bad(("d_fraction",), "$where has an exponent beyond $FRACTION_EXPONENT_MAX in absolute value: $(repr(v))")
     r = Rational{BigInt}(parse(BigInt, string(m.captures[2]) * frac), BigInt(10)^length(frac)) *
         Rational{BigInt}(big(10)^max(ex, 0), big(10)^max(-ex, 0))
     return m.captures[1] == "-" ? -r : r
 end
 
-function _check_fractions(d, nK)
+# Like the size table, the table is complete: every K index and every class that exists at that K (L5).
+function _check_fractions(d, K)
     haskey(d, "d_fraction") || return Dict{Int, Dict{String, Rational{BigInt}}}()
-    rows = _table_rows("d_fraction", d["d_fraction"], nK)
+    rows = _table_rows("d_fraction", d["d_fraction"], length(K))
     out = Dict{Int, Dict{String, Rational{BigInt}}}()
-    for (i, row) in rows
+    for i in 1:length(K)
+        haskey(rows, i) || _bad(("d_fraction",), "misses K index $i")
+        row = rows[i]
+        for c in _CLASS5
+            haskey(row, c) || !_exists(K, i, c) || _bad(("d_fraction",), "misses class $c at K index $i")
+        end
         out[i] = Dict{String, Rational{BigInt}}()
         for (c, v) in row
             f = _ratio("fraction of K index $i class $c", v)
@@ -116,5 +137,5 @@ function _check_rounds(d, K, n_c, grid_side)
     ngs = haskey(d, "newton_grid_side") ? _int("newton_grid_side", d["newton_grid_side"]) : grid_side
     src == "lattice" && haskey(d, "quota") && _bad(("quota", "screen_source"), "`quota` needs screen_source = \"random\"")
     return (screen_source = src, screen_points = pts, rk..., newton_grid_side = ngs, quota = _check_quota(d, K, n_c),
-            d_fraction = _check_fractions(d, length(K)))
+            d_fraction = _check_fractions(d, K))
 end

@@ -1,7 +1,8 @@
 # The plan with rounds (Amendment D94: E39, E41, R25, R26): which rounds and arms the log releases, the orbit subsets D and D_B,
 # the chunk cells with the round, the digest of the ref arm and the requests a run may make.
 
-_release(a) = get(a, "release", "each_round")      # an arm without a release key is planned with the each_round phase when the block has release keys
+# An arm without a release key in a block with release keys is planned, listed and counted in the ref digest as each_round (M2: one rule).
+_release(a) = get(a, "release", "each_round")
 
 "Round of a chunk cell `k<i>:<class>:r<round>`; the controls (no round in the name) count in round 1."
 _cell_round(cell) = (m = match(r":r(\d+)$", cell); m === nothing ? 1 : parse(Int, m.captures[1]))
@@ -36,7 +37,9 @@ end
 function _subsets_at(bases, R, closed, db_size)
     DR = [(id = b.id, k_index = b.k_index) for b in bases if b.in_D && 1 <= b.round <= R]
     isempty(bases) && return (DR = DR, dbids = Int[], alloc = Int[])
-    seed = parse(BigInt, first(b.run_seed for b in bases if b.round > 0))
+    i0 = findfirst(b -> b.round > 0, bases)
+    i0 === nothing && throw(ArgumentError("run block `arm.release`: the panel has no orbit with a round (a panel with rounds is needed for release keys)"))
+    seed = parse(BigInt, bases[i0].run_seed)
     nK = maximum(b.k_index for b in bases)
     alloc = closed ? db_allocation([count(x -> x.k_index == i, DR) for i in 1:nK], db_size) : Int[]
     return (DR = DR, dbids = closed ? db_subset(seed, R, DR, db_size) : Int[], alloc = alloc)
@@ -49,13 +52,19 @@ log is then ignored). With `check` and no log the plan is a dry plan that holds 
 function _round_setup(rb, pnl, bases, round_log, check)
     _check_d_columns(rb, pnl)
     arms = rb.raw["arm"]
+    r_max = Int(get(pnl.man, "r_max", 1))
     if !any(a -> haskey(a, "release"), arms)
         for a in arms
             a["orbits"] == "D_B" && throw(ArgumentError("run block `arm.release`: arm `$(a["name"])` uses the subset D_B, which needs a release key (closure)"))
         end
+        r_max > 1 && throw(ArgumentError("run block `arm.release`: the panel has $r_max rounds (manifest r_max), so the arms need release keys (R25 item 2)"))
+        round_log === nothing || throw(ArgumentError("round log $round_log is given but the block has no release key: nothing would be released by it"))
         return nothing
     end
-    r_max = Int(get(pnl.man, "r_max", 1))
+    for (i, a) in enumerate(arms)
+        a["orbits"] == "D_B" && get(a, "release", "") != "closure" &&
+            throw(ArgumentError("run block `arm[$i].release`: arm `$(a["name"])` uses the subset D_B and needs release = \"closure\" explicitly"))
+    end
     r_max > 1 || throw(ArgumentError("run block `arm.release`: the panel has one round (manifest r_max = $r_max), so a release key has no meaning"))
     bases = [b.round > 0 ? merge(b, (cell = b.cell * ":r$(b.round)",)) : b for b in bases]
     if round_log === nothing
@@ -72,9 +81,31 @@ end
 
 # The digest of the ref arm for the rounds 1 to `r` (E40): SHA-256 of the sorted chunk hashes of its chunks with a round in the name, each followed by a newline.
 function _ref_digest(chunks, rb, r)
-    ref = Set(a["name"] for a in rb.raw["arm"] if get(a, "release", "") == "each_round")
-    hs = [c.hash for c in chunks if any(in(ref), c.arms) && occursin(r":r\d+$", c.cell) && _cell_round(c.cell) <= r]
-    return bytes2hex(sha256(join(sort!(hs) .* "\n")))
+    return bytes2hex(sha256(join(sort!([c.hash for c in _ref_chunks(chunks, rb, r)]) .* "\n")))
+end
+
+# The chunks of the ref arms (each_round) with a round up to `r` in the cell name.
+function _ref_chunks(chunks, rb, r)
+    ref = Set(a["name"] for a in rb.raw["arm"] if _release(a) == "each_round")
+    return [c for c in chunks if any(in(ref), c.arms) && occursin(r":r\d+$", c.cell) && _cell_round(c.cell) <= r]
+end
+
+# H2: every log entry n says rounds 1 to n are done: a ref chunk of such a round must be in the store, complete, with the plan's chunk hash
+# (root attributes only, E43). A refusal names the first entry that is not backed; nothing is written.
+function _check_store(plan::RunPlan, store, round_log, hooks)
+    rd = plan.rounds
+    (rd === nothing || rd.log_entries == 0) && return
+    for c in sort!(_ref_chunks(plan.chunks, plan.block, rd.log_entries); by = c -> (_cell_round(c.cell), c.ordinal))
+        f = chunk_path(store, c.ordinal)
+        a = Dict{String, Any}()
+        if isfile(f)
+            _read_hook(hooks, :attrs, f)
+            a = try read_chunk_attrs(f) catch; Dict{String, Any}() end
+        end
+        why = !isfile(f) ? "is missing in the store" : get(a, "complete", false) !== true ? "is incomplete" :
+              get(a, "chunk_hash", "") != c.hash ? "has a chunk hash different from the plan's" : continue
+        _log_err(round_log, _cell_round(c.cell), "the store file $(basename(f)) (round $(_cell_round(c.cell)) chunk of the ref arm) $why")
+    end
 end
 
 "Check the log against the plan's chunks (R26 item 1) and return the `rounds` record of the plan."

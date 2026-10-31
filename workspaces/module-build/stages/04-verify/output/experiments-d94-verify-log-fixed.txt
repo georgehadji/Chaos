@@ -1,0 +1,83 @@
+# Stage 04, Amendment D94, review fixes (C1, H1, H2, M1, M2, L4 to L7, L9). Raw output of the reruns after the fixes; no commit.
+# D94 script (run_d94.jl, julia --project -t 4), last lines:
+Test Summary:                                                                                                                  | Pass  Total     Time
+D94 RED run                                                                                                                    | 2457   2457  1m01.0s
+D94 RED run                                                                                                                    | 2457   2457  1m01.0s
+  FILE ex_d94_grammar.jl                                                                                                       |  187    187    23.6s
+  FILE ex_d94_streams.jl                                                                                                       |  127    127     4.5s
+  FILE ex_d94_panel.jl                                                                                                         | 1866   1866     9.8s
+  FILE ex_d94_plan.jl                                                                                                          |  155    155    16.7s
+  FILE ex_d94_run.jl                                                                                                           |   55     55     4.8s
+    D94o resume across rounds: round by round, killed and resumed, equals one run of the closed plan (I14, I33)                |   20     20     3.7s
+# whole package suite (Pkg.test), summary:
+Test Summary:         |    Pass  Broken    Total      Time
+Chaoslab              | 1403999       1  1404000  22m27.5s
+  quality             |      12               12     45.9s
+     Testing Chaoslab tests passed 
+# REV and O26R
+# experiments D94 verification, julia 1.13.2, threads 4, sections REV,O26R
+REV-C1 | plan before closure with an indicator spec held only by a closure arm builds; dry check plan builds | 3 / 0 | builds | PASS
+REV-H1 | D_B arm without release key refused naming the key path | run block `arm[3].release`: arm `db` uses the subset D_B and needs release = "closure" explicitly | arm[3].release | PASS
+REV-M1 | panel with 3 rounds, block without release keys refused | run block `arm.release`: the panel has 3 rounds (manifest r_max), so the arms need release keys (R25 item 2) | release keys | PASS
+REV-M1 | one-round panel, block without release keys, round log given: refused | round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-48 | no release key | PASS
+REV-M1 | the same without the log still plans | true | true | PASS
+REV-M2 | ref digest of round 1 equals SHA-256 of the sorted round 1 chunk hashes of the arms ref and fr (free arm counted) | 490b965f844016d4 | 490b965f844016d4 | PASS
+REV-H2 | run_campaign, ref chunk 1 of round 1 missing: refused naming entry 1 and the file; no file written: true | round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpa | entry 1, chunk-00001.h5 | PASS
+REV-H2 | run_campaign, ref chunk 1 of round 1 incomplete: refused naming entry 1 and the file; no file written: true | round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpa | entry 1, chunk-00001.h5 | PASS
+REV-H2 | run_campaign, ref chunk 1 of round 1 chunk hash changed: refused naming entry 1 and the file; no file written: true | round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpa | entry 1, chunk-00001.h5 | PASS
+REV-H2 | same store intact: the run is accepted (no refusal) |  | no refusal | PASS
+REV-L4 | duplicate K index key "01" refused in d_fraction and in quota | true / true | true / true | PASS
+REV-L4 | duplicate K index key " 1" refused in d_fraction and in quota | true / true | true / true | PASS
+REV-L5 | d_fraction: a complete table (K = 0 classes C, S, X absent) read; a missing K index and a missing class refused naming them | 2 / panel input `d_fraction`: misses K index 2 / panel input `d_fraction`: misses class R at K inde | 2 / misses K index 2 / misses class R | PASS
+REV-L6 | huge exponent (1e-5000000, 1e99999999999999999999), r_max 10^9 and screen_points 2^40 refused; seconds for the two fractions | true true true true; 0.0 | true true true true; < 1 | PASS
+REV-L7 | release keys on a panel with no orbit of a round: named refusal (before: BoundsError or empty collection) | run block `arm.release`: the panel has no orbit with a round (a panel with rounds is needed for release keys) | no orbit with a round | PASS
+REV-L9 | round log with invalid UTF-8 refused naming the file | round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Ch | UTF-8 | PASS
+# section REV took 13.5 s
+O26 | oracle's valid log through run_campaign: status / ran / skipped, store files | complete / 0 / 23; 23 | complete / 0 / 23; 23 | PASS
+O26 | oracle's valid log through the entry point (--round-log): exit code | 0 | 0 | PASS
+O26 |   round-log-bad-count_n_ts-1.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-count_n_ts-2.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-count_n_ts-3.txt | library:  | exit 0 | files unchanged false
+O26 |   round-log-bad-count_n_w2-1.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-count_n_w2-2.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-count_n_w2-3.txt | library:  | exit 0 | files unchanged false
+O26 |   round-log-bad-decision-1.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-decision-2.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-decision-3.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-panel_sha256-1.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-panel_sha256-2.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-panel_sha256-3.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-prereg_sha256-1.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-prereg_sha256-2.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-prereg_sha256-3.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-prev_sha256-1.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-prev_sha256-2.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-prev_sha256-3.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-ref_digest-1.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-ref_digest-2.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-ref_digest-3.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-round-1.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-round-2.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 |   round-log-bad-round-3.txt | library: round log C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15e | exit 1 | files unchanged true
+O26 | altered copies refused by the library guard / by the entry point (exit 1) / naming the expected entry / store and manifest folder unchanged, of 24 | 22 / 22 / 22 / 22 | 22 / 22 / 22 / 22 | PASS
+O26 | INFO | accepted, not covered by any check of the log (a count of the last entry, which no later entry chains): round-log-bad-count_n_ts-3.txt, round-log-bad-count_n_w2-3.txt
+# section O26R took 1.7 s
+# done: 19 PASS, 0 FAIL, 1 INFO
+# THREADS and P1PLAN
+# experiments D94 verification, julia 1.13.2, threads 4, sections THREADS,P1PLAN
+D94b | P1 plan with the code of HEAD (code_version fixed), chunks / items | 1363 / 15569 | 1363 / 15569 | PASS
+D94b | P1 plan hash, code before D94 (commit 7f70aa7, git worktree under the scratch folder, same fixed code_version) / HEAD | 6408ce042c5727d8 / 6408ce042c5727d8 | equal | PASS
+D94b | P1 plan text SHA-256 equal | true | true | PASS
+D94b | ordinal, key and hash of all chunks, lines differing between 7f70aa7 and HEAD | 0 | 0 (of 1363) | PASS
+D94b | ordinal and key of the 1363 chunks against the manifest of the accepted P1 run (recorded plan_sha256 81b04cdf..., made with another code_version, so only keys compare), differing | 0 | 0 | PASS
+D94b | INFO | recorded plan and chunk hashes in the repo (p1 manifest) used code_version of the run commit; the pre-D94 values above are computed here with 7f70aa7
+D94b | INFO | plan of the rebuilt panel (prereg of commit 3991155; host fields differ, so the file SHA-256 differs): plan hash 132c0e284d8a50d2 against 6408ce042c5727d8 of the committed panel; chunk lines (ordinal, hash, key) differing: 0
+# section P1PLAN took 4.3 s
+THREADS | INFO | julia -t 1: child 27.8 s, provenance threads 1, ntasks 1
+THREADS | INFO | julia -t 4: child 27.3 s, provenance threads 4, ntasks 4
+THREADS | INFO | julia -t 23: child 26.4 s, provenance threads 23, ntasks 23
+D94p | d94-A-panel.toml from julia -t 1, 4, 23 byte-identical (SHA-256 7d6875534dc7) | 1 | 1 distinct | PASS
+D94p | d94-A-panel.toml.pools.toml from julia -t 1, 4, 23 byte-identical (SHA-256 f9c182db7709) | 1 | 1 distinct | PASS
+D94p | plan.txt from julia -t 1, 4, 23 byte-identical (SHA-256 ab429c804274) | 1 | 1 distinct | PASS
+# section THREADS took 81.5 s
+# done: 8 PASS, 0 FAIL, 5 INFO

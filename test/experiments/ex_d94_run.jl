@@ -87,12 +87,12 @@ end
         push!(kills, (; store, logp, n))
     end
     # one run of the closed plan with the log already closed (the digests are those of the round by round campaign)
-    once = ex_store("d94o-once")
+    once = ex_store("d94o-once"); mkpath(once); foreach(f -> cp(f, joinpath(once, basename(f))), filter(f -> "ref" in d94_attr(f, "arms"), ex_chunk_files(kills[1].store)))   # H2: the log needs the ref chunks of its rounds in the store
     ologp = ex_path("d94o-once.log")
     kd = kills[1]
     write(ologp, d94_log_text(fx, [d94_spec(1), d94_spec(2), d94_spec(3, "close")], r -> d94_digest(d94_ref_hashes(kd.store, r)))[1])
     res = ex_campaign(fx; store = once, round_log = ologp, threads = 4)
-    @test res.status == "complete" && length(res.ran) == plan.counts.chunks
+    @test res.status == "complete" && length(res.ran) == length(d94_clo_chunks(plan)) && length(res.ran) + length(res.skipped) == plan.counts.chunks
     canon_once = d94_canon_store(once)
     @test !isempty(canon_once)
     for kd in kills

@@ -1,0 +1,84 @@
+# Reduced real panel of D94q and D94r (read by verify/experiments-d94.jl). Overrides on the [panel] block of the P1 preregistration
+# (K list, N_scr, thresholds, q_max, grid_side and the rest are the P1 values, which the p3 test draw keeps: "Test draw", item 1).
+# Values below are read from the PROSE of workspaces/study/stages/01-design/output/p3-abstention-preregistration.md (the machine-readable
+# block is not written yet, owner decision P69): "Test draw" items 2 to 5 and the register rows "screening size, R_max, per-cell sizes",
+# "D fractions, size of D_B" and "test_seed". Reduced: screen_points 4096 (study: 262144), r_max 3 (study: 5).
+[panel]
+seed = 20261030
+screen_source = "random"
+screen_points = 4096
+r_max = 3
+gate_rounds = [1]
+controls = "none"
+db_size = 100
+
+# K index 1 to 6 = K 0, 0.5, K_c, pi/2, 2 pi, 10. Per round: T, R, X 40 at every K > 0; C 100 at K = 0.5 and K_c, 40 at the other K;
+# S 25 at K = 0.5 and 2 pi, 250 at K_c and pi/2, none at K = 10 (550 per round in all); K = 0: T and R 40 each, drawn in the gate round only.
+[panel.quota.1]
+T = 40
+R = 40
+[panel.quota.2]
+T = 40
+R = 40
+X = 40
+C = 100
+S = 25
+[panel.quota.3]
+T = 40
+R = 40
+X = 40
+C = 100
+S = 250
+[panel.quota.4]
+T = 40
+R = 40
+X = 40
+C = 40
+S = 250
+[panel.quota.5]
+T = 40
+R = 40
+X = 40
+C = 40
+S = 25
+[panel.quota.6]
+T = 40
+R = 40
+X = 40
+C = 40
+S = 0
+
+# D share: 0.30 for class S and for class C at K = 0.5 and K_c, 0.05 for every other cell (K = 0 included, P74).
+[panel.d_fraction.1]
+T = "0.05"
+R = "0.05"
+[panel.d_fraction.2]
+T = "0.05"
+R = "0.05"
+X = "0.05"
+C = "0.30"
+S = "0.30"
+[panel.d_fraction.3]
+T = "0.05"
+R = "0.05"
+X = "0.05"
+C = "0.30"
+S = "0.30"
+[panel.d_fraction.4]
+T = "0.05"
+R = "0.05"
+X = "0.05"
+C = "0.05"
+S = "0.30"
+[panel.d_fraction.5]
+T = "0.05"
+R = "0.05"
+X = "0.05"
+C = "0.05"
+S = "0.30"
+[panel.d_fraction.6]
+T = "0.05"
+R = "0.05"
+X = "0.05"
+C = "0.05"
+S = "0.30"

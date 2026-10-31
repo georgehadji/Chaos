@@ -1,0 +1,411 @@
+===== fixtureA.txt (verify/experiments-d94-oracle.py)
+O23-gen-u64 | 64-bit words equal to the library's (state, multiplier, high word) | 1000/1000 | all | PASS
+O23-gen-f64 | uniform = low 52 bits * 2^-52 equals the library's Float64 | 1000/1000 | all | PASS
+O23-gen-alt | alternative: high 52 bits * 2^-52 equals the library's Float64 | 0/1000 | none expected | INFO
+# inputs from the manifest: seed 20261012, 3 K, r_max 3, gates [1], screen_points 64, db_size 6
+O23-pool-points | sidecar points per K equals screen_points | 64 | all K | PASS
+O23-pool-counts | manifest pool counts differ from sidecar run lists (of 9) | 0 | 0 | PASS
+O23-bits-sha | K index 1: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1S2C4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 2: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 3: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-pts-range | all 192 points in [0, 2 pi) | True | true | PASS
+O23-pts-distinct | no two screening points equal within a K | True | true | PASS
+O23-fy-exact | draws where the float floor(u (M-t+1)) differs from the exact rational floor | 0 | info | INFO
+O23-ids-count | orbits of the panel (non-control) equals the rebuilt count | 61 vs 61 | equal | PASS
+O23-ids-run | ids 1..N without a gap, panel order | True | true | PASS
+O23-ids-order | orbits whose (round, K index, class, draw index) differs from the id order of E36 (of 61) | 0 | 0 | PASS
+O23-pts-ids | pool orbits whose point id differs from the rebuilt draw (of 32) | 0 | 0 | PASS
+O23-pts-bits | pool orbit starts differing in the 17-digit decimal text of x0 or p0 (of 32) | 0 | 0 | PASS
+O23-pts-dec | pool orbit starts whose exact decimal text differs from the binary64 pair (of 32) | 0 | 0 | PASS
+O23-pool-class | drawn pool orbits whose point id is not in the sidecar pool of its class (of 32) | 0 | 0 | PASS
+O23-I29-starts | equal starts (binary64 pair) among all 61 orbits | 0 | 0 | PASS
+O23-I29-ids | point ids drawn twice at a K | 0 | 0 | PASS
+O23-rounds | round of every orbit in 1..r_max | True | true | PASS
+O23-gate | K = 0 orbits outside the gate rounds | 0 | 0 | PASS
+O23-seed-cell | cell stream seeds (E33 text) differing (of 61) | 0 | 0 | PASS
+O23-seed-run | run seeds differing from the manifest seed (of 61) | 0 | 0 | PASS
+O23-seed-orbit | per-orbit seeds differing from the inferred rule (see header; E16's rule lives in another spec) | 0 of 61 | 0 | PASS
+O23-roundcells-count | round cell records in the manifest equals rounds x K x 5 | 45 vs 45 | equal | PASS
+O23-roundcell-pool | round cell records whose pool differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-q | round cell records whose q differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-drawn | round cell records whose drawn differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-status | round cell records whose status differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-cells-sum | manifest cells whose drawn differs from the sum over rounds (of 15) | 0 | 0 | PASS
+O23-totals | manifest totals.orbits equals the orbit count | 61 vs 61 | equal | PASS
+O23-D-size | round cells whose D count differs from floor(f n + 1/2) (of 45) | 0 | 0 | PASS
+O23-D-flags | orbits whose in_D flag differs from the rebuilt D (of 61) | 0 | 0 | PASS
+O23-D-fracs | manifest d_fraction tables differ from the input tables | 0 | 0 | PASS
+O23-D-total | |D| rebuilt | 30 | info | INFO
+O23-DB-size-R1 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 12) | 6 | PASS
+O23-DB-size-R2 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 21) | 6 | PASS
+O23-DB-size-R3 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 30) | 6 | PASS
+O23-DB-export | no D_B export given: D_B checked for size only | - | - | INFO
+O23-R0-start | K = 0 R orbits unmatched (fraction index, p0, x0 under either reading of 2 pi u2) | 0 | 0 of 2 | PASS
+O23-R-source | K > 0 R orbits whose (source orbit, source point) differs from the rebuilt index | 0 | 0 of 12 | PASS
+O23-R-start | K > 0 R orbits whose start matches under no variant | 0 | 0 of 12 | PASS
+O23-X-phi | X orbits whose stored phi matches under neither reading of 2 pi u2 | 0 | 0 of 15 | PASS
+O23-X-r | X orbits whose stored r differs from the correctly rounded 10^l by more than 1 ulp | 0 | 0 of 15 | PASS
+O23-X-r-exact | X orbits whose stored r differs from the correctly rounded 10^l (any amount; the spec fixes no pow rounding) | 1 | info of 15 | INFO
+O23-X-start | X orbits whose start is farther than 2 ulp from the exact r cos(phi), r sin(phi) of the stored r and phi (E12; start formed in binary64) | 0 | 0 of 15 (max deviation 0.73 ulp) | PASS
+O23-X-start-exact | X orbits whose start equals binary64 r*cos(phi), r*sin(phi) with this platform's cos and sin (the spec fixes no cos rounding) | 15 | info of 15 | INFO
+O23-variant | R K=0 fraction index (ascending value order instead): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 fraction index (order by b, then a): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 p0 = RN(2 pi a/b) (256-bit): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 x0 = RN(2 pi u2) (256-bit): matches | 1 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 x0 = binary64 product 2pi*u2: matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi 256-bit: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi RN: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi binary64 product: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi stored: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R stored phi = RN(2 pi u2) (256-bit): matches | 10 of 12 | info (which reading matched) | INFO
+O23-variant | R stored phi = binary64 product 2pi*u2: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | X r = 10^l (l 256-bit): matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X r = 10^l (l binary64, exact pow): matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X r = libm 10.0**l: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi 256-bit: matches | 0 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi RN: matches | 5 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi binary64 product: matches | 7 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi stored: matches | 7 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi 256-bit: matches | 0 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi RN: matches | 9 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi binary64 product: matches | 10 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi stored: matches | 10 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi RN: matches | 11 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi binary64 product: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi stored: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi RN: matches | 12 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi binary64 product: matches | 15 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi stored: matches | 15 of 15 | info (which reading matched) | INFO
+O23-variant | X stored phi = RN(2 pi u2) (256-bit): matches | 12 of 15 | info (which reading matched) | INFO
+O23-variant | X stored phi = binary64 product 2pi*u2: matches | 15 of 15 | info (which reading matched) | INFO
+TOTAL | 78 checks | PASS 39 | FAIL 0 | INFO 39
+===== reduced.txt (verify/experiments-d94-oracle.py)
+O23-gen-u64 | 64-bit words equal to the library's (state, multiplier, high word) | 1000/1000 | all | PASS
+O23-gen-f64 | uniform = low 52 bits * 2^-52 equals the library's Float64 | 1000/1000 | all | PASS
+O23-gen-alt | alternative: high 52 bits * 2^-52 equals the library's Float64 | 0/1000 | none expected | INFO
+# inputs from the manifest: seed 20261030, 6 K, r_max 3, gates [1], screen_points 4096, db_size 100
+O23-pool-points | sidecar points per K equals screen_points | 4096 | all K | PASS
+O23-pool-counts | manifest pool counts differ from sidecar run lists (of 18) | 0 | 0 | PASS
+O23-bits-sha | K index 1: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1S2C4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 2: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 3: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 4: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 5: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 6: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T4C2S1 | info (format not fixed by the spec) | INFO
+O23-pts-range | all 24576 points in [0, 2 pi) | True | true | PASS
+O23-pts-distinct | no two screening points equal within a K | True | true | PASS
+O23-fy-exact | draws where the float floor(u (M-t+1)) differs from the exact rational floor | 0 | info | INFO
+O23-ids-count | orbits of the panel (non-control) equals the rebuilt count | 2193 vs 2193 | equal | PASS
+O23-ids-run | ids 1..N without a gap, panel order | True | true | PASS
+O23-ids-order | orbits whose (round, K index, class, draw index) differs from the id order of E36 (of 2193) | 0 | 0 | PASS
+O23-pts-ids | pool orbits whose point id differs from the rebuilt draw (of 1193) | 0 | 0 | PASS
+O23-pts-bits | pool orbit starts differing in the 17-digit decimal text of x0 or p0 (of 1193) | 0 | 0 | PASS
+O23-pts-dec | pool orbit starts whose exact decimal text differs from the binary64 pair (of 1193) | 0 | 0 | PASS
+O23-pool-class | drawn pool orbits whose point id is not in the sidecar pool of its class (of 1193) | 0 | 0 | PASS
+O23-I29-starts | equal starts (binary64 pair) among all 2193 orbits | 0 | 0 | PASS
+O23-I29-ids | point ids drawn twice at a K | 0 | 0 | PASS
+O23-rounds | round of every orbit in 1..r_max | True | true | PASS
+O23-gate | K = 0 orbits outside the gate rounds | 0 | 0 | PASS
+O23-seed-cell | cell stream seeds (E33 text) differing (of 2193) | 0 | 0 | PASS
+O23-seed-run | run seeds differing from the manifest seed (of 2193) | 0 | 0 | PASS
+O23-seed-orbit | per-orbit seeds differing from the inferred rule (see header; E16's rule lives in another spec) | 0 of 2193 | 0 | PASS
+O23-roundcells-count | round cell records in the manifest equals rounds x K x 5 | 90 vs 90 | equal | PASS
+O23-roundcell-pool | round cell records whose pool differs (pool for S, C, T; R and X pools not rebuilt) (of 90) | 0 | 0 | PASS
+O23-roundcell-q | round cell records whose q differs (pool for S, C, T; R and X pools not rebuilt) (of 90) | 0 | 0 | PASS
+O23-roundcell-drawn | round cell records whose drawn differs (pool for S, C, T; R and X pools not rebuilt) (of 90) | 0 | 0 | PASS
+O23-roundcell-status | round cell records whose status differs (pool for S, C, T; R and X pools not rebuilt) (of 90) | 0 | 0 | PASS
+O23-cells-sum | manifest cells whose drawn differs from the sum over rounds (of 30) | 0 | 0 | PASS
+O23-totals | manifest totals.orbits equals the orbit count | 2193 vs 2193 | equal | PASS
+O23-D-size | round cells whose D count differs from floor(f n + 1/2) (of 90) | 0 | 0 | PASS
+O23-D-flags | orbits whose in_D flag differs from the rebuilt D (of 2193) | 0 | 0 | PASS
+O23-D-fracs | manifest d_fraction tables differ from the input tables | 0 | 0 | PASS
+O23-D-total | |D| rebuilt | 215 | info | INFO
+O23-DB-seed | export seed / r_max / db_size equal the manifest | (20261030, 3, 100) | (20261030, 3, 100) | PASS
+O23-DB-size-R1 | |D_B| = min(db_size, |D_R|) | 99 (|D_R| = 99) | 99 | PASS
+O23-DB-ids-R1 | D_B ids in the symmetric difference with the exported D_B | 0 | 0 | PASS
+O23-DB-per-K-R1 | D_B per K index equals the export | [4, 23, 48, 16, 4, 4] vs [4, 23, 48, 16, 4, 4] | equal | PASS
+O23-D-ids-R1 | D_R ids in the symmetric difference with the exported D_R | 0 | 0 | PASS
+O23-DB-n-R1 | export DB_size equals | 99 vs 99 | equal | PASS
+O23-DB-size-R2 | |D_B| = min(db_size, |D_R|) | 100 (|D_R| = 157) | 100 | PASS
+O23-DB-ids-R2 | D_B ids in the symmetric difference with the exported D_B | 0 | 0 | PASS
+O23-DB-per-K-R2 | D_B per K index equals the export | [3, 18, 54, 15, 5, 5] vs [3, 18, 54, 15, 5, 5] | equal | PASS
+O23-D-ids-R2 | D_R ids in the symmetric difference with the exported D_R | 0 | 0 | PASS
+O23-DB-n-R2 | export DB_size equals | 100 vs 100 | equal | PASS
+O23-DB-size-R3 | |D_B| = min(db_size, |D_R|) | 100 (|D_R| = 215) | 100 | PASS
+O23-DB-ids-R3 | D_B ids in the symmetric difference with the exported D_B | 0 | 0 | PASS
+O23-DB-per-K-R3 | D_B per K index equals the export | [2, 16, 56, 15, 6, 5] vs [2, 16, 56, 15, 6, 5] | equal | PASS
+O23-D-ids-R3 | D_R ids in the symmetric difference with the exported D_R | 0 | 0 | PASS
+O23-DB-n-R3 | export DB_size equals | 100 vs 100 | equal | PASS
+O23-R0-start | K = 0 R orbits unmatched (fraction index, p0, x0 under either reading of 2 pi u2) | 0 | 0 of 40 | PASS
+O23-R-source | K > 0 R orbits whose (source orbit, source point) differs from the rebuilt index | 0 | 0 of 360 | PASS
+O23-R-start | K > 0 R orbits whose start matches under no variant | 0 | 0 of 360 | PASS
+O23-X-phi | X orbits whose stored phi matches under neither reading of 2 pi u2 | 0 | 0 of 600 | PASS
+O23-X-r | X orbits whose stored r differs from the correctly rounded 10^l by more than 1 ulp | 0 | 0 of 600 | PASS
+O23-X-r-exact | X orbits whose stored r differs from the correctly rounded 10^l (any amount; the spec fixes no pow rounding) | 4 | info of 600 | INFO
+O23-X-start | X orbits whose start is farther than 2 ulp from the exact r cos(phi), r sin(phi) of the stored r and phi (E12; start formed in binary64) | 0 | 0 of 600 (max deviation 1.30 ulp) | PASS
+O23-X-start-exact | X orbits whose start equals binary64 r*cos(phi), r*sin(phi) with this platform's cos and sin (the spec fixes no cos rounding) | 571 | info of 600 | INFO
+O23-variant | R K=0 fraction index (ascending value order instead): matches | 8 of 40 | info (which reading matched) | INFO
+O23-variant | R K=0 fraction index (order by b, then a): matches | 40 of 40 | info (which reading matched) | INFO
+O23-variant | R K=0 p0 = RN(2 pi a/b) (256-bit): matches | 40 of 40 | info (which reading matched) | INFO
+O23-variant | R K=0 x0 = RN(2 pi u2) (256-bit): matches | 35 of 40 | info (which reading matched) | INFO
+O23-variant | R K=0 x0 = binary64 product 2pi*u2: matches | 40 of 40 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi 256-bit: matches | 335 of 360 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi RN: matches | 347 of 360 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi binary64 product: matches | 360 of 360 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi stored: matches | 360 of 360 | info (which reading matched) | INFO
+O23-variant | R stored phi = RN(2 pi u2) (256-bit): matches | 271 of 360 | info (which reading matched) | INFO
+O23-variant | R stored phi = binary64 product 2pi*u2: matches | 360 of 360 | info (which reading matched) | INFO
+O23-variant | X r = 10^l (l 256-bit): matches | 596 of 600 | info (which reading matched) | INFO
+O23-variant | X r = 10^l (l binary64, exact pow): matches | 596 of 600 | info (which reading matched) | INFO
+O23-variant | X r = libm 10.0**l: matches | 597 of 600 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi 256-bit: matches | 86 of 600 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi RN: matches | 217 of 600 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi binary64 product: matches | 280 of 600 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi stored: matches | 280 of 600 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi 256-bit: matches | 101 of 600 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi RN: matches | 272 of 600 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi binary64 product: matches | 355 of 600 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi stored: matches | 355 of 600 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi RN: matches | 426 of 600 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi binary64 product: matches | 568 of 600 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi stored: matches | 568 of 600 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi RN: matches | 428 of 600 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi binary64 product: matches | 571 of 600 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi stored: matches | 571 of 600 | info (which reading matched) | INFO
+O23-variant | X stored phi = RN(2 pi u2) (256-bit): matches | 445 of 600 | info (which reading matched) | INFO
+O23-variant | X stored phi = binary64 product 2pi*u2: matches | 600 of 600 | info (which reading matched) | INFO
+TOTAL | 93 checks | PASS 52 | FAIL 0 | INFO 41
+===== threads-t1.txt (verify/experiments-d94-oracle.py)
+# inputs from the manifest: seed 20261012, 3 K, r_max 3, gates [1], screen_points 64, db_size 6
+O23-pool-points | sidecar points per K equals screen_points | 64 | all K | PASS
+O23-pool-counts | manifest pool counts differ from sidecar run lists (of 9) | 0 | 0 | PASS
+O23-bits-sha | K index 1: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1S2C4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 2: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 3: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-pts-range | all 192 points in [0, 2 pi) | True | true | PASS
+O23-pts-distinct | no two screening points equal within a K | True | true | PASS
+O23-fy-exact | draws where the float floor(u (M-t+1)) differs from the exact rational floor | 0 | info | INFO
+O23-ids-count | orbits of the panel (non-control) equals the rebuilt count | 61 vs 61 | equal | PASS
+O23-ids-run | ids 1..N without a gap, panel order | True | true | PASS
+O23-ids-order | orbits whose (round, K index, class, draw index) differs from the id order of E36 (of 61) | 0 | 0 | PASS
+O23-pts-ids | pool orbits whose point id differs from the rebuilt draw (of 32) | 0 | 0 | PASS
+O23-pts-bits | pool orbit starts differing in the 17-digit decimal text of x0 or p0 (of 32) | 0 | 0 | PASS
+O23-pts-dec | pool orbit starts whose exact decimal text differs from the binary64 pair (of 32) | 0 | 0 | PASS
+O23-pool-class | drawn pool orbits whose point id is not in the sidecar pool of its class (of 32) | 0 | 0 | PASS
+O23-I29-starts | equal starts (binary64 pair) among all 61 orbits | 0 | 0 | PASS
+O23-I29-ids | point ids drawn twice at a K | 0 | 0 | PASS
+O23-rounds | round of every orbit in 1..r_max | True | true | PASS
+O23-gate | K = 0 orbits outside the gate rounds | 0 | 0 | PASS
+O23-seed-cell | cell stream seeds (E33 text) differing (of 61) | 0 | 0 | PASS
+O23-seed-run | run seeds differing from the manifest seed (of 61) | 0 | 0 | PASS
+O23-seed-orbit | per-orbit seeds differing from the inferred rule (see header; E16's rule lives in another spec) | 0 of 61 | 0 | PASS
+O23-roundcells-count | round cell records in the manifest equals rounds x K x 5 | 45 vs 45 | equal | PASS
+O23-roundcell-pool | round cell records whose pool differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-q | round cell records whose q differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-drawn | round cell records whose drawn differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-status | round cell records whose status differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-cells-sum | manifest cells whose drawn differs from the sum over rounds (of 15) | 0 | 0 | PASS
+O23-totals | manifest totals.orbits equals the orbit count | 61 vs 61 | equal | PASS
+O23-D-size | round cells whose D count differs from floor(f n + 1/2) (of 45) | 0 | 0 | PASS
+O23-D-flags | orbits whose in_D flag differs from the rebuilt D (of 61) | 0 | 0 | PASS
+O23-D-fracs | manifest d_fraction tables differ from the input tables | 0 | 0 | PASS
+O23-D-total | |D| rebuilt | 30 | info | INFO
+O23-DB-size-R1 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 12) | 6 | PASS
+O23-DB-size-R2 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 21) | 6 | PASS
+O23-DB-size-R3 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 30) | 6 | PASS
+O23-DB-export | no D_B export given: D_B checked for size only | - | - | INFO
+O23-R0-start | K = 0 R orbits unmatched (fraction index, p0, x0 under either reading of 2 pi u2) | 0 | 0 of 2 | PASS
+O23-R-source | K > 0 R orbits whose (source orbit, source point) differs from the rebuilt index | 0 | 0 of 12 | PASS
+O23-R-start | K > 0 R orbits whose start matches under no variant | 0 | 0 of 12 | PASS
+O23-X-phi | X orbits whose stored phi matches under neither reading of 2 pi u2 | 0 | 0 of 15 | PASS
+O23-X-r | X orbits whose stored r differs from the correctly rounded 10^l by more than 1 ulp | 0 | 0 of 15 | PASS
+O23-X-r-exact | X orbits whose stored r differs from the correctly rounded 10^l (any amount; the spec fixes no pow rounding) | 1 | info of 15 | INFO
+O23-X-start | X orbits whose start is farther than 2 ulp from the exact r cos(phi), r sin(phi) of the stored r and phi (E12; start formed in binary64) | 0 | 0 of 15 (max deviation 0.73 ulp) | PASS
+O23-X-start-exact | X orbits whose start equals binary64 r*cos(phi), r*sin(phi) with this platform's cos and sin (the spec fixes no cos rounding) | 15 | info of 15 | INFO
+O23-variant | R K=0 fraction index (ascending value order instead): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 fraction index (order by b, then a): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 p0 = RN(2 pi a/b) (256-bit): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 x0 = RN(2 pi u2) (256-bit): matches | 1 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 x0 = binary64 product 2pi*u2: matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi 256-bit: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi RN: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi binary64 product: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi stored: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R stored phi = RN(2 pi u2) (256-bit): matches | 10 of 12 | info (which reading matched) | INFO
+O23-variant | R stored phi = binary64 product 2pi*u2: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | X r = 10^l (l 256-bit): matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X r = 10^l (l binary64, exact pow): matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X r = libm 10.0**l: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi 256-bit: matches | 0 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi RN: matches | 5 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi binary64 product: matches | 7 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi stored: matches | 7 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi 256-bit: matches | 0 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi RN: matches | 9 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi binary64 product: matches | 10 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi stored: matches | 10 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi RN: matches | 11 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi binary64 product: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi stored: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi RN: matches | 12 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi binary64 product: matches | 15 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi stored: matches | 15 of 15 | info (which reading matched) | INFO
+O23-variant | X stored phi = RN(2 pi u2) (256-bit): matches | 12 of 15 | info (which reading matched) | INFO
+O23-variant | X stored phi = binary64 product 2pi*u2: matches | 15 of 15 | info (which reading matched) | INFO
+TOTAL | 75 checks | PASS 37 | FAIL 0 | INFO 38
+===== threads-t4.txt (verify/experiments-d94-oracle.py)
+# inputs from the manifest: seed 20261012, 3 K, r_max 3, gates [1], screen_points 64, db_size 6
+O23-pool-points | sidecar points per K equals screen_points | 64 | all K | PASS
+O23-pool-counts | manifest pool counts differ from sidecar run lists (of 9) | 0 | 0 | PASS
+O23-bits-sha | K index 1: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1S2C4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 2: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 3: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-pts-range | all 192 points in [0, 2 pi) | True | true | PASS
+O23-pts-distinct | no two screening points equal within a K | True | true | PASS
+O23-fy-exact | draws where the float floor(u (M-t+1)) differs from the exact rational floor | 0 | info | INFO
+O23-ids-count | orbits of the panel (non-control) equals the rebuilt count | 61 vs 61 | equal | PASS
+O23-ids-run | ids 1..N without a gap, panel order | True | true | PASS
+O23-ids-order | orbits whose (round, K index, class, draw index) differs from the id order of E36 (of 61) | 0 | 0 | PASS
+O23-pts-ids | pool orbits whose point id differs from the rebuilt draw (of 32) | 0 | 0 | PASS
+O23-pts-bits | pool orbit starts differing in the 17-digit decimal text of x0 or p0 (of 32) | 0 | 0 | PASS
+O23-pts-dec | pool orbit starts whose exact decimal text differs from the binary64 pair (of 32) | 0 | 0 | PASS
+O23-pool-class | drawn pool orbits whose point id is not in the sidecar pool of its class (of 32) | 0 | 0 | PASS
+O23-I29-starts | equal starts (binary64 pair) among all 61 orbits | 0 | 0 | PASS
+O23-I29-ids | point ids drawn twice at a K | 0 | 0 | PASS
+O23-rounds | round of every orbit in 1..r_max | True | true | PASS
+O23-gate | K = 0 orbits outside the gate rounds | 0 | 0 | PASS
+O23-seed-cell | cell stream seeds (E33 text) differing (of 61) | 0 | 0 | PASS
+O23-seed-run | run seeds differing from the manifest seed (of 61) | 0 | 0 | PASS
+O23-seed-orbit | per-orbit seeds differing from the inferred rule (see header; E16's rule lives in another spec) | 0 of 61 | 0 | PASS
+O23-roundcells-count | round cell records in the manifest equals rounds x K x 5 | 45 vs 45 | equal | PASS
+O23-roundcell-pool | round cell records whose pool differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-q | round cell records whose q differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-drawn | round cell records whose drawn differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-status | round cell records whose status differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-cells-sum | manifest cells whose drawn differs from the sum over rounds (of 15) | 0 | 0 | PASS
+O23-totals | manifest totals.orbits equals the orbit count | 61 vs 61 | equal | PASS
+O23-D-size | round cells whose D count differs from floor(f n + 1/2) (of 45) | 0 | 0 | PASS
+O23-D-flags | orbits whose in_D flag differs from the rebuilt D (of 61) | 0 | 0 | PASS
+O23-D-fracs | manifest d_fraction tables differ from the input tables | 0 | 0 | PASS
+O23-D-total | |D| rebuilt | 30 | info | INFO
+O23-DB-size-R1 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 12) | 6 | PASS
+O23-DB-size-R2 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 21) | 6 | PASS
+O23-DB-size-R3 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 30) | 6 | PASS
+O23-DB-export | no D_B export given: D_B checked for size only | - | - | INFO
+O23-R0-start | K = 0 R orbits unmatched (fraction index, p0, x0 under either reading of 2 pi u2) | 0 | 0 of 2 | PASS
+O23-R-source | K > 0 R orbits whose (source orbit, source point) differs from the rebuilt index | 0 | 0 of 12 | PASS
+O23-R-start | K > 0 R orbits whose start matches under no variant | 0 | 0 of 12 | PASS
+O23-X-phi | X orbits whose stored phi matches under neither reading of 2 pi u2 | 0 | 0 of 15 | PASS
+O23-X-r | X orbits whose stored r differs from the correctly rounded 10^l by more than 1 ulp | 0 | 0 of 15 | PASS
+O23-X-r-exact | X orbits whose stored r differs from the correctly rounded 10^l (any amount; the spec fixes no pow rounding) | 1 | info of 15 | INFO
+O23-X-start | X orbits whose start is farther than 2 ulp from the exact r cos(phi), r sin(phi) of the stored r and phi (E12; start formed in binary64) | 0 | 0 of 15 (max deviation 0.73 ulp) | PASS
+O23-X-start-exact | X orbits whose start equals binary64 r*cos(phi), r*sin(phi) with this platform's cos and sin (the spec fixes no cos rounding) | 15 | info of 15 | INFO
+O23-variant | R K=0 fraction index (ascending value order instead): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 fraction index (order by b, then a): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 p0 = RN(2 pi a/b) (256-bit): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 x0 = RN(2 pi u2) (256-bit): matches | 1 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 x0 = binary64 product 2pi*u2: matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi 256-bit: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi RN: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi binary64 product: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi stored: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R stored phi = RN(2 pi u2) (256-bit): matches | 10 of 12 | info (which reading matched) | INFO
+O23-variant | R stored phi = binary64 product 2pi*u2: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | X r = 10^l (l 256-bit): matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X r = 10^l (l binary64, exact pow): matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X r = libm 10.0**l: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi 256-bit: matches | 0 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi RN: matches | 5 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi binary64 product: matches | 7 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi stored: matches | 7 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi 256-bit: matches | 0 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi RN: matches | 9 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi binary64 product: matches | 10 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi stored: matches | 10 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi RN: matches | 11 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi binary64 product: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi stored: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi RN: matches | 12 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi binary64 product: matches | 15 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi stored: matches | 15 of 15 | info (which reading matched) | INFO
+O23-variant | X stored phi = RN(2 pi u2) (256-bit): matches | 12 of 15 | info (which reading matched) | INFO
+O23-variant | X stored phi = binary64 product 2pi*u2: matches | 15 of 15 | info (which reading matched) | INFO
+TOTAL | 75 checks | PASS 37 | FAIL 0 | INFO 38
+===== threads-t23.txt (verify/experiments-d94-oracle.py)
+# inputs from the manifest: seed 20261012, 3 K, r_max 3, gates [1], screen_points 64, db_size 6
+O23-pool-points | sidecar points per K equals screen_points | 64 | all K | PASS
+O23-pool-counts | manifest pool counts differ from sidecar run lists (of 9) | 0 | 0 | PASS
+O23-bits-sha | K index 1: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1S2C4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 2: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-bits-sha | K index 3: bits_sha256 reproduced from the run lists (1 byte per point, mask) | T1C2S4 | info (format not fixed by the spec) | INFO
+O23-pts-range | all 192 points in [0, 2 pi) | True | true | PASS
+O23-pts-distinct | no two screening points equal within a K | True | true | PASS
+O23-fy-exact | draws where the float floor(u (M-t+1)) differs from the exact rational floor | 0 | info | INFO
+O23-ids-count | orbits of the panel (non-control) equals the rebuilt count | 61 vs 61 | equal | PASS
+O23-ids-run | ids 1..N without a gap, panel order | True | true | PASS
+O23-ids-order | orbits whose (round, K index, class, draw index) differs from the id order of E36 (of 61) | 0 | 0 | PASS
+O23-pts-ids | pool orbits whose point id differs from the rebuilt draw (of 32) | 0 | 0 | PASS
+O23-pts-bits | pool orbit starts differing in the 17-digit decimal text of x0 or p0 (of 32) | 0 | 0 | PASS
+O23-pts-dec | pool orbit starts whose exact decimal text differs from the binary64 pair (of 32) | 0 | 0 | PASS
+O23-pool-class | drawn pool orbits whose point id is not in the sidecar pool of its class (of 32) | 0 | 0 | PASS
+O23-I29-starts | equal starts (binary64 pair) among all 61 orbits | 0 | 0 | PASS
+O23-I29-ids | point ids drawn twice at a K | 0 | 0 | PASS
+O23-rounds | round of every orbit in 1..r_max | True | true | PASS
+O23-gate | K = 0 orbits outside the gate rounds | 0 | 0 | PASS
+O23-seed-cell | cell stream seeds (E33 text) differing (of 61) | 0 | 0 | PASS
+O23-seed-run | run seeds differing from the manifest seed (of 61) | 0 | 0 | PASS
+O23-seed-orbit | per-orbit seeds differing from the inferred rule (see header; E16's rule lives in another spec) | 0 of 61 | 0 | PASS
+O23-roundcells-count | round cell records in the manifest equals rounds x K x 5 | 45 vs 45 | equal | PASS
+O23-roundcell-pool | round cell records whose pool differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-q | round cell records whose q differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-drawn | round cell records whose drawn differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-roundcell-status | round cell records whose status differs (pool for S, C, T; R and X pools not rebuilt) (of 45) | 0 | 0 | PASS
+O23-cells-sum | manifest cells whose drawn differs from the sum over rounds (of 15) | 0 | 0 | PASS
+O23-totals | manifest totals.orbits equals the orbit count | 61 vs 61 | equal | PASS
+O23-D-size | round cells whose D count differs from floor(f n + 1/2) (of 45) | 0 | 0 | PASS
+O23-D-flags | orbits whose in_D flag differs from the rebuilt D (of 61) | 0 | 0 | PASS
+O23-D-fracs | manifest d_fraction tables differ from the input tables | 0 | 0 | PASS
+O23-D-total | |D| rebuilt | 30 | info | INFO
+O23-DB-size-R1 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 12) | 6 | PASS
+O23-DB-size-R2 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 21) | 6 | PASS
+O23-DB-size-R3 | |D_B| = min(db_size, |D_R|) | 6 (|D_R| = 30) | 6 | PASS
+O23-DB-export | no D_B export given: D_B checked for size only | - | - | INFO
+O23-R0-start | K = 0 R orbits unmatched (fraction index, p0, x0 under either reading of 2 pi u2) | 0 | 0 of 2 | PASS
+O23-R-source | K > 0 R orbits whose (source orbit, source point) differs from the rebuilt index | 0 | 0 of 12 | PASS
+O23-R-start | K > 0 R orbits whose start matches under no variant | 0 | 0 of 12 | PASS
+O23-X-phi | X orbits whose stored phi matches under neither reading of 2 pi u2 | 0 | 0 of 15 | PASS
+O23-X-r | X orbits whose stored r differs from the correctly rounded 10^l by more than 1 ulp | 0 | 0 of 15 | PASS
+O23-X-r-exact | X orbits whose stored r differs from the correctly rounded 10^l (any amount; the spec fixes no pow rounding) | 1 | info of 15 | INFO
+O23-X-start | X orbits whose start is farther than 2 ulp from the exact r cos(phi), r sin(phi) of the stored r and phi (E12; start formed in binary64) | 0 | 0 of 15 (max deviation 0.73 ulp) | PASS
+O23-X-start-exact | X orbits whose start equals binary64 r*cos(phi), r*sin(phi) with this platform's cos and sin (the spec fixes no cos rounding) | 15 | info of 15 | INFO
+O23-variant | R K=0 fraction index (ascending value order instead): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 fraction index (order by b, then a): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 p0 = RN(2 pi a/b) (256-bit): matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 x0 = RN(2 pi u2) (256-bit): matches | 1 of 2 | info (which reading matched) | INFO
+O23-variant | R K=0 x0 = binary64 product 2pi*u2: matches | 2 of 2 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi 256-bit: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi RN: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi binary64 product: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R start (256-bit sum, delta_R binary64) with phi stored: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | R stored phi = RN(2 pi u2) (256-bit): matches | 10 of 12 | info (which reading matched) | INFO
+O23-variant | R stored phi = binary64 product 2pi*u2: matches | 12 of 12 | info (which reading matched) | INFO
+O23-variant | X r = 10^l (l 256-bit): matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X r = 10^l (l binary64, exact pow): matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X r = libm 10.0**l: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi 256-bit: matches | 0 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi RN: matches | 5 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi binary64 product: matches | 7 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r 256-bit, phi stored: matches | 7 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi 256-bit: matches | 0 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi RN: matches | 9 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi binary64 product: matches | 10 of 15 | info (which reading matched) | INFO
+O23-variant | X start (256-bit product) from r stored, phi stored: matches | 10 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi RN: matches | 11 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi binary64 product: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r libm 10.0**l, phi stored: matches | 14 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi RN: matches | 12 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi binary64 product: matches | 15 of 15 | info (which reading matched) | INFO
+O23-variant | X start (binary64 r*cos, r*sin) from r stored, phi stored: matches | 15 of 15 | info (which reading matched) | INFO
+O23-variant | X stored phi = RN(2 pi u2) (256-bit): matches | 12 of 15 | info (which reading matched) | INFO
+O23-variant | X stored phi = binary64 product 2pi*u2: matches | 15 of 15 | info (which reading matched) | INFO
+TOTAL | 75 checks | PASS 37 | FAIL 0 | INFO 38

@@ -117,6 +117,7 @@ function run_campaign(prereg::AbstractString, panel::AbstractString; store::Abst
     unknown = setdiff(String.(cap_override), [a["name"] for a in plan.block.raw["arm"]])
     isempty(unknown) || throw(ArgumentError("cap_override names no arm of the plan: $(join(unknown, ", "))"))
     _check_request(plan, arms, up_to)
+    _check_store(plan, store, round_log, hooks)
     selected = _selected(plan, arms, up_to)
     over_threads = _check_threads(plan, threads, thread_override)
     git, dirty = _check_tree(repo === nothing ? _root() : repo, allow_dirty)

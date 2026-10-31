@@ -1,0 +1,141 @@
+# P1PLAN_OLD: plan of the commit before D94 (7f70aa7) computed under a git worktree of that commit (Chaoslab loaded from the worktree); the remaining sections run on HEAD
+# experiments D94 verification, julia 1.13.2, threads 4, sections P1PLAN_OLD
+D94b | INFO | plan of the commit before the amendment (Chaoslab loaded from C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\d94v\wt-7f70aa7, HEAD there 7f70aa793bee3ca8e1620d18a85adfe4045afdb9), code_version fixed to "d94-verify-fixed-code-version": hash 6408ce042c5727d829cf45475d076ba1153cbea873e244494213a7b1891438e3, 1363 chunks
+# section P1PLAN_OLD took 3.2 s
+# done: 0 PASS, 0 FAIL, 1 INFO
+# experiments D94 verification, julia 1.13.2, threads 23, sections default
+D94b | [current preregistration] real P1 panel rebuilt with the code of HEAD, threads 23, wall seconds | 404.9 | completes | PASS
+D94b | INFO | [current preregistration] committed panel (working tree) 6408835 bytes SHA-256 881874d26aa8883caa0545331ba167a3f2c9e3c249cdb6ba32ad39c98ad348d5; rebuilt 6332443 bytes SHA-256 652899914411950d86b31e797b7971d94e32db205ef2fb36344f500e81576ab1; carriage returns committed/rebuilt 76392 / 0 (i/lf    w/crlf  attr/                 	workspaces/study/stages/02-panel/output/p1-le-benchmark-panel.toml: the working tree has the CRLF form of the checkout, the blob has LF)
+D94b | [current preregistration] rebuilt panel against the committed file (CRLF read as LF, as the module reads files), lines differing outside the ignored fields (git_sha, git_dirty, package_version, julia_version, stablerngs_version; [manifest.prereg] header_sha256, computed_sha256, amendments); lines 76385 / 76385 | 0 | 0 | PASS
+D94b | [current preregistration] same, the two texts without those lines are equal (byte for byte) | true | true | PASS
+D94b | INFO | [current preregistration] ignored values: git_sha committed f627688667d757664883003479fc65fbd03804cb / rebuilt ab61826c9659fd5b3239169e99b4445636ef4b0d; git_dirty committed false / rebuilt false; package_version committed 0.0.1 / rebuilt 0.1.2; julia_version committed 1.13.2 / rebuilt 1.13.2; stablerngs_version committed 1.1.0 / rebuilt 1.1.0; prereg path workspaces/study/stages/01-design/output/p1-le-benchmark-preregistration.md / workspaces/study/stages/01-design/output/p1-le-benchmark-preregistration.md; header_sha256 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46 / 62011ba5af514da4f1238aef9ae6cb35ca21093c4343b71dd696df360b9994bf; amendments 3 / 6
+D94b | [current preregistration] manifest key lists and orbit counts equal | true | true | PASS
+# section P1BUILD took 405.2 s
+D94b | [preregistration of commit 3991155] real P1 panel rebuilt with the code of HEAD, threads 23, wall seconds | 398.3 | completes | PASS
+D94b | INFO | [preregistration of commit 3991155] committed panel (working tree) 6408835 bytes SHA-256 881874d26aa8883caa0545331ba167a3f2c9e3c249cdb6ba32ad39c98ad348d5; rebuilt 6332421 bytes SHA-256 f5f8acad957449c8a3ae4df381c41e9501e18ed65630fd295b3f027ce758a443; carriage returns committed/rebuilt 76392 / 0 (i/lf    w/crlf  attr/                 	workspaces/study/stages/02-panel/output/p1-le-benchmark-panel.toml: the working tree has the CRLF form of the checkout, the blob has LF)
+D94b | [preregistration of commit 3991155] rebuilt panel against the committed file (CRLF read as LF, as the module reads files), lines differing outside the ignored fields (git_sha, git_dirty, package_version, julia_version, stablerngs_version; [manifest.prereg] path); lines 76387 / 76387 | 0 | 0 | PASS
+D94b | [preregistration of commit 3991155] same, the two texts without those lines are equal (byte for byte) | true | true | PASS
+D94b | INFO | [preregistration of commit 3991155] ignored values: git_sha committed f627688667d757664883003479fc65fbd03804cb / rebuilt ab61826c9659fd5b3239169e99b4445636ef4b0d; git_dirty committed false / rebuilt false; package_version committed 0.0.1 / rebuilt 0.1.2; julia_version committed 1.13.2 / rebuilt 1.13.2; stablerngs_version committed 1.1.0 / rebuilt 1.1.0; prereg path workspaces/study/stages/01-design/output/p1-le-benchmark-preregistration.md / <outside repository>/p1-preregistration-at-3991155.md; header_sha256 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46 / 650b3558ab9a728747da85b0f46b123be888a6224996baa667543e6e2e1ddf46; amendments 3 / 3
+D94b | [preregistration of commit 3991155] manifest key lists and orbit counts equal | true | true | PASS
+# section P1BUILD_AT took 398.6 s
+D94b | P1 plan with the code of HEAD (code_version fixed), chunks / items | 1363 / 15569 | 1363 / 15569 | PASS
+D94b | P1 plan hash, code before D94 (commit 7f70aa7, git worktree under the scratch folder, same fixed code_version) / HEAD | 6408ce042c5727d8 / 6408ce042c5727d8 | equal | PASS
+D94b | P1 plan text SHA-256 equal | true | true | PASS
+D94b | ordinal, key and hash of all chunks, lines differing between 7f70aa7 and HEAD | 0 | 0 (of 1363) | PASS
+D94b | ordinal and key of the 1363 chunks against the manifest of the accepted P1 run (recorded plan_sha256 81b04cdf..., made with another code_version, so only keys compare), differing | 0 | 0 | PASS
+D94b | INFO | recorded plan and chunk hashes in the repo (p1 manifest) used code_version of the run commit; the pre-D94 values above are computed here with 7f70aa7
+D94b | INFO | plan of the rebuilt panel (prereg of commit 3991155; host fields differ, so the file SHA-256 differs): plan hash 132c0e284d8a50d2 against 6408ce042c5727d8 of the committed panel; chunk lines (ordinal, hash, key) differing: 0
+# section P1PLAN took 3.4 s
+O23 | generator check data written: 4 seeds x (250 words + 250 floats) = 2000 numbers in generator.txt; StableRNGs 1.1.0 | 72299 | written | PASS
+O23 | reading of the spec 'uniform from the low 52 bits of a word': float i equals (word i & (2^52 - 1)) * 2^-52 for the same stream, all 1000 pairs, differing | 0 | 0 | PASS
+O23 | INFO | seed 2^63 + 5 = 9223372036854775813 is accepted by StableRNG; the module itself refuses seeds above typemax(Int) (impl note, reading 4)
+# section GENERATOR took 0.0 s
+D94t | source files searched (src/Experiments, *.jl, comments included) | 45 | >= 40 | PASS
+D94t | hits of the p3 value (seed 20261030) in src/Experiments | 0 | 0 | PASS
+D94t | hits of the p3 value (screen points 262144) in src/Experiments | 0 | 0 | PASS
+D94t | hits of the p3 value (screen side 512) in src/Experiments | 0 | 0 | PASS
+D94t | hits of the p3 value (orbits per round 1470) in src/Experiments | 0 | 0 | PASS
+D94t | hits of the p3 value (orbit total 7430) in src/Experiments | 0 | 0 | PASS
+D94t | hits of the p3 value (D total 1309) in src/Experiments | 0 | 0 | PASS
+D94t | hits of the p3 value (D per round 261) in src/Experiments | 0 | 0 | PASS
+D94t | hits of the p3 value (gate orbits 80) in src/Experiments (a small or common number: hits listed for reading, not scored) | 0 | reported | INFO
+D94t | hits of the p3 value (size 600/320/550) in src/Experiments | 0 | 0 | PASS
+D94t | hits of the p3 value (D parts 165/36) in src/Experiments (a small or common number: hits listed for reading, not scored) | 0 | reported | INFO
+D94t | hits of the p3 value (D fraction 0.30) in src/Experiments; 1 reviewed coincidence | 0 | 0 | PASS
+D94t |   hit | run_grid.jl:59 [code, reviewed: docstring example of a direction text (0.3 + pi/5), not a D fraction] "Value of a decimal or closed-form text (`\"0.3 + pi/5\"`) at the ambient BigFloat precision, decimals read ex
+D94t | hits of the p3 value (D fraction 0.05) in src/Experiments | 0 | 0 | PASS
+D94t | hits of the p3 value (quota 250) in src/Experiments (a small or common number: hits listed for reading, not scored) | 0 | reported | INFO
+D94t | hits of the p3 value (quota 100) in src/Experiments (a small or common number: hits listed for reading, not scored) | 0 | reported | INFO
+D94t | hits of the p3 value (quota 40) in src/Experiments (a small or common number: hits listed for reading, not scored) | 3 | reported | INFO
+D94t |   hit | round_log.jl:17 [code] _log_err(path, 1, "a line that is not an entry: $(repr(first(strip(line), 40)))")
+D94t |   hit | round_log.jl:29 [code] m === nothing && _log_err(path, n, "a line that is not key=value: $(repr(first(strip(line), 40)))")
+D94t |   hit | run_campaign.jl:28 [code] const STRICT_SLACK = 2.0^-40   # a count equal to a fraction of the chunk passes whatever the rounding of that
+D94t | hits of the p3 value (quota 25) in src/Experiments (a small or common number: hits listed for reading, not scored) | 0 | reported | INFO
+D94t | hits of the p3 value (round count 5) in src/Experiments (a small or common number: hits listed for reading, not scored); 1 reviewed coincidence | 22 | reported | INFO
+D94t |   hit | inputs.jl:29 [code] "Value of a decimal or closed-form entry (`\"pi/2\"`, `\"(3 + sqrt(5))/2\"`, `0.5`) at the ambient BigFloat pr
+D94t |   hit | orbits.jl:113 [code] `delta_dup / 5` proves two distinct orbits closer than `10 delta_dup` (every accepted solution is within `delt
+D94t |   hit | orbits.jl:130 [code] dmin > delta_dup / 5 && throw(ArgumentError(
+D94t |   hit | orbits.jl:132 [code] "above delta_dup / 5, so two distinct orbits are closer than 10 delta_dup"))
+D94t |   hit | run_device.jl:35 [code] R[k + 5, g, i] = g > 1 ? max(R[k + 5, g - 1, i], p) : p
+D94t |   hit | run_device.jl:135 [code] b.det[g], b.symp[g], b.orth[g], b.sumd[g], b.pair[g] = Rh[k + 1, g, j], Rh[k + 2, g, j], Rh[k + 3, g, j], Rh[k
+D94t |   hit | run_grid.jl:59 [code, reviewed: docstring example of a direction text (0.3 + pi/5), not a D fraction] "Value of a decimal or closed-form text (`\"0.3 + pi/5\"`) at the ambient BigFloat precision, decimals read ex
+D94t |   hit | run_groups.jl:39 [code] return attempt >= 2 && prov.backend === :gpu ? cpu_prov(Foundation.FALLBACK_REASONS[5]) : prov
+D94t |   hit | run_groups.jl:178 [comment] # First completed group of an arm against its budget line (R5 item 5): over first_chunk_cost_factor times the 
+D94t |   hit | run_groups.jl:201 [code] for _ in 1:(small ? 5 : 1)
+D94t |   hit | run_indicator.jl:73 [code] order = _ind_order(s["order"], "$path.order"; lo = 0, hi = 5)
+D94t |   hit | run_indicator_device.jl:122 [code] b.state[g, 1], b.state[g, 2] = Rh[nser + 4, g, j], Rh[nser + 5, g, j]
+D94t | hits of the distinctive p3 values (seed, sizes, totals, fractions) in the module source | 0 | 0 | PASS
+# section SRC took 0.0 s
+D94q | reduced real panel built (real K list, seed 20261030, quota and fraction tables, db_size 100, screen_points 4096, r_max 3, controls none), threads 23, wall seconds | 320.6 | completes | PASS
+D94q | INFO | orbits 2193 (drawn 2193, controls 0), in D 215, panel SHA-256 ddd7e5718fc509e06e52d76e4d51a9b049c0335053481309b3e748e6451abc49
+D94q | no control orbit with controls = none | 0 | 0 | PASS
+D94q | INFO | round cells with status populated: 47 of 90
+D94q | INFO | round cells with status short: 5 of 90
+D94q | INFO | round cells with status empty: 22 of 90
+D94q | INFO | round cells with status not drawn: 7 of 90
+D94q | INFO | round cells with status undefined: 9 of 90
+D94q | K = 0 orbits only in the gate round 1 (orbits at K index 1 outside round 1) | 0 | 0 | PASS
+D94q | D_B for R = 1 (library function), |D_R| / |D_B| / per K index [4, 23, 48, 16, 4, 4] | 99 / 99 | |D_B| = min(100, |D_R|), subset of D_R | PASS
+D94q | D_B for R = 2 (library function), |D_R| / |D_B| / per K index [3, 18, 54, 15, 5, 5] | 157 / 100 | |D_B| = min(100, |D_R|), subset of D_R | PASS
+D94q | D_B for R = 3 (library function), |D_R| / |D_B| / per K index [2, 16, 56, 15, 6, 5] | 215 / 100 | |D_B| = min(100, |D_R|), subset of D_R | PASS
+# section REDUCED took 321.4 s
+D94q | fixture panel A built into C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\d94v\fixtureA, wall seconds | 0.1409 | completes | PASS
+D94q | INFO | fixture A: seed 20261012, K ["0", "1.5", "5"], M 64, r_max 3, orbits 61, panel SHA-256 0c0f61f63908591e78c566a000f905ba44e80c5f3077d61c7be9439140a2e03b
+D94q | INFO | plan texts of fixture A (R_plan 1, 2, 3 open and closed) written to plan.txt
+# section FIXA took 1.8 s
+O26 | run 1 of the campaign finished, chunk files in the store, log entries written | 3, 1 | - | INFO
+O26 | run 2 of the campaign finished, chunk files in the store, log entries written | 6, 2 | - | INFO
+O26 | run 3 of the campaign finished, chunk files in the store, log entries written | 9, 3 | - | INFO
+O26 | campaign through 3 rounds and closure: chunk files in the store | 23 | > 0 | PASS
+O26 | ref arm digest of rounds 1 to 1 from the chunk_hash attributes (the helper's HDF5 read) | 804c278fa1f56812862f5d1db333b01e70370ea54dba69121361a1c617c70b52 | - | INFO
+O26 | ref arm digest of rounds 1 to 2 from the chunk_hash attributes (the helper's HDF5 read) | 5a8173df4edb09050fb0cdf3d67c3e6560c2586b59417776ddc514d5cd16476e | - | INFO
+O26 | ref arm digest of rounds 1 to 3 from the chunk_hash attributes (the helper's HDF5 read) | 4effc526344bc239de0c3407da4649ab5d5a17fff5b938f297d830c8c4679ea8 | - | INFO
+# section O26 took 9.6 s
+THREADS | INFO | julia -t 1: child 18.7 s, provenance threads 1, ntasks 1
+THREADS | INFO | julia -t 4: child 17.8 s, provenance threads 4, ntasks 4
+THREADS | INFO | julia -t 23: child 18.0 s, provenance threads 23, ntasks 23
+D94p | d94-A-panel.toml from julia -t 1, 4, 23 byte-identical (SHA-256 0c0f61f63908) | 1 | 1 distinct | PASS
+D94p | d94-A-panel.toml.pools.toml from julia -t 1, 4, 23 byte-identical (SHA-256 f9c182db7709) | 1 | 1 distinct | PASS
+D94p | plan.txt from julia -t 1, 4, 23 byte-identical (SHA-256 43f21da54957) | 1 | 1 distinct | PASS
+# section THREADS took 54.5 s
+D94s | random_screen_points at M = 262144 (one K, minimum of 3), seconds | 0.08244 | reported | INFO
+D94s | one K (K_c) at screen_points 262144, N_scr 1e5, threads 23: build_panel wall seconds (Newton search included) | 104.4 | reported | INFO
+D94s | ESTIMATE (6 K in turn, K = 0 screened too, P71; one K measured x 6): wall hours on 23 threads | 0.174 | <= 2 h | PASS
+D94s | ESTIMATE of peak memory, MiB (maxrss after one K 1960.0 + 5 more K of points and bits 21.2; before 1761.0) | 1981 | <= 8192 | PASS
+D94s | INFO | one-K panel: orbits 470, pools Any[Dict{String, Any}("class" => "T", "k_index" => 1, "count" => 137057), Dict{String, Any}("class" => "C", "k_index" => 1, "count" => 91038), Dict{String, Any}("class" => "S", "k_index" => 1, "count" => 2508)], status of the round cells T populated pool 137057 drawn 40; R populated pool 37 drawn 40; C populated pool 90851 drawn 100; S populated pool 2508 drawn 250; X populated pool 0 drawn 40
+D94s | INFO | the real test panel is NOT built: it needs the amended preregistration of the study (P69), which does not exist; D94s is not run
+# section COST took 105.1 s
+README | paths listed in README.txt / missing | 18 / 0 | 0 missing | PASS
+# section README took 0.0 s
+O24 |   K index 1 (K = 0.0): 200 points, L1 series in 4.4 s, class counts in the sample T/C/S = 169/0/0 | -
+O24 |   K index 2 (K = 0.5): 200 points, L1 series in 4.4 s, class counts in the sample T/C/S = 192/2/0 | -
+O24 |   K index 3 (K = 0.971635406): 200 points, L1 series in 4.4 s, class counts in the sample T/C/S = 111/62/1 | -
+O24 |   K index 4 (K = 1.5707963267948966): 200 points, L1 series in 4.5 s, class counts in the sample T/C/S = 59/118/0 | -
+O24 |   K index 5 (K = 6.283185307179586): 200 points, L1 series in 5.0 s, class counts in the sample T/C/S = 0/198/0 | -
+O24 |   K index 6 (K = 10.0): 200 points, L1 series in 4.9 s, class counts in the sample T/C/S = 0/200/0 | -
+O24 | points checked (200 random point ids per K index, 6 K) | 1200 | 1200 | PASS
+O24 | largest |lambda_L5 - lambda_L1| as a multiple of the O5 bound 2 B_S / N_scr | 0 | <= 1 | PASS
+O24 | class bits recomputed from L5 (screening values, predicates of E11) against the sidecar, differing points | 0 | 0 | PASS
+O24 | class bits recomputed from the L1 values against the sidecar: differing points near a threshold (listed, not counted) | 0 | reported | INFO
+O24 | class bits recomputed from the L1 values against the sidecar: differing points not near a threshold (failures) | 0 | 0 | PASS
+# section O24 took 347.1 s
+O25 | p2 grid starts read from the h4 tables of the p2 preregistration | 2304 | 2304 | PASS
+O25 | starts of the reduced panel (orbits) / distinct pairs among them (I29) | 2193 / 2193 | equal | PASS
+O25 | reduced-panel starts equal (binary64 pair) to a start of the P1 panel (883 orbits, the p2 panel is this file) | 0 | 0 | PASS
+O25 | reduced-panel starts equal (binary64 pair) to a p2 grid start (2304) | 0 | 0 | PASS
+O25 | smallest torus distance of the reduced-panel starts to the P1 panel starts (any K), at orbit id 1598 | 1.273e-06 | reported | INFO
+O25 | same, restricted to the same K (K index of both) | 1.273e-06 | reported | INFO
+O25 | smallest torus distance of the reduced-panel starts to the p2 grid starts | 0.001289 | reported | INFO
+O25 | INFO | p2 panel starts: the p2 panel is the P1 panel file (p2 preregistration, Panel: 'the frozen P1 panel P (reused)'); no other p2 panel file exists under workspaces/, nothing under data/ was read
+# section O25 took 0.6 s
+# done: 49 PASS, 0 FAIL, 40 INFO
+# NOTE: the COST lines above ran in the same process as the P1 and reduced builds, so the maxrss figure there includes their memory; the COST section is rerun alone below for the memory figure
+# experiments D94 verification, julia 1.13.2, threads 23, sections COST
+D94s | random_screen_points at M = 262144 (one K, minimum of 3), seconds | 0.0878 | reported | INFO
+D94s | one K (K_c) at screen_points 262144, N_scr 1e5, threads 23: build_panel wall seconds (Newton search included) | 109.8 | reported | INFO
+D94s | ESTIMATE (6 K in turn, K = 0 screened too, P71; one K measured x 6): wall hours on 23 threads | 0.183 | <= 2 h | PASS
+D94s | ESTIMATE of peak memory, MiB (maxrss after one K 1560.0 + 5 more K of points and bits 21.2; before 590.0) | 1581 | <= 8192 | PASS
+D94s | INFO | one-K panel: orbits 470, pools Any[Dict{String, Any}("class" => "T", "k_index" => 1, "count" => 137057), Dict{String, Any}("class" => "C", "k_index" => 1, "count" => 91038), Dict{String, Any}("class" => "S", "k_index" => 1, "count" => 2508)], status of the round cells T populated pool 137057 drawn 40; R populated pool 37 drawn 40; C populated pool 90851 drawn 100; S populated pool 2508 drawn 250; X populated pool 0 drawn 40
+D94s | INFO | the real test panel is NOT built: it needs the amended preregistration of the study (P69), which does not exist; D94s is not run
+# section COST took 110.8 s
+# done: 2 PASS, 0 FAIL, 4 INFO

@@ -37,3 +37,10 @@ include(joinpath(@__DIR__, "ex_d86_run.jl"))       # D86n to D86r
 include(joinpath(@__DIR__, "ex_d86_store.jl"))     # D86s to D86v
 include(joinpath(@__DIR__, "ex_d86_guards.jl"))    # D86w, D86x
 include(joinpath(@__DIR__, "ex_d86_review.jl"))   # stage 04 review fixes
+# Amendment D94 (panel builder in rounds and the study runner with the round log): helpers, then one file per group of criteria
+include(joinpath(@__DIR__, "ex_d94_helpers.jl"))
+include(joinpath(@__DIR__, "ex_d94_grammar.jl"))   # D94a, D94b, D94k, D94u
+include(joinpath(@__DIR__, "ex_d94_streams.jl"))   # D94c, D94f, D94h, D94i (function level)
+include(joinpath(@__DIR__, "ex_d94_panel.jl"))     # D94c to D94j, D94p, D94t (builder level)
+include(joinpath(@__DIR__, "ex_d94_plan.jl"))      # D94i, D94l, D94m
+include(joinpath(@__DIR__, "ex_d94_run.jl"))       # D94n, D94o

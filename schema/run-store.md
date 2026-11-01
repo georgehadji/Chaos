@@ -125,3 +125,7 @@ Datasets under `orbits/<n>/indicators/<id>/`:
 `t`, `state`, `winding`, `diagnostics/<name>` and `cost/<id>` are as for any method; `cost/<id>` of `frequency` has a sixth entry (transform seconds). A `pair` orbit has the attributes `Dx`, `Dx_r` (the realized separation), `mode`, `xi0` (two binary64); a failed pair stores `Dx_r = NaN`. Failed chunks follow the rule above (blank rows from the failure on).
 
 Group `pooled/<id>` (chunk level, `stretching` with a `counts` subset): attribute `orbits` (the number of orbits pooled) always; when all pooled orbits share one cell range (bitwise equal `range`), also `counts` (int64, (bins + 2) x 2: the exact integer sum of the orbits' counts at the last grid step) and the attribute `range` (two binary64). When they do not share it, the group holds `orbits` only (D88). The write compares the pooled and provenance groups on the read-back like the orbit data.
+
+## Added by Amendment D94 (version stays 2)
+
+No change of the file layout. In a plan with rounds (`experiments-spec.md`, "Amendment D94", E41) the cell named in `chunk_key` is `k<i>:<class>:r<round>` (K = 0 cells alike; controls stay `controls`); a plan without rounds keeps the names `k<i>:<class>`. No orbit attribute `round` is added (P70): the round of an orbit lives in the panel file only. Chunk ordinals of a plan with rounds follow E41 (each_round arms, then closure arms; round ascending).

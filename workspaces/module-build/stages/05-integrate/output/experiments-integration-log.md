@@ -269,3 +269,69 @@ Short hashes are the commits on `main` from 38eee93 to 366677f that touched the 
 - `stages/04-verify/output/gpu-rtx5060-d86-verify-log-fixed.txt` (62fd6c2, 366677f)
 - `stages/04-verify/output/gpu-rtx5060-d86-verify-log.txt` (62fd6c2)
 - `stages/05-integrate/output/experiments-integration-log.md` (working tree)
+
+## Amendment D94 (panel builder and run blocks in rounds, study p3-abstention), stage 05
+
+Branch: `main` (commits pushed, no force-push). Decision D94 (stage 01; owner decisions P69 to P86 approved as proposed).
+
+### Catalog rows flipped
+
+None: the amendment adds no catalog method or indicator.
+
+Evidence: `stages/04-verify/output/experiments-d94-verification.md`, accepted at the stage 04 checkpoint (2026-11-01). Criteria D94a to D94r, D94t, D94u and O26 pass; D94s not run (the real test panel needs the study amendment P69; cost estimated 0.18 h, 1.6 GiB); D94v closed by this stage. Full `Pkg.test()` after the review fixes 1403999 pass, 0 fail, 1 broken (existing); Aqua and JET clean; independent review: C1, H1, H2, M1, M2 and five LOW fixed with 16 probes, M3 and four LOW recorded.
+
+### D94v at integration
+
+| Item | Where | Result |
+|------|-------|--------|
+| Cell naming with rounds, no layout change, P70 (no orbit attribute `round`) | `schema/run-store.md`, "Added by Amendment D94" | done |
+| Panel format and "Files" | `src/Experiments/CONTEXT.md` (fourth scope, five file rows, section "Rounds (D94)", 78 lines) | done |
+| Study stage `02-panel` notes the new keys | `workspaces/study/stages/02-panel/references/panel-rounds.md`, input row in its `CONTEXT.md` | done |
+| Decision log row D94 | `_config/decision-log.md` (7f70aa7) | present |
+| `_config/risks.md` review | due at the M4 exit, not at this amendment | not done here |
+
+Spec text (owner decisions M3 and V3): `experiments-spec.md`, "Clarifications at stage 05": the recorded pool size, the binary64 product for `2 pi u_2`, the order of the K = 0 fractions, the class-bit byte encoding, P70, and the recorded deviations L1, L2, L3, L8. No behaviour or hash changes. `python scripts/icm_validate.py`: all checks pass.
+
+### Open (not verified or deferred)
+
+- D94s and O23 to O26 at full size on the real test panel: after the study amendment P69 (machine-readable panel and run blocks).
+- V1: a count altered in the last log entry is accepted; the test-side Analysis amendment recomputes the counts of every entry from the ref store.
+- V2: the per-orbit seed rule part of O23 is not independent. V4: REV probes run on the fixed code only.
+- Byte identity across machines. The command line entry was run for `--round-log` only on fixtures.
+- Not done here: the test-side Analysis amendment (HA, HB, HC, P81 counts, the round-log writer), P69, the A1 freeze run and Amendment A1; CI for recent commits not checked.
+
+### Commits
+
+- `7f70aa7` stage 01: D94 spec, decision log row, owner decisions
+- `25f3458` stage 02: failing tests (7 files), plan, golden values
+- `ab61826` stage 03: five new files, 14 changed, GREEN, recorded test rework (D86x), impl notes
+- `5b36b36` stage 04: verification, review fixes, oracle and log scripts, recorded test rework (D94o)
+- (this log) `experiments integration log (D94)`: the commit that adds this section and the documentation edits.
+
+### Files changed on `main` for D94 (short hashes of the commits above that touched the file)
+
+- `_config/decision-log.md` (7f70aa7)
+- `workspaces/module-build/stages/01-spec/output/experiments-spec.md` (7f70aa7, this log)
+- `test/experiments/ex_d94_golden.jl`, `ex_d94_grammar.jl`, `ex_d94_helpers.jl`, `ex_d94_panel.jl`, `ex_d94_plan.jl`, `ex_d94_streams.jl`, `runtests.jl` (25f3458)
+- `test/experiments/ex_d94_run.jl` (25f3458, 5b36b36)
+- `test/experiments/ex_d86_guards.jl` (ab61826)
+- `workspaces/module-build/stages/02-tests/output/experiments-test-plan.md` (25f3458, ab61826)
+- `src/Experiments/Experiments.jl`, `cells.jl`, `inputs.jl`, `panel.jl`, `panel_tables.jl`, `rounds_panel.jl`, `rounds_streams.jl`, `run_block.jl`, `run_campaign.jl`, `run_cli.jl`, `run_groups.jl`, `run_manifest.jl`, `run_resume.jl`, `run_store.jl` (ab61826)
+- `src/Experiments/inputs_rounds.jl`, `round_log.jl`, `run_plan.jl`, `run_rounds.jl`, `run_session.jl` (ab61826, 5b36b36)
+- `src/Experiments/CONTEXT.md` (this log)
+- `bench/experiments.jl` (ab61826)
+- `workspaces/module-build/stages/03-implement/output/experiments-d94-impl-notes.md` (ab61826)
+- `verify/experiments-d94.jl`, `experiments-d94-panels.jl`, `experiments-d94-screen.jl`, `experiments-d94-review.jl`, `experiments-d94-reduced.toml`, `experiments-d94-oracle.py`, `experiments-d94-log.py` (5b36b36)
+- `workspaces/module-build/stages/04-verify/output/experiments-d94-verification.md`, `experiments-d94-verify-log.txt`, `experiments-d94-verify-log-fixed.txt`, `experiments-d94-oracle-log.txt` (5b36b36)
+- `schema/run-store.md` (this log)
+- `workspaces/study/stages/02-panel/CONTEXT.md`, `references/panel-rounds.md` (this log)
+- `CHANGELOG.md` (this log)
+- `workspaces/module-build/stages/05-integrate/output/experiments-integration-log.md` (this log)
+
+### Audit
+
+| Check | Result |
+|-------|--------|
+| Status matches evidence (no catalog row; D94s deferred to P69 and named; findings V1 to V4 recorded) | pass |
+| Log names the commit SHAs and every file changed | pass |
+| `CHANGELOG.md` has an entry for the amendment | pass |

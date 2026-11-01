@@ -7,6 +7,7 @@ Build and inspect the orbit panel. Skip for grid scans.
 | Source | File/Location | Section/Scope | Why |
 |--------|--------------|---------------|-----|
 | Previous stage | `../01-design/output/[study]-preregistration.md` | "Panel" section | orbit classes to build |
+| Reference | `references/panel-rounds.md` | Full file | only when the panel block has the D94 keys (rounds) |
 
 ## Process
 

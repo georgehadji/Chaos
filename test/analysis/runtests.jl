@@ -53,3 +53,15 @@ include(joinpath(@__DIR__, "an_p3_dispatch.jl"))     # D93a, D93q
 include(joinpath(@__DIR__, "an_p3_refusals.jl"))     # D93c, D93p after refusals
 include(joinpath(@__DIR__, "an_p3_pipeline.jl"))     # D93d to D93f, D93j to D93l, D93n to D93p end to end
 include(joinpath(@__DIR__, "an_p3_gate.jl"))         # D93c P68: a gate orbit outside Cal with a missing verdict item (stage 03 rework, owner decision 3)
+
+# D95 stage 02 (Amendment D95, study p3-abstention, test side). The module has no D95 functionality yet: the files below are RED, except the fixture self-test (an_p3t_fixture.jl), the
+# McNemar and stream guards of an_p3t_stats.jl and the layering guards of an_p3t_dispatch.jl. Reference and helpers first, then one file per theme.
+include(joinpath(@__DIR__, "an_p3t_ref.jl"))         # independent reference of the test side (round log entry, count rule, type 7 percentile, AUC, ROC, strata, HA, HB, HC, power at achieved sizes)
+include(joinpath(@__DIR__, "an_p3t_helpers.jl"))     # toy campaign: 31 orbits, 3 rounds, 50 chunk files; panel with rounds; test-side table, record, preregistration with Amendment A1; instances
+include(joinpath(@__DIR__, "an_p3t_fixture.jl"))     # fixture self-test: passes before the module exists
+include(joinpath(@__DIR__, "an_p3t_stats.jl"))       # D95h D95i D95k on prescribed tables, D95m, O21 (a) to (g)
+include(joinpath(@__DIR__, "an_p3t_params.jl"))      # D95b
+include(joinpath(@__DIR__, "an_p3t_log.jl"))         # D95d, D95e
+include(joinpath(@__DIR__, "an_p3t_refusals.jl"))    # D95c
+include(joinpath(@__DIR__, "an_p3t_dispatch.jl"))    # D95a, D95p
+include(joinpath(@__DIR__, "an_p3t_pipeline.jl"))    # D95f to D95l, D95n, D95o end to end

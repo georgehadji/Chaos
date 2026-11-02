@@ -57,3 +57,16 @@ const P3MODEL = (rule = Dict(:T => (p = 0.1, d = 0.9), :RW => (p = 0.1, d = 0.9)
 SUITE["p3_simulate_hb one path point (285 + 950 orbits) 100 runs"] = @benchmarkable AN.p3_simulate_hb($P3MODEL, 285, 950, $P3Q; point = 16, runs = 100, threads = 1)
 const P3QHC = merge(P3Q, (auc_p = 0.55, auc_shrink = 0.5, nonfail_per_fail = 20, nf_start = 20, nf_second = 25, delta_c = 0.1, z_one_sided = 1.645, d_expected_total = 1048, d_worst_total = 1309, p_hc = 0.8, alpha_ci = 0.05))
 SUITE["p3_simulate_hc n_f = 65 50 runs"] = @benchmarkable AN.p3_simulate_hc($P3QHC, 0.75, 0.55; nf = 65, runs = 50, threads = 1)
+
+# Study p3-abstention (Amendment D95): the exact bootstrap of the test side at the sizes of the real study (7430 orbits for HA, 1309 for HC; 100 of the 1e4 replicates, so 1e4 costs 100 times
+# the figure), the exact percentile of 1e4 replicate values, and the counting arithmetic of one `count-round` call (the file reads are not benchmarked here, they dominate it).
+const P3TQ = merge(P3Q, (bootstrap_resamples = 100, alpha_ci = 0.05, e_max = 0.2, a_max = 0.3, delta_a = 0.1, g_max = 1, min_set = 20, delta_c = 0.1, target_f = 65, f_s = 0.2, lam_w2 = 0.1))
+const P3TOUTS = (:chaotic_supported, :regular_supported, :unresolved)
+const P3TH_ROWS = [(id = i, rho = i % 3 == 0 ? :R : :C, out = P3TOUTS[1 + (i * 7) % 3], Ts = i % 60 == 0 && i % 3 != 0, W2 = i % 9 == 0 && i % 3 != 0, S2 = i % 7 == 0 && i % 3 != 0) for i in 1:7430]
+SUITE["p3t_ha 7430 orbits 100 replicates (exact)"] = @benchmarkable AN.p3t_ha($P3TH_ROWS, $([:regular_supported, :regular_supported]), $P3TQ; threads = 1)
+const P3TC_ROWS = [(id = i, rho = i % 2 == 0 ? :C : :R, nC = i % 5, nR = (i * 3) % 5, sP = (i % 4) // 6) for i in 1:1309]
+SUITE["p3t_hc 1309 orbits 100 replicates (exact)"] = @benchmarkable AN.p3t_hc($P3TC_ROWS, $P3TQ; threads = 1)
+const P3T_VALS = [Rational{Int}(rand(P3RNG, 0:1000), 1000) for _ in 1:10_000]
+SUITE["p3t_percentile 1e4 exact values"] = @benchmarkable AN.p3t_percentile($P3T_VALS, 19 // 20)
+const P3T_STATE = [(id = i, round = 1 + i % 5, kindex = 2, excluded = i % 50 == 0, drift = i % 40 == 0, rho = i % 3 == 0 ? :R : :C, lref = (1 + i % 9) // 20, lns = (i % 5) // 100) for i in 1:7430]
+SUITE["p3t_counts 7430 orbits (one count-round call, arithmetic only)"] = @benchmarkable AN.p3t_counts($P3T_STATE, $P3TQ, (t_s = 285, w2 = 1235), 5)

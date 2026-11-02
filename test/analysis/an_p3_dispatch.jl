@@ -46,15 +46,18 @@ p3_norm(path) = join([l for l in split(read(path, String), '\n') if !occursin(r"
     end
 end
 
-@testset "D93a analyze with the preregistration of this study is refused (exit code 1) naming the slug and the command calibrate" begin
+@testset "D93a analyze with the preregistration of this study and no round log is refused (exit code 1) naming the round log (D95 E59 lifts the refusal naming calibrate)" begin
     st = p3_cached("default")
     c = p3_copy(st, "dispatch-analyze")
-    kw = (; prereg = c.prereg, manifest = c.s2.manifest, panel = c.s2.panel, params = c.params, store = c.s2.store, out = c.out)
-    @test an_rejects(() -> AN.analyze(; kw...), ["p3-abstention", "calibrate"]) && !ispath(c.out)
+    absent_log, absent_tp, absent_rec = joinpath(c.dir, "absent-round-log.txt"), joinpath(c.dir, "absent-test-parameters.toml"), joinpath(c.dir, "absent-record.json")
+    kw = (; prereg = c.prereg, manifest = c.s2.manifest, panel = c.s2.panel, params = c.params, store = c.s2.store, out = c.out, test_params = absent_tp, round_log = absent_log,
+          p2_manifest = c.s2.manifest, p2_prereg = c.s2.prereg, p2_params = c.s2.params, calibration_record = absent_rec)
+    @test an_rejects(() -> AN.analyze(; kw...), ["round log"]) && !ispath(c.out)
     io = IOBuffer()
-    @test AN.cli(["analyze", c.prereg, c.s2.manifest, c.s2.panel, c.params, "--store", c.s2.store, "--out", c.out]; io = io) == 1
+    @test AN.cli(["analyze", c.prereg, c.params, absent_tp, "--store", c.s2.store, "--panel", c.s2.panel, "--round-log", absent_log, "--manifest", c.s2.manifest, "--p2-manifest", c.s2.manifest,
+                  "--p2-preregistration", c.s2.prereg, "--p2-parameters", c.s2.params, "--calibration-record", absent_rec, "--out", c.out]; io = io) == 1
     msg = String(take!(io))
-    @test occursin("p3-abstention", msg) && occursin("calibrate", msg) && !ispath(c.out)
+    @test occursin("round log", msg) && !ispath(c.out) && !isfile(absent_log)
     # with the options of the P2 pipeline too
     io = IOBuffer()
     @test AN.cli(vcat(["analyze", c.prereg, c.s2.manifest, c.s2.panel, c.params, "--store", c.s2.store, "--out", c.out, "--p1-store", c.p1.store]); io = io) == 1 && !ispath(c.out)

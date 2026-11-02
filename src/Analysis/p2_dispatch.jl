@@ -48,12 +48,15 @@ Run the analysis of the study named by the preregistration (E21): `p1-le-benchma
 reference inputs `p1_*` (default: the files of study `p1-le-benchmark` by the study layout). The `p1_*` keywords are an error for `p1-le-benchmark`.
 """
 function analyze(; prereg, manifest, panel, params, store, out, figures::Bool = false, threads::Integer = Threads.nthreads(), seed::Union{Nothing, Integer} = nothing,
-                 p1_prereg = nothing, p1_manifest = nothing, p1_params = nothing, p1_store = nothing)
+                 p1_prereg = nothing, p1_manifest = nothing, p1_params = nothing, p1_store = nothing, kw...)
     slug = study_slug(prereg)
-    slug == P3_SLUG && _fail("study $P3_SLUG: the analysis of test data is a later amendment; the command calibrate is the command of this study (calibrate <preregistration> <parameters>)")
+    slug == P3_SLUG && return analyze_p3t(; prereg, manifest, panel, params, store, out, threads, p1_prereg, p1_params, kw...)
+    kwerr() = _fail("unknown keyword $(first(keys(kw))): the keywords of the test side are for study $P3_SLUG only")
     if slug == P2_SLUG
+        isempty(kw) || kwerr()
         return analyze_p2(; prereg, manifest, panel, params, store, out, figures, threads, p1_prereg, p1_manifest, p1_params, p1_store)
     elseif slug == P1_SLUG
+        isempty(kw) || kwerr()
         any(!isnothing, (p1_prereg, p1_manifest, p1_params, p1_store)) &&
             _fail("the keywords p1_prereg, p1_manifest, p1_params and p1_store are for study $P2_SLUG; this preregistration is of study $slug")
         _check_study(manifest, slug)

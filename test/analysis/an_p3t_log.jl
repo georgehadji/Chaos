@@ -36,7 +36,7 @@ end
     # drop reasons by hand (I46): round 2 has the drift orbit 14 and the excluded orbit 24 inside count.orbits; the U orbit 23 is counted among the orbits only
     @test res[2].counts.orbits == 22 && res[2].counts.drift == 1 && res[2].counts.excluded == 1 && res[2].counts.t_s == 4 && res[2].counts.w2 == 7
     # the digest of round r covers the ref chunks of the rounds up to r only (a failed chunk included)
-    @test occursin("ref_digest=$(p3t_digest(S, 2))\n", ents[2]) && p3t_digest(S, 1) != p3t_digest(S, 2) && length(p3t_ref_hashes(S, 3)) == 22
+    @test occursin("ref_digest=$(p3t_digest(S, 2))\n", ents[2]) && p3t_digest(S, 1) != p3t_digest(S, 2) && length(p3t_ref_hashes(S, 3)) == 24
 end
 
 @testset "D95d the decision at the boundaries of the targets and at r_max" begin

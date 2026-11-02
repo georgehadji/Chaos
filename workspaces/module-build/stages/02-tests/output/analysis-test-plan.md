@@ -808,3 +808,9 @@ Audit: coverage of the spec (every (S) criterion maps to a test, table above); R
 
 The owner approved the tests as written, with the readings and the contract pinned above. Carried to stage 03: the existing testset "D93a analyze with the preregistration of this study is refused" (`an_p3_dispatch.jl`) asserts the refusal that D95 E59 replaces; its change is a recorded test rework at stage 03. The tg item is read at `N_1` in the toy campaign (E65 says `N_c`); the study amendment P69 fixes the run block. Suite time is measured at stage 03; moves to `verify/` follow D38 if the analysis suite exceeds the D35 ceiling.
 Audit of 2026-11-01: Coverage of spec (every (S) part of D95a to D95q maps to tests; (V) parts listed for stage 04), RED (69 UndefVarError and 12 MethodError of the missing API, 9 failures of the missing `count-round` command and the read-only log check, no parse or helper error, existing suites unchanged), Reproducible (StableRNGs with recorded seeds), No memory values (expected values from the independent reference or by hand): pass.
+
+### Rework at stage 03 (2026-11-03)
+
+Two recorded test reworks, owner decisions; no assertion weakened in kind; details in `stages/03-implement/output/analysis-d95-impl-notes.md`.
+1. `an_p3_dispatch.jl`, testset "D93a ...": restricted to the case of an absent round log (refusal naming `round log`, exit code 1, no output folder, no log file), as decided at the stage 02 checkpoint.
+2. `an_p3t_log.jl:39`: the fixture count of ref chunks of rounds 1 to 3 is 24 (12 cells, L1 and L5), not 22; the assertion calls no module code.

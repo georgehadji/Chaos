@@ -1,0 +1,33 @@
+# verify/experiments-d96.jl lib + verify/experiments-d96-cli.sh, default project, 4 threads, 2026-11-03; fixture: discovery d96 inputs (SHA-256 list scratchpad d96v/fixture-sha256.txt)
+O27 | run round 1 | status=complete ran=26 skipped=0 failed=0 indicators=String[] | status complete | PASS
+O27 | indicator table before closure | String[] | empty (R28) | PASS
+O27 | count_round | action=appended round=1 decision=continue orbits=15 | - | INFO
+O27 | run round 2 | status=complete ran=22 skipped=26 failed=0 indicators=String[] | status complete | PASS
+O27 | count_round | action=appended round=2 decision=continue orbits=30 | - | INFO
+O27 | run round 3 | status=complete ran=20 skipped=48 failed=0 indicators=String[] | status complete | PASS
+O27 | count_round | action=appended round=3 decision=close orbits=44 | - | INFO
+O27 | log closed | true | true | PASS
+O27 | run closure | status=complete ran=282 skipped=68 failed=0 indicators=["bk1", "fq1", "pa1", "tg"] | status complete | PASS
+O27 | indicator table at closure | ["bk1", "fq1", "pa1", "tg"] | the specs of the closure arms | INFO
+O27 | run closure again (resume) | status=complete ran=0 skipped=350 failed=0 indicators=["bk1", "fq1", "pa1", "tg"] | status complete | PASS
+O27 | round log sha256 | 4c96292f4053896149f59f3a7de2dc643c0fb8d608b437b0fee3cdf81c9ea24e | - | INFO
+status: complete
+chunks run: 26, skipped: 0, failed twice: 0; manifest: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d96v/out/manifest-cli.json
+O27 | CLI run round 1 | exit 0 | exit 0 | PASS
+O27 | count_round | action=appended round=1 decision=continue orbits=15 | - | INFO
+status: complete
+chunks run: 22, skipped: 26, failed twice: 0; manifest: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d96v/out/manifest-cli.json
+O27 | CLI run round 2 | exit 0 | exit 0 | PASS
+O27 | count_round | action=appended round=2 decision=continue orbits=30 | - | INFO
+status: complete
+chunks run: 20, skipped: 48, failed twice: 0; manifest: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d96v/out/manifest-cli.json
+O27 | CLI run round 3 | exit 0 | exit 0 | PASS
+O27 | count_round | action=appended round=3 decision=close orbits=44 | - | INFO
+status: complete
+chunks run: 282, skipped: 68, failed twice: 0; manifest: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d96v/out/manifest-cli.json
+O27 | CLI run closure | exit 0 | exit 0 | PASS
+status: complete
+chunks run: 0, skipped: 350, failed twice: 0; manifest: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d96v/out/manifest-cli.json
+O27 | CLI run closure again (resume) | exit 0 | exit 0 | PASS
+O27 | chunk files CLI, library | 350, 350 | equal | -
+O27 | CLI round log equals the library round log (bytes) | 4c96292f40538961, 4c96292f40538961 | identical | PASS

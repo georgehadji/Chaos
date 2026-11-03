@@ -49,6 +49,7 @@ function p3t_measured_costs(man)
     for (key, spec, arm) in ((:cost_l1, "L1", ""), (:cost_tg, "tg", "ind"), (:cost_pa1, "pa1", "ind_pa1"), (:cost_bk1, "bk1", "ind"), (:cost_fq1, "fq1", "ind"))
         s = get(get(get(get(man, "arms", Dict()), arm, Dict()), "specs", Dict()), spec, Dict())
         v = spec == "L1" ? _p3t_cost_l1(man) : haskey(s, "measured_ns_per_orbit_step") ? Float64(s["measured_ns_per_orbit_step"]) : nothing
+        v == 0 && (v = nothing)      # the runner writes 0.0 for a spec with zero steps (E78)
         v === nothing ? push!(miss, spec) : (vals[key] = v)
     end
     return vals, miss

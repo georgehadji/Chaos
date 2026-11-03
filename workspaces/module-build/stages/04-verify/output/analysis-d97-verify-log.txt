@@ -1,0 +1,191 @@
+Verify log of module analysis, Amendment D97 (stage 04). Code at cc38b10 (+ verify/ scripts of this stage), Julia 1.13.2, 4 threads. Fixture: scratchpad d97v/fixture (the D96 fixture without patches/; SHA-256 list checked, the 13 non-patch files OK).
+Raw outputs of the scripts. Lines 'O27 |' come from verify/experiments-d96.jl (label kept from D96), 'D97 |' and 'O28 |' from the D97 scripts.
+
+##### A. Clean campaign, library: julia --project -t 4 verify/experiments-d96.jl lib <fixture> <out>   (no Analysis patch; count_round after each round)
+O27 | run round 1 | status=complete ran=26 skipped=0 failed=0 indicators=String[] | status complete | PASS
+O27 | indicator table before closure | String[] | empty (R28) | PASS
+O27 | count_round | action=appended round=1 decision=continue orbits=15 | - | INFO
+O27 | run round 2 | status=complete ran=22 skipped=26 failed=0 indicators=String[] | status complete | PASS
+O27 | count_round | action=appended round=2 decision=continue orbits=30 | - | INFO
+O27 | run round 3 | status=complete ran=20 skipped=48 failed=0 indicators=String[] | status complete | PASS
+O27 | count_round | action=appended round=3 decision=close orbits=44 | - | INFO
+O27 | log closed | true | true | PASS
+O27 | run closure | status=complete ran=282 skipped=68 failed=0 indicators=["bk1", "fq1", "pa1", "tg"] | status complete | PASS
+O27 | indicator table at closure | ["bk1", "fq1", "pa1", "tg"] | the specs of the closure arms | INFO
+O27 | run closure again (resume) | status=complete ran=0 skipped=350 failed=0 indicators=["bk1", "fq1", "pa1", "tg"] | status complete | PASS
+O27 | round log sha256 | 60c708b5a15a2514e21fa89f50bb316ed1399d7d769d6eacde973b75aaaf6742 | - | INFO
+
+##### A. julia --project -t 4 verify/experiments-d96.jl analyze <fixture> <out> lib
+D97 | count_round on the closed log | action=closed round=3 decision=close | action closed | PASS
+D97 | analyze lib | status=ok decisions=(HA = "not decidable", HB = "not decidable", HC = "not decidable") | no refusal | PASS
+
+##### B. CLI, run --round-log by rounds, library count_round between the runs: bash verify/experiments-d96-cli.sh <fixture> <out>  (no patch)
+status: complete
+chunks run: 26, skipped: 0, failed twice: 0; manifest: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d97v/out/manifest-cli.json
+O27 | CLI run round 1 | exit 0 | exit 0 | PASS
+O27 | count_round | action=appended round=1 decision=continue orbits=15 | - | INFO
+status: complete
+chunks run: 22, skipped: 26, failed twice: 0; manifest: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d97v/out/manifest-cli.json
+O27 | CLI run round 2 | exit 0 | exit 0 | PASS
+O27 | count_round | action=appended round=2 decision=continue orbits=30 | - | INFO
+status: complete
+chunks run: 20, skipped: 48, failed twice: 0; manifest: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d97v/out/manifest-cli.json
+O27 | CLI run round 3 | exit 0 | exit 0 | PASS
+O27 | count_round | action=appended round=3 decision=close orbits=44 | - | INFO
+status: complete
+chunks run: 282, skipped: 68, failed twice: 0; manifest: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d97v/out/manifest-cli.json
+O27 | CLI run closure | exit 0 | exit 0 | PASS
+status: complete
+chunks run: 0, skipped: 350, failed twice: 0; manifest: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d97v/out/manifest-cli.json
+O27 | CLI run closure again (resume) | exit 0 | exit 0 | PASS
+O27 | chunk files CLI, library | 350, 350 | equal | -
+O27 | CLI round log equals the library round log (bytes) | 60c708b5a15a2514, 60c708b5a15a2514 | identical | PASS
+
+##### C. CLI count-round and analyze: bash verify/analysis-d97-cli.sh <fixture> <out> lib   (script version of this first run: analyze on its own store only; its two DIFFERENT lines compare two different campaigns (chunk hashes and measured costs differ) and are not a check, see the next block)
+D97 | CLI run round 1 | exit 0 | exit 0 | PASS
+counts: drift=0 excluded=0 orbits=15 t_s=0 target_t_s=5 target_w2=11 w2=3
+targets: t_s 5, w2 11; decision: continue
+D97 | CLI count-round after round 1 | exit 0 | exit 0 | PASS
+D97 | CLI run round 2 | exit 0 | exit 0 | PASS
+counts: drift=0 excluded=0 orbits=30 t_s=0 target_t_s=5 target_w2=11 w2=7
+targets: t_s 5, w2 11; decision: continue
+D97 | CLI count-round after round 2 | exit 0 | exit 0 | PASS
+D97 | CLI run round 3 | exit 0 | exit 0 | PASS
+counts: drift=0 excluded=0 orbits=44 t_s=0 target_t_s=5 target_w2=11 w2=10
+targets: t_s 5, w2 11; decision: close
+D97 | CLI count-round after round 3 | exit 0 | exit 0 | PASS
+D97 | CLI run closure | exit 0 | exit 0 | PASS
+D97 | CLI run closure again (resume) | exit 0 | exit 0 | PASS
+D97 | CLI count-round on the closed log | exit 0 | exit 0 | PASS
+counts: drift=0 excluded=0 orbits=44 t_s=0 target_t_s=5 target_w2=11 w2=10
+targets: t_s 5, w2 11; decision: close
+D97 | CLI round log (count-round written) equals the library round log (bytes) | 60c708b5a15a2514, 60c708b5a15a2514 | identical | PASS
+D97 | CLI analyze | exit 0 | exit 0 | PASS
+D97 | CLI p3-abstention-tables.md equals the library output (bytes) | - | identical | DIFFERENT (see note: the files carry the git commit line and the paths of the call)
+D97 | CLI p3-abstention-test-results.json equals the library output (bytes) | - | identical | DIFFERENT (see note: the files carry the git commit line and the paths of the call)
+
+##### C. FAULTS=1 bash verify/analysis-d97-cli.sh <fixture> <out> lib   (final script version; on the clean library store: CLI analyze, bytes against the library output)
+D97 | CLI analyze (libstore-faults) | exit 0 | exit 0 | PASS
+D97 | CLI p3-abstention-tables.md equals the library output on the same store (bytes) | - | identical | PASS
+D97 | CLI p3-abstention-test-results.json equals the library output on the same store (bytes) | - | identical | PASS
+
+##### D. Independent reader, clean campaign
+# julia --project=verify verify/analysis-p3t-export.jl <out>/store-lib <work>
+items exported: 422
+# python -I verify/analysis-d97-oracle.py <fixture> <out> lib <work> <work>/oracle.json   (the checks of the oracle, then the last line)
+[   0.1 s] PASS E59 preregistration SELF hash equals the header cell 769a712079a1b76bb7374d8e7be3b97babc3d3c921c54502202f547cc2c4f897
+[   0.1 s] PASS E61 f no two chunks with the same arm, orbit and item 0
+[   0.1 s] PASS E61 f every chunk file complete, study is the slug, panel and preregistration hashes equal the files 0
+[   0.1 s] PASS E81/E61 i the six arm names are the keys of the manifest 'arms' object and each has chunks ['chk', 'd64', 'd64_pa1', 'ind', 'ind_pa1', 'ref']
+[   0.1 s] PASS E74 every chunk key ends in a cell of the form k<i>:<class>:r<round> 350
+[   0.1 s] PASS E80 no chunk of a round above the closing round (the runner never released one) 3
+[   0.1 s] PASS E61 i manifest chunk hashes equal those of the chunk files read 350
+[   0.1 s] PASS E76 manifest study, and status complete (no failed entry) or complete with failed chunks (at least one failed entry) complete, 0 failed entries
+[   0.1 s] PASS E76 the set of failed chunks of the manifest equals that of the chunk files 0
+[   0.1 s] PASS E61 e panel hash in manifest equals panel file cdf1ea2a19c05ac758aea898acfa0f9826eefed90c1d6dbdbd0cda897d9b61e3
+[   0.1 s] PASS E59 manifest preregistration hash equals header 
+[   0.1 s] PASS E61 j identity: stored ic and params equal the panel file for every item read 0
+[   0.1 s] PASS I51 every orbit of the panel up to the closing round is in exactly one ref cell: each has its L1 and L5 item or its ref chunk is listed as failed, and no ref item is missing without a failed chunk 46
+[   0.1 s] PASS E62 a the log is whole entries of 13 lines 39
+[   0.1 s] PASS E62/E63 entry 1 text recomputed equals the log file entry (13 lines, counts, ref digest, decision, chain) 
+[   0.1 s] PASS E62/E63 entry 2 text recomputed equals the log file entry (13 lines, counts, ref digest, decision, chain) 
+[   0.1 s] PASS E62/E63 entry 3 text recomputed equals the log file entry (13 lines, counts, ref digest, decision, chain) 
+[   0.1 s] PASS E63 h the last entry says close close
+[   0.1 s] PASS E62 rounds with complete ref chunks all have entries [1, 2, 3]
+[   0.1 s] PASS E64 c the gate set has gate_size orbits 2
+[   0.1 s] PASS E77 every failed chunk is of one of the six arms and its cell has orbits in the panel up to the closing round []
+[   0.1 s] PASS E64 c every orbit of the chk arm has the panel flag in_D [4, 22, 28, 31, 41]
+[   0.1 s] PASS E75 the horizon of every verdict item read is N_c (N_c + 1 for pa1) []
+[   0.1 s] PASS E77/E61 k every missing item of a candidate orbit belongs to a chunk listed as failed (else the module must refuse) []
+[   0.2 s] PASS E79 the chk horizon is a single value and equals the key N_B of the P1 parameter table ([1000], 1000)
+[   0.2 s] HA not decidable [] ['T_s has 0 < min_set', 'bound of d_T undefined (dropped 100 of 100)'] HB not decidable ['set below floor'] HC not decidable ['failures 2 < min_set', 'bound undefined']
+# python -I verify/analysis-d97-compare.py <work>/oracle.json <out>/analysis-lib <work>/compare.log <panel>   (lines not EQUAL, then the total)
+NOTE F2 rule family: the module has 4 points (a cross), the oracle's product grid has 6; oracle-only points: [('1', '4'), ('3', '4')]; their cross flag: [False, False]
+   convention: ['table lines (header, separator, rows) joined by LF']
+   convention: ['table lines (header, separator, rows) joined by LF']
+
+QUANTITIES COMPARED: 956; EQUAL: 956; DIFFER: 0
+# independent log writer and runner check
+wrote valid log and 39 altered copies to C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-C
+O28 | independent writer log equals the count_round log (bytes) | identical | PASS
+O28 | round log SHA-256 | 60c708b5a15a2514e21fa89f50bb316ed1399d7d769d6eacde973b75aaaf6742
+O28 | runner reader and checker on the log of count_round (3 entries, r_max 3, panel and prereg hashes, ref digest from the chunk files of the arm ref) | accepted (R_plan = 3, closed = true) | accepted | PASS
+O28 | runner on the 39 one-byte alterations of the independent writer | refused 32, accepted 7, other exceptions 0 | accepted are the 7 count lines of the last entry, as D94 O26 and D95 O24 | PASS
+      accepted: round-log-bad-count_drift-3.txt, round-log-bad-count_excluded-3.txt, round-log-bad-count_orbits-3.txt, round-log-bad-count_t_s-3.txt, round-log-bad-count_target_t_s-3.txt, round-log-bad-count_target_w2-3.txt, round-log-bad-count_w2-3.txt
+
+##### E. Second campaign, chunks failed twice (FAULTS=1): julia --project -t 4 verify/experiments-d96.jl lib <fixture> <out2>   (ref L1 k3:T:r2, ind tg k2:C:r2, ind_pa1 pa1 k3:C:r2, d64 tg k3:C:r1, d64_pa1 pa1 k2:C:r1, chk L5 Double64 k2:C:r2, chk L5 BigFloat k3:C:r2)
+O27 | run round 1 | status=complete ran=26 skipped=0 failed=0 indicators=String[] | status complete | PASS
+O27 | indicator table before closure | String[] | empty (R28) | PASS
+O27 | count_round | action=appended round=1 decision=continue orbits=15 | - | INFO
+O27 | run round 2 | status=complete with failed chunks ran=22 skipped=26 failed=1 indicators=String[] | status complete with failed chunks | PASS
+O27 | count_round | action=appended round=2 decision=continue orbits=30 | - | INFO
+O27 | run round 3 | status=complete with failed chunks ran=20 skipped=48 failed=0 indicators=String[] | status complete with failed chunks | PASS
+O27 | count_round | action=appended round=3 decision=close orbits=44 | - | INFO
+O27 | log closed | true | true | PASS
+O27 | run closure | status=complete with failed chunks ran=282 skipped=68 failed=6 indicators=["bk1", "fq1", "pa1", "tg"] | status complete with failed chunks | PASS
+O27 | indicator table at closure | ["bk1", "fq1", "pa1", "tg"] | the specs of the closure arms | INFO
+O27 | run closure again (resume) | status=complete with failed chunks ran=0 skipped=350 failed=0 indicators=["bk1", "fq1", "pa1", "tg"] | status complete with failed chunks | PASS
+O27 | round log sha256 | 93a95040b0d44616c90a94e12157a0c1f378003a7cbfe0e96d97a3d34ce0ecc8 | - | INFO
+
+##### E. julia --project -t 4 verify/experiments-d96.jl analyze <fixture> <out2> lib   (FAULTS=1)
+D97 | count_round on the closed log | action=closed round=3 decision=close | action closed | PASS
+D97 | analyze lib | status=ok decisions=(HA = "not decidable", HB = "not decidable", HC = "not decidable") | no refusal | PASS
+
+##### E. FAULTS=1 bash verify/analysis-d97-cli.sh <fixture> <out2> lib   (CLI analyze on the same store, bytes against the library output)
+D97 | CLI analyze (libstore-faults) | exit 0 | exit 0 | PASS
+D97 | CLI p3-abstention-tables.md equals the library output on the same store (bytes) | - | identical | PASS
+D97 | CLI p3-abstention-test-results.json equals the library output on the same store (bytes) | - | identical | PASS
+
+##### F. Independent reader, second campaign
+# julia --project=verify verify/analysis-p3t-export.jl <out>/store-lib <work>
+items exported: 422
+# python -I verify/analysis-d97-oracle.py <fixture> <out> lib <work> <work>/oracle.json   (the checks of the oracle, then the last line)
+[   0.1 s] PASS E59 preregistration SELF hash equals the header cell 769a712079a1b76bb7374d8e7be3b97babc3d3c921c54502202f547cc2c4f897
+[   0.1 s] PASS E61 f no two chunks with the same arm, orbit and item 0
+[   0.1 s] PASS E61 f every chunk file complete, study is the slug, panel and preregistration hashes equal the files 0
+[   0.1 s] PASS E81/E61 i the six arm names are the keys of the manifest 'arms' object and each has chunks ['chk', 'd64', 'd64_pa1', 'ind', 'ind_pa1', 'ref']
+[   0.1 s] PASS E74 every chunk key ends in a cell of the form k<i>:<class>:r<round> 350
+[   0.1 s] PASS E80 no chunk of a round above the closing round (the runner never released one) 3
+[   0.1 s] PASS E61 i manifest chunk hashes equal those of the chunk files read 350
+[   0.1 s] PASS E76 manifest study, and status complete (no failed entry) or complete with failed chunks (at least one failed entry) complete with failed chunks, 7 failed entries
+[   0.1 s] PASS E76 the set of failed chunks of the manifest equals that of the chunk files 7
+[   0.1 s] PASS E61 e panel hash in manifest equals panel file cdf1ea2a19c05ac758aea898acfa0f9826eefed90c1d6dbdbd0cda897d9b61e3
+[   0.1 s] PASS E59 manifest preregistration hash equals header 
+[   0.1 s] PASS E61 j identity: stored ic and params equal the panel file for every item read 0
+[   0.1 s] PASS I51 every orbit of the panel up to the closing round is in exactly one ref cell: each has its L1 and L5 item or its ref chunk is listed as failed, and no ref item is missing without a failed chunk 46
+[   0.1 s] PASS E62 a the log is whole entries of 13 lines 39
+[   0.1 s] PASS E62/E63 entry 1 text recomputed equals the log file entry (13 lines, counts, ref digest, decision, chain) 
+[   0.1 s] PASS E62/E63 entry 2 text recomputed equals the log file entry (13 lines, counts, ref digest, decision, chain) 
+[   0.1 s] PASS E62/E63 entry 3 text recomputed equals the log file entry (13 lines, counts, ref digest, decision, chain) 
+[   0.1 s] PASS E63 h the last entry says close close
+[   0.1 s] PASS E62 rounds with complete ref chunks all have entries [1, 2, 3]
+[   0.1 s] PASS E64 c the gate set has gate_size orbits 2
+[   0.1 s] PASS E77 every failed chunk is of one of the six arms and its cell has orbits in the panel up to the closing round [('chk', (2, 'C', 2)), ('chk', (3, 'C', 2)), ('d64', (3, 'C', 1)), ('d64_pa1', (2, 'C', 1)), ('ind', (2, 'C', 2)), ('ind_pa1', (3, 'C', 2)), ('ref', (3, 'T', 2))]
+[   0.1 s] PASS E64 c every orbit of the chk arm has the panel flag in_D [4, 28, 31, 41]
+[   0.1 s] PASS E75 the horizon of every verdict item read is N_c (N_c + 1 for pa1) []
+[   0.1 s] PASS E77/E61 k every missing item of a candidate orbit belongs to a chunk listed as failed (else the module must refuse) []
+[   0.1 s] PASS E79 the chk horizon is a single value and equals the key N_B of the P1 parameter table ([1000], 1000)
+[   0.2 s] HA not decidable [] ['T_s has 0 < min_set', 'bound of d_T undefined (dropped 100 of 100)'] HB not decidable ['set below floor'] HC not decidable ['failures 1 < min_set', 'bound undefined']
+# python -I verify/analysis-d97-compare.py <work>/oracle.json <out>/analysis-lib <work>/compare.log <panel>   (lines not EQUAL, then the total)
+NOTE T3 orbit 28: the oracle has missing value(s) ['BF']; module cells: ['0.191151581021', '0.23392664298', 'n.a.', 'n.a.', 'dropped']
+NOTE F2 rule family: the module has 4 points (a cross), the oracle's product grid has 6; oracle-only points: [('1', '4'), ('3', '4')]; their cross flag: [False, False]
+   convention: ['table lines (header, separator, rows) joined by LF']
+   convention: ['table lines (header, separator, rows) joined by LF']
+
+QUANTITIES COMPARED: 951; EQUAL: 951; DIFFER: 0
+# independent log writer and runner check
+wrote valid log and 39 altered copies to C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-C
+O28 | independent writer log equals the count_round log (bytes) | identical | PASS
+O28 | round log SHA-256 | 93a95040b0d44616c90a94e12157a0c1f378003a7cbfe0e96d97a3d34ce0ecc8
+O28 | runner reader and checker on the log of count_round (3 entries, r_max 3, panel and prereg hashes, ref digest from the chunk files of the arm ref) | accepted (R_plan = 3, closed = true) | accepted | PASS
+O28 | runner on the 39 one-byte alterations of the independent writer | refused 32, accepted 7, other exceptions 0 | accepted are the 7 count lines of the last entry, as D94 O26 and D95 O24 | PASS
+      accepted: round-log-bad-count_drift-3.txt, round-log-bad-count_excluded-3.txt, round-log-bad-count_orbits-3.txt, round-log-bad-count_t_s-3.txt, round-log-bad-count_target_t_s-3.txt, round-log-bad-count_target_w2-3.txt, round-log-bad-count_w2-3.txt
+
+##### G. Second campaign: exclusions of E77 (oracle result; equal to the module, section F)
+sizes {'E_test': 24, 'W2': 7, 'T_s': 0, 'S2': 6, 'D': 19, 'D_B': 4, 'gate': 2}
+orbits that left D by a failed d64 or d64_pa1 chunk (and are in E_test): [6, 13]
+orbit that left D_B (its Double64 chk chunk failed): [22]
+drops: {'excluded (ref item incomplete)': [24, 25], 'rho = U': [3, 4, 5, 7, 10, 12, 15, 18, 19, 33, 34, 35, 39, 40], 'no verdict data': [21, 22, 27, 28]}
+failed cells (T11): [('chunk-00031.h5', ['ref'], 'k3:T:r2', [24, 25]), ('chunk-00129.h5', ['d64'], 'k3:C:r1', [12, 13]), ('chunk-00164.h5', ['d64_pa1'], 'k2:C:r1', [6, 7]), ('chunk-00177.h5', ['ind'], 'k2:C:r2', [21, 22]), ('chunk-00214.h5', ['ind_pa1'], 'k3:C:r2', [27, 28]), ('chunk-00263.h5', ['chk'], 'k2:C:r2', [21, 22]), ('chunk-00267.h5', ['chk'], 'k3:C:r2', [27, 28])]
+excluded count per log entry: [0, 2, 2]
+manifest status: complete with failed chunks

@@ -48,6 +48,7 @@ function p3t_read_panel(panel, r_max)
         for k in ("id", "k_index", "K", "x0_dec", "p0_dec")
             haskey(o, k) || _fail("panel file $panel: orbit $(get(o, "id", "?")) has no key $k")
         end
+        haskey(o, "class") && o["class"] isa AbstractString && !isempty(o["class"]) || _fail("panel file $panel: orbit $(o["id"]) has no class (a non-empty text, E74)")
         1 <= o["round"] <= r_max || _fail("panel file $panel: orbit $(o["id"]) has the round $(o["round"]), outside 1 to r_max = $(Int(r_max))")
     end
     return orbits

@@ -71,3 +71,4 @@ include(joinpath(@__DIR__, "an_p3t_pipeline.jl"))    # D95f to D95l, D95n, D95o 
 # side" testsets of an_p3t_d97.jl). The D95 files above that read the toy store (fixture, log, refusals, pipeline) are RED for the same reason until stage 03.
 include(joinpath(@__DIR__, "an_p3t_shape.jl"))       # D97i: the toy campaign against a campaign of the real runner (cells, arms, manifest keys, attributes, item labels)
 include(joinpath(@__DIR__, "an_p3t_d97.jl"))         # D97a to D97i and O30
+include(joinpath(@__DIR__, "an_p3t_d97r.jl"))        # D97 rework after the stage 04 review: chk and d64 missing items, panel class, zero-step specs

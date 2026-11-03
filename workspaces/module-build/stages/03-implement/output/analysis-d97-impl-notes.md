@@ -43,3 +43,21 @@ Largest changed function: `_p3t_t3` (24 lines). All files stay under 400 lines (
 ## Not done here
 
 Coverage of the changed functions was not measured (the D97 tests exercise the changed branches by design; this was not checked by a coverage tool). No benchmark change. O28 and O29 (real fixture campaigns, independent reader) are stage 04. Nothing committed.
+
+## Rework after stage 04 review (2026-11-03)
+
+Owner decision: the four MEDIUM findings of the independent review are fixed (tests first: `an_p3t_d97r.jl`, test plan "Rework after stage 04 review"). The tests were not edited after the RED run (14 fail, 7 pass, 0 error).
+
+Changes (all in `src/Analysis`, 33 lines added, 8 removed):
+
+- `p3t_data.jl`: `_p3t_missing_items` takes the precision (default Float64). New `_p3t_failed_in(chunks, arm, cell, prec)`: a chunk of that arm, cell and precision label failed twice. New `_p3t_double_gap`, called by `_p3t_double` (which now also gets `c` and the panel): a D orbit that lacks any of the four Double64 items (tg, fq1, bk1 in d64; pa1 in d64_pa1) leaves D if its chunk of that arm and cell failed, otherwise the load refuses naming the orbit, the item and the arm. `p3t_dB`: an orbit is known to be in D_B by any chk L5 item (precision label without bit count); the other precision, if missing and its chk chunk is not listed as failed, is refused naming the orbit and the precision. D_B stays the orbits with a Double64 chk item (an orbit whose Double64 chunk failed leaves D_B, P118; a failed BigFloat chunk shows `n.a.`).
+- `p3t_store.jl`: `p3t_read_panel` requires `class` as a non-empty text on every orbit (ArgumentError naming the key and the orbit).
+- `p3t_run.jl`: `p3t_measured_costs` treats a spec value of 0 as no value (sensitivity (iii) not decidable, reason names the spec).
+
+Readings chosen:
+
+1. "Counted" (E70, P104 b): the spec names no table line or key, so the count stays implicit in |D| (`sets.counts.D`, `hc.set_size`); no key added to the machine file (D95n).
+2. d64: the check covers the four Double64 items, not only the ones V* reads (E64 c "the four Double64 items"). An orbit in D missing an unread item (for example fq1) in an unlisted chunk is refused; if the chunk failed, it leaves D. The failed-chunk test is by arm and cell, as for ind (not by spec).
+3. chk: D_B is not recorded outside the chk items (the run plan draws it at closure). A missing chk item is refused only where the orbit is known to be in D_B, that is, it carries the other chk item. An orbit missing both items of unlisted chunks is not detectable and is not in D_B.
+
+Results: analysis subset (fixture 41, shape 52, stats 327, params 49, log 45, refusals 5, dispatch 22, pipeline 111, d97 109, d97r 21) all pass, log `d97/d97r-green.log`. Whole suite: 1404801 pass, 0 fail, 0 error, 1 broken (existing weighted-birkhoff), 26m29s, log `d97/d97r-pkg-test.log`; analysis 2659 pass. I47 untouched (no non-p3t file changed). Oracle rerun in `d97v/rework/` (clean and FAULTS=1): 956 of 956 and 951 of 951 equal, 0 differ.

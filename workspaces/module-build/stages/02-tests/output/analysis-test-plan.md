@@ -912,3 +912,20 @@ Second run, the causes of the D97 tests on their own (driver `d97/driver2.jl`): 
 Guards of D97j in the same session: `an_p2_dispatch.jl` 33 of 33, `an_p3_dispatch.jl` 37 of 37 (log `d97/d97-golden.log`). The whole package suite was not run (stage 03).
 
 Audit: Coverage of spec (every (S) criterion D97a to D97j and O30 maps to a test, table above; D97k is (V)), RED (every new failing test fails because Analysis reads the old shape; no parse error, undefined name or helper error; the fixture and shape tests pass), Reproducible (the panel orbits are the draws of `p3t_seed('a')`; no new random draw; the statistics of the reference use the named streams of E66), No memory values (every expected value is by hand from the design, from the reference with the tags changed, or from the `P2_COST` figures of the fixture; no regression value from the bibliography): pass.
+
+### Rework after stage 04 review (2026-11-03)
+
+Owner decision: the four MEDIUM findings of the independent review (`analysis-d97-verification.md`, items 1 to 4) are fixed, stage 02 then stage 03. New file `test/analysis/an_p3t_d97r.jl` (registered in `runtests.jl` after `an_p3t_d97.jl`; helpers of `an_p3t_helpers.jl` and `an_p3t_d97.jl` only, none changed). No existing test is edited.
+
+| Finding | Testset | Assertions | Pins |
+|---|---|---|---|
+| 1 chk | D97r1 a chk item missing from a chunk not listed as failed | orbit 8 dropped from the chk Double64 chunk, then from the BigFloat chunk of cell k3:C:r1, no failure in the manifest: `analyze` refuses naming `8`, the precision and `chk`, no output folder (2 x 1) | E61 k, E77 last sentence |
+| 1 chk | D97r1 a failed chk chunk keeps its reading (guard) | BigFloat chunk of k3:C:r1 failed twice: orbits 6 and 8 have a T3 row with the Float64 and Double64 values and no BigFloat value, orbits 3 and 12 unchanged (the Double64 failure case stays in D97d) | P118 |
+| 2 d64 | D97r2 a Double64 item missing from a chunk not listed as failed | orbit 4 dropped from d64 tg, d64 fq1, d64_pa1 pa1 (one run each): refusal naming `4` and the spec | E77, E61 k |
+| 2 d64 | D97r2 orbits of a failed d64 chunk leave D (guard) | on the multi-failure store: counts D equals the length of the D list (8) and none of the orbits 3 to 8 is in it | E70, P104 b |
+| 3 class | D97r3 panel key class | `p3t_read_panel` on a panel with orbit 5 without `class`, with `class = ""`, with `class = 3`: ArgumentError naming `class` and `orbit 5` (3); `analyze` and `count_round` on a panel without class: the same, no output folder (2) | E74, E61 e |
+| 4 zero steps | D97r4 a spec with 0.0 | `measured_ns_per_orbit_step = 0.0` for tg (arm ind), then pa1 (arm ind_pa1): sensitivity (iii) not decidable, the reason names the spec and no other spec nor L1, T10 shows no number for the spec and numbers for the others (2 x 3) | E78 |
+
+Reading for finding 2: E70 and P104 b say "leaves the set and is counted"; they name no table line or key. The test pins the count through |D| (`sets.counts.D`), no new key (D95n).
+
+RED run (log `d97/d97r-red.log`, driver `d97/driver.jl` with the D95 and D97 files, code at cc38b10): D95 and D97 files unchanged and green (fixture 41, shape 52, stats 327, params 49, log 45, refusals 5, dispatch 22, pipeline 111, d97 109); `an_p3t_d97r.jl`: 7 pass (guards), 14 fail, 0 error. Causes: the module accepts the missing chk and d64 items (no refusal), the panel without class gives no ArgumentError (a later `KeyError`), and a spec of 0.0 is read as a measured cost (sensitivity decidable).

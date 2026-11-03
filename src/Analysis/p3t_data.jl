@@ -27,15 +27,18 @@ function p3t_check_identity(items, panel_orbits)
     end
 end
 
-# The verdict items of E65 that an orbit lacks (Float64, arms ind and ind_pa1; tg at N_c, E75).
-function _p3t_missing_items(idx, p2, id)
-    d1, F = p2.directions[1], "Float64"
+# The verdict items of E65 that an orbit lacks (precision F: Float64 for the arms ind and ind_pa1, Double64 for d64 and d64_pa1; tg at N_c, E75).
+function _p3t_missing_items(idx, p2, id, F = "Float64")
+    d1 = p2.directions[1]
     need = (("tg", p2.N_c, d1), ("fq1", p2.N_c, nothing), ("pa1", p2.N_c + 1, nothing), ("bk1", p2.N_c, nothing))
     return String[s for (s, h, d) in need if !haskey(idx, p2_key(id, s, F, h, 1, d))]
 end
 
 # The cells (E74) of the chunks of the arms ind and ind_pa1 that failed twice (E77).
 _p3t_failed_ind_cells(chunks) = Set(String(c.cell) for c in chunks if ("ind" in c.arms || "ind_pa1" in c.arms) && c.status == "failed" && c.kindex > 0)
+
+# Whether a chunk of the arm `arm` and the cell `cell` whose precision label starts with `prec` failed twice (E77).
+_p3t_failed_in(chunks, arm, cell, prec) = any(ch -> arm in ch.arms && ch.status == "failed" && ch.cell == cell && startswith(String(ch.attrs["precision"]), prec), chunks)
 
 # The orbits with the drift flag on any item read (E64 b); the counts of the round log use the flag of L1 and L5 only (E62 b), the difference is reported (I46).
 _p3t_drifted(idx) = Set(k[1] for (k, it) in idx if "drift" in it.flags)
@@ -90,7 +93,7 @@ function p3t_orbits(c, st, idx, theta)
         push!(rows, (id = r.id, rho = r.rho, round = r.round, kindex = r.kindex, lref = r.lref, lns = r.lns, Ts = Ts, W2 = C && (Ts || r.lref <= lw), S2 = C && r.lref >= ls,
                      V = Vr, out = p3_rule_a(Vr, kP, theta), in_D = panel[r.id]["in_D"] === true))
     end
-    return (rows = rows, drops = drops, gate = _p3t_gate(c, idx, ctx, theta, kP), vd = _p3t_double(rows, ctx, theta))
+    return (rows = rows, drops = drops, gate = _p3t_gate(c, idx, ctx, theta, kP), vd = _p3t_double(rows, ctx, theta, c, panel))
 end
 
 # The gate set (E64 c): the K = 0 orbits of round 1; their number must equal `gate_size`. An orbit without verdict items has the output `nothing` (HA is then not decidable, P100).
@@ -103,11 +106,23 @@ function _p3t_gate(c, idx, ctx, theta, kP)
     return (ids = ids, out = out, missing_ids = [id for id in ids if !(id in have)])
 end
 
+# E77, E61 k: true if a D orbit lacks one of the four Double64 items (E64 c) and every one it lacks is in a chunk of d64 (tg, fq1, bk1) or d64_pa1 (pa1) that failed twice: the orbit leaves D and is counted by |D|
+# (E70, P104 b), no other key. A missing item of a chunk not listed as failed is a refusal.
+function _p3t_double_gap(ctx, c, id, cell)
+    miss = _p3t_missing_items(ctx.idx, ctx.p, id, "Double64")
+    for s in miss
+        arm = s == "pa1" ? "d64_pa1" : "d64"
+        _p3t_failed_in(c.chunks, arm, cell, "") || _fail("item $s (Double64) is missing from the store for orbit $id, whose chunk of the arm $arm is not listed as failed (E61 k, E77)")
+    end
+    return !isempty(miss)
+end
+
 # The Double64 verdicts of the voters of V* for the orbits of E_test with the flag in_D that carry the four Double64 items (E64 c): the set D.
-function _p3t_double(rows, ctx, theta)
+function _p3t_double(rows, ctx, theta, c, panel)
     out = Dict{Int, Dict{Symbol, Vector{Symbol}}}()
     for r in rows
         r.in_D || continue
+        _p3t_double_gap(ctx, c, r.id, p3t_cell_of(panel[r.id])) && continue
         vals = [p2_values(ctx, r.id, X; prec = "Double64", _p3t_hor(ctx.p, X)...) for X in theta.V]
         any(isnothing, vals) && continue
         out[r.id] = Dict{Symbol, Vector{Symbol}}(X => Symbol[p2_verdict(X, :R1, v, ctx.p) for v in vs] for (X, vs) in zip(theta.V, vals))
@@ -115,10 +130,18 @@ function _p3t_double(rows, ctx, theta)
     return out
 end
 
-"The orbits of D_B (E64 c): the orbits that carry an item of the arm chk (the L5 item in Double64, in a chunk of that arm); their flag in_D must be set."
+"""
+The orbits of D_B (E64 c): the orbits that carry the L5 item in Double64 in a chunk of the arm chk; their flag in_D must be set. An orbit with only one of the two chk items is known to be in D_B by that item: the
+other is a refusal unless its chunk failed twice (E61 k, E77); an orbit whose Double64 chunk failed has no Double64 item and leaves D_B (P118). An orbit with neither item is not known to D_B.
+"""
 function p3t_dB(c, idx)
-    p2 = c.p2
-    ids = sort!(unique(Int[k[1] for (k, it) in idx if k[2] == "L5" && k[3] == "Double64" && "chk" in it.arms]))
+    have = Set((k[1], replace(k[3], r"\(\d+\)" => "")) for (k, it) in idx if k[2] == "L5" && "chk" in it.arms)
+    cell = Dict(Int(o["id"]) => p3t_cell_of(o) for o in c.panel_orbits)
+    for (id, _) in have, prec in ("Double64", "BigFloat")
+        (id, prec) in have || _p3t_failed_in(c.chunks, "chk", get(cell, id, ""), prec) ||
+            _fail("item L5 in $prec of the arm chk is missing from the store for orbit $id, whose chunk is not listed as failed (E61 k, E77)")
+    end
+    ids = sort!(Int[id for (id, prec) in have if prec == "Double64"])
     flag = Dict(Int(o["id"]) => o["in_D"] === true for o in c.panel_orbits)
     for id in ids
         get(flag, id, false) || _fail("orbit $id carries a check item (arm chk) but the flag in_D of the panel file is not set (E64 c)")

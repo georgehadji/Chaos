@@ -1,0 +1,18 @@
+# D95k (V): verify/analysis-d95k.jl on campaign-fixed (4000 runs, 4 threads), then python -I verify/analysis-d95k.py
+{"auc_i_used":0.9,"auc_p":0.55,"delta_c":"0.1","nf":2,"nn":4,"runs":4000,"successes":1452,"z_one_sided":"1.645"}
+{"auc_i_used":0.9,"auc_p":0.55,"delta_c":"0.1","nf":3,"nn":6,"runs":4000,"successes":1657,"z_one_sided":"1.645"}
+{"auc_i_used":0.9,"auc_p":0.55,"delta_c":"0.1","nf":4,"nn":8,"runs":4000,"successes":2149,"z_one_sided":"1.645"}
+{"auc_i_used":0.9,"auc_p":0.55,"delta_c":"0.1","nf":5,"nn":10,"runs":4000,"successes":2438,"z_one_sided":"1.645"}
+{"auc_i_used":0.9,"auc_p":0.55,"delta_c":"0.1","nf":6,"nn":12,"runs":4000,"successes":2648,"z_one_sided":"1.645"}
+{"auc_i_used":0.9,"auc_p":0.55,"delta_c":"0.1","nf":8,"nn":16,"runs":4000,"successes":3091,"z_one_sided":"1.645"}
+{"auc_i_used":0.9,"auc_p":0.55,"delta_c":"0.1","nf":10,"nn":30,"runs":4000,"successes":3510,"z_one_sided":"1.645"}
+{"auc_i_used":0.9,"auc_p":0.55,"delta_c":"0.1","nf":20,"nn":60,"runs":4000,"successes":3968,"z_one_sided":"1.645"}
+D95k | nf=2 nn=4 | module 1452, oracle 1475 of 4000 | diff -0.0058, 3 SE 0.0323 | PASS
+D95k | nf=3 nn=6 | module 1657, oracle 1761 of 4000 | diff -0.0260, 3 SE 0.0332 | PASS
+D95k | nf=4 nn=8 | module 2149, oracle 2115 of 4000 | diff 0.0085, 3 SE 0.0335 | PASS
+D95k | nf=5 nn=10 | module 2438, oracle 2433 of 4000 | diff 0.0013, 3 SE 0.0327 | PASS
+D95k | nf=6 nn=12 | module 2648, oracle 2736 of 4000 | diff -0.0220, 3 SE 0.0315 | PASS
+D95k | nf=8 nn=16 | module 3091, oracle 3111 of 4000 | diff -0.0050, 3 SE 0.0280 | PASS
+D95k | nf=10 nn=30 | module 3510, oracle 3488 of 4000 | diff 0.0055, 3 SE 0.0222 | PASS
+D95k | nf=20 nn=60 | module 3968, oracle 3967 of 4000 | diff 0.0002, 3 SE 0.0060 | PASS
+D95k | summary: 8 sizes, 0 outside 3 SE | PASS

@@ -433,3 +433,8 @@ Recorded test rework (owner decision "fix all", C1): `test/analysis/an_p3t_helpe
 ### Owner decision at the D95 stage 04 checkpoint (2026-11-03)
 
 Accepted by the owner, with the review fixes and the test rework as above; V2 goes to study stage 04 on the real store, V3 goes into the spec at stage 05, V4 stays a stated limit.
+
+### Addendum after acceptance (2026-11-03, owner request)
+
+- Whole package suite at 77770b8: 1404598 pass, 0 fail, 0 error, 1 broken (existing, weighted-birkhoff), 29 min 15 s; quality 12, layering 2, analysis 2476, experiments 9244.
+- D95k (V): `verify/analysis-d95k.jl` (module, `p3t_power_hc` on the record of `campaign-fixed`, 4000 runs) and `verify/analysis-d95k.py` (the independent simulator `sim_hc` of `verify/analysis-p3-oracle.py`, own generator and streams). At 8 sizes (n_f 2 to 20) every difference is within 3 combined SE (largest -0.026 against 0.033 at n_f 3); raw output `analysis-d95k-log.txt`. Both sides read d_I and d_P from the same record; only the simulation and the decision rule are independent. Result: pass. The audit exception for D95k in the table above is closed.

@@ -75,7 +75,7 @@ const D96_R19 = ["kind", "spec", "spec_sha256", "chain", "budget", "bytes_per_or
         t = ind[id]
         @test all(k -> haskey(t, k), D96_R19)
         @test t["kind"] == specs[id]["kind"] && t["spec"] == d86_spec_text(specs[id]) && t["spec_sha256"] == d86_spec_hash(specs[id])
-        @test t["budget"] == specs[id]["budget"]
+        @test t["budget"] == Dict("Float64" => specs[id]["budget"]["Float64"])   # the block keeps only the precisions of the arms (D86 item 1)
         @test Set(keys(t["bytes_per_orbit"])) == Set(["M", "R", "S", "B", "total"])
     end
     @test haskey(ind["fq"], "windows") && ind["fq"]["windows"] == [16, 32] && ind["fq"]["run_length"] == 64

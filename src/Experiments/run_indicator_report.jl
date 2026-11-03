@@ -46,7 +46,9 @@ function _indicator_manifest(plan::RunPlan)
     out = Dict{String, Any}()
     for spec in plan.block.raw["indicator"]
         id = spec["id"]
-        it = first(i for i in plan.items if i.method == id)
+        k = findfirst(i -> i.method == id, plan.items)
+        k === nothing && continue   # R28: a spec held only by closure arms has no item before closure and is not listed
+        it = plan.items[k]
         b = orbit_bytes(plan, it)
         m = Dict{String, Any}("kind" => spec["kind"], "spec" => spec_text(spec), "spec_sha256" => spec_hash(spec), "chain" => chain_record(spec), "budget" => spec["budget"],
                               "bytes_per_orbit" => Dict{String, Any}("M" => b.M, "R" => b.R, "S" => b.S, "B" => b.B, "total" => b.total))

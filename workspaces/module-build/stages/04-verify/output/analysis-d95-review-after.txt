@@ -1,0 +1,35 @@
+    C1 detail: shape: "" | near: test-side parameter file test-parameters.toml: key power_hb_planned is 0.31, but the calib | null: test-side parameter file test-parameters.toml: key power_hc_planned cannot be checked: the | hc 1e-13: test-side parameter file test-parameters.toml: key power_hc_planned is 0.82, but the calib
+REV C1 | record in the shape of p3_record (path j = 0, 1, 2 with a null power at j = 0; power_expected a row): the planned powers are read at the target point and in the row; 1e-13 apart and null refuse | PASS
+    H2 detail: item stored twice: orbit 1, spec L1 (arm ref, Float64, horizon 80000, direction pi/4), chunk file chunk-00999.h5
+REV H2 | a second ref item with the same content (another cell) refuses naming the orbit and the item (before: the second silently overwrote the first) | PASS
+    H3 detail: orbit 3; refusal ""; reason now: drift
+REV H3 | the drift flag on an ind-arm item (fq1) drops the orbit with reason drift (analyze, drops of the results file) | PASS
+    H4 detail: orbit 3: lambda_ns is NaN, not a finite number
+REV H4 | a non-finite lambda_ns of an orbit that needs it refuses naming the orbit (orbit 3) | PASS
+    M5 detail: 11 rows checked, 10 with a lambda whose two readings differ
+REV M5 | lambda_ref and lambda_ns are the exact binary64 values (Rational{BigInt} of the Float64), not the shortest decimal text | PASS
+    M6 detail: append ok=true; failure injected: "the round log C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-"; log unchanged and folder clean=true
+REV M6 | append: the new log is old + entry, no temporary file stays; a failure at the last step leaves the log bytes unchanged and no temporary file | PASS
+    M7 detail: the round log C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents- | the round log C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-
+REV M7 | a round log that is not valid UTF-8 refuses naming the log (count_round on an open log and analyze on the closed log) | PASS
+    M8 detail: d64-arm orbit 3, chk-arm orbit 4; D_B = [4]
+REV M8 | D_B is the set of orbits with an L5 Double64 item of the arm chk: an L5 Double64 item of another arm is not counted | PASS
+    M9 detail: pair (0.3000000000000003, 0.10000000000000031): binary64 says false, exact says true
+REV M9 | ladder test in exact rationals: a pair that binary64 subtraction rounds to the bound is decided by the exact difference | PASS
+    M10 detail: option value first: true (want true); p3 as an option value: false (want false); plain: true (want true)
+REV M10 | _is_p3t reads the first positional argument, not the value of an option | PASS
+    L11 detail: the keywords figures and seed are not options of the test side of study p3-abstention | the keywords figures and seed are not options of the test side of study p3-abstention
+REV L11 | analyze for the p3 slug refuses the keywords figures and seed | PASS
+    L12 detail: capped up=[:SALI], round-down available=Symbol[], none=[:SALI]; LE round-down budget (100, 640, 100)
+REV L12 | round-down sensitivity: capped list of the round-down budgets, LE round-down budget limited to N_c | PASS
+    L13 detail: chunk file chunk-00001.h5: the root attribute tau is missing | panel file C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vib | panel file C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vib
+REV L13 | a chunk file without the root attribute tau refuses naming it; a panel orbit without x0_dec or with a round outside 1 to r_max refuses naming the orbit and the key | PASS
+    L14 detail: a ref chunk of round 4 exists in the store after the last entry (round 3) of the closed round log
+REV L14 | closed log: analyze refuses a ref chunk of a round above the last entry (count_round on a closed log stays tolerant, E62 c (i)) | PASS
+    L16 detail: chunk file chunk-00998.h5: the cell "k9" of a ref chunk is not of the form k<K index>:r<round>
+REV L16 | a ref chunk whose cell is not k<K index>:r<round> refuses naming the file | PASS
+    L17 detail: 0.5
+REV L17 | T6 prints a McNemar p-value of a large exact rational with 12 significant digits (no fraction) | PASS
+    V1 detail: round log entry 3: line decision is "closf", not continue or close
+REV V1 | count_round with an altered entry 3 (decision=closf) and closure chunks in the store names entry 3 (before: the closure-chunk guard answered first) | PASS
+REV summary | 17 probes, 17 PASS, 0 FAIL | PASS

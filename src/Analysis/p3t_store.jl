@@ -13,7 +13,7 @@ function p3t_scan(store, slug, panel_hash, prereg_hash, on_read)
             _fail("chunk file $f: the root attributes cannot be read ($(first(sprint(showerror, e), 120)))")
         end
         on_read === nothing || on_read(:attrs, path)
-        for k in ("study", "panel_sha256", "prereg_sha256", "chunk_key", "chunk_hash", "arms", "status", "complete")
+        for k in ("study", "panel_sha256", "prereg_sha256", "chunk_key", "chunk_hash", "arms", "status", "complete", "method", "precision", "horizon", "tau")
             haskey(a, k) || _fail("chunk file $f: the root attribute $k is missing")
         end
         a["study"] == slug || _fail("chunk file $f belongs to study \"$(a["study"])\", not to study $slug")
@@ -32,21 +32,23 @@ function _p3t_chunk(f, path, a)
     cell = something(match(r"cell=(\S+)", String(a["chunk_key"])), (captures = [""],)).captures[1]
     m = match(r"^k(\d+):r(\d+)$", cell)
     arms = String.(a["arms"])
+    "ref" in arms && m === nothing && _fail("chunk file $f: the cell \"$cell\" of a ref chunk is not of the form k<K index>:r<round>")
     return (file = f, path = path, ordinal = parse(Int, f[7:11]), key = String(a["chunk_key"]), hash = String(a["chunk_hash"]), arms = arms, ref = "ref" in arms, cell = String(cell),
             kindex = m === nothing ? 0 : parse(Int, m.captures[1]), round = m === nothing ? 0 : parse(Int, m.captures[2]), method = String(a["method"]), status = String(a["status"]),
             complete = a["complete"] === true, attrs = a)
 end
 
 "The panel file of the test run: the orbit tables, each with the round (D94 R23) and the flag `in_D`; an `ArgumentError` naming the orbit and the key otherwise (E61 e)."
-function p3t_read_panel(panel)
+function p3t_read_panel(panel, r_max)
     isfile(panel) || _fail("panel file $panel does not exist")
     orbits = TOML.parsefile(panel)["orbit"]
     for o in orbits
         haskey(o, "round") && _isint(o["round"]) || _fail("panel file $panel: orbit $(get(o, "id", "?")) has no round (D94 R23)")
         haskey(o, "in_D") && o["in_D"] isa Bool || _fail("panel file $panel: orbit $(get(o, "id", "?")) has no flag in_D (D94 R23)")
-        for k in ("id", "k_index", "K")
+        for k in ("id", "k_index", "K", "x0_dec", "p0_dec")
             haskey(o, k) || _fail("panel file $panel: orbit $(get(o, "id", "?")) has no key $k")
         end
+        1 <= o["round"] <= r_max || _fail("panel file $panel: orbit $(o["id"]) has the round $(o["round"]), outside 1 to r_max = $(Int(r_max))")
     end
     return orbits
 end
@@ -66,7 +68,7 @@ function p3t_round_problems(chunks, panel_orbits, r)
 end
 
 "The digest of E62 a: the SHA-256 of the chunk hashes of the ref chunks of the rounds up to `r`, ascending as byte strings, each followed by LF."
-p3t_ref_digest(chunks, r) = bytes2hex(sha256(codeunits(join(sort!([c.hash for c in chunks if c.ref && 1 <= c.round <= r]) .* "\n"))))
+p3t_ref_digest(chunks, r) = bytes2hex(sha256(codeunits(join(sort!([c.hash for c in chunks if c.ref && c.complete && 1 <= c.round <= r]) .* "\n"))))
 
 # The orbit ids of a ref cell (round, K index) by the panel.
 p3t_cell_ids(panel_orbits, r, k) = Int[Int(o["id"]) for o in panel_orbits if Int(o["round"]) == r && Int(o["k_index"]) == k]
@@ -75,7 +77,7 @@ p3t_cell_ids(panel_orbits, r, k) = Int[Int(o["id"]) for o in panel_orbits if Int
 
 _p3t_xl(it) = it.mode == "wrapped" ? _p3_lifted_p2 : _p3_lifted_p1
 
-# The row of one orbit from its ref items (E62 b, E64 a): excluded if an item or a recorded step is missing, the drift flag, the label rho and lambda_ref, lambda_ns (exact rationals).
+# The row of one orbit from its ref items (E62 b, E64 a): excluded if an item or a recorded step is missing, the drift flag of L1 or L5, the label rho and lambda_ref, lambda_ns (exact rationals, `nothing` outside E_test).
 function _p3t_ref_row(o, it1, it5, q, p2)
     id, N = Int(o["id"]), q.N_1
     base = (id = id, round = Int(o["round"]), kindex = Int(o["k_index"]), excluded = true, drift = false, rho = :missing, lref = nothing, lns = nothing)
@@ -85,7 +87,14 @@ function _p3t_ref_row(o, it1, it5, q, p2)
     (c0.data === nothing || rn === nothing) && return base
     drift = "drift" in it1.flags || "drift" in it5.flags
     rho = drift ? :missing : p3_relabel(c0.data, p2).rho
-    return merge(base, (excluded = false, drift = drift, rho = rho, lref = p3_rat(it1.lam[_p3_step(it1, N)]), lns = p3_rat(it1.lam[rn])))
+    need = rho === :C || rho === :R      # only the orbits that stay in E_test need the exponents (E64 b, c)
+    return merge(base, (excluded = false, drift = drift, rho = rho, lref = need ? _p3t_lam(it1.lam[_p3_step(it1, N)], id, "lambda_ref") : nothing, lns = need ? _p3t_lam(it1.lam[rn], id, "lambda_ns") : nothing))
+end
+
+# A stored exponent as an exact rational: the binary64 value itself (the owner's reading of "exact", M5); a non-finite value refuses naming the orbit.
+function _p3t_lam(x, id, what)
+    isfinite(x) || _fail("orbit $id: $what is $x, not a finite number")
+    return Rational{BigInt}(x)
 end
 
 "The seven counts of E62 b after round `n` (a Dict by the names of the count lines) from the rows of the ref state and the targets."

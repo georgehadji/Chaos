@@ -47,7 +47,11 @@ end
 
 # Whether `analyze` is called for the preregistration of study p3-abstention (its first positional argument names a file with that slug).
 function _is_p3t(a)
-    pos = [x for x in a[2:end] if !startswith(x, "--")]
+    pos, i = String[], 2
+    while i <= length(a)
+        known = a[i] in CLI_P3T_OPTIONS || a[i] in CLI_VALUE_OPTIONS      # an option of either form takes the next argument as its value
+        startswith(a[i], "--") ? (i += known ? 2 : 1) : (push!(pos, String(a[i])); i += 1)
+    end
     isempty(pos) && return false
     return try
         study_slug(pos[1]) == P3_SLUG

@@ -1,0 +1,1358 @@
+=== A: compare against the oracle result of the earlier toy campaign (oracle/oracle-result.json): the module output of campaign-fixed, rebuilt files, so the file hashes of the fingerprints differ ===
+DIFFER fingerprint preregistration  oracle=c1b4664d464a1fec2498f400469d9cbf99c80d43094e05f2b276f2c07036855f module=aa33dd290c114dfb233a85e359128d573a06689412903ba6441582d634ee4da8
+EQUAL fingerprint panel
+DIFFER fingerprint calibration_record  oracle=4fb05d2d85c7f84d46188270f818a6f16f92f97f41624dcf4eaf5eb6da29559e module=eb3517c75565562eac35f0f8e0a112b4e63c0d2c18beac4d1efbf2c420bcc369
+EQUAL fingerprint p3_parameters
+DIFFER fingerprint test_parameters  oracle=e3be69fb6d2927d44eb2b58674b4798b0844a86d0905368f7e6deff50244ac8c module=d71319e96006e51435a6f9cc45bc3613bd6e60a28240a177bf9ea7daac068a98
+DIFFER fingerprint manifest  oracle=0942cd3ed741809359eca2ae02bd8f5fc5fffbb02fdebad4940a6088223a2e0e module=4c1e813e89f4b8a25f7dd11c958bf8d6c5aecb736ceb59380928ee0d922dd8e4
+DIFFER fingerprint round_log  oracle=0e1d0b2ef434888b3ed778ecbf1a89e2a74740520df5fba0d83f35a23b77e776 module=0329c35162b918826fc8d8c237760bd0ee01e68e2367509c22d0cf839cb2d2ee
+DIFFER fingerprint chunk file chunk-00001.h5  oracle=c4f092e3f82875d3484ba340c1634ef45ac5d1dca6243beb0017ed8f575ba3db module=1fcf58af72e8584511fabb6c3298d310add60d90046a10f9c64c5386ed6c70b3
+DIFFER fingerprint chunk file chunk-00002.h5  oracle=1e8ac0199484f5e9e7d3411118a3d345760bdebea1256a2311541549c503775f module=ab4a2da2db83209b022295b37ade3af5626515bfa269c9d2bc20d3d6ec709410
+DIFFER fingerprint chunk file chunk-00003.h5  oracle=f1e289bebdca28797690bf0c84b1849761a6459492c2cbc156c8f5663c053718 module=e0b66063ffa68d37c633777b4cde596f5e0e821682a207c6198aa789836d3186
+DIFFER fingerprint chunk file chunk-00004.h5  oracle=80b3685b27a6191c4228b196a643995229c2191f381221a4b8260c495a016ae0 module=464f6894fb3f43a774bf1f84544a9081b4c4dd207badcb4d5eb60ff06382e97a
+DIFFER fingerprint chunk file chunk-00005.h5  oracle=cfdcee14d75169cb8a19e4612f7046ab4297efd56af04cfac0a5685aa4777d34 module=caf2e5226fef7c02f5a07f85579fc2dca3838f4f3c41e6a0df9a042e3ece2a67
+DIFFER fingerprint chunk file chunk-00006.h5  oracle=0c31c5dd2a3a4471ba43e103cc5402a6792dec845b08e4f64ebadb223c642eac module=c1a175812152b424ef054901bc9decaaa95ac3b0633d0b35cb7e9d0674abf30b
+DIFFER fingerprint chunk file chunk-00007.h5  oracle=676802e5bb6d5b9fff7eb5917a597f799bc75c1558131d417f08ed414e1a9949 module=ac335a142051fe0995378ecce195e2b06e852d251095677915ba8f324e85dba9
+DIFFER fingerprint chunk file chunk-00008.h5  oracle=975144298a91747dd0ff5296e6b82df18479f399e007645b49d694c3a449aad0 module=f383063019ca8a2d4e35b0b16502dcd08829e620c2d29aade94040318435e1a4
+DIFFER fingerprint chunk file chunk-00009.h5  oracle=0310b041935846500678e41e605a67a8c1ff9fa4d99ec13747803bbf656012aa module=38e3d2a1ef6b6838020321010ce1ad75664e47df7bf3797ddb2f0bb892ea72d3
+DIFFER fingerprint chunk file chunk-00010.h5  oracle=f5683d3fdea91f51d65d3da79d4925a9dbe7237cc475b3fda837c7cfb795562e module=36c3625b5c6bb3dce5a85c2899cb334e27dd3c62ccf00b17aed5061413484f4f
+DIFFER fingerprint chunk file chunk-00011.h5  oracle=efdcc3329aafb1c73ca3c3275200d1a438fff049468d9849c7bf78d1856d504a module=9bba58b9e03db575e1ff4ebf96026626cb43eb4fef1623fe3f63b2b69fca254e
+DIFFER fingerprint chunk file chunk-00012.h5  oracle=9b17de338647a905fd93faab4d7a8e0636c1109c7bd1735d723356a50187b1e3 module=fc7b290fd4188c36f23067d3cbff7c657caf004ccb89b14430c969c2b9b8c177
+DIFFER fingerprint chunk file chunk-00013.h5  oracle=37171d529a91a58756d69aeb42cdb8304941aa26df0dae0be376e10605b8a108 module=5d7cfb98da38bd3359da542d9200b5e9b977f6688aa48cff136c34320ca32cf1
+DIFFER fingerprint chunk file chunk-00014.h5  oracle=9005cc48d9c7ba1b8be3d00d45891c634c6f8135615d677845f2ba3952a32251 module=a21a2eb6cd652b7286aac9cc99c2f7b14a67937799284e4ce938e4b7fbcff756
+DIFFER fingerprint chunk file chunk-00015.h5  oracle=e2a250fd05b6581be28c2852f3f706832a694939341a6368c0ff3671a137edfb module=616068380b62a8a435870286fa81fbd95e32c2e0fafce35f089ea34045297181
+DIFFER fingerprint chunk file chunk-00016.h5  oracle=42a95d8731013d4d26adc91f51ac3132d728754b5b51e82c02974428ee44fc88 module=c224b6c69f6e0150e442720f848888ac875a26d5b2b776b2a1173ee31cdbca43
+DIFFER fingerprint chunk file chunk-00017.h5  oracle=8b2bdeba3902dd0f63da33472dc390bd4364ca1950235a271c6e9f797a588272 module=28df185ca9adcd1efe2a938e9cdfa01ebb317a28127b561c5fb64e9d28ed7c78
+DIFFER fingerprint chunk file chunk-00018.h5  oracle=d9f222003945c0299de744e40b47982206f936a982fa358e99fb64f058ddf7c7 module=ac1f91cfca80777d536210dae50fb34b8c224f0d21927bc20e3069942956f77d
+DIFFER fingerprint chunk file chunk-00019.h5  oracle=4480f52751c3a414754a7eeb05f3631593b94c41c9f79477e15f8dae8b2d0794 module=8e1a4d6a412416d6ecc513c4d99316b903865358851bbe68492cf3c4890209e5
+DIFFER fingerprint chunk file chunk-00020.h5  oracle=f19fc739df903e271a99f539f83b3c0ee6f5d7190a8079717a6773bdce1a1464 module=57e922d61ec7632f3fc020480e5b29367f068d5a09f45da85cfb5dde1df7fe63
+DIFFER fingerprint chunk file chunk-00021.h5  oracle=803f67225354282ae8fbed87497b9761a2e711008884903ab68531df86e7ed26 module=5aebfac0b26d5a138dad75a60a4923ab08353069002d6db973bc2f85cc202e0f
+DIFFER fingerprint chunk file chunk-00022.h5  oracle=20ec2331b56706e75b669600ebc0d13866df8d106c0c7100089e1f25f3c85588 module=e9b3900e82509b7d564fe785e1715e7ae625582327161043879440c88a56c00d
+DIFFER fingerprint chunk file chunk-00023.h5  oracle=84a16da6e5e7b4374cdf7273aaa1a26c3c86a816454263c187d5975fe9c963a4 module=b568b79813ea53b10bcffe1763ac9c1d5c717972ad09fdd825ce3419b3a5ba7c
+DIFFER fingerprint chunk file chunk-00024.h5  oracle=dd68043beae183316200cf268ea9da8c4eddc4f9bd0de902d0f4bc06ffd6c564 module=889b7b4bcd01c19e2b3124360413e1e2638eea8807d62ef0fe615154bb825feb
+DIFFER fingerprint chunk file chunk-00025.h5  oracle=4022050de2e72c419a1d1714122d43c2e86a94555c9d9861f76159829061739b module=bf2dce6e3d46cf5370c9918c8877807ac63e8b91c2ccee587326f3607d190bab
+DIFFER fingerprint chunk file chunk-00026.h5  oracle=ff70cadbebace00f51a9d58944423b8fde39359a498a03601f6d403a2d480552 module=bc88b4081e6e0935bd78d2be1c632b208f4d78d835de3a836fae9de28a7464ac
+DIFFER fingerprint chunk file chunk-00027.h5  oracle=5b66ff95dd5e8751e5cbefb5dc4c8ca4b0bdcee006f5d52de705c30cd40132ad module=0b73273afc12c4f702869336658fa5dfac701c29760bb9691c67439637c9c4fe
+DIFFER fingerprint chunk file chunk-00028.h5  oracle=7005c5201abee02d1477d4502656f451e970489b924ec268bfb8f0da927ccd1a module=305b967b99b8758b07ce27b9c48d85232c7a721fe378935f0508b83a16300b5f
+DIFFER fingerprint chunk file chunk-00029.h5  oracle=3cb2eae139d617e8f920e484a003c34f7110489b963399a6d5e9261642c849f2 module=46fc791d8e604fd68a43f460f848ec53a38f4b31e1e739ff520d0ce8b31261ae
+DIFFER fingerprint chunk file chunk-00030.h5  oracle=7a64f220c9c7a6ee8eaec6116f32a83cc160866c202061881a0367aa9763ab32 module=6e61816042cd0402149203525dfa86da13ee0c9567752c99a7539fbf7cf159b3
+DIFFER fingerprint chunk file chunk-00031.h5  oracle=f9aecd031b6d764d01b8e4e737fcf42161f7fd7d55c67aa2cef1ff697524169e module=7e45532bd30a3176f99b1ddf725df64f1ca603bf5327ef8a6addd9bceed7d7b9
+DIFFER fingerprint chunk file chunk-00032.h5  oracle=39c96bf54a14a1bf9b06205783bff860a419cc5decf2f7db0cdfb605d678983e module=b90bc3659e061e9d45ee11a040f6328c7431c7c33f01d181552e3bd021f518f4
+DIFFER fingerprint chunk file chunk-00033.h5  oracle=7cc1d9718df0d198cff6fb34bbda9a063a52c12923fd1f5e9b7b73ee80735a71 module=47c99cc036f6cd26c85664f38b97180fc5f9bd8fe678feb59a369e6e8a149b76
+DIFFER fingerprint chunk file chunk-00034.h5  oracle=77d1269b9cef389abdee9b7e5acdaa04b97bb7a3a3ee7620cfb22dbfa02c1894 module=90c59b6e1524c18faa27e39db803e9ca8060f5ae14e0ff9a4dee3a6136ea271a
+DIFFER fingerprint chunk file chunk-00035.h5  oracle=b70f495cf65fe2b180e02304a9987696966d1a913196734706e400f3cbe72e1d module=70d7dca65d05380ff71a5eef3bfd5543baea7f4493cf7263e6eb5602c94bd7f6
+DIFFER fingerprint chunk file chunk-00036.h5  oracle=5853a125efab6c9792e8e0692e5a651e8b67a6ec0c83630a0bab87c4aa4b8828 module=452e0bc661a91fb2b8eb453ef6254ddf67f08e23329cfacdb453e2615e766b83
+DIFFER fingerprint chunk file chunk-00037.h5  oracle=f65c6b39ac1ab5df901917f5e52b7b82560a7e94eebfe8461c65636286cd3775 module=d85c1f2c6d2ac0cbec38d747bf8932218857fb58008a16fa296acaf8fcd0a23c
+DIFFER fingerprint chunk file chunk-00038.h5  oracle=f32f295f7c7016fd0d12519109368a40033017df703ba41eb87e92852de2477c module=4e3d53584c5dd62870ed3e65a0485b61ffe20ecd2776ed0cc18087f547afbe5c
+DIFFER fingerprint chunk file chunk-00039.h5  oracle=3140f9f03c7c7095f632e8bfe7f414bd390c01a50584a5c5eb890d6e7e5d092f module=77a6c6e1d8ce61d80c9f5ca269e3ebe887206cde8aa79e9159e1de76d5e1e054
+DIFFER fingerprint chunk file chunk-00040.h5  oracle=a263cfd1084af64514232cc2e584fbae4ddbcc6e798be800ac7c17406375665d module=4aeff7b2e732e7fc89e70b373bab8846543a351441814d87bd404d163edce167
+DIFFER fingerprint chunk file chunk-00041.h5  oracle=84be34463b85f93f9b5bc9725251788fbb0bd23c8efd491b4dbe642401bd99a7 module=78a3c3fb141a5db5ea63a15c3e0abe0db6cc890dcbf8e3c63dc9b487eacbeda3
+DIFFER fingerprint chunk file chunk-00042.h5  oracle=3a53197eaa3a46e91b38f349671b1994d77dbb9f8a3268b884cbd64eb9c4f8c6 module=45e9911e9b26851e17e5d03047ff91ce5ec79fe2f6a5ba2c9732c4ea58590c4b
+DIFFER fingerprint chunk file chunk-00043.h5  oracle=59d516b3811f164c81bd31e9e5b8023448f7a95e52749936e62c4b833bf624cf module=8e82da66270a66cb304da5e1c44e23b5496092978204f9a900e0e0b48309c47f
+DIFFER fingerprint chunk file chunk-00044.h5  oracle=88197ab56d1087633de9845efb8657118991d7841ba180691453211c8cf139a1 module=54d77b9bfcb1efdb3b11ad9f32871e7392c087d314fc43a8c06f5e14839bae4c
+DIFFER fingerprint chunk file chunk-00045.h5  oracle=77f60d1fc401120484c1aac9d050aff398595356e5ca92efd418a122fbfabf5e module=b5d4618e98dda0c3a298d675f79e3cd63145f6c50de404884c0b5aa95b045bfe
+DIFFER fingerprint chunk file chunk-00046.h5  oracle=4f221c30b428df2effd118d9e0411f656f9a66b6f789e59228c8dadeeba40d63 module=18b61eb01bbf0948a90d8c8fc9282220cbd0207868b7df59b8e18452625d7223
+DIFFER fingerprint chunk file chunk-00047.h5  oracle=4b77e17f6d6e0666418ee574e0f6d49a47a4b5b037ba2c0d9bcf10df57c350cb module=b70495bf718c163da24fc69f8e7be97529708d19c41742c1c8d39b7b7343526b
+DIFFER fingerprint chunk file chunk-00048.h5  oracle=bd46869d07650fc2eb15083b7fa24548e3a75f173d754683a4cdca751b3dce11 module=79dfb9deae4d39b802bac8636bafc5da97edfe8e69483aa44b913e4facf20c4c
+DIFFER fingerprint chunk file chunk-00049.h5  oracle=f827194bde450027d0820829129c3d4502a70027f5a20d5db317bf2778c3e069 module=a8293fdf045d6316fd564f4801b29451da9ca68c41d0b85c3cfcb4d0e2efb74b
+DIFFER fingerprint chunk file chunk-00050.h5  oracle=39d65d3e5b14ba550d5658a5f49bb3d8634cd137c179fad6fb91c9733f94068f module=3922db5ff8726d30580e28fd8221af162731391dbd7b4e3bec74603849ab4fda
+EQUAL log entry 1 decision
+EQUAL log entry 1 count.drift
+EQUAL log entry 1 count.excluded
+EQUAL log entry 1 count.orbits
+EQUAL log entry 1 count.t_s
+EQUAL log entry 1 count.target_t_s
+EQUAL log entry 1 count.target_w2
+EQUAL log entry 1 count.w2
+EQUAL log entry 1 text recomputed by the oracle equals the log file (oracle internal check)
+EQUAL log entry 2 decision
+EQUAL log entry 2 count.drift
+EQUAL log entry 2 count.excluded
+EQUAL log entry 2 count.orbits
+EQUAL log entry 2 count.t_s
+EQUAL log entry 2 count.target_t_s
+EQUAL log entry 2 count.target_w2
+EQUAL log entry 2 count.w2
+EQUAL log entry 2 text recomputed by the oracle equals the log file (oracle internal check)
+EQUAL log entry 3 decision
+EQUAL log entry 3 count.drift
+EQUAL log entry 3 count.excluded
+EQUAL log entry 3 count.orbits
+EQUAL log entry 3 count.t_s
+EQUAL log entry 3 count.target_t_s
+EQUAL log entry 3 count.target_w2
+EQUAL log entry 3 count.w2
+EQUAL log entry 3 text recomputed by the oracle equals the log file (oracle internal check)
+EQUAL log entries
+EQUAL set E_test ids
+EQUAL set E_test size
+EQUAL set W2 ids
+EQUAL set W2 size
+EQUAL set T_s ids
+EQUAL set T_s size
+EQUAL set S2 ids
+EQUAL set S2 size
+EQUAL set D ids
+EQUAL set D size
+EQUAL set D_B ids
+EQUAL set D_B size
+EQUAL set gate ids
+EQUAL set gate size
+EQUAL overlap T_s and S2
+EQUAL strata sizes
+EQUAL strata sizes in HA
+EQUAL drops (orbit, reason)
+EQUAL drops round and k_index
+EQUAL log difference (last entry minus final sets)
+EQUAL by K index and round rows
+EQUAL rule outputs of E_test
+EQUAL rule outputs of W2
+EQUAL rule outputs of T_s
+EQUAL rule outputs of S2
+EQUAL rule outputs of D
+EQUAL HA e
+EQUAL HA a(E_test)
+EQUAL HA a(W2)
+EQUAL HA a(T_s)
+EQUAL HA a(S2)
+EQUAL HA a(W2) - a(S2)
+EQUAL HA a(T_s) - a(S2)
+EQUAL HA g
+EQUAL HA bound e value
+EQUAL HA bound e dropped replicates
+EQUAL HA bound a_E value
+EQUAL HA bound a_E dropped replicates
+EQUAL HA bound d_W value
+EQUAL HA bound d_W dropped replicates
+EQUAL HA bound d_T value
+EQUAL HA bound d_T dropped replicates
+EQUAL HA decision
+EQUAL HA failing items
+EQUAL HA gate missing
+EQUAL HB number of comparisons
+EQUAL HB T_s:SALI set and indicator
+EQUAL HB T_s:SALI b
+EQUAL HB T_s:SALI cost
+EQUAL HB T_s:SALI capped
+EQUAL HB T_s:SALI cost_unmatched
+EQUAL HB T_s:SALI fr_x
+EQUAL HB T_s:SALI fr_rule
+EQUAL HB T_s:SALI n11
+EQUAL HB T_s:SALI n10
+EQUAL HB T_s:SALI n01
+EQUAL HB T_s:SALI n00
+EQUAL HB T_s:SALI p
+EQUAL HB T_s:SALI margin
+EQUAL HB T_s:SALI pass
+EQUAL HB T_s:FLI set and indicator
+EQUAL HB T_s:FLI b
+EQUAL HB T_s:FLI cost
+EQUAL HB T_s:FLI capped
+EQUAL HB T_s:FLI cost_unmatched
+EQUAL HB T_s:FLI fr_x
+EQUAL HB T_s:FLI fr_rule
+EQUAL HB T_s:FLI n11
+EQUAL HB T_s:FLI n10
+EQUAL HB T_s:FLI n01
+EQUAL HB T_s:FLI n00
+EQUAL HB T_s:FLI p
+EQUAL HB T_s:FLI margin
+EQUAL HB T_s:FLI pass
+EQUAL HB T_s:MEGNO set and indicator
+EQUAL HB T_s:MEGNO b
+EQUAL HB T_s:MEGNO cost
+EQUAL HB T_s:MEGNO capped
+EQUAL HB T_s:MEGNO cost_unmatched
+EQUAL HB T_s:MEGNO fr_x
+EQUAL HB T_s:MEGNO fr_rule
+EQUAL HB T_s:MEGNO n11
+EQUAL HB T_s:MEGNO n10
+EQUAL HB T_s:MEGNO n01
+EQUAL HB T_s:MEGNO n00
+EQUAL HB T_s:MEGNO p
+EQUAL HB T_s:MEGNO margin
+EQUAL HB T_s:MEGNO pass
+EQUAL HB T_s:E1 set and indicator
+EQUAL HB T_s:E1 b
+EQUAL HB T_s:E1 cost
+EQUAL HB T_s:E1 capped
+EQUAL HB T_s:E1 cost_unmatched
+EQUAL HB T_s:E1 fr_x
+EQUAL HB T_s:E1 fr_rule
+EQUAL HB T_s:E1 n11
+EQUAL HB T_s:E1 n10
+EQUAL HB T_s:E1 n01
+EQUAL HB T_s:E1 n00
+EQUAL HB T_s:E1 p
+EQUAL HB T_s:E1 margin
+EQUAL HB T_s:E1 pass
+EQUAL HB T_s:E2 set and indicator
+EQUAL HB T_s:E2 b
+EQUAL HB T_s:E2 cost
+EQUAL HB T_s:E2 capped
+EQUAL HB T_s:E2 cost_unmatched
+EQUAL HB T_s:E2 fr_x
+EQUAL HB T_s:E2 fr_rule
+EQUAL HB T_s:E2 n11
+EQUAL HB T_s:E2 n10
+EQUAL HB T_s:E2 n01
+EQUAL HB T_s:E2 n00
+EQUAL HB T_s:E2 p
+EQUAL HB T_s:E2 margin
+EQUAL HB T_s:E2 pass
+EQUAL HB T_s:WBA set and indicator
+EQUAL HB T_s:WBA b
+EQUAL HB T_s:WBA cost
+EQUAL HB T_s:WBA capped
+EQUAL HB T_s:WBA cost_unmatched
+EQUAL HB T_s:WBA fr_x
+EQUAL HB T_s:WBA fr_rule
+EQUAL HB T_s:WBA n11
+EQUAL HB T_s:WBA n10
+EQUAL HB T_s:WBA n01
+EQUAL HB T_s:WBA n00
+EQUAL HB T_s:WBA p
+EQUAL HB T_s:WBA margin
+EQUAL HB T_s:WBA pass
+EQUAL HB W2:LE set and indicator
+EQUAL HB W2:LE b
+EQUAL HB W2:LE cost
+EQUAL HB W2:LE capped
+EQUAL HB W2:LE cost_unmatched
+EQUAL HB W2:LE fr_x
+EQUAL HB W2:LE fr_rule
+EQUAL HB W2:LE n11
+EQUAL HB W2:LE n10
+EQUAL HB W2:LE n01
+EQUAL HB W2:LE n00
+EQUAL HB W2:LE p
+EQUAL HB W2:LE margin
+EQUAL HB W2:LE pass
+EQUAL HB W2:SALI set and indicator
+EQUAL HB W2:SALI b
+EQUAL HB W2:SALI cost
+EQUAL HB W2:SALI capped
+EQUAL HB W2:SALI cost_unmatched
+EQUAL HB W2:SALI fr_x
+EQUAL HB W2:SALI fr_rule
+EQUAL HB W2:SALI n11
+EQUAL HB W2:SALI n10
+EQUAL HB W2:SALI n01
+EQUAL HB W2:SALI n00
+EQUAL HB W2:SALI p
+EQUAL HB W2:SALI margin
+EQUAL HB W2:SALI pass
+EQUAL HB W2:FLI set and indicator
+EQUAL HB W2:FLI b
+EQUAL HB W2:FLI cost
+EQUAL HB W2:FLI capped
+EQUAL HB W2:FLI cost_unmatched
+EQUAL HB W2:FLI fr_x
+EQUAL HB W2:FLI fr_rule
+EQUAL HB W2:FLI n11
+EQUAL HB W2:FLI n10
+EQUAL HB W2:FLI n01
+EQUAL HB W2:FLI n00
+EQUAL HB W2:FLI p
+EQUAL HB W2:FLI margin
+EQUAL HB W2:FLI pass
+EQUAL HB W2:MEGNO set and indicator
+EQUAL HB W2:MEGNO b
+EQUAL HB W2:MEGNO cost
+EQUAL HB W2:MEGNO capped
+EQUAL HB W2:MEGNO cost_unmatched
+EQUAL HB W2:MEGNO fr_x
+EQUAL HB W2:MEGNO fr_rule
+EQUAL HB W2:MEGNO n11
+EQUAL HB W2:MEGNO n10
+EQUAL HB W2:MEGNO n01
+EQUAL HB W2:MEGNO n00
+EQUAL HB W2:MEGNO p
+EQUAL HB W2:MEGNO margin
+EQUAL HB W2:MEGNO pass
+EQUAL HB W2:E1 set and indicator
+EQUAL HB W2:E1 b
+EQUAL HB W2:E1 cost
+EQUAL HB W2:E1 capped
+EQUAL HB W2:E1 cost_unmatched
+EQUAL HB W2:E1 fr_x
+EQUAL HB W2:E1 fr_rule
+EQUAL HB W2:E1 n11
+EQUAL HB W2:E1 n10
+EQUAL HB W2:E1 n01
+EQUAL HB W2:E1 n00
+EQUAL HB W2:E1 p
+EQUAL HB W2:E1 margin
+EQUAL HB W2:E1 pass
+EQUAL HB W2:E2 set and indicator
+EQUAL HB W2:E2 b
+EQUAL HB W2:E2 cost
+EQUAL HB W2:E2 capped
+EQUAL HB W2:E2 cost_unmatched
+EQUAL HB W2:E2 fr_x
+EQUAL HB W2:E2 fr_rule
+EQUAL HB W2:E2 n11
+EQUAL HB W2:E2 n10
+EQUAL HB W2:E2 n01
+EQUAL HB W2:E2 n00
+EQUAL HB W2:E2 p
+EQUAL HB W2:E2 margin
+EQUAL HB W2:E2 pass
+EQUAL HB W2:WBA set and indicator
+EQUAL HB W2:WBA b
+EQUAL HB W2:WBA cost
+EQUAL HB W2:WBA capped
+EQUAL HB W2:WBA cost_unmatched
+EQUAL HB W2:WBA fr_x
+EQUAL HB W2:WBA fr_rule
+EQUAL HB W2:WBA n11
+EQUAL HB W2:WBA n10
+EQUAL HB W2:WBA n01
+EQUAL HB W2:WBA n00
+EQUAL HB W2:WBA p
+EQUAL HB W2:WBA margin
+EQUAL HB W2:WBA pass
+EQUAL HB failing comparisons (as sets; the module lists them in alphabetical order, the oracle in table order)
+EQUAL HB coverage
+EQUAL HB coverage ok
+EQUAL HB coverage price
+EQUAL HB underpowered flag
+EQUAL HB cost-unmatched LE flag
+EQUAL HB defects
+EQUAL HB sizes
+EQUAL HB decision
+EQUAL HB without LE number of comparisons
+EQUAL HB without LE T_s:SALI set and indicator
+EQUAL HB without LE T_s:SALI b
+EQUAL HB without LE T_s:SALI cost
+EQUAL HB without LE T_s:SALI capped
+EQUAL HB without LE T_s:SALI cost_unmatched
+EQUAL HB without LE T_s:SALI fr_x
+EQUAL HB without LE T_s:SALI fr_rule
+EQUAL HB without LE T_s:SALI n11
+EQUAL HB without LE T_s:SALI n10
+EQUAL HB without LE T_s:SALI n01
+EQUAL HB without LE T_s:SALI n00
+EQUAL HB without LE T_s:SALI p
+EQUAL HB without LE T_s:SALI margin
+EQUAL HB without LE T_s:SALI pass
+EQUAL HB without LE T_s:FLI set and indicator
+EQUAL HB without LE T_s:FLI b
+EQUAL HB without LE T_s:FLI cost
+EQUAL HB without LE T_s:FLI capped
+EQUAL HB without LE T_s:FLI cost_unmatched
+EQUAL HB without LE T_s:FLI fr_x
+EQUAL HB without LE T_s:FLI fr_rule
+EQUAL HB without LE T_s:FLI n11
+EQUAL HB without LE T_s:FLI n10
+EQUAL HB without LE T_s:FLI n01
+EQUAL HB without LE T_s:FLI n00
+EQUAL HB without LE T_s:FLI p
+EQUAL HB without LE T_s:FLI margin
+EQUAL HB without LE T_s:FLI pass
+EQUAL HB without LE T_s:MEGNO set and indicator
+EQUAL HB without LE T_s:MEGNO b
+EQUAL HB without LE T_s:MEGNO cost
+EQUAL HB without LE T_s:MEGNO capped
+EQUAL HB without LE T_s:MEGNO cost_unmatched
+EQUAL HB without LE T_s:MEGNO fr_x
+EQUAL HB without LE T_s:MEGNO fr_rule
+EQUAL HB without LE T_s:MEGNO n11
+EQUAL HB without LE T_s:MEGNO n10
+EQUAL HB without LE T_s:MEGNO n01
+EQUAL HB without LE T_s:MEGNO n00
+EQUAL HB without LE T_s:MEGNO p
+EQUAL HB without LE T_s:MEGNO margin
+EQUAL HB without LE T_s:MEGNO pass
+EQUAL HB without LE T_s:E1 set and indicator
+EQUAL HB without LE T_s:E1 b
+EQUAL HB without LE T_s:E1 cost
+EQUAL HB without LE T_s:E1 capped
+EQUAL HB without LE T_s:E1 cost_unmatched
+EQUAL HB without LE T_s:E1 fr_x
+EQUAL HB without LE T_s:E1 fr_rule
+EQUAL HB without LE T_s:E1 n11
+EQUAL HB without LE T_s:E1 n10
+EQUAL HB without LE T_s:E1 n01
+EQUAL HB without LE T_s:E1 n00
+EQUAL HB without LE T_s:E1 p
+EQUAL HB without LE T_s:E1 margin
+EQUAL HB without LE T_s:E1 pass
+EQUAL HB without LE T_s:E2 set and indicator
+EQUAL HB without LE T_s:E2 b
+EQUAL HB without LE T_s:E2 cost
+EQUAL HB without LE T_s:E2 capped
+EQUAL HB without LE T_s:E2 cost_unmatched
+EQUAL HB without LE T_s:E2 fr_x
+EQUAL HB without LE T_s:E2 fr_rule
+EQUAL HB without LE T_s:E2 n11
+EQUAL HB without LE T_s:E2 n10
+EQUAL HB without LE T_s:E2 n01
+EQUAL HB without LE T_s:E2 n00
+EQUAL HB without LE T_s:E2 p
+EQUAL HB without LE T_s:E2 margin
+EQUAL HB without LE T_s:E2 pass
+EQUAL HB without LE T_s:WBA set and indicator
+EQUAL HB without LE T_s:WBA b
+EQUAL HB without LE T_s:WBA cost
+EQUAL HB without LE T_s:WBA capped
+EQUAL HB without LE T_s:WBA cost_unmatched
+EQUAL HB without LE T_s:WBA fr_x
+EQUAL HB without LE T_s:WBA fr_rule
+EQUAL HB without LE T_s:WBA n11
+EQUAL HB without LE T_s:WBA n10
+EQUAL HB without LE T_s:WBA n01
+EQUAL HB without LE T_s:WBA n00
+EQUAL HB without LE T_s:WBA p
+EQUAL HB without LE T_s:WBA margin
+EQUAL HB without LE T_s:WBA pass
+EQUAL HB without LE W2:SALI set and indicator
+EQUAL HB without LE W2:SALI b
+EQUAL HB without LE W2:SALI cost
+EQUAL HB without LE W2:SALI capped
+EQUAL HB without LE W2:SALI cost_unmatched
+EQUAL HB without LE W2:SALI fr_x
+EQUAL HB without LE W2:SALI fr_rule
+EQUAL HB without LE W2:SALI n11
+EQUAL HB without LE W2:SALI n10
+EQUAL HB without LE W2:SALI n01
+EQUAL HB without LE W2:SALI n00
+EQUAL HB without LE W2:SALI p
+EQUAL HB without LE W2:SALI margin
+EQUAL HB without LE W2:SALI pass
+EQUAL HB without LE W2:FLI set and indicator
+EQUAL HB without LE W2:FLI b
+EQUAL HB without LE W2:FLI cost
+EQUAL HB without LE W2:FLI capped
+EQUAL HB without LE W2:FLI cost_unmatched
+EQUAL HB without LE W2:FLI fr_x
+EQUAL HB without LE W2:FLI fr_rule
+EQUAL HB without LE W2:FLI n11
+EQUAL HB without LE W2:FLI n10
+EQUAL HB without LE W2:FLI n01
+EQUAL HB without LE W2:FLI n00
+EQUAL HB without LE W2:FLI p
+EQUAL HB without LE W2:FLI margin
+EQUAL HB without LE W2:FLI pass
+EQUAL HB without LE W2:MEGNO set and indicator
+EQUAL HB without LE W2:MEGNO b
+EQUAL HB without LE W2:MEGNO cost
+EQUAL HB without LE W2:MEGNO capped
+EQUAL HB without LE W2:MEGNO cost_unmatched
+EQUAL HB without LE W2:MEGNO fr_x
+EQUAL HB without LE W2:MEGNO fr_rule
+EQUAL HB without LE W2:MEGNO n11
+EQUAL HB without LE W2:MEGNO n10
+EQUAL HB without LE W2:MEGNO n01
+EQUAL HB without LE W2:MEGNO n00
+EQUAL HB without LE W2:MEGNO p
+EQUAL HB without LE W2:MEGNO margin
+EQUAL HB without LE W2:MEGNO pass
+EQUAL HB without LE W2:E1 set and indicator
+EQUAL HB without LE W2:E1 b
+EQUAL HB without LE W2:E1 cost
+EQUAL HB without LE W2:E1 capped
+EQUAL HB without LE W2:E1 cost_unmatched
+EQUAL HB without LE W2:E1 fr_x
+EQUAL HB without LE W2:E1 fr_rule
+EQUAL HB without LE W2:E1 n11
+EQUAL HB without LE W2:E1 n10
+EQUAL HB without LE W2:E1 n01
+EQUAL HB without LE W2:E1 n00
+EQUAL HB without LE W2:E1 p
+EQUAL HB without LE W2:E1 margin
+EQUAL HB without LE W2:E1 pass
+EQUAL HB without LE W2:E2 set and indicator
+EQUAL HB without LE W2:E2 b
+EQUAL HB without LE W2:E2 cost
+EQUAL HB without LE W2:E2 capped
+EQUAL HB without LE W2:E2 cost_unmatched
+EQUAL HB without LE W2:E2 fr_x
+EQUAL HB without LE W2:E2 fr_rule
+EQUAL HB without LE W2:E2 n11
+EQUAL HB without LE W2:E2 n10
+EQUAL HB without LE W2:E2 n01
+EQUAL HB without LE W2:E2 n00
+EQUAL HB without LE W2:E2 p
+EQUAL HB without LE W2:E2 margin
+EQUAL HB without LE W2:E2 pass
+EQUAL HB without LE W2:WBA set and indicator
+EQUAL HB without LE W2:WBA b
+EQUAL HB without LE W2:WBA cost
+EQUAL HB without LE W2:WBA capped
+EQUAL HB without LE W2:WBA cost_unmatched
+EQUAL HB without LE W2:WBA fr_x
+EQUAL HB without LE W2:WBA fr_rule
+EQUAL HB without LE W2:WBA n11
+EQUAL HB without LE W2:WBA n10
+EQUAL HB without LE W2:WBA n01
+EQUAL HB without LE W2:WBA n00
+EQUAL HB without LE W2:WBA p
+EQUAL HB without LE W2:WBA margin
+EQUAL HB without LE W2:WBA pass
+EQUAL HB without LE decision
+EQUAL HB without LE failing (as sets)
+EQUAL sensitivity round_down decidable
+EQUAL sensitivity round_down verdict
+EQUAL sensitivity round_down failing (as sets)
+EQUAL sensitivity pilot decidable
+EQUAL sensitivity pilot verdict
+EQUAL sensitivity pilot failing (as sets)
+EQUAL sensitivity measured decidable
+EQUAL sensitivity measured verdict
+EQUAL sensitivity measured reason names the cause (spec L1 has no measured value)
+EQUAL sensitivity without_le decidable
+EQUAL sensitivity without_le verdict
+EQUAL sensitivity without_le failing (as sets)
+EQUAL HB power at achieved sizes: successes
+EQUAL HB power runs
+EQUAL HB power
+EQUAL HB power se
+EQUAL HB planned power
+EQUAL HC power at achieved sizes absent (not underpowered)
+EQUAL HC auc_i
+EQUAL HC auc_p
+EQUAL HC delta
+EQUAL HC lower bound
+EQUAL HC upper bound
+EQUAL HC failures and non-failures
+EQUAL HC failure ids
+EQUAL HC dropped replicates
+EQUAL HC decision
+EQUAL HC underpowered
+EQUAL HC set size
+EQUAL flag underpowered HB
+EQUAL flag underpowered HC
+EQUAL flag cost-unmatched LE
+EQUAL flag not decidable causes
+EQUAL T9 pairs
+EQUAL T9 overrides
+EQUAL T9 orbits
+EQUAL T2 round 1 orbits, K=0, E_test, W2, T_s, S2
+EQUAL T2 round 2 orbits, K=0, E_test, W2, T_s, S2
+EQUAL T2 round 3 orbits, K=0, E_test, W2, T_s, S2
+EQUAL T2 size E_test
+EQUAL T2 size W2
+EQUAL T2 size T_s
+EQUAL T2 size S2
+EQUAL T2 size D
+EQUAL T2 size D_B
+EQUAL T2 size gate
+EQUAL T2 target W2
+EQUAL T2 target T_s
+EQUAL T3 orbit 3 (reading: last recorded step not above N_B) L5 values, ladder, agree, rho
+EQUAL T3 orbit 6 (reading: last recorded step not above N_B) L5 values, ladder, agree, rho
+EQUAL T3 orbit 8 (reading: last recorded step not above N_B) L5 values, ladder, agree, rho
+EQUAL T3 orbit 12 (reading: last recorded step not above N_B) L5 values, ladder, agree, rho
+EQUAL T3 number of orbits
+EQUAL T3 summary line: agree 4 of 4; ladder C 0 R 0
+EQUAL T4 E_test K index all round all outputs
+EQUAL T4 E_test K index 2 round 1 outputs
+EQUAL T4 E_test K index 2 round 2 outputs
+EQUAL T4 E_test K index 2 round 3 outputs
+EQUAL T4 E_test K index 3 round 1 outputs
+EQUAL T4 E_test K index 3 round 2 outputs
+EQUAL T4 E_test K index 3 round 3 outputs
+EQUAL T4 E_test K index 4 round 1 outputs
+EQUAL T4 E_test K index 4 round 2 outputs
+EQUAL T4 E_test K index 4 round 3 outputs
+EQUAL T4 W2 K index all round all outputs
+EQUAL T4 W2 K index 2 round 1 outputs
+EQUAL T4 W2 K index 2 round 2 outputs
+EQUAL T4 W2 K index 2 round 3 outputs
+EQUAL T4 W2 K index 3 round 1 outputs
+EQUAL T4 W2 K index 3 round 2 outputs
+EQUAL T4 W2 K index 3 round 3 outputs
+EQUAL T4 W2 K index 4 round 1 outputs
+EQUAL T4 W2 K index 4 round 2 outputs
+EQUAL T4 W2 K index 4 round 3 outputs
+EQUAL T4 T_s K index all round all outputs
+EQUAL T4 T_s K index 2 round 1 outputs
+EQUAL T4 T_s K index 2 round 2 outputs
+EQUAL T4 T_s K index 2 round 3 outputs
+EQUAL T4 T_s K index 3 round 1 outputs
+EQUAL T4 T_s K index 3 round 2 outputs
+EQUAL T4 T_s K index 3 round 3 outputs
+EQUAL T4 T_s K index 4 round 1 outputs
+EQUAL T4 T_s K index 4 round 2 outputs
+EQUAL T4 T_s K index 4 round 3 outputs
+EQUAL T4 S2 K index all round all outputs
+EQUAL T4 S2 K index 2 round 1 outputs
+EQUAL T4 S2 K index 2 round 2 outputs
+EQUAL T4 S2 K index 2 round 3 outputs
+EQUAL T4 S2 K index 3 round 1 outputs
+EQUAL T4 S2 K index 3 round 2 outputs
+EQUAL T4 S2 K index 3 round 3 outputs
+EQUAL T4 S2 K index 4 round 1 outputs
+EQUAL T4 S2 K index 4 round 2 outputs
+EQUAL T4 S2 K index 4 round 3 outputs
+EQUAL T4 number of rows
+EQUAL T9 contradictions of decided orbits (R_a, R_ab)
+EQUAL T10 L1 measured, cost key, pilot key
+EQUAL T10 tg measured, cost key, pilot key
+EQUAL T10 pa1 measured, cost key, pilot key
+EQUAL T10 bk1 measured, cost key, pilot key
+EQUAL T10 fq1 measured, cost key, pilot key
+EQUAL T11 non-zero flag counts by arm, item, flag
+EQUAL T11 chunks failed twice
+EQUAL F2 rule q_C=2 q_R=3 decided share
+EQUAL F2 rule q_C=2 q_R=3 error
+EQUAL F2 rule q_C=1 q_R=3 decided share
+EQUAL F2 rule q_C=1 q_R=3 error
+EQUAL F2 rule q_C=3 q_R=3 decided share
+EQUAL F2 rule q_C=3 q_R=3 error
+EQUAL F2 rule q_C=2 q_R=4 decided share
+EQUAL F2 rule q_C=2 q_R=4 error
+NOTE F2 rule family: the module has 4 points (a cross), the oracle's product grid has 6; oracle-only points: [('1', '4'), ('3', '4')]; their cross flag: [False, False]
+EQUAL F2 module rule points are exactly the oracle's cross points
+EQUAL F2 single LE decided share
+EQUAL F2 single LE error
+EQUAL F2 single SALI decided share
+EQUAL F2 single SALI error
+EQUAL F2 single FLI decided share
+EQUAL F2 single FLI error
+EQUAL F2 single MEGNO decided share
+EQUAL F2 single MEGNO error
+EQUAL F2 single E1 decided share
+EQUAL F2 single E1 error
+EQUAL F2 single E2 decided share
+EQUAL F2 single E2 error
+EQUAL F2 single WBA decided share
+EQUAL F2 single WBA error
+EQUAL F2 number of single curves
+EQUAL F2 digest is the SHA-256 of the table lines of the block under one of four conventions (independent recomputation)
+   convention: ['table lines (header, separator, rows) joined by LF']
+EQUAL F3 s_I number of ROC rows
+EQUAL F3 s_I threshold
+EQUAL F3 s_I fpr
+EQUAL F3 s_I tpr
+EQUAL F3 s_I threshold
+EQUAL F3 s_I fpr
+EQUAL F3 s_I tpr
+EQUAL F3 s_I threshold
+EQUAL F3 s_I fpr
+EQUAL F3 s_I tpr
+EQUAL F3 s_I AUC
+EQUAL F3 s_P number of ROC rows
+EQUAL F3 s_P threshold
+EQUAL F3 s_P fpr
+EQUAL F3 s_P tpr
+EQUAL F3 s_P threshold
+EQUAL F3 s_P fpr
+EQUAL F3 s_P tpr
+EQUAL F3 s_P threshold
+EQUAL F3 s_P fpr
+EQUAL F3 s_P tpr
+EQUAL F3 s_P AUC
+EQUAL F3 digest is the SHA-256 of the table lines of the block under one of four conventions
+   convention: ['table lines (header, separator, rows) joined by LF']
+EQUAL the SHA-256 of the machine file is stated in the tables file and equals the recomputed one
+
+QUANTITIES COMPARED: 645; EQUAL: 590; DIFFER: 55
+  DIFF: fingerprint preregistration
+  DIFF: fingerprint calibration_record
+  DIFF: fingerprint test_parameters
+  DIFF: fingerprint manifest
+  DIFF: fingerprint round_log
+  DIFF: fingerprint chunk file chunk-00001.h5
+  DIFF: fingerprint chunk file chunk-00002.h5
+  DIFF: fingerprint chunk file chunk-00003.h5
+  DIFF: fingerprint chunk file chunk-00004.h5
+  DIFF: fingerprint chunk file chunk-00005.h5
+  DIFF: fingerprint chunk file chunk-00006.h5
+  DIFF: fingerprint chunk file chunk-00007.h5
+  DIFF: fingerprint chunk file chunk-00008.h5
+  DIFF: fingerprint chunk file chunk-00009.h5
+  DIFF: fingerprint chunk file chunk-00010.h5
+  DIFF: fingerprint chunk file chunk-00011.h5
+  DIFF: fingerprint chunk file chunk-00012.h5
+  DIFF: fingerprint chunk file chunk-00013.h5
+  DIFF: fingerprint chunk file chunk-00014.h5
+  DIFF: fingerprint chunk file chunk-00015.h5
+  DIFF: fingerprint chunk file chunk-00016.h5
+  DIFF: fingerprint chunk file chunk-00017.h5
+  DIFF: fingerprint chunk file chunk-00018.h5
+  DIFF: fingerprint chunk file chunk-00019.h5
+  DIFF: fingerprint chunk file chunk-00020.h5
+  DIFF: fingerprint chunk file chunk-00021.h5
+  DIFF: fingerprint chunk file chunk-00022.h5
+  DIFF: fingerprint chunk file chunk-00023.h5
+  DIFF: fingerprint chunk file chunk-00024.h5
+  DIFF: fingerprint chunk file chunk-00025.h5
+  DIFF: fingerprint chunk file chunk-00026.h5
+  DIFF: fingerprint chunk file chunk-00027.h5
+  DIFF: fingerprint chunk file chunk-00028.h5
+  DIFF: fingerprint chunk file chunk-00029.h5
+  DIFF: fingerprint chunk file chunk-00030.h5
+  DIFF: fingerprint chunk file chunk-00031.h5
+  DIFF: fingerprint chunk file chunk-00032.h5
+  DIFF: fingerprint chunk file chunk-00033.h5
+  DIFF: fingerprint chunk file chunk-00034.h5
+  DIFF: fingerprint chunk file chunk-00035.h5
+  DIFF: fingerprint chunk file chunk-00036.h5
+  DIFF: fingerprint chunk file chunk-00037.h5
+  DIFF: fingerprint chunk file chunk-00038.h5
+  DIFF: fingerprint chunk file chunk-00039.h5
+  DIFF: fingerprint chunk file chunk-00040.h5
+  DIFF: fingerprint chunk file chunk-00041.h5
+  DIFF: fingerprint chunk file chunk-00042.h5
+  DIFF: fingerprint chunk file chunk-00043.h5
+  DIFF: fingerprint chunk file chunk-00044.h5
+  DIFF: fingerprint chunk file chunk-00045.h5
+  DIFF: fingerprint chunk file chunk-00046.h5
+  DIFF: fingerprint chunk file chunk-00047.h5
+  DIFF: fingerprint chunk file chunk-00048.h5
+  DIFF: fingerprint chunk file chunk-00049.h5
+  DIFF: fingerprint chunk file chunk-00050.h5
+
+=== B: compare against the independent oracle rerun on the inputs and the store of campaign-fixed (oracle-fixed/oracle-result.json) ===
+EQUAL fingerprint preregistration
+EQUAL fingerprint panel
+EQUAL fingerprint calibration_record
+EQUAL fingerprint p3_parameters
+EQUAL fingerprint test_parameters
+EQUAL fingerprint manifest
+EQUAL fingerprint round_log
+EQUAL fingerprint chunk file chunk-00001.h5
+EQUAL fingerprint chunk file chunk-00002.h5
+EQUAL fingerprint chunk file chunk-00003.h5
+EQUAL fingerprint chunk file chunk-00004.h5
+EQUAL fingerprint chunk file chunk-00005.h5
+EQUAL fingerprint chunk file chunk-00006.h5
+EQUAL fingerprint chunk file chunk-00007.h5
+EQUAL fingerprint chunk file chunk-00008.h5
+EQUAL fingerprint chunk file chunk-00009.h5
+EQUAL fingerprint chunk file chunk-00010.h5
+EQUAL fingerprint chunk file chunk-00011.h5
+EQUAL fingerprint chunk file chunk-00012.h5
+EQUAL fingerprint chunk file chunk-00013.h5
+EQUAL fingerprint chunk file chunk-00014.h5
+EQUAL fingerprint chunk file chunk-00015.h5
+EQUAL fingerprint chunk file chunk-00016.h5
+EQUAL fingerprint chunk file chunk-00017.h5
+EQUAL fingerprint chunk file chunk-00018.h5
+EQUAL fingerprint chunk file chunk-00019.h5
+EQUAL fingerprint chunk file chunk-00020.h5
+EQUAL fingerprint chunk file chunk-00021.h5
+EQUAL fingerprint chunk file chunk-00022.h5
+EQUAL fingerprint chunk file chunk-00023.h5
+EQUAL fingerprint chunk file chunk-00024.h5
+EQUAL fingerprint chunk file chunk-00025.h5
+EQUAL fingerprint chunk file chunk-00026.h5
+EQUAL fingerprint chunk file chunk-00027.h5
+EQUAL fingerprint chunk file chunk-00028.h5
+EQUAL fingerprint chunk file chunk-00029.h5
+EQUAL fingerprint chunk file chunk-00030.h5
+EQUAL fingerprint chunk file chunk-00031.h5
+EQUAL fingerprint chunk file chunk-00032.h5
+EQUAL fingerprint chunk file chunk-00033.h5
+EQUAL fingerprint chunk file chunk-00034.h5
+EQUAL fingerprint chunk file chunk-00035.h5
+EQUAL fingerprint chunk file chunk-00036.h5
+EQUAL fingerprint chunk file chunk-00037.h5
+EQUAL fingerprint chunk file chunk-00038.h5
+EQUAL fingerprint chunk file chunk-00039.h5
+EQUAL fingerprint chunk file chunk-00040.h5
+EQUAL fingerprint chunk file chunk-00041.h5
+EQUAL fingerprint chunk file chunk-00042.h5
+EQUAL fingerprint chunk file chunk-00043.h5
+EQUAL fingerprint chunk file chunk-00044.h5
+EQUAL fingerprint chunk file chunk-00045.h5
+EQUAL fingerprint chunk file chunk-00046.h5
+EQUAL fingerprint chunk file chunk-00047.h5
+EQUAL fingerprint chunk file chunk-00048.h5
+EQUAL fingerprint chunk file chunk-00049.h5
+EQUAL fingerprint chunk file chunk-00050.h5
+EQUAL log entry 1 decision
+EQUAL log entry 1 count.drift
+EQUAL log entry 1 count.excluded
+EQUAL log entry 1 count.orbits
+EQUAL log entry 1 count.t_s
+EQUAL log entry 1 count.target_t_s
+EQUAL log entry 1 count.target_w2
+EQUAL log entry 1 count.w2
+EQUAL log entry 1 text recomputed by the oracle equals the log file (oracle internal check)
+EQUAL log entry 2 decision
+EQUAL log entry 2 count.drift
+EQUAL log entry 2 count.excluded
+EQUAL log entry 2 count.orbits
+EQUAL log entry 2 count.t_s
+EQUAL log entry 2 count.target_t_s
+EQUAL log entry 2 count.target_w2
+EQUAL log entry 2 count.w2
+EQUAL log entry 2 text recomputed by the oracle equals the log file (oracle internal check)
+EQUAL log entry 3 decision
+EQUAL log entry 3 count.drift
+EQUAL log entry 3 count.excluded
+EQUAL log entry 3 count.orbits
+EQUAL log entry 3 count.t_s
+EQUAL log entry 3 count.target_t_s
+EQUAL log entry 3 count.target_w2
+EQUAL log entry 3 count.w2
+EQUAL log entry 3 text recomputed by the oracle equals the log file (oracle internal check)
+EQUAL log entries
+EQUAL set E_test ids
+EQUAL set E_test size
+EQUAL set W2 ids
+EQUAL set W2 size
+EQUAL set T_s ids
+EQUAL set T_s size
+EQUAL set S2 ids
+EQUAL set S2 size
+EQUAL set D ids
+EQUAL set D size
+EQUAL set D_B ids
+EQUAL set D_B size
+EQUAL set gate ids
+EQUAL set gate size
+EQUAL overlap T_s and S2
+EQUAL strata sizes
+EQUAL strata sizes in HA
+EQUAL drops (orbit, reason)
+EQUAL drops round and k_index
+EQUAL log difference (last entry minus final sets)
+EQUAL by K index and round rows
+EQUAL rule outputs of E_test
+EQUAL rule outputs of W2
+EQUAL rule outputs of T_s
+EQUAL rule outputs of S2
+EQUAL rule outputs of D
+EQUAL HA e
+EQUAL HA a(E_test)
+EQUAL HA a(W2)
+EQUAL HA a(T_s)
+EQUAL HA a(S2)
+EQUAL HA a(W2) - a(S2)
+EQUAL HA a(T_s) - a(S2)
+EQUAL HA g
+EQUAL HA bound e value
+EQUAL HA bound e dropped replicates
+EQUAL HA bound a_E value
+EQUAL HA bound a_E dropped replicates
+EQUAL HA bound d_W value
+EQUAL HA bound d_W dropped replicates
+EQUAL HA bound d_T value
+EQUAL HA bound d_T dropped replicates
+EQUAL HA decision
+EQUAL HA failing items
+EQUAL HA gate missing
+EQUAL HB number of comparisons
+EQUAL HB T_s:SALI set and indicator
+EQUAL HB T_s:SALI b
+EQUAL HB T_s:SALI cost
+EQUAL HB T_s:SALI capped
+EQUAL HB T_s:SALI cost_unmatched
+EQUAL HB T_s:SALI fr_x
+EQUAL HB T_s:SALI fr_rule
+EQUAL HB T_s:SALI n11
+EQUAL HB T_s:SALI n10
+EQUAL HB T_s:SALI n01
+EQUAL HB T_s:SALI n00
+EQUAL HB T_s:SALI p
+EQUAL HB T_s:SALI margin
+EQUAL HB T_s:SALI pass
+EQUAL HB T_s:FLI set and indicator
+EQUAL HB T_s:FLI b
+EQUAL HB T_s:FLI cost
+EQUAL HB T_s:FLI capped
+EQUAL HB T_s:FLI cost_unmatched
+EQUAL HB T_s:FLI fr_x
+EQUAL HB T_s:FLI fr_rule
+EQUAL HB T_s:FLI n11
+EQUAL HB T_s:FLI n10
+EQUAL HB T_s:FLI n01
+EQUAL HB T_s:FLI n00
+EQUAL HB T_s:FLI p
+EQUAL HB T_s:FLI margin
+EQUAL HB T_s:FLI pass
+EQUAL HB T_s:MEGNO set and indicator
+EQUAL HB T_s:MEGNO b
+EQUAL HB T_s:MEGNO cost
+EQUAL HB T_s:MEGNO capped
+EQUAL HB T_s:MEGNO cost_unmatched
+EQUAL HB T_s:MEGNO fr_x
+EQUAL HB T_s:MEGNO fr_rule
+EQUAL HB T_s:MEGNO n11
+EQUAL HB T_s:MEGNO n10
+EQUAL HB T_s:MEGNO n01
+EQUAL HB T_s:MEGNO n00
+EQUAL HB T_s:MEGNO p
+EQUAL HB T_s:MEGNO margin
+EQUAL HB T_s:MEGNO pass
+EQUAL HB T_s:E1 set and indicator
+EQUAL HB T_s:E1 b
+EQUAL HB T_s:E1 cost
+EQUAL HB T_s:E1 capped
+EQUAL HB T_s:E1 cost_unmatched
+EQUAL HB T_s:E1 fr_x
+EQUAL HB T_s:E1 fr_rule
+EQUAL HB T_s:E1 n11
+EQUAL HB T_s:E1 n10
+EQUAL HB T_s:E1 n01
+EQUAL HB T_s:E1 n00
+EQUAL HB T_s:E1 p
+EQUAL HB T_s:E1 margin
+EQUAL HB T_s:E1 pass
+EQUAL HB T_s:E2 set and indicator
+EQUAL HB T_s:E2 b
+EQUAL HB T_s:E2 cost
+EQUAL HB T_s:E2 capped
+EQUAL HB T_s:E2 cost_unmatched
+EQUAL HB T_s:E2 fr_x
+EQUAL HB T_s:E2 fr_rule
+EQUAL HB T_s:E2 n11
+EQUAL HB T_s:E2 n10
+EQUAL HB T_s:E2 n01
+EQUAL HB T_s:E2 n00
+EQUAL HB T_s:E2 p
+EQUAL HB T_s:E2 margin
+EQUAL HB T_s:E2 pass
+EQUAL HB T_s:WBA set and indicator
+EQUAL HB T_s:WBA b
+EQUAL HB T_s:WBA cost
+EQUAL HB T_s:WBA capped
+EQUAL HB T_s:WBA cost_unmatched
+EQUAL HB T_s:WBA fr_x
+EQUAL HB T_s:WBA fr_rule
+EQUAL HB T_s:WBA n11
+EQUAL HB T_s:WBA n10
+EQUAL HB T_s:WBA n01
+EQUAL HB T_s:WBA n00
+EQUAL HB T_s:WBA p
+EQUAL HB T_s:WBA margin
+EQUAL HB T_s:WBA pass
+EQUAL HB W2:LE set and indicator
+EQUAL HB W2:LE b
+EQUAL HB W2:LE cost
+EQUAL HB W2:LE capped
+EQUAL HB W2:LE cost_unmatched
+EQUAL HB W2:LE fr_x
+EQUAL HB W2:LE fr_rule
+EQUAL HB W2:LE n11
+EQUAL HB W2:LE n10
+EQUAL HB W2:LE n01
+EQUAL HB W2:LE n00
+EQUAL HB W2:LE p
+EQUAL HB W2:LE margin
+EQUAL HB W2:LE pass
+EQUAL HB W2:SALI set and indicator
+EQUAL HB W2:SALI b
+EQUAL HB W2:SALI cost
+EQUAL HB W2:SALI capped
+EQUAL HB W2:SALI cost_unmatched
+EQUAL HB W2:SALI fr_x
+EQUAL HB W2:SALI fr_rule
+EQUAL HB W2:SALI n11
+EQUAL HB W2:SALI n10
+EQUAL HB W2:SALI n01
+EQUAL HB W2:SALI n00
+EQUAL HB W2:SALI p
+EQUAL HB W2:SALI margin
+EQUAL HB W2:SALI pass
+EQUAL HB W2:FLI set and indicator
+EQUAL HB W2:FLI b
+EQUAL HB W2:FLI cost
+EQUAL HB W2:FLI capped
+EQUAL HB W2:FLI cost_unmatched
+EQUAL HB W2:FLI fr_x
+EQUAL HB W2:FLI fr_rule
+EQUAL HB W2:FLI n11
+EQUAL HB W2:FLI n10
+EQUAL HB W2:FLI n01
+EQUAL HB W2:FLI n00
+EQUAL HB W2:FLI p
+EQUAL HB W2:FLI margin
+EQUAL HB W2:FLI pass
+EQUAL HB W2:MEGNO set and indicator
+EQUAL HB W2:MEGNO b
+EQUAL HB W2:MEGNO cost
+EQUAL HB W2:MEGNO capped
+EQUAL HB W2:MEGNO cost_unmatched
+EQUAL HB W2:MEGNO fr_x
+EQUAL HB W2:MEGNO fr_rule
+EQUAL HB W2:MEGNO n11
+EQUAL HB W2:MEGNO n10
+EQUAL HB W2:MEGNO n01
+EQUAL HB W2:MEGNO n00
+EQUAL HB W2:MEGNO p
+EQUAL HB W2:MEGNO margin
+EQUAL HB W2:MEGNO pass
+EQUAL HB W2:E1 set and indicator
+EQUAL HB W2:E1 b
+EQUAL HB W2:E1 cost
+EQUAL HB W2:E1 capped
+EQUAL HB W2:E1 cost_unmatched
+EQUAL HB W2:E1 fr_x
+EQUAL HB W2:E1 fr_rule
+EQUAL HB W2:E1 n11
+EQUAL HB W2:E1 n10
+EQUAL HB W2:E1 n01
+EQUAL HB W2:E1 n00
+EQUAL HB W2:E1 p
+EQUAL HB W2:E1 margin
+EQUAL HB W2:E1 pass
+EQUAL HB W2:E2 set and indicator
+EQUAL HB W2:E2 b
+EQUAL HB W2:E2 cost
+EQUAL HB W2:E2 capped
+EQUAL HB W2:E2 cost_unmatched
+EQUAL HB W2:E2 fr_x
+EQUAL HB W2:E2 fr_rule
+EQUAL HB W2:E2 n11
+EQUAL HB W2:E2 n10
+EQUAL HB W2:E2 n01
+EQUAL HB W2:E2 n00
+EQUAL HB W2:E2 p
+EQUAL HB W2:E2 margin
+EQUAL HB W2:E2 pass
+EQUAL HB W2:WBA set and indicator
+EQUAL HB W2:WBA b
+EQUAL HB W2:WBA cost
+EQUAL HB W2:WBA capped
+EQUAL HB W2:WBA cost_unmatched
+EQUAL HB W2:WBA fr_x
+EQUAL HB W2:WBA fr_rule
+EQUAL HB W2:WBA n11
+EQUAL HB W2:WBA n10
+EQUAL HB W2:WBA n01
+EQUAL HB W2:WBA n00
+EQUAL HB W2:WBA p
+EQUAL HB W2:WBA margin
+EQUAL HB W2:WBA pass
+EQUAL HB failing comparisons (as sets; the module lists them in alphabetical order, the oracle in table order)
+EQUAL HB coverage
+EQUAL HB coverage ok
+EQUAL HB coverage price
+EQUAL HB underpowered flag
+EQUAL HB cost-unmatched LE flag
+EQUAL HB defects
+EQUAL HB sizes
+EQUAL HB decision
+EQUAL HB without LE number of comparisons
+EQUAL HB without LE T_s:SALI set and indicator
+EQUAL HB without LE T_s:SALI b
+EQUAL HB without LE T_s:SALI cost
+EQUAL HB without LE T_s:SALI capped
+EQUAL HB without LE T_s:SALI cost_unmatched
+EQUAL HB without LE T_s:SALI fr_x
+EQUAL HB without LE T_s:SALI fr_rule
+EQUAL HB without LE T_s:SALI n11
+EQUAL HB without LE T_s:SALI n10
+EQUAL HB without LE T_s:SALI n01
+EQUAL HB without LE T_s:SALI n00
+EQUAL HB without LE T_s:SALI p
+EQUAL HB without LE T_s:SALI margin
+EQUAL HB without LE T_s:SALI pass
+EQUAL HB without LE T_s:FLI set and indicator
+EQUAL HB without LE T_s:FLI b
+EQUAL HB without LE T_s:FLI cost
+EQUAL HB without LE T_s:FLI capped
+EQUAL HB without LE T_s:FLI cost_unmatched
+EQUAL HB without LE T_s:FLI fr_x
+EQUAL HB without LE T_s:FLI fr_rule
+EQUAL HB without LE T_s:FLI n11
+EQUAL HB without LE T_s:FLI n10
+EQUAL HB without LE T_s:FLI n01
+EQUAL HB without LE T_s:FLI n00
+EQUAL HB without LE T_s:FLI p
+EQUAL HB without LE T_s:FLI margin
+EQUAL HB without LE T_s:FLI pass
+EQUAL HB without LE T_s:MEGNO set and indicator
+EQUAL HB without LE T_s:MEGNO b
+EQUAL HB without LE T_s:MEGNO cost
+EQUAL HB without LE T_s:MEGNO capped
+EQUAL HB without LE T_s:MEGNO cost_unmatched
+EQUAL HB without LE T_s:MEGNO fr_x
+EQUAL HB without LE T_s:MEGNO fr_rule
+EQUAL HB without LE T_s:MEGNO n11
+EQUAL HB without LE T_s:MEGNO n10
+EQUAL HB without LE T_s:MEGNO n01
+EQUAL HB without LE T_s:MEGNO n00
+EQUAL HB without LE T_s:MEGNO p
+EQUAL HB without LE T_s:MEGNO margin
+EQUAL HB without LE T_s:MEGNO pass
+EQUAL HB without LE T_s:E1 set and indicator
+EQUAL HB without LE T_s:E1 b
+EQUAL HB without LE T_s:E1 cost
+EQUAL HB without LE T_s:E1 capped
+EQUAL HB without LE T_s:E1 cost_unmatched
+EQUAL HB without LE T_s:E1 fr_x
+EQUAL HB without LE T_s:E1 fr_rule
+EQUAL HB without LE T_s:E1 n11
+EQUAL HB without LE T_s:E1 n10
+EQUAL HB without LE T_s:E1 n01
+EQUAL HB without LE T_s:E1 n00
+EQUAL HB without LE T_s:E1 p
+EQUAL HB without LE T_s:E1 margin
+EQUAL HB without LE T_s:E1 pass
+EQUAL HB without LE T_s:E2 set and indicator
+EQUAL HB without LE T_s:E2 b
+EQUAL HB without LE T_s:E2 cost
+EQUAL HB without LE T_s:E2 capped
+EQUAL HB without LE T_s:E2 cost_unmatched
+EQUAL HB without LE T_s:E2 fr_x
+EQUAL HB without LE T_s:E2 fr_rule
+EQUAL HB without LE T_s:E2 n11
+EQUAL HB without LE T_s:E2 n10
+EQUAL HB without LE T_s:E2 n01
+EQUAL HB without LE T_s:E2 n00
+EQUAL HB without LE T_s:E2 p
+EQUAL HB without LE T_s:E2 margin
+EQUAL HB without LE T_s:E2 pass
+EQUAL HB without LE T_s:WBA set and indicator
+EQUAL HB without LE T_s:WBA b
+EQUAL HB without LE T_s:WBA cost
+EQUAL HB without LE T_s:WBA capped
+EQUAL HB without LE T_s:WBA cost_unmatched
+EQUAL HB without LE T_s:WBA fr_x
+EQUAL HB without LE T_s:WBA fr_rule
+EQUAL HB without LE T_s:WBA n11
+EQUAL HB without LE T_s:WBA n10
+EQUAL HB without LE T_s:WBA n01
+EQUAL HB without LE T_s:WBA n00
+EQUAL HB without LE T_s:WBA p
+EQUAL HB without LE T_s:WBA margin
+EQUAL HB without LE T_s:WBA pass
+EQUAL HB without LE W2:SALI set and indicator
+EQUAL HB without LE W2:SALI b
+EQUAL HB without LE W2:SALI cost
+EQUAL HB without LE W2:SALI capped
+EQUAL HB without LE W2:SALI cost_unmatched
+EQUAL HB without LE W2:SALI fr_x
+EQUAL HB without LE W2:SALI fr_rule
+EQUAL HB without LE W2:SALI n11
+EQUAL HB without LE W2:SALI n10
+EQUAL HB without LE W2:SALI n01
+EQUAL HB without LE W2:SALI n00
+EQUAL HB without LE W2:SALI p
+EQUAL HB without LE W2:SALI margin
+EQUAL HB without LE W2:SALI pass
+EQUAL HB without LE W2:FLI set and indicator
+EQUAL HB without LE W2:FLI b
+EQUAL HB without LE W2:FLI cost
+EQUAL HB without LE W2:FLI capped
+EQUAL HB without LE W2:FLI cost_unmatched
+EQUAL HB without LE W2:FLI fr_x
+EQUAL HB without LE W2:FLI fr_rule
+EQUAL HB without LE W2:FLI n11
+EQUAL HB without LE W2:FLI n10
+EQUAL HB without LE W2:FLI n01
+EQUAL HB without LE W2:FLI n00
+EQUAL HB without LE W2:FLI p
+EQUAL HB without LE W2:FLI margin
+EQUAL HB without LE W2:FLI pass
+EQUAL HB without LE W2:MEGNO set and indicator
+EQUAL HB without LE W2:MEGNO b
+EQUAL HB without LE W2:MEGNO cost
+EQUAL HB without LE W2:MEGNO capped
+EQUAL HB without LE W2:MEGNO cost_unmatched
+EQUAL HB without LE W2:MEGNO fr_x
+EQUAL HB without LE W2:MEGNO fr_rule
+EQUAL HB without LE W2:MEGNO n11
+EQUAL HB without LE W2:MEGNO n10
+EQUAL HB without LE W2:MEGNO n01
+EQUAL HB without LE W2:MEGNO n00
+EQUAL HB without LE W2:MEGNO p
+EQUAL HB without LE W2:MEGNO margin
+EQUAL HB without LE W2:MEGNO pass
+EQUAL HB without LE W2:E1 set and indicator
+EQUAL HB without LE W2:E1 b
+EQUAL HB without LE W2:E1 cost
+EQUAL HB without LE W2:E1 capped
+EQUAL HB without LE W2:E1 cost_unmatched
+EQUAL HB without LE W2:E1 fr_x
+EQUAL HB without LE W2:E1 fr_rule
+EQUAL HB without LE W2:E1 n11
+EQUAL HB without LE W2:E1 n10
+EQUAL HB without LE W2:E1 n01
+EQUAL HB without LE W2:E1 n00
+EQUAL HB without LE W2:E1 p
+EQUAL HB without LE W2:E1 margin
+EQUAL HB without LE W2:E1 pass
+EQUAL HB without LE W2:E2 set and indicator
+EQUAL HB without LE W2:E2 b
+EQUAL HB without LE W2:E2 cost
+EQUAL HB without LE W2:E2 capped
+EQUAL HB without LE W2:E2 cost_unmatched
+EQUAL HB without LE W2:E2 fr_x
+EQUAL HB without LE W2:E2 fr_rule
+EQUAL HB without LE W2:E2 n11
+EQUAL HB without LE W2:E2 n10
+EQUAL HB without LE W2:E2 n01
+EQUAL HB without LE W2:E2 n00
+EQUAL HB without LE W2:E2 p
+EQUAL HB without LE W2:E2 margin
+EQUAL HB without LE W2:E2 pass
+EQUAL HB without LE W2:WBA set and indicator
+EQUAL HB without LE W2:WBA b
+EQUAL HB without LE W2:WBA cost
+EQUAL HB without LE W2:WBA capped
+EQUAL HB without LE W2:WBA cost_unmatched
+EQUAL HB without LE W2:WBA fr_x
+EQUAL HB without LE W2:WBA fr_rule
+EQUAL HB without LE W2:WBA n11
+EQUAL HB without LE W2:WBA n10
+EQUAL HB without LE W2:WBA n01
+EQUAL HB without LE W2:WBA n00
+EQUAL HB without LE W2:WBA p
+EQUAL HB without LE W2:WBA margin
+EQUAL HB without LE W2:WBA pass
+EQUAL HB without LE decision
+EQUAL HB without LE failing (as sets)
+EQUAL sensitivity round_down decidable
+EQUAL sensitivity round_down verdict
+EQUAL sensitivity round_down failing (as sets)
+EQUAL sensitivity pilot decidable
+EQUAL sensitivity pilot verdict
+EQUAL sensitivity pilot failing (as sets)
+EQUAL sensitivity measured decidable
+EQUAL sensitivity measured verdict
+EQUAL sensitivity measured reason names the cause (spec L1 has no measured value)
+EQUAL sensitivity without_le decidable
+EQUAL sensitivity without_le verdict
+EQUAL sensitivity without_le failing (as sets)
+EQUAL HB power at achieved sizes: successes
+EQUAL HB power runs
+EQUAL HB power
+EQUAL HB power se
+EQUAL HB planned power
+EQUAL HC power at achieved sizes absent (not underpowered)
+EQUAL HC auc_i
+EQUAL HC auc_p
+EQUAL HC delta
+EQUAL HC lower bound
+EQUAL HC upper bound
+EQUAL HC failures and non-failures
+EQUAL HC failure ids
+EQUAL HC dropped replicates
+EQUAL HC decision
+EQUAL HC underpowered
+EQUAL HC set size
+EQUAL flag underpowered HB
+EQUAL flag underpowered HC
+EQUAL flag cost-unmatched LE
+EQUAL flag not decidable causes
+EQUAL T9 pairs
+EQUAL T9 overrides
+EQUAL T9 orbits
+EQUAL T2 round 1 orbits, K=0, E_test, W2, T_s, S2
+EQUAL T2 round 2 orbits, K=0, E_test, W2, T_s, S2
+EQUAL T2 round 3 orbits, K=0, E_test, W2, T_s, S2
+EQUAL T2 size E_test
+EQUAL T2 size W2
+EQUAL T2 size T_s
+EQUAL T2 size S2
+EQUAL T2 size D
+EQUAL T2 size D_B
+EQUAL T2 size gate
+EQUAL T2 target W2
+EQUAL T2 target T_s
+EQUAL T3 orbit 3 (reading: last recorded step not above N_B) L5 values, ladder, agree, rho
+EQUAL T3 orbit 6 (reading: last recorded step not above N_B) L5 values, ladder, agree, rho
+EQUAL T3 orbit 8 (reading: last recorded step not above N_B) L5 values, ladder, agree, rho
+EQUAL T3 orbit 12 (reading: last recorded step not above N_B) L5 values, ladder, agree, rho
+EQUAL T3 number of orbits
+EQUAL T3 summary line: agree 4 of 4; ladder C 0 R 0
+EQUAL T4 E_test K index all round all outputs
+EQUAL T4 E_test K index 2 round 1 outputs
+EQUAL T4 E_test K index 2 round 2 outputs
+EQUAL T4 E_test K index 2 round 3 outputs
+EQUAL T4 E_test K index 3 round 1 outputs
+EQUAL T4 E_test K index 3 round 2 outputs
+EQUAL T4 E_test K index 3 round 3 outputs
+EQUAL T4 E_test K index 4 round 1 outputs
+EQUAL T4 E_test K index 4 round 2 outputs
+EQUAL T4 E_test K index 4 round 3 outputs
+EQUAL T4 W2 K index all round all outputs
+EQUAL T4 W2 K index 2 round 1 outputs
+EQUAL T4 W2 K index 2 round 2 outputs
+EQUAL T4 W2 K index 2 round 3 outputs
+EQUAL T4 W2 K index 3 round 1 outputs
+EQUAL T4 W2 K index 3 round 2 outputs
+EQUAL T4 W2 K index 3 round 3 outputs
+EQUAL T4 W2 K index 4 round 1 outputs
+EQUAL T4 W2 K index 4 round 2 outputs
+EQUAL T4 W2 K index 4 round 3 outputs
+EQUAL T4 T_s K index all round all outputs
+EQUAL T4 T_s K index 2 round 1 outputs
+EQUAL T4 T_s K index 2 round 2 outputs
+EQUAL T4 T_s K index 2 round 3 outputs
+EQUAL T4 T_s K index 3 round 1 outputs
+EQUAL T4 T_s K index 3 round 2 outputs
+EQUAL T4 T_s K index 3 round 3 outputs
+EQUAL T4 T_s K index 4 round 1 outputs
+EQUAL T4 T_s K index 4 round 2 outputs
+EQUAL T4 T_s K index 4 round 3 outputs
+EQUAL T4 S2 K index all round all outputs
+EQUAL T4 S2 K index 2 round 1 outputs
+EQUAL T4 S2 K index 2 round 2 outputs
+EQUAL T4 S2 K index 2 round 3 outputs
+EQUAL T4 S2 K index 3 round 1 outputs
+EQUAL T4 S2 K index 3 round 2 outputs
+EQUAL T4 S2 K index 3 round 3 outputs
+EQUAL T4 S2 K index 4 round 1 outputs
+EQUAL T4 S2 K index 4 round 2 outputs
+EQUAL T4 S2 K index 4 round 3 outputs
+EQUAL T4 number of rows
+EQUAL T9 contradictions of decided orbits (R_a, R_ab)
+EQUAL T10 L1 measured, cost key, pilot key
+EQUAL T10 tg measured, cost key, pilot key
+EQUAL T10 pa1 measured, cost key, pilot key
+EQUAL T10 bk1 measured, cost key, pilot key
+EQUAL T10 fq1 measured, cost key, pilot key
+EQUAL T11 non-zero flag counts by arm, item, flag
+EQUAL T11 chunks failed twice
+EQUAL F2 rule q_C=2 q_R=3 decided share
+EQUAL F2 rule q_C=2 q_R=3 error
+EQUAL F2 rule q_C=1 q_R=3 decided share
+EQUAL F2 rule q_C=1 q_R=3 error
+EQUAL F2 rule q_C=3 q_R=3 decided share
+EQUAL F2 rule q_C=3 q_R=3 error
+EQUAL F2 rule q_C=2 q_R=4 decided share
+EQUAL F2 rule q_C=2 q_R=4 error
+NOTE F2 rule family: the module has 4 points (a cross), the oracle's product grid has 6; oracle-only points: [('1', '4'), ('3', '4')]; their cross flag: [False, False]
+EQUAL F2 module rule points are exactly the oracle's cross points
+EQUAL F2 single LE decided share
+EQUAL F2 single LE error
+EQUAL F2 single SALI decided share
+EQUAL F2 single SALI error
+EQUAL F2 single FLI decided share
+EQUAL F2 single FLI error
+EQUAL F2 single MEGNO decided share
+EQUAL F2 single MEGNO error
+EQUAL F2 single E1 decided share
+EQUAL F2 single E1 error
+EQUAL F2 single E2 decided share
+EQUAL F2 single E2 error
+EQUAL F2 single WBA decided share
+EQUAL F2 single WBA error
+EQUAL F2 number of single curves
+EQUAL F2 digest is the SHA-256 of the table lines of the block under one of four conventions (independent recomputation)
+   convention: ['table lines (header, separator, rows) joined by LF']
+EQUAL F3 s_I number of ROC rows
+EQUAL F3 s_I threshold
+EQUAL F3 s_I fpr
+EQUAL F3 s_I tpr
+EQUAL F3 s_I threshold
+EQUAL F3 s_I fpr
+EQUAL F3 s_I tpr
+EQUAL F3 s_I threshold
+EQUAL F3 s_I fpr
+EQUAL F3 s_I tpr
+EQUAL F3 s_I AUC
+EQUAL F3 s_P number of ROC rows
+EQUAL F3 s_P threshold
+EQUAL F3 s_P fpr
+EQUAL F3 s_P tpr
+EQUAL F3 s_P threshold
+EQUAL F3 s_P fpr
+EQUAL F3 s_P tpr
+EQUAL F3 s_P threshold
+EQUAL F3 s_P fpr
+EQUAL F3 s_P tpr
+EQUAL F3 s_P AUC
+EQUAL F3 digest is the SHA-256 of the table lines of the block under one of four conventions
+   convention: ['table lines (header, separator, rows) joined by LF']
+EQUAL the SHA-256 of the machine file is stated in the tables file and equals the recomputed one
+
+QUANTITIES COMPARED: 645; EQUAL: 645; DIFFER: 0

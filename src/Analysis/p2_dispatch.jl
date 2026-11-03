@@ -50,6 +50,7 @@ reference inputs `p1_*` (default: the files of study `p1-le-benchmark` by the st
 function analyze(; prereg, manifest, panel, params, store, out, figures::Bool = false, threads::Integer = Threads.nthreads(), seed::Union{Nothing, Integer} = nothing,
                  p1_prereg = nothing, p1_manifest = nothing, p1_params = nothing, p1_store = nothing, kw...)
     slug = study_slug(prereg)
+    slug == P3_SLUG && (figures || seed !== nothing) && _fail("the keywords figures and seed are not options of the test side of study $P3_SLUG")
     slug == P3_SLUG && return analyze_p3t(; prereg, manifest, panel, params, store, out, threads, p1_prereg, p1_params, kw...)
     kwerr() = _fail("unknown keyword $(first(keys(kw))): the keywords of the test side are for study $P3_SLUG only")
     if slug == P2_SLUG

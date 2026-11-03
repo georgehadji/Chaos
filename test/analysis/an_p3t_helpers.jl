@@ -278,7 +278,7 @@ function p3t_record_nt(q, t, h0, sha71)
             sets = (cal = (pooled = 36, panel = 12, grid = 24), S2 = (pooled = 8, panel = 2, grid = 6), T_s = (pooled = 6, panel = 2, grid = 4), W2 = (pooled = 13, panel = 5, grid = 8)),
             theta_space = (size = 55,), selection = (feasible = 1, tol = 1, index = 11, star = (index = 11, V = th.V, qC = th.qC, qR = th.qR, w = th.w, v = th.v), J_min = 1 // 20, theta = th),
             pp_hb = (rates = Dict{String, Any}(), model = p3t_model(), path = [row], targets = (outcome = "ok", cap = t.cap_flag, j = 0, rho_star = 1 // 1, n_T = t.target_t_s, n_W = t.target_w2)),
-            pp_hc = (auc_i_used = 0.9, auc_p = 0.55, deliverable_expected = t.target_f, deliverable_worst = t.target_f + 10, power_expected = t.power_hc_planned, target = t.target_f,
+            pp_hc = (auc_i_used = 0.9, auc_p = 0.55, deliverable_expected = t.target_f, deliverable_worst = t.target_f + 10, power_expected = (nf = t.target_f, successes = 33, runs = q.pp_runs, power = t.power_hc_planned, se = 0.05), target = t.target_f,
                      target_power = 0.8, underpowered = false, power_cap = false), r_ab = (), readings = String[])
 end
 

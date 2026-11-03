@@ -1,0 +1,39 @@
+    C1 detail: shape: "OTHER: MethodError: no method matching Float64(::Nothing)
+The type `Float64` exists, but n" | near: OTHER: MethodError: no method matching Float64(::Nothing)
+The type `Float64` exists, but n | null: OTHER: MethodError: no method matching Float64(::Nothing)
+The type `Float64` exists, but n | hc 1e-13: OTHER: MethodError: no method matching Float64(::Nothing)
+The type `Float64` exists, but n
+REV C1 | record in the shape of p3_record (path j = 0, 1, 2 with a null power at j = 0; power_expected a row): the planned powers are read at the target point and in the row; 1e-13 apart and null refuse | FAIL
+    H2 detail: 
+REV H2 | a second ref item with the same content (another cell) refuses naming the orbit and the item (before: the second silently overwrote the first) | FAIL
+    H3 detail: orbit 3; refusal ""; reason now: not dropped
+REV H3 | the drift flag on an ind-arm item (fq1) drops the orbit with reason drift (analyze, drops of the results file) | FAIL
+    H4 detail: p3_rat: cannot read the number NaN
+REV H4 | a non-finite lambda_ns of an orbit that needs it refuses naming the orbit (orbit 3) | FAIL
+REV M5 | lambda_ref and lambda_ns are the exact binary64 values (Rational{BigInt} of the Float64), not the shortest decimal text | FAIL
+    M6 detail: append ok=true; failure injected: "OTHER: SystemError: opening file "C:/Users/tesse/AppData/Local/Temp/claude/C--Us"; log unchanged and folder clean=true
+REV M6 | append: the new log is old + entry, no temporary file stays; a failure at the last step leaves the log bytes unchanged and no temporary file | PASS
+    M7 detail: round log entry 1 is not in canonical form: line 14 is "ÿ" where "" is expected | round log entry 3 is not in canonical form: line 14 is "ÿ" where "" is expected
+REV M7 | a round log that is not valid UTF-8 refuses naming the log (count_round on an open log and analyze on the closed log) | FAIL
+    M8 detail: d64-arm orbit 3, chk-arm orbit 4; D_B = [3, 4]
+REV M8 | D_B is the set of orbits with an L5 Double64 item of the arm chk: an L5 Double64 item of another arm is not counted | FAIL
+    M9 detail: pair (0.30000000000000016, 0.10000000000000014): binary64 says false, exact says true
+REV M9 | ladder test in exact rationals: a pair that binary64 subtraction rounds to the bound is decided by the exact difference (probe error: UndefVarError: `_p3t_ladder` not defined in `Chaoslab.Analysis`
+Suggestion: check for spelling errors or missing imports) | FAIL
+    M10 detail: option value first: false (want true); p3 as an option value: true (want false); plain: true (want true)
+REV M10 | _is_p3t reads the first positional argument, not the value of an option | FAIL
+    L11 detail:  | 
+REV L11 | analyze for the p3 slug refuses the keywords figures and seed | FAIL
+REV L12 | round-down sensitivity: capped list of the round-down budgets, LE round-down budget limited to N_c (probe error: UndefVarError: `_p3t_capped` not defined in `Chaoslab.Analysis`
+Suggestion: check for spelling errors or missing imports) | FAIL
+    L13 detail: OTHER: KeyError: key "tau" not found | panel_sha256 of chunk file chunk-00001.h5 differs from the SHA-256 of the panel  | panel_sha256 of chunk file chunk-00001.h5 differs from the SHA-256 of the panel 
+REV L13 | a chunk file without the root attribute tau refuses naming it; a panel orbit without x0_dec or with a round outside 1 to r_max refuses naming the orbit and the key | FAIL
+    L14 detail: store file chunk-00999.h5 is not in the manifest
+REV L14 | closed log: analyze refuses a ref chunk of a round above the last entry (count_round on a closed log stays tolerant, E62 c (i)) | FAIL
+    L16 detail: 
+REV L16 | a ref chunk whose cell is not k<K index>:r<round> refuses naming the file | FAIL
+REV L17 | T6 prints a McNemar p-value of a large exact rational with 12 significant digits (no fraction) (probe error: UndefVarError: `_p3t_pshow` not defined in `Chaoslab.Analysis`
+Suggestion: check for spelling errors or missing imports.) | FAIL
+    V1 detail: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closure of the round log
+REV V1 | count_round with an altered entry 3 (decision=closf) and closure chunks in the store names entry 3 (before: the closure-chunk guard answered first) | FAIL
+REV summary | 17 probes, 1 PASS, 16 FAIL | FAIL

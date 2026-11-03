@@ -87,8 +87,6 @@ function _p3t_table71(params)
             b_primary = val("b_primary"), n_t_min = val("n_t_min"), n_w_min = val("n_w_min"), y_t = val("y_t"), y_w = val("y_w"), r_max = val("r_max"), test_seed = val("test_seed"))
 end
 
-_p3t_close(a, b) = isapprox(Float64(a), Float64(b); rtol = 1e-11, atol = 1e-15)
-
 # Checks (a) and (b) of E60: the hashes of the record and of the 71-key table, and the outcome of the record.
 function _p3t_check_record_hashes(path, p, record, params, rec)
     bytes2hex(sha256(read(record))) == p.calibration_record_sha256 || _p3terr(path, :calibration_record_sha256, "is $(p.calibration_record_sha256), but the SHA-256 of $record differs")
@@ -99,17 +97,29 @@ function _p3t_check_record_hashes(path, p, record, params, rec)
     out == "selected" || throw(ArgumentError("calibration record $record: the outcome is \"$out\", not \"selected\": the study stopped at calibration"))
 end
 
-# Check (c): theta*, the targets, the cap flag and the planned powers of the record equal the keys.
+# A planned power equals the row of the record exactly: the rational successes / runs or the decimal text of its power (E60 c); a missing row or null counts refuse naming the key.
+function _p3t_same_power(path, k, row, planned, what)
+    (row isa AbstractDict && get(row, "successes", nothing) !== nothing && get(row, "runs", nothing) !== nothing) ||
+        _p3terr(path, k, "cannot be checked: the calibration record has no $what with successes and runs")
+    want = p3_rat(planned)
+    ok = want == p3_rat(row["successes"]) // p3_rat(row["runs"]) || (get(row, "power", nothing) !== nothing && want == p3_rat(row["power"]))
+    ok || _p3terr(path, k, "is $planned, but the calibration record has $(row["power"]) ($(row["successes"]) of $(row["runs"]))")
+end
+
+# Check (c): theta*, the targets, the cap flag and the planned powers of the record equal the keys (the HB power is that of the path point j of the targets, p3_record's `pp_hb`).
 function _p3t_check_record_values(path, p, rec)
     th = rec["selection"]["theta"]
     same(k, a, b) = a == b || _p3terr(path, k, "is $(repr(b)), but the calibration record has $(repr(a))")
     same(:theta_voters, String.(th["V"]), p.theta_voters)
     same(:theta_q_c, th["qC"], p.theta_q_c); same(:theta_q_r, th["qR"], p.theta_q_r); same(:theta_w, th["w"], p.theta_w); same(:theta_v, th["v"], p.theta_v)
-    tg = rec["pp_hb"]["targets"]
+    (rec["pp_hb"] === nothing || rec["pp_hc"] === nothing) && _p3terr(path, :target_f, "cannot be checked: the calibration record has no block pp_hb or pp_hc")
+    tg, hc = rec["pp_hb"]["targets"], rec["pp_hc"]
     same(:target_t_s, tg["n_T"], p.target_t_s); same(:target_w2, tg["n_W"], p.target_w2); same(:cap_flag, tg["cap"], p.cap_flag)
-    same(:target_f, rec["pp_hc"]["target"], p.target_f)
-    _p3t_close(rec["pp_hb"]["path"][1]["power"], p.power_hb_planned) || _p3terr(path, :power_hb_planned, "is $(p.power_hb_planned), but the record has $(rec["pp_hb"]["path"][1]["power"])")
-    _p3t_close(rec["pp_hc"]["power_expected"], p.power_hc_planned) || _p3terr(path, :power_hc_planned, "is $(p.power_hc_planned), but the record has $(rec["pp_hc"]["power_expected"])")
+    hc["target"] === nothing && _p3terr(path, :target_f, "cannot be checked: pp_hc.target of the calibration record is null")
+    same(:target_f, hc["target"], p.target_f)
+    pt = findfirst(x -> x["j"] == tg["j"], rec["pp_hb"]["path"])
+    _p3t_same_power(path, :power_hb_planned, pt === nothing ? nothing : rec["pp_hb"]["path"][pt], p.power_hb_planned, "path point j = $(tg["j"])")
+    _p3t_same_power(path, :power_hc_planned, hc["power_expected"], p.power_hc_planned, "row power_expected")
 end
 
 # Checks (d), (e), (f): theta* in its ranges, the targets between the floors and the caps (exact), the seed and `r_max` of the record.

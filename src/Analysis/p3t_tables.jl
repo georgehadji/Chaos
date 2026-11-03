@@ -24,7 +24,7 @@ function _p3t_t2(A)
     rho = [count(x -> x.rho === s, A.st.rows) for s in (:C, :R, :U)]
     L = ["The test draw. Orbits in the panel file: $(length(A.c.panel_orbits)); rounds $(length(rds)).", ""]
     append!(L, mdt(["round", "orbits", "K = 0", "E_test", "W2", "T_s", "S2"], rows))
-    append!(L, ["", "Labels of the orbits with K > 0 read (rho = C, R, U): $(rho[1]), $(rho[2]), $(rho[3]); excluded $(count(x -> x.excluded, A.st.rows)), drift $(count(x -> x.drift, A.st.rows)).", ""])
+    append!(L, ["", "Labels of the orbits with K > 0 read (rho = C, R, U): $(rho[1]), $(rho[2]), $(rho[3]); excluded $(count(x -> x.excluded, A.st.rows)), drift on L1 or L5 (as the round log counts) $(count(x -> x.drift, A.st.rows)); dropped as drift on any item read (E64 b) $(count(d -> d.reason == "drift", A.O.drops)).", ""])
     cnt = (E_test = length(E), W2 = count(r -> r.W2, E), T_s = count(r -> r.Ts, E), S2 = count(r -> r.S2, E), D = length(O.vd), D_B = length(A.dB), gate = length(O.gate.ids))
     append!(L, mdt(["set", "size", "target"], [["E_test", cnt.E_test, nothing], ["W2", cnt.W2, A.c.t.target_w2], ["T_s", cnt.T_s, A.c.t.target_t_s], ["S2", cnt.S2, nothing], ["D", cnt.D, A.c.t.target_f],
                                               ["D_B", cnt.D_B, nothing], ["gate", cnt.gate, nothing]]))
@@ -38,6 +38,9 @@ function _p3t_lam_nb(it, nB)
     return it.lam[i]
 end
 
+# The ladder test (a) in exact rationals: the stored exponents as binary64 values (M5), the bound as its decimal text (M9).
+_p3t_ladder(lam, tol) = any(abs(Rational{BigInt}(lam[i]) - Rational{BigInt}(lam[i + 1])) > p3_rat(tol) for i in 1:2)
+
 function _p3t_t3(A, files)
     if files.p1_params === nothing || !isfile(files.p1_params)
         return ["The P1 parameter table was not given: the reference check on D_B is not computed."]
@@ -50,10 +53,10 @@ function _p3t_t3(A, files)
         its = [itm("Float64")(id), itm("Double64")(id), itm("BigFloat")(id)]
         lam = [_p3t_lam_nb(it, p1.N_B) for it in its]
         labs = [rho_of(id, it) for it in its]
-        ladder = any(isnothing, lam) ? nothing : (abs(lam[1] - lam[2]) > p1.ladder_tol || abs(lam[2] - lam[3]) > p1.ladder_tol)
+        ladder = any(x -> x === nothing || !isfinite(x), lam) ? nothing : _p3t_ladder(lam, p1.ladder_tol)
         same = any(isnothing, labs) ? nothing : allequal(labs)
         same === true && (agree += 1)
-        rho = A.byid[id].rho
+        rho = haskey(A.byid, id) ? A.byid[id].rho : :dropped      # an orbit of D_B may have left E_test (drift on an item read, E64 b)
         ladder === true && (forced[rho] = get(forced, rho, 0) + 1)
         push!(rows, Any[id, p1.N_B, lam[1], lam[2], lam[3], ladder, same, rho])
     end
@@ -89,10 +92,13 @@ function _p3t_t5(A)
     return L
 end
 
+# The exact p-value of a comparison as printed in T6: 12 significant digits; the JSON file keeps the rational.
+_p3t_pshow(p) = p isa Rational ? Float64(p) : p
+
 function _p3t_t6(A)
     r, hb = A.hbr, A.hbr.hb
     cmp = p3t_cmp_rows(hb, A.M, A.qt, r.bx)
-    rows = [[x.set, x.indicator, x.b, x.cost, x.capped, x.cost_unmatched, x.fr_x, x.fr_rule, x.n11, x.n10, x.n01, x.n00, x.p, x.margin, x.pass] for x in cmp]
+    rows = [[x.set, x.indicator, x.b, x.cost, x.capped, x.cost_unmatched, x.fr_x, x.fr_rule, x.n11, x.n10, x.n01, x.n00, _p3t_pshow(x.p), x.margin, x.pass] for x in cmp]
     L = ["HB: $(hb.decision). Final sizes: T_s $(r.sizes.Ts), W2 $(r.sizes.W2); underpowered: $(hb.underpowered); cost-unmatched LE: true; defects: $(isempty(hb.defects) ? "none" : join(hb.defects, ", ")).", ""]
     append!(L, mdt(["set", "comparator", "b_X", "cost", "capped", "cost-unmatched", "FR_X", "FR_rule", "n11", "n10", "n01", "n00", "p", "margin", "pass"], rows))
     append!(L, ["", "Coverage of the rule (price 1 - cov): T_s $(_c(r.cov[:Ts])) (price $(_c(1 - r.cov[:Ts]))), W2 $(_c(r.cov[:W2])) (price $(_c(1 - r.cov[:W2]))); condition met: $(hb.coverage_ok).",

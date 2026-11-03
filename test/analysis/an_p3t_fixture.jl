@@ -59,7 +59,7 @@ end
     @test p3ref_sha256_file(I.record) == I.t.calibration_record_sha256 && p3ref_sha256_file(I.params) == I.t.p3_table_sha256 == rec["fingerprints"]["p3_parameters"]
     @test rec["outcome"]["selection"] == "selected" && rec["parameters"]["test_seed"] == 20261030 && rec["parameters"]["r_max"] == 3.0
     @test rec["pp_hb"]["targets"]["n_T"] == I.t.target_t_s && rec["pp_hb"]["targets"]["n_W"] == I.t.target_w2 && rec["pp_hc"]["target"] == I.t.target_f && rec["pp_hb"]["targets"]["cap"] === false
-    @test rec["selection"]["theta"]["V"] == ["SALI", "FLI", "MEGNO", "E2"] && rec["selection"]["theta"]["qC"] == 2 && rec["pp_hc"]["power_expected"] == I.t.power_hc_planned
+    @test rec["selection"]["theta"]["V"] == ["SALI", "FLI", "MEGNO", "E2"] && rec["selection"]["theta"]["qC"] == 2 && rec["pp_hc"]["power_expected"]["power"] == I.t.power_hc_planned
     @test rec["pp_hb"]["path"][1]["power"] == I.t.power_hb_planned && rec["pp_hb"]["model"]["rule"]["T"]["p"] == 0.1 && rec["pp_hb"]["model"]["comp"]["SALI"]["RW"]["s"] == 0.3
 end
 

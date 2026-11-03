@@ -365,3 +365,71 @@ No CRITICAL or HIGH finding. Fixed at this stage (code only, no test changed; th
 The owner accepted stage 04: the six review fixes stand; V1 (the HC test slightly anti-conservative at AUC 0.5) is recorded with no change to the frozen test; V2 (HB expected underpowered at the cap) goes to the decision on Amendment A1, before any test data; V3 and V4 stay as stated limits.
 
 Owner decision on V2 (2026-10-31, after stage 05): run as frozen. No register change; Amendment A1 records the cap targets, the power at the cap and the expected-underpowered flag for HB (NEGATIVE allowed).
+
+## Amendment D95: test side of study p3-abstention (stage 04)
+
+Date: 2026-11-03, Julia 1.13.2, code at 8a6adff plus the review fixes below (not committed at the time of writing). Spec: `analysis-spec.md`, "Amendment D95" (E59 to E73, I38 to I46, O20 to O24, criteria D95a to D95q). Notes: `stages/03-implement/output/analysis-d95-impl-notes.md`.
+
+Verify scripts:
+- `verify/analysis-p3t.jl` (toy campaign of O22 e, round by round, and the checks of D95d, D95o, D95q), `analysis-p3t-cli.sh` and `analysis-p3t-run.py` (CLI, wall time, peak memory), `analysis-p3t-alter.jl` (O23), `analysis-p3t-runner.jl` (O24, runner side), `analysis-p3t-power.jl` (D95j threads), `analysis-p3t-regress.sh` and `analysis-p3t-regress.py` (D95a golden outputs from 263717c in a temporary worktree), `analysis-d95-review.jl` (review probes REV).
+- `verify/analysis-p3t-export.jl`, `analysis-p3t-oracle.py`, `analysis-p3t-compare.py` (O20): independent author. It read only the spec, `schema/run-store.md`, the preregistration, `verify/` and the campaign; no file of `src/`, `test/`, `bench/` or the stage 02 and 03 folders. Its result was written before the module output was opened.
+
+Raw output (this folder): `analysis-d95-verify-log.txt` and `analysis-d95-oracle-log.txt` (before the fixes), `analysis-d95-review-before.txt` and `analysis-d95-review-after.txt` (probes), `analysis-d95-verify-log-fixed.txt` and `analysis-d95-oracle-log-fixed.txt` (after the fixes). Run artifacts are in the session scratchpad (`d95v/`); nothing under `data/` was written.
+
+### Evidence per criterion
+
+| Criterion | Evidence | Result |
+|-----------|----------|--------|
+| D95a (S, V) | (S) suite; (V) `calibrate`, p1 and p2 `analyze` on the real inputs equal golden outputs of 263717c except the git commit lines (record 3242, calibration tables 542, p1 18103, p2 14114 lines); the one other differing line is the record SHA-256 in the calibration tables, which follows from the commit line in the record | pass |
+| D95b, D95c, D95m, D95n, D95p (S) | package suite after the fixes: analysis 2476 pass, 0 fail, 0 error; quality 12 (Aqua, JET clean) | pass |
+| D95d (S, V) | (S) suite; (V) 3-entry log of the toy campaign (continue, continue, close) byte-identical at 1, 4 and 23 threads; the independent writer `verify/experiments-d94-log.py` gives the same 1330 bytes; runner acceptance through `run_campaign` and `--round-log` not run (finding V2); the runner's own reader and checker accept the log | pass, 1 finding |
+| D95e O23 | before the fixes 1065 alterations (3-entry log 663, 2-entry prefix 363, the 39 of the independent writer), all refused by `count_round` and `analyze` with ArgumentError, no output folder; after the fixes 1026 alterations on the rebuilt campaign, all refused, entry named in 977 (the rest name the preceding entry, because the alteration merges two entries); the two D94 O26 cases accepted at the time (counts of the last entry) are now refused, closing D94 V1 | pass |
+| D95f, D95g, D95h, D95i, D95l (S, V) | (S) suite; (V) O20 on the toy campaign: 645 quantities (log entries, 50 chunk hashes, labels, drops, sets, strata, HA bounds and bootstrap, 13 HB comparisons and 12 without LE, 4 sensitivities, HC, R_ab, T2 to T4, T9 to T11, F2 and F3 rows and digests), 645 equal before the fixes and 645 equal after (oracle rerun unedited on the rebuilt inputs) | pass |
+| D95j (S, V) | (S) suite; (V) `p3t_power_hb` and `p3t_power_hc` on the campaign inputs, 36 cases with 40, 400 and 2000 runs, identical at 1, 4 and 23 threads (27 with nonzero successes) | pass |
+| D95k (V) | power at achieved failures against an independent simulation within 3 SE: not run (the toy reaches its HC target, so no recomputation) | not run |
+| D95o (S, V) | log and both output files byte-identical at 1, 4, 23 threads and in a second folder; CLI equals library; input and store hashes unchanged after every call; no absolute path; `data/` listing (3374 files) identical before and after | pass |
+| D95q (V) | CLI end to end exit 0; `count-round` 17.4 to 18.9 s, `analyze` 28.2 to 29.7 s (with about 15 s start-up), peak 1.15 to 1.60 GB (bounds 5 min, 30 min, 8 GB); O20 equal (above); study size not measured | pass |
+
+### Independent code review (fresh Sonnet subagent, spec and code, not the notes)
+
+One CRITICAL, three HIGH, six MEDIUM, seven LOW. Owner decision 2026-11-03: fix all, each with a probe. Probes on the unfixed code: 16 FAIL, 1 PASS (M6); after the fixes: 17 PASS. Three of the FAIL before (M9, L12, L17) are probe errors because the new helper did not exist yet, not a reproduced wrong result.
+
+Fixed:
+- C1 (`p3t_params.jl`): E60 (c) read the planned HB power at the first path point (j = 0, may be null) and the planned HC power as a number, while the record holds a row. Both `count-round` and `analyze` failed with a MethodError on a record of a real `calibrate` run. Now the HB power is read at the path point of `targets.j` (or `power_cap` in the cap case) and the HC power from the `power_expected` row, compared exactly (no `rtol`, review L15), null values refused naming the key. The hand-built test record had the wrong shape (test rework below).
+- H2 (`p3t_count.jl`): ref items keyed by orbit and spec only; a second item overwrote the first. Now selected by content (Float64, N_1, tau, `directions[1]`, E64 a); a repeat is refused naming orbit, item and file.
+- H3 (`p3t_data.jl`, `p3t_tables.jl`): drift was read from L1 and L5 only. Now the flag on any item read drops the orbit with reason drift (E64 b); the log counts keep E62 b; T2 shows both counts (I46). The H3 probe also found a KeyError in T3 for a D_B orbit outside E_test; fixed (dropped).
+- H4, M5 (`p3t_store.jl`): lambda was converted for every row through its decimal text; a non-finite value aborted the run without naming the orbit. Now converted only where used, as the exact binary64 value (`Rational{BigInt}`); a non-finite value is refused naming the orbit. Thresholds stay exact rationals of their decimal text.
+- M6 (`p3t_count.jl`): the append writes the old bytes plus the entry to a temporary file, re-reads the log, then renames; on error the temporary file is removed and the log keeps its bytes. The probe does not discriminate (the old code also refused its injected failure).
+- M7 invalid UTF-8 in the log refused naming the log; M8 D_B restricted to the chk arm; M9 T3 ladder test in exact rationals; M10 `_is_p3t` skips option values.
+- L11 `figures` and `seed` refused for the p3 slug; L12 round-down sensitivity with its own capped list and LE limited to N_c; L13 `method`, `precision`, `horizon`, `tau` required root attributes, panel `x0_dec`, `p0_dec` and round range checked; L14 `analyze` refuses a ref chunk of a round above the last entry of a closed log; L16 a ref chunk with a malformed cell refused naming the file, digest filtered on `complete`; L17 T6 prints p-values at 12 significant digits (the machine file keeps the exact rational).
+- V1 of this verification (found by O23 before the fixes): `count_round` on an altered log that reads as open, with closure chunks present, gave the closure-chunk message without the entry (21 of 1065 cases). Entries are now verified before that guard, and the message names the entry.
+
+Recorded, not changed: L14 for `count_round` (a closed log stays tolerant of later chunks: E62 c (i) and the D95d test say so).
+
+Recorded test rework (owner decision "fix all", C1): `test/analysis/an_p3t_helpers.jl:281` (`power_expected` is the row of the record), `an_p3t_fixture.jl:62` (reads `["power"]` of that row), `an_p3t_params.jl:98` (the alteration sets `power` in the row). No assertion weakened.
+
+### Findings of the verification
+
+- V1. Entry not named in 21 refusals of O23 (fixed above).
+- V2 (O24). Runner acceptance of the log through `run_campaign` and `--round-log` was not run: the toy store is written by the chunk writer, not the runner, so the runner's planned ref digest cannot match it. The runner's reader and checker accept the log; on the 39 alterations of the independent writer they refuse 32 and accept the 7 count lines of the last entry (the runner does not recount, P81; Analysis now refuses them). Proposed: run it at study stage 04 on the real store.
+- V3 (spec text, for stage 05). The oracle author found points the spec leaves open: F2 rule family as cross or product grid (E72, D93 E54; module and oracle agree on the cross); the source of N_B in T3 (E71; the oracle aligned to the module's reading after seeing it, P109); which arm's specs give a measured cost (E69 c); drift on any item (E64 b) against L1 and L5 (E62 b), handled by H3; whether one undefined bound makes HC not decidable (E70); "read up to N_c" for LE (E65); the row form behind the F2 and F3 digests; the null `pp_hc.target` case of E60 (c), now refused.
+- V4 (toy coverage). The toy rule is never false-regular (HB power 0 of 40), has no tie at a set boundary, drops no HA replicate and does not exercise HC power at achieved sizes. "All equal" in O20 does not cover these paths, nor the C1 record shape.
+
+### Audit
+
+| Check | Pass condition | Result |
+|-------|----------------|--------|
+| Evidence | Every acceptance criterion has a number or a plot | pass, except D95k (V) (not run) and O24 runner acceptance (V2) |
+| Review closed | No open CRITICAL or HIGH review finding | pass (C1, H2, H3, H4 fixed and probed) |
+
+## Not verified (D95)
+
+- The whole package suite after the fixes (the analysis suite and quality were run; the fixes touch only `src/Analysis/` and three analysis test lines).
+- O24 runner acceptance (V2) and D95k (V).
+- Time and memory at study size on the real test store (it does not exist yet).
+- Byte identity across machines.
+- Aqua and JET ran in a scratch environment (`verify` has no Aqua).
+
+### Owner decision at the D95 stage 04 checkpoint (2026-11-03)
+
+Accepted by the owner, with the review fixes and the test rework as above; V2 goes to study stage 04 on the real store, V3 goes into the spec at stage 05, V4 stays a stated limit.

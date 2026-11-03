@@ -1,0 +1,278 @@
+# D95 stage 04 verify log, Julia side (2026-11-03). Module at 8a6adff, Julia 1.13.2, Windows. Scratch root: d95v. Nothing under data/ was written.
+# Scripts: verify/analysis-p3t.jl (campaign), analysis-p3t-cli.sh + analysis-p3t-run.py (CLI, time, memory, threads), analysis-p3t-alter.jl (O23), analysis-p3t-runner.jl (O24 runner side), analysis-p3t-power.jl (D95j), analysis-p3t-regress.sh/.py (D95a)
+
+## 1. campaign written (analysis-p3t.jl, -t 4)
+count_round round 1: action=appended round=1 decision=continue counts=(drift = 1, excluded = 0, orbits = 12, t_s = 2, target_t_s = 5, target_w2 = 11, w2 = 4)
+count_round round 2: action=appended round=2 decision=continue counts=(drift = 1, excluded = 1, orbits = 22, t_s = 4, target_t_s = 5, target_w2 = 11, w2 = 7)
+count_round round 3: action=appended round=3 decision=close counts=(drift = 1, excluded = 1, orbits = 29, t_s = 5, target_t_s = 5, target_w2 = 11, w2 = 11)
+analyze returned: @NamedTuple{status::Symbol, results::String, tables::String, f2::@NamedTuple{columns::Vector{String}, rows::Vector{Vector{Any}}, digest::String}, f3::@NamedTuple{columns::Vector{String}, rows::Vector{Vector{Any}}, digest::String}, decisions::@NamedTuple{HA::String, HB::String, HC::String}}
+module-out: ["p3-abstention-tables.md", "p3-abstention-test-results.json"]
+campaign written: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d95v\campaign; files in store: 50
+
+real	0m48.379s
+user	0m0.015s
+sys	0m0.015s
+
+## 2. CLI end to end at 1, 4, 23 threads (D95q, D95o, D95d); RUN lines: wall time, peak working set of the julia process
+RUN | count-round r1 t=1 | rc=0 | wall=18.6 s | peak_ws=1532 MB
+stage r1 unchanged
+inputs unchanged after count-round 1; round-log bytes: 444
+RUN | count-round r2 t=1 | rc=0 | wall=18.9 s | peak_ws=1598 MB
+stage r2 unchanged
+inputs unchanged after count-round 2; round-log bytes: 888
+RUN | count-round r3 t=1 | rc=0 | wall=18.7 s | peak_ws=1585 MB
+stage r3 unchanged
+inputs unchanged after count-round 3; round-log bytes: 1330
+RUN | analyze t=1 out=module-out | rc=0 | wall=29.2 s | peak_ws=1534 MB
+inputs unchanged after analyze (module-out)
+files in module-out: p3-abstention-tables.md p3-abstention-test-results.json 
+RUN | count-round r1 t=4 | rc=0 | wall=17.7 s | peak_ws=1234 MB
+stage r1 unchanged
+inputs unchanged after count-round 1; round-log bytes: 444
+RUN | count-round r2 t=4 | rc=0 | wall=17.7 s | peak_ws=1235 MB
+stage r2 unchanged
+inputs unchanged after count-round 2; round-log bytes: 888
+RUN | count-round r3 t=4 | rc=0 | wall=17.5 s | peak_ws=1226 MB
+stage r3 unchanged
+inputs unchanged after count-round 3; round-log bytes: 1330
+RUN | analyze t=4 out=module-out | rc=0 | wall=29.7 s | peak_ws=1250 MB
+inputs unchanged after analyze (module-out)
+files in module-out: p3-abstention-tables.md p3-abstention-test-results.json 
+RUN | analyze t=4 out=module-out-b | rc=0 | wall=29.0 s | peak_ws=1249 MB
+inputs unchanged after analyze (module-out-b)
+files in module-out-b: p3-abstention-tables.md p3-abstention-test-results.json 
+RUN | count-round r1 t=23 | rc=0 | wall=17.8 s | peak_ws=1147 MB
+stage r1 unchanged
+inputs unchanged after count-round 1; round-log bytes: 444
+RUN | count-round r2 t=23 | rc=0 | wall=17.8 s | peak_ws=1145 MB
+stage r2 unchanged
+inputs unchanged after count-round 2; round-log bytes: 888
+RUN | count-round r3 t=23 | rc=0 | wall=17.4 s | peak_ws=1153 MB
+stage r3 unchanged
+inputs unchanged after count-round 3; round-log bytes: 1330
+RUN | analyze t=23 out=module-out | rc=0 | wall=28.2 s | peak_ws=1197 MB
+inputs unchanged after analyze (module-out)
+files in module-out: p3-abstention-tables.md p3-abstention-test-results.json 
+--- identity of the outputs across runs
+round-log t1 == t4
+p3-abstention-tables.md t1 == t4
+p3-abstention-test-results.json t1 == t4
+round-log t1 == t23
+p3-abstention-tables.md t1 == t23
+p3-abstention-test-results.json t1 == t23
+p3-abstention-tables.md out == out-b (t4)
+p3-abstention-test-results.json out == out-b (t4)
+round-log == part-1 library log
+p3-abstention-tables.md == part-1 library output
+p3-abstention-test-results.json == part-1 library output
+--- absolute paths in the outputs:
+none
+
+## 3. O24 writer identity and runner side
+python -I verify/experiments-d94-log.py --panel <campaign>/inputs/p3-abstention-test-panel.toml --prereg-sha c1b4664d464a1fec2498f400469d9cbf99c80d43094e05f2b276f2c07036855f --rounds 3 --decisions continue,continue,close --counts "drift=1,excluded=0,orbits=12,t_s=2,target_t_s=5,target_w2=11,w2=4;drift=1,excluded=1,orbits=22,t_s=4,target_t_s=5,target_w2=11,w2=7;drift=1,excluded=1,orbits=29,t_s=5,target_t_s=5,target_w2=11,w2=11" --store <campaign>/store --each-round-arms L1,L5
+chunk hash source: raw byte scan of the chunk files (h5dump not installed); arm = method id; 50 chunks; 3 entries; panel_sha256 2eb94e9148efa02f0b61fda8eddca5d343161d6f958867a28e19d9fa6b98ca60
+wrote valid log and 39 altered copies to C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d95v/o24
+O24 | count-round log == independent writer log, byte for byte (1330 bytes) | PASS
+0e1d0b2ef434888b3ed778ecbf1a89e2a74740520df5fba0d83f35a23b77e776 *C:/U
+0e1d0b2ef434888b3ed778ecbf1a89e2a74740520df5fba0d83f35a23b77e776 *C:/U
+O24 | runner reader and checker on the log of count-round (3 entries, r_max 3, panel and prereg hashes, ref digest from the store chunk hashes) | accepted (R_plan = 3, closed = true) | accepted | PASS
+O24 | runner on the 39 one-byte alterations of the independent writer | refused 32, accepted 7, other exceptions 0 | accepted are the 7 count lines of the last entry (the runner does not recount; a count line of entries 1 and 2 breaks the chain), as the 2 of D94 O26 | PASS
+      accepted: round-log-bad-count_drift-3.txt, round-log-bad-count_excluded-3.txt, round-log-bad-count_orbits-3.txt, round-log-bad-count_t_s-3.txt, round-log-bad-count_target_t_s-3.txt, round-log-bad-count_target_w2-3.txt, round-log-bad-count_w2-3.txt
+
+## 4. O23 / D95e log alterations
+# progress 100 / 1065 after 29.0 s
+# progress 200 / 1065 after 41.0 s
+# progress 300 / 1065 after 54.0 s
+# progress 400 / 1065 after 67.0 s
+# progress 500 / 1065 after 79.0 s
+# progress 600 / 1065 after 92.0 s
+# progress 700 / 1065 after 102.0 s
+# progress 800 / 1065 after 111.0 s
+# progress 900 / 1065 after 120.0 s
+# progress 1000 / 1065 after 130.0 s
+O23 | family | cases | count_round refused | analyze refused | named entry == altered entry (both) | status
+O23 | 3e/F1a last byte substituted | 39 | 39 | 39 | 38 | all refused
+O23 | 3e/F1b first byte substituted | 39 | 39 | 39 | 36 | all refused
+O23 | 3e/F1c last byte deleted | 39 | 39 | 39 | 38 | all refused
+O23 | 3e/F1d byte inserted at end | 39 | 39 | 39 | 38 | all refused
+O23 | 3e/F1e trailing space | 39 | 39 | 39 | 38 | all refused
+O23 | 3e/F2a count plus one | 21 | 21 | 21 | 21 | all refused
+O23 | 3e/F2b count minus one | 20 | 20 | 20 | 20 | all refused
+O23 | 3e/F5 leading zero in a count | 21 | 21 | 21 | 21 | all refused
+O23 | 3e/F6a count line emptied | 21 | 21 | 21 | 21 | all refused
+O23 | 3e/F6b count line deleted | 21 | 21 | 21 | 21 | all refused
+O23 | 3e/F3 two lines swapped | 234 | 234 | 234 | 210 | all refused
+O23 | 3e/F4 blank line | 42 | 42 | 42 | 40 | all refused
+O23 | 3e/F7 count name added | 12 | 12 | 12 | 12 | all refused
+O23 | 3e/F8 line duplicated | 3 | 3 | 3 | 3 | all refused
+O23 | 3e/F8 line deleted | 6 | 6 | 6 | 4 | all refused
+O23 | 3e/F9 file level | 17 | 17 | 17 | 14 | all refused
+O23 | 2e/F1a last byte substituted | 26 | 26 | 26 | 26 | all refused
+O23 | 2e/F1b first byte substituted | 26 | 26 | 26 | 25 | all refused
+O23 | 2e/F1c last byte deleted | 26 | 26 | 26 | 26 | all refused
+O23 | 2e/F1d byte inserted at end | 26 | 26 | 26 | 26 | all refused
+O23 | 2e/F1e trailing space | 26 | 26 | 26 | 26 | all refused
+O23 | 2e/F2a count plus one | 14 | 14 | 14 | 14 | all refused
+O23 | 2e/F2b count minus one | 13 | 13 | 13 | 13 | all refused
+O23 | 2e/F5 leading zero in a count | 14 | 14 | 14 | 14 | all refused
+O23 | 2e/F6a count line emptied | 14 | 14 | 14 | 14 | all refused
+O23 | 2e/F6b count line deleted | 14 | 14 | 14 | 14 | all refused
+O23 | 2e/F3 two lines swapped | 156 | 156 | 156 | 144 | all refused
+O23 | 2e/F4 blank line | 28 | 28 | 28 | 27 | all refused
+O23 | 2e/F7 count name added | 8 | 8 | 8 | 8 | all refused
+O23 | 2e/F8 line duplicated | 2 | 2 | 2 | 2 | all refused
+O23 | 2e/F8 line deleted | 4 | 4 | 4 | 3 | all refused
+O23 | 2e/F9 file level | 16 | 16 | 16 | 14 | all refused
+O23 | py/O26 writer alteration | 39 | 39 | 39 | 38 | all refused
+TOTAL | cases 1065 | count_round refused 1065 | analyze refused 1065 | other exception types 0 | entry named == altered entry in both 1009
+--- cases not refused by both, or refused by an exception that is not ArgumentError:
+--- cases refused by both but naming a different entry than the altered one (message of count_round / analyze):
+  count: 56
+  3e/F1b first byte substituted | entry 2 line round | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,2 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 14 is "decision=continue" where "" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,3 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 14 is "count.drift=1" where "" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,4 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,5 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,6 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,7 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,8 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,9 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,10 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,11 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,12 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,13 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F4 blank line | entry 2 after line 0 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 15 is "" where "(end)" is expected
+  3e/F8 line deleted | entry 2 first line deleted | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F1b first byte substituted | entry 3 line round | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F1a last byte substituted | entry 3 line decision | altered entry 3 | named cr 0 an 3 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F1b first byte substituted | entry 3 line decision | altered entry 3 | named cr 0 an 3 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F1c last byte deleted | entry 3 line decision | altered entry 3 | named cr 0 an 3 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F1d byte inserted at end | entry 3 line decision | altered entry 3 | named cr 0 an 3 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F1e trailing space | entry 3 line decision | altered entry 3 | named cr 0 an 3 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,2 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,3 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,4 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,5 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,6 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,7 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,8 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,9 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,10 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,11 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,12 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F3 two lines swapped | entry 3 lines 1,13 | altered entry 3 | named cr 0 an 2 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F4 blank line | entry 3 after line 0 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 15 is "" where "(end)" is expected
+  3e/F8 line deleted | entry 3 first line deleted | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F9 file level | empty file | altered entry 1 | named cr 0 an 0 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F9 file level | only a LF | altered entry 1 | named cr 0 an 1 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F9 file level | a line of an unknown key appended | altered entry 4 | named cr 3 an 3 | ArgumentError: round log entry 3 is not in canonical form: line 14 is "extra=1" where "" is expected
+  2e/F1b first byte substituted | entry 2 line round | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,2 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 14 is "decision=continue" where "" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,3 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 14 is "count.drift=1" where "" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,4 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,5 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,6 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,7 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,8 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,9 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,10 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,11 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,12 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,13 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F4 blank line | entry 2 after line 0 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 15 is "" where "(end)" is expected
+  2e/F8 line deleted | entry 2 first line deleted | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F9 file level | empty file | altered entry 1 | named cr 0 an 0 | ArgumentError: a ref chunk of round 2 exists in the store while the next round to count is round 1: the guard of the runner was by
+  2e/F9 file level | a line of an unknown key appended | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 14 is "extra=1" where "" is expected
+  py/O26 writer alteration | decision entry 3 | altered entry 3 | named cr 0 an 3 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+--- sample messages
+  3e/F1a last byte substituted | entry 1 line round | ArgumentError: round log entry 1: line round says 2, the rounds must be 1, 2, ... without gap or repeat (expected 1)
+  3e/F1d byte inserted at end | entry 1 line round | ArgumentError: round log entry 1: line round is missing or not an integer
+  3e/F1b first byte substituted | entry 1 line decision | ArgumentError: round log entry 1: line decision is "", not continue or close
+  3e/F1e trailing space | entry 1 line decision | ArgumentError: round log entry 1: line decision is "continue ", not continue or close
+  3e/F1c last byte deleted | entry 1 line count.drift | ArgumentError: round log entry 1: line count.drift is missing or not an integer
+  3e/F1a last byte substituted | entry 1 line count.excluded | ArgumentError: round log entry 1: line count.excluded is 1, the recomputation from the ref datasets gives 0
+  3e/F1d byte inserted at end | entry 1 line count.excluded | ArgumentError: round log entry 1: line count.excluded is missing or not an integer
+  3e/F1b first byte substituted | entry 1 line count.orbits | ArgumentError: round log entry 1: line count.orbits is missing or not an integer
+  3e/F1e trailing space | entry 1 line count.orbits | ArgumentError: round log entry 1 is not in canonical form: line 5 is "count.orbits=12 " where "count.orbits=12" is expected
+  3e/F1c last byte deleted | entry 1 line count.t_s | ArgumentError: round log entry 1: line count.t_s is missing or not an integer
+  3e/F1a last byte substituted | entry 1 line count.target_t_s | ArgumentError: round log entry 1: line count.target_t_s is 6, the recomputation from the ref datasets gives 5
+  3e/F1d byte inserted at end | entry 1 line count.target_t_s | ArgumentError: round log entry 1: line count.target_t_s is missing or not an integer
+  3e/F1b first byte substituted | entry 1 line count.target_w2 | ArgumentError: round log entry 1: line count.target_w2 is missing or not an integer
+  3e/F1e trailing space | entry 1 line count.target_w2 | ArgumentError: round log entry 1 is not in canonical form: line 8 is "count.target_w2=11 " where "count.target_w2=11" is expected
+  3e/F1c last byte deleted | entry 1 line count.w2 | ArgumentError: round log entry 1: line count.w2 is missing or not an integer
+  3e/F1a last byte substituted | entry 1 line panel_sha256 | ArgumentError: round log entry 1: line panel_sha256 differs from the SHA-256 of the panel file
+  3e/F1d byte inserted at end | entry 1 line panel_sha256 | ArgumentError: round log entry 1: line panel_sha256 is missing or not 64 lowercase hex digits
+  3e/F1b first byte substituted | entry 1 line prereg_sha256 | ArgumentError: round log entry 1: line prereg_sha256 is missing or not 64 lowercase hex digits
+  3e/F1e trailing space | entry 1 line prereg_sha256 | ArgumentError: round log entry 1: line prereg_sha256 is missing or not 64 lowercase hex digits
+  3e/F1c last byte deleted | entry 1 line ref_digest | ArgumentError: round log entry 1: line ref_digest is missing or not 64 lowercase hex digits
+--- valid logs (accepted):
+  1-entry log with the store of round 1 | count_round: (:accepted, "nothing")
+  2-entry log with the store of round 2 | count_round: (:accepted, "nothing")
+  3-entry log with the store of round 3 | count_round: (:accepted, "closed") | analyze: accepted
+inputs unchanged by all calls (every file of the campaign except the log): true
+round-log restored to the valid text: true
+
+## 5. D95j power at achieved sizes, 1, 4, 23 threads
+D95j | HB power runs=40 nT=1 nRW=1 | successes at 1/4/23 threads: 0/0/0 of 40 | identical incl. power and se: true | PASS
+D95j | HB power runs=40 nT=3 nRW=5 | successes at 1/4/23 threads: 0/0/0 of 40 | identical incl. power and se: true | PASS
+D95j | HB power runs=40 nT=5 nRW=6 | successes at 1/4/23 threads: 0/0/0 of 40 | identical incl. power and se: true | PASS
+D95j | HB power runs=40 nT=10 nRW=12 | successes at 1/4/23 threads: 5/5/5 of 40 | identical incl. power and se: true | PASS
+D95j | HB power runs=40 nT=20 nRW=25 | successes at 1/4/23 threads: 28/28/28 of 40 | identical incl. power and se: true | PASS
+D95j | HB power runs=40 nT=40 nRW=50 | successes at 1/4/23 threads: 39/39/39 of 40 | identical incl. power and se: true | PASS
+D95j | HB power runs=40 nT=80 nRW=100 | successes at 1/4/23 threads: 40/40/40 of 40 | identical incl. power and se: true | PASS
+D95j | HB power runs=400 nT=1 nRW=1 | successes at 1/4/23 threads: 0/0/0 of 400 | identical incl. power and se: true | PASS
+D95j | HB power runs=400 nT=3 nRW=5 | successes at 1/4/23 threads: 0/0/0 of 400 | identical incl. power and se: true | PASS
+D95j | HB power runs=400 nT=5 nRW=6 | successes at 1/4/23 threads: 0/0/0 of 400 | identical incl. power and se: true | PASS
+D95j | HB power runs=400 nT=10 nRW=12 | successes at 1/4/23 threads: 60/60/60 of 400 | identical incl. power and se: true | PASS
+D95j | HB power runs=400 nT=20 nRW=25 | successes at 1/4/23 threads: 283/283/283 of 400 | identical incl. power and se: true | PASS
+D95j | HB power runs=400 nT=40 nRW=50 | successes at 1/4/23 threads: 398/398/398 of 400 | identical incl. power and se: true | PASS
+D95j | HB power runs=400 nT=80 nRW=100 | successes at 1/4/23 threads: 400/400/400 of 400 | identical incl. power and se: true | PASS
+D95j | HB power runs=2000 nT=1 nRW=1 | successes at 1/4/23 threads: 0/0/0 of 2000 | identical incl. power and se: true | PASS
+D95j | HB power runs=2000 nT=3 nRW=5 | successes at 1/4/23 threads: 0/0/0 of 2000 | identical incl. power and se: true | PASS
+D95j | HB power runs=2000 nT=5 nRW=6 | successes at 1/4/23 threads: 0/0/0 of 2000 | identical incl. power and se: true | PASS
+D95j | HB power runs=2000 nT=10 nRW=12 | successes at 1/4/23 threads: 262/262/262 of 2000 | identical incl. power and se: true | PASS
+D95j | HB power runs=2000 nT=20 nRW=25 | successes at 1/4/23 threads: 1404/1404/1404 of 2000 | identical incl. power and se: true | PASS
+D95j | HB power runs=2000 nT=40 nRW=50 | successes at 1/4/23 threads: 1986/1986/1986 of 2000 | identical incl. power and se: true | PASS
+D95j | HB power runs=2000 nT=80 nRW=100 | successes at 1/4/23 threads: 2000/2000/2000 of 2000 | identical incl. power and se: true | PASS
+D95j | HC power runs=40 nf=2 nn=4 | successes at 1/4/23 threads: 12/12/12 of 40 | identical incl. power and se: true | PASS
+D95j | HC power runs=40 nf=6 nn=12 | successes at 1/4/23 threads: 24/24/24 of 40 | identical incl. power and se: true | PASS
+D95j | HC power runs=40 nf=12 nn=40 | successes at 1/4/23 threads: 36/36/36 of 40 | identical incl. power and se: true | PASS
+D95j | HC power runs=40 nf=30 nn=100 | successes at 1/4/23 threads: 40/40/40 of 40 | identical incl. power and se: true | PASS
+D95j | HC power runs=40 nf=60 nn=300 | successes at 1/4/23 threads: 40/40/40 of 40 | identical incl. power and se: true | PASS
+D95j | HC power runs=400 nf=2 nn=4 | successes at 1/4/23 threads: 148/148/148 of 400 | identical incl. power and se: true | PASS
+D95j | HC power runs=400 nf=6 nn=12 | successes at 1/4/23 threads: 268/268/268 of 400 | identical incl. power and se: true | PASS
+D95j | HC power runs=400 nf=12 nn=40 | successes at 1/4/23 threads: 379/379/379 of 400 | identical incl. power and se: true | PASS
+D95j | HC power runs=400 nf=30 nn=100 | successes at 1/4/23 threads: 400/400/400 of 400 | identical incl. power and se: true | PASS
+D95j | HC power runs=400 nf=60 nn=300 | successes at 1/4/23 threads: 400/400/400 of 400 | identical incl. power and se: true | PASS
+D95j | HC power runs=2000 nf=2 nn=4 | successes at 1/4/23 threads: 729/729/729 of 2000 | identical incl. power and se: true | PASS
+D95j | HC power runs=2000 nf=6 nn=12 | successes at 1/4/23 threads: 1325/1325/1325 of 2000 | identical incl. power and se: true | PASS
+D95j | HC power runs=2000 nf=12 nn=40 | successes at 1/4/23 threads: 1866/1866/1866 of 2000 | identical incl. power and se: true | PASS
+D95j | HC power runs=2000 nf=30 nn=100 | successes at 1/4/23 threads: 1999/1999/1999 of 2000 | identical incl. power and se: true | PASS
+D95j | HC power runs=2000 nf=60 nn=300 | successes at 1/4/23 threads: 2000/2000/2000 of 2000 | identical incl. power and se: true | PASS
+D95j | summary: 36 cases, 0 differ between thread counts, 27 cases with successes > 0, largest success count 2000 | PASS
+
+## 6. D95a regression of calibrate, p1 analyze, p2 analyze against the module at 263717c
+RUN | golden calibrate | rc=0 | wall=81.5 s | peak_ws=2365 MB
+d95v/regress/golden/calibrate\p3-abstention-calibration-record.json tables written: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d95v/regress/golden/calibrate\p3-abstention-calibration-tables.md outcome: selected 
+RUN | golden p2 | rc=2 | wall=60.3 s | peak_ws=2110 MB
+tables written: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d95v/regress/golden/p2\p2-indicators-tables.md figures skipped: the plotting package is not loaded (run under the verify environment) 
+RUN | golden p1 | rc=2 | wall=42.3 s | peak_ws=1427 MB
+tables written: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d95v/regress/golden/p1\p1-le-benchmark-tables.md figures skipped: the plotting package is not loaded (run under the verify environment) 
+RUN | head calibrate | rc=0 | wall=59.3 s | peak_ws=2515 MB
+pad/d95v/regress/head/calibrate\p3-abstention-calibration-record.json tables written: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d95v/regress/head/calibrate\p3-abstention-calibration-tables.md outcome: selected 
+RUN | head p2 | rc=2 | wall=61.3 s | peak_ws=2116 MB
+tables written: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d95v/regress/head/p2\p2-indicators-tables.md figures skipped: the plotting package is not loaded (run under the verify environment) 
+RUN | head p1 | rc=2 | wall=43.8 s | peak_ws=1515 MB
+tables written: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d95v/regress/head/p1\p1-le-benchmark-tables.md figures skipped: the plotting package is not loaded (run under the verify environment) 
+REGRESS | calibrate\p3-abstention-calibration-record.json | lines 3242 / 3242 | lines differing outside the ignored version and commit lines: 0 | ignored lines golden 2 head 2 | byte-identical: False | PASS
+REGRESS | calibrate\p3-abstention-calibration-tables.md | lines 542 / 542 | lines differing outside the ignored version and commit lines: 1 | ignored lines golden 2 head 2 | byte-identical: False | FAIL
+   golden: record SHA-256: da3704cafe82780608cdc12bad493ef3bad520191b11e71dd0e36579556e8d01
+   head  : record SHA-256: 02688e5df00d71310b1b8bafb31f25b450b5b755e2b2a1c0e203347433b94e08
+REGRESS | p1\p1-le-benchmark-tables.md | lines 18103 / 18103 | lines differing outside the ignored version and commit lines: 0 | ignored lines golden 2 head 2 | byte-identical: False | PASS
+REGRESS | p2\p2-indicators-tables.md | lines 14114 / 14114 | lines differing outside the ignored version and commit lines: 0 | ignored lines golden 3 head 3 | byte-identical: False | PASS
+REGRESS | files differing outside the ignored lines: 1
+
+## 7. data/ listing (SHA-256 of every file, 3374 files) before and after all runs
+1e30ec93fdf66b0f03cce365e96db5002cb890d777f71cd600d85a45957eddaa *data-before.txt
+1e30ec93fdf66b0f03cce365e96db5002cb890d777f71cd600d85a45957eddaa *data-after.txt
+identical

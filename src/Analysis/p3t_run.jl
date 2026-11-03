@@ -17,14 +17,19 @@ function p3t_hb_tables(rows, qt, bx; le::Bool = true)
     return cmp, Dict{Symbol, Any}(:Ts => share(sets.Ts), :W2 => share(sets.W2)), (Ts = length(sets.Ts), W2 = length(sets.W2))
 end
 
-# The budget function of the matched budgets of `M` (E69 a): the ceiling rule, or the round-down budgets of the sensitivity (i).
-p3t_budget_fn(M, down::Bool) = X -> down ? M.X[X].round_down : (X === :LE ? M.le_read : M.X[X].b)
+# The budget function of the matched budgets of `M` (E69 a): the ceiling rule, or the round-down budgets of the sensitivity (i); LE is read at most up to `Nc` in both.
+function p3t_budget_fn(M, down::Bool, Nc)
+    return X -> down ? (X === :LE && M.X[X].round_down !== nothing ? min(M.X[X].round_down, Nc) : M.X[X].round_down) : (X === :LE ? M.le_read : M.X[X].b)
+end
+
+# The voters without a budget under the rule of the matching: capped by the ceiling rule, or without a round-down budget.
+_p3t_capped(qt, M, down) = Symbol[X for X in Symbol.(qt.voter_bits) if down ? M.X[X].round_down_none : M.X[X].capped]
 
 "HB (E68) for a matching `M`: the decision with the comparators LE included, and the same without LE (reported, no effect)."
 function p3t_hb_run(rows, qt, M, theta; down::Bool = false)
-    bx = p3t_budget_fn(M, down)
+    bx = p3t_budget_fn(M, down, qt.N_c)
     cmp, cov, sizes = p3t_hb_tables(rows, qt, bx)
-    capped = Symbol[X for X in Symbol.(qt.voter_bits) if M.X[X].capped]
+    capped = _p3t_capped(qt, M, down)
     hb = p3t_hb(cmp, cov, sizes, qt; capped)
     cmp12, cov12, _ = p3t_hb_tables(rows, qt, bx; le = false)
     return (hb = hb, cov = cov, sizes = sizes, without_le = p3t_hb(cmp12, cov12, sizes, qt; capped), bx = bx)
@@ -49,7 +54,7 @@ _p3t_sens(decidable, verdict, failing, reason) = (decidable = decidable, verdict
 # One sensitivity (E69 b): the HB comparisons recomputed with the costs `costs` (a NamedTuple or `nothing`) or the round-down budgets; not decidable if a comparator has no budget.
 function _p3t_variant(rows, qt, theta, costs, down)
     M = p3_matched(costs === nothing ? qt : merge(qt, costs), theta.V)
-    bad = Symbol[X for X in vcat(:LE, Symbol.(qt.voter_bits)) if p3t_budget_fn(M, down)(X) === nothing]
+    bad = Symbol[X for X in vcat(:LE, Symbol.(qt.voter_bits)) if p3t_budget_fn(M, down, qt.N_c)(X) === nothing]
     isempty(bad) || return _p3t_sens(false, "not decidable", String[], down ? "no round-down budget for $(join(bad, ", "))" : "the matching caps the comparators $(join(bad, ", "))")
     r = p3t_hb_run(rows, qt, M, theta; down)
     return _p3t_sens(true, r.hb.decision, r.hb.failing, "")

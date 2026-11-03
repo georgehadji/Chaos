@@ -26,7 +26,7 @@ function p3t_context(; prereg, params, test_params, store, panel, p2_manifest, p
     after_hash === nothing || after_hash()      # analyze: the round log is the first input after the hash rule
     qp = _p3_read(params, prereg, p2_params, p2_prereg, p2_manifest, p1_params, nothing)
     t = p3t_read_params(test_params; prereg, record = calibration_record, params)
-    orbits = p3t_read_panel(panel)
+    orbits = p3t_read_panel(panel, Int(qp.q.r_max))
     panel_hash = raw[panel]
     chunks = p3t_scan(store, slug, panel_hash, ph, on_read)
     merge!(raw, _p3_hashes([c.path for c in chunks]))
@@ -37,6 +37,7 @@ end
 function p3t_read_closed_log(path)
     isfile(path) || _fail("the round log $path is absent: analyze needs the closed round log of the test run")
     text = read(path, String)
+    isvalid(text) || _fail("the round log $path is not valid UTF-8")
     isempty(text) && _fail("the round log $path is empty: analyze needs the closed round log of the test run")
     return text
 end

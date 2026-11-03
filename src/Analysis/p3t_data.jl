@@ -36,10 +36,13 @@ end
 
 _p3t_failed_ind_cells(chunks) = Set(parse(Int, c.cell[2:end]) for c in chunks if "ind" in c.arms && c.status == "failed" && occursin(r"^k\d+$", c.cell))
 
+# The orbits with the drift flag on any item read (E64 b); the counts of the round log use the flag of L1 and L5 only (E62 b), the difference is reported (I46).
+_p3t_drifted(idx) = Set(k[1] for (k, it) in idx if "drift" in it.flags)
+
 # The reason an orbit leaves E_test (E64 b), or "" to keep it. An item that E65 needs and an orbit lacks, outside a chunk that failed twice, refuses (E61 k).
-function _p3t_reason(r, idx, p2, failed_ind)
+function _p3t_reason(r, idx, p2, failed_ind, drifted)
     r.excluded && return "excluded"
-    r.drift && return "drift"
+    (r.drift || r.id in drifted) && return "drift"
     r.rho === :U && return "unresolved"
     miss = _p3t_missing_items(idx, p2, r.id)
     isempty(miss) && return ""
@@ -59,11 +62,11 @@ orbits of round 1 with their output, `nothing` without verdict items), the set s
 function p3t_orbits(c, st, idx, theta)
     q, p2 = c.q, c.p2
     ctx = (p = p2, idx = idx)
-    failed_ind = _p3t_failed_ind_cells(c.chunks)
+    failed_ind, drifted = _p3t_failed_ind_cells(c.chunks), _p3t_drifted(idx)
     panel = Dict(Int(o["id"]) => o for o in c.panel_orbits)
     rows, drops, kept = NamedTuple[], NamedTuple[], NamedTuple[]
     for r in sort(st.rows; by = x -> x.id)
-        why = _p3t_reason(r, idx, p2, failed_ind)
+        why = _p3t_reason(r, idx, p2, failed_ind, drifted)
         isempty(why) ? push!(kept, r) : push!(drops, (id = r.id, reason = why, round = r.round, k_index = r.kindex))
     end
     V = p3t_verdict_tables(ctx, [r.id for r in kept])
@@ -101,10 +104,10 @@ function _p3t_double(rows, ctx, theta)
     return out
 end
 
-"The orbits of D_B (E64 c): the orbits that carry an item of the arm chk (the L5 item in Double64); their flag in_D must be set."
+"The orbits of D_B (E64 c): the orbits that carry an item of the arm chk (the L5 item in Double64, in a chunk of that arm); their flag in_D must be set."
 function p3t_dB(c, idx)
     p2 = c.p2
-    ids = sort!(unique(Int[k[1] for k in keys(idx) if k[2] == "L5" && k[3] == "Double64"]))
+    ids = sort!(unique(Int[k[1] for (k, it) in idx if k[2] == "L5" && k[3] == "Double64" && "chk" in it.arms]))
     flag = Dict(Int(o["id"]) => o["in_D"] === true for o in c.panel_orbits)
     for id in ids
         get(flag, id, false) || _fail("orbit $id carries a check item (arm chk) but the flag in_D of the panel file is not set (E64 c)")

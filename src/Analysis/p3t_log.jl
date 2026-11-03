@@ -19,6 +19,7 @@ end
 # The entries of a log text: each starts at a line `round=`; a text that does not start with such a line is one entry (entry 1, refused by the parser).
 function p3t_split_log(text::AbstractString)
     isempty(text) && return String[]
+    isvalid(text) || _fail("the round log is not valid UTF-8")
     st = [m.offset for m in eachmatch(r"(?m)^round=", text)]
     (isempty(st) || st[1] != 1) && return [text]
     push!(st, ncodeunits(text) + 1)

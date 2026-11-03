@@ -1,0 +1,139 @@
+count_round round 1: action=appended round=1 decision=continue counts=(drift = 1, excluded = 0, orbits = 12, t_s = 2, target_t_s = 5, target_w2 = 11, w2 = 4)
+count_round round 2: action=appended round=2 decision=continue counts=(drift = 1, excluded = 1, orbits = 22, t_s = 4, target_t_s = 5, target_w2 = 11, w2 = 7)
+count_round round 3: action=appended round=3 decision=close counts=(drift = 1, excluded = 1, orbits = 29, t_s = 5, target_t_s = 5, target_w2 = 11, w2 = 11)
+analyze returned: @NamedTuple{status::Symbol, results::String, tables::String, f2::@NamedTuple{columns::Vector{String}, rows::Vector{Vector{Any}}, digest::String}, f3::@NamedTuple{columns::Vector{String}, rows::Vector{Vector{Any}}, digest::String}, decisions::@NamedTuple{HA::String, HB::String, HC::String}}
+module-out: ["p3-abstention-tables.md", "p3-abstention-test-results.json"]
+campaign written: C:/Users/tesse/AppData/Local/Temp/claude/C--Users-tesse-Documents-Vibe-Coding-Chaos/5df15ee1-47df-4875-85bd-1bd4d7c665a6/scratchpad/d95v\campaign-fixed; files in store: 50
+
+real	1m0.110s
+user	0m0.000s
+sys	0m0.000s
+
+=== analysis-p3t-alter.jl (O23) against campaign-fixed (the 39 logs of the independent writer in o24 are bound to the earlier campaign's hashes and are not used here) ===
+# progress 100 / 1026 after 37.0 s
+# progress 200 / 1026 after 55.0 s
+# progress 300 / 1026 after 72.0 s
+# progress 400 / 1026 after 86.0 s
+# progress 500 / 1026 after 100.0 s
+# progress 600 / 1026 after 115.0 s
+# progress 700 / 1026 after 125.0 s
+# progress 800 / 1026 after 135.0 s
+# progress 900 / 1026 after 146.0 s
+# progress 1000 / 1026 after 160.0 s
+O23 | family | cases | count_round refused | analyze refused | named entry == altered entry (both) | status
+O23 | 3e/F1a last byte substituted | 39 | 39 | 39 | 39 | all refused
+O23 | 3e/F1b first byte substituted | 39 | 39 | 39 | 37 | all refused
+O23 | 3e/F1c last byte deleted | 39 | 39 | 39 | 39 | all refused
+O23 | 3e/F1d byte inserted at end | 39 | 39 | 39 | 39 | all refused
+O23 | 3e/F1e trailing space | 39 | 39 | 39 | 39 | all refused
+O23 | 3e/F2a count plus one | 21 | 21 | 21 | 21 | all refused
+O23 | 3e/F2b count minus one | 20 | 20 | 20 | 20 | all refused
+O23 | 3e/F5 leading zero in a count | 21 | 21 | 21 | 21 | all refused
+O23 | 3e/F6a count line emptied | 21 | 21 | 21 | 21 | all refused
+O23 | 3e/F6b count line deleted | 21 | 21 | 21 | 21 | all refused
+O23 | 3e/F3 two lines swapped | 234 | 234 | 234 | 210 | all refused
+O23 | 3e/F4 blank line | 42 | 42 | 42 | 40 | all refused
+O23 | 3e/F7 count name added | 12 | 12 | 12 | 12 | all refused
+O23 | 3e/F8 line duplicated | 3 | 3 | 3 | 3 | all refused
+O23 | 3e/F8 line deleted | 6 | 6 | 6 | 4 | all refused
+O23 | 3e/F9 file level | 17 | 17 | 17 | 15 | all refused
+O23 | 2e/F1a last byte substituted | 26 | 26 | 26 | 26 | all refused
+O23 | 2e/F1b first byte substituted | 26 | 26 | 26 | 25 | all refused
+O23 | 2e/F1c last byte deleted | 26 | 26 | 26 | 26 | all refused
+O23 | 2e/F1d byte inserted at end | 26 | 26 | 26 | 26 | all refused
+O23 | 2e/F1e trailing space | 26 | 26 | 26 | 26 | all refused
+O23 | 2e/F2a count plus one | 14 | 14 | 14 | 14 | all refused
+O23 | 2e/F2b count minus one | 13 | 13 | 13 | 13 | all refused
+O23 | 2e/F5 leading zero in a count | 14 | 14 | 14 | 14 | all refused
+O23 | 2e/F6a count line emptied | 14 | 14 | 14 | 14 | all refused
+O23 | 2e/F6b count line deleted | 14 | 14 | 14 | 14 | all refused
+O23 | 2e/F3 two lines swapped | 156 | 156 | 156 | 144 | all refused
+O23 | 2e/F4 blank line | 28 | 28 | 28 | 27 | all refused
+O23 | 2e/F7 count name added | 8 | 8 | 8 | 8 | all refused
+O23 | 2e/F8 line duplicated | 2 | 2 | 2 | 2 | all refused
+O23 | 2e/F8 line deleted | 4 | 4 | 4 | 3 | all refused
+O23 | 2e/F9 file level | 16 | 16 | 16 | 14 | all refused
+TOTAL | cases 1026 | count_round refused 1026 | analyze refused 1026 | other exception types 0 | entry named == altered entry in both 977
+--- cases not refused by both, or refused by an exception that is not ArgumentError:
+--- cases refused by both but naming a different entry than the altered one (message of count_round / analyze):
+  count: 49
+  3e/F1b first byte substituted | entry 2 line round | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,2 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 14 is "decision=continue" where "" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,3 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 14 is "count.drift=1" where "" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,4 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,5 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,6 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,7 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,8 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,9 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,10 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,11 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,12 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F3 two lines swapped | entry 2 lines 1,13 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F4 blank line | entry 2 after line 0 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 15 is "" where "(end)" is expected
+  3e/F8 line deleted | entry 2 first line deleted | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  3e/F1b first byte substituted | entry 3 line round | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,2 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,3 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,4 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,5 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,6 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,7 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,8 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,9 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,10 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,11 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,12 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F3 two lines swapped | entry 3 lines 1,13 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F4 blank line | entry 3 after line 0 | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 15 is "" where "(end)" is expected
+  3e/F8 line deleted | entry 3 first line deleted | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 2 is "decision=continue" where "decision=close" is expected
+  3e/F9 file level | empty file | altered entry 1 | named cr 0 an 0 | ArgumentError: a chunk file of a closure arm exists before closure (chunk-00025.h5 and 25 more): the closure arms run after closur
+  3e/F9 file level | a line of an unknown key appended | altered entry 4 | named cr 3 an 3 | ArgumentError: round log entry 3 is not in canonical form: line 14 is "extra=1" where "" is expected
+  2e/F1b first byte substituted | entry 2 line round | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,2 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 14 is "decision=continue" where "" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,3 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 14 is "count.drift=1" where "" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,4 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,5 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,6 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,7 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,8 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,9 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,10 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,11 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,12 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F3 two lines swapped | entry 2 lines 1,13 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F4 blank line | entry 2 after line 0 | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 15 is "" where "(end)" is expected
+  2e/F8 line deleted | entry 2 first line deleted | altered entry 2 | named cr 1 an 1 | ArgumentError: round log entry 1 is not in canonical form: line 4 is "count.excluded=0" where "count.excluded=1" is expected
+  2e/F9 file level | empty file | altered entry 1 | named cr 0 an 0 | ArgumentError: a ref chunk of round 2 exists in the store while the next round to count is round 1: the guard of the runner was by
+  2e/F9 file level | a line of an unknown key appended | altered entry 3 | named cr 2 an 2 | ArgumentError: round log entry 2 is not in canonical form: line 14 is "extra=1" where "" is expected
+--- sample messages
+  3e/F1a last byte substituted | entry 1 line round | ArgumentError: round log entry 1: line round says 2, the rounds must be 1, 2, ... without gap or repeat (expected 1)
+  3e/F1d byte inserted at end | entry 1 line round | ArgumentError: round log entry 1: line round is missing or not an integer
+  3e/F1b first byte substituted | entry 1 line decision | ArgumentError: round log entry 1: line decision is "", not continue or close
+  3e/F1e trailing space | entry 1 line decision | ArgumentError: round log entry 1: line decision is "continue ", not continue or close
+  3e/F1c last byte deleted | entry 1 line count.drift | ArgumentError: round log entry 1: line count.drift is missing or not an integer
+  3e/F1a last byte substituted | entry 1 line count.excluded | ArgumentError: round log entry 1: line count.excluded is 1, the recomputation from the ref datasets gives 0
+  3e/F1d byte inserted at end | entry 1 line count.excluded | ArgumentError: round log entry 1: line count.excluded is missing or not an integer
+  3e/F1b first byte substituted | entry 1 line count.orbits | ArgumentError: round log entry 1: line count.orbits is missing or not an integer
+  3e/F1e trailing space | entry 1 line count.orbits | ArgumentError: round log entry 1 is not in canonical form: line 5 is "count.orbits=12 " where "count.orbits=12" is expected
+  3e/F1c last byte deleted | entry 1 line count.t_s | ArgumentError: round log entry 1: line count.t_s is missing or not an integer
+  3e/F1a last byte substituted | entry 1 line count.target_t_s | ArgumentError: round log entry 1: line count.target_t_s is 6, the recomputation from the ref datasets gives 5
+  3e/F1d byte inserted at end | entry 1 line count.target_t_s | ArgumentError: round log entry 1: line count.target_t_s is missing or not an integer
+  3e/F1b first byte substituted | entry 1 line count.target_w2 | ArgumentError: round log entry 1: line count.target_w2 is missing or not an integer
+  3e/F1e trailing space | entry 1 line count.target_w2 | ArgumentError: round log entry 1 is not in canonical form: line 8 is "count.target_w2=11 " where "count.target_w2=11" is expected
+  3e/F1c last byte deleted | entry 1 line count.w2 | ArgumentError: round log entry 1: line count.w2 is missing or not an integer
+  3e/F1a last byte substituted | entry 1 line panel_sha256 | ArgumentError: round log entry 1: line panel_sha256 differs from the SHA-256 of the panel file
+  3e/F1d byte inserted at end | entry 1 line panel_sha256 | ArgumentError: round log entry 1: line panel_sha256 is missing or not 64 lowercase hex digits
+  3e/F1b first byte substituted | entry 1 line prereg_sha256 | ArgumentError: round log entry 1: line prereg_sha256 is missing or not 64 lowercase hex digits
+  3e/F1e trailing space | entry 1 line prereg_sha256 | ArgumentError: round log entry 1: line prereg_sha256 is missing or not 64 lowercase hex digits
+  3e/F1c last byte deleted | entry 1 line ref_digest | ArgumentError: round log entry 1: line ref_digest is missing or not 64 lowercase hex digits
+--- valid logs (accepted):
+  1-entry log with the store of round 1 | count_round: (:accepted, "nothing")
+  2-entry log with the store of round 2 | count_round: (:accepted, "nothing")
+  3-entry log with the store of round 3 | count_round: (:accepted, "closed") | analyze: accepted
+inputs unchanged by all calls (every file of the campaign except the log): true
+round-log restored to the valid text: true
+
+real	2m56.520s
+user	0m0.015s
+sys	0m0.031s

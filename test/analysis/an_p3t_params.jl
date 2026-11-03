@@ -95,7 +95,7 @@ end
                              ("tf", r -> merge(r, (; pp_hc = merge(r.pp_hc, (; target = 7)))), "target_f"),
                              ("cap", r -> merge(r, (; pp_hb = merge(r.pp_hb, (; targets = merge(r.pp_hb.targets, (; cap = true)))))), "cap_flag"),
                              ("phb", r -> merge(r, (; pp_hb = merge(r.pp_hb, (; path = [merge(r.pp_hb.path[1], (; power = 0.5))])))), "power_hb_planned"),
-                             ("phc", r -> merge(r, (; pp_hc = merge(r.pp_hc, (; power_expected = 0.5)))), "power_hc_planned"))
+                             ("phc", r -> merge(r, (; pp_hc = merge(r.pp_hc, (; power_expected = merge(r.pp_hc.power_expected, (; power = 0.5)))))), "power_hc_planned"))
         I = mk("c-$tag"; record_edit = edit)
         @test an_rejects(() -> p3t_rd(I), [key])
     end

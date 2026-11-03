@@ -424,8 +424,7 @@ Recorded test rework (owner decision "fix all", C1): `test/analysis/an_p3t_helpe
 
 ## Not verified (D95)
 
-- The whole package suite after the fixes (the analysis suite and quality were run; the fixes touch only `src/Analysis/` and three analysis test lines).
-- O24 runner acceptance (V2) and D95k (V).
+- O24 runner acceptance (V2); owner decision 2026-11-03: run it after P69 and before the A1 freeze run, as a dry campaign with the real run block on a small panel that is not the test panel (runner and `count-round` alternating by round, then `run_campaign` and `--round-log` with exit 0). The whole package suite and D95k (V) were run after acceptance (addendum below).
 - Time and memory at study size on the real test store (it does not exist yet).
 - Byte identity across machines.
 - Aqua and JET ran in a scratch environment (`verify` has no Aqua).

@@ -292,3 +292,63 @@ Updated in this stage: `CHANGELOG.md` (entry for the amendment), `src/Analysis/C
 | Status matches evidence (no catalog row; no open D93 criterion; findings V1 to V4 recorded) | pass |
 | Log names the commit SHAs and every file changed | pass |
 | `CHANGELOG.md` has an entry for the amendment | pass |
+
+## Amendment D95 (test side of study p3-abstention), stage 05
+
+Branch: `main` (commits pushed, no force-push). Decision D95 (stage 01; owner decisions P87 to P115 approved as drafted, P107 the audit exception of D93 P61 extended).
+
+### Catalog rows flipped
+
+None, as for the base module.
+
+Evidence: `stages/04-verify/output/analysis-verification.md` (section "Amendment D95: test side of study p3-abstention (stage 04)" and its addendum), accepted at the stage 04 checkpoint (2026-11-03). Toy campaign of O22 (e): O20 independent Python oracle 645 of 645 quantities equal before and after the review fixes; O23 every altered log refused by `count-round` and `analyze` (1065 cases; the D94 finding V1 on the last entry is closed); D95a golden outputs of 263717c equal except the commit lines; byte-identical outputs at 1, 4 and 23 threads, `data/` listing unchanged; D95k HC power within 3 SE of an independent simulator at 8 sizes; `count-round` about 18 s, `analyze` about 29 s, at most 1.6 GB. Independent code review: 1 CRITICAL, 3 HIGH, 6 MEDIUM, 7 LOW, all fixed with 17 verify probes (owner decision "fix all"), one recorded test rework (three lines of the C1 fixture record). Full `Pkg.test()` after the fixes 1404598 pass, 0 fail, 1 broken (existing).
+
+Updated in this stage: `analysis-spec.md` ("Clarifications at stage 05" of D95: the readings of the review fixes, the spec points found by the oracle author, O24, the recorded tg deviation), `src/Analysis/CONTEXT.md` (D95 cost and limits; 78 lines), `CHANGELOG.md` (entry), `workspaces/study/stages/03-run/references/round-loop.md` (new: the run and `count-round` loop and the O24 gate before the A1 freeze run) with its Inputs row in `workspaces/study/stages/03-run/CONTEXT.md`.
+
+### Open (not verified or deferred)
+
+- O24 runner acceptance on a runner-made store: a study gate after P69, before the A1 freeze run (owner decision 2026-11-03).
+- No real test store yet (P115): arm names, item horizons and manifest fields rest on the pinned readings; time and memory at study size not measured.
+- Toy coverage (V4): no false-regular rule, no tie at a set boundary, no dropped HA replicate.
+- The M6 probe does not discriminate; three "before" probe failures (M9, L12, L17) are missing helpers, not reproduced wrong results.
+- Byte identity across machines. Aqua and JET at stage 04 ran in a scratch environment; the full suite run includes them.
+- Not done here: the study amendment P69, D94s, the A1 freeze run, A1; `_config/risks.md` review is due at the M4 exit.
+
+### Commits
+
+- `edb523e` stage 01: D95 spec, decision log row, owner decisions
+- `88cfad0` stage 02: failing tests (10 files), plan
+- `8a6adff` stage 03: `count-round` and the p3 test side of `analyze`, 12 `p3t_*` files, GREEN, recorded test reworks, impl notes
+- `77770b8` stage 04: verification, review fixes, verify and oracle scripts, logs
+- `2f9a36c`, `eb2af04` stage 04 addendum: full suite, D95k (V), O24 decision
+- (this log) the commit that adds this section and the documentation edits
+
+### Files changed on `main` for D95 (short hashes of the commits above that touched the file)
+
+- `_config/decision-log.md` (edb523e)
+- `workspaces/module-build/stages/01-spec/output/analysis-spec.md` (edb523e, this log)
+- `test/analysis/an_p3t_dispatch.jl`, `an_p3t_pipeline.jl`, `an_p3t_ref.jl`, `an_p3t_refusals.jl`, `an_p3t_stats.jl`, `runtests.jl` (88cfad0)
+- `test/analysis/an_p3t_log.jl` (88cfad0, 8a6adff)
+- `test/analysis/an_p3t_fixture.jl`, `an_p3t_helpers.jl`, `an_p3t_params.jl` (88cfad0, 77770b8)
+- `test/analysis/an_p3_dispatch.jl` (8a6adff)
+- `workspaces/module-build/stages/02-tests/output/analysis-test-plan.md` (88cfad0, 8a6adff)
+- `src/Analysis/p3t_figs.jl`, `p3t_json.jl`, `p3t_stats.jl`, `Analysis.jl` (8a6adff)
+- `src/Analysis/cli.jl`, `p2_dispatch.jl`, `p3t_count.jl`, `p3t_data.jl`, `p3t_inputs.jl`, `p3t_log.jl`, `p3t_params.jl`, `p3t_pipeline.jl`, `p3t_run.jl`, `p3t_store.jl`, `p3t_tables.jl` (8a6adff, 77770b8)
+- `src/Analysis/CONTEXT.md` (8a6adff, this log)
+- `bin/chaoslab.jl`, `bench/analysis.jl` (8a6adff)
+- `workspaces/module-build/stages/03-implement/output/analysis-d95-impl-notes.md` (8a6adff)
+- `verify/analysis-p3t.jl`, `analysis-p3t-alter.jl`, `analysis-p3t-cli.sh`, `analysis-p3t-run.py`, `analysis-p3t-runner.jl`, `analysis-p3t-power.jl`, `analysis-p3t-regress.sh`, `analysis-p3t-regress.py`, `analysis-p3t-export.jl`, `analysis-p3t-oracle.py`, `analysis-p3t-compare.py`, `analysis-d95-review.jl` (77770b8)
+- `verify/analysis-d95k.jl`, `analysis-d95k.py` (2f9a36c)
+- `workspaces/module-build/stages/04-verify/output/analysis-d95-verify-log.txt`, `analysis-d95-verify-log-fixed.txt`, `analysis-d95-oracle-log.txt`, `analysis-d95-oracle-log-fixed.txt`, `analysis-d95-review-before.txt`, `analysis-d95-review-after.txt` (77770b8)
+- `workspaces/module-build/stages/04-verify/output/analysis-d95k-log.txt` (2f9a36c)
+- `workspaces/module-build/stages/04-verify/output/analysis-verification.md` (77770b8, 2f9a36c, eb2af04)
+- `CHANGELOG.md`, `workspaces/study/stages/03-run/CONTEXT.md`, `workspaces/study/stages/03-run/references/round-loop.md` (this log)
+- `workspaces/module-build/stages/05-integrate/output/analysis-integration-log.md` (this log)
+
+### Audit
+
+| Check | Result |
+|-------|--------|
+| Status matches evidence (no catalog row; no open D95 criterion; O24 deferred to a study gate by owner decision, findings V2 to V4 recorded) | pass |
+| Log names the commit SHAs and every file changed | pass |
+| `CHANGELOG.md` has an entry for the amendment | pass |

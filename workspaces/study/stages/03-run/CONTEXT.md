@@ -12,6 +12,7 @@ Run the study mechanically with health checks and provenance.
 | Config | `/_config/numerics-defaults.toml` | Full file | health thresholds |
 | Config | `/_config/environment.md` | Full file | data root, cores |
 | Guide | `/_config/setup-guides/julia.md`, `/_config/setup-guides/rebound.md` | Full files, first run only | install and run commands (rebound only for N-body) |
+| Reference | `references/round-loop.md` | Full file | only when the run block has arms with `release` (rounds and a round log) |
 
 ## Process
 

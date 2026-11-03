@@ -789,3 +789,28 @@ Audit. Coverage: every (S) criterion D94a to D94p, D94t (S part), D94u maps to a
 ### Rework at stage 03 (D94)
 
 One line of an earlier test, owner decision 2026-10-31: `test/experiments/ex_d86_guards.jl` (D86x) lists the options of the usage text exactly; the list gains `--round-log`, which D94u and R26 require once in the usage text. The two assertions could not both hold. Precedent: D58 added `--prior-record` to the same list. No D94 test changed; no assertion weakened. D86x passes 8 of 8 after the change.
+
+## Amendment D96 (stage 02, 2026-11-03)
+
+Tests: `test/experiments/ex_d96.jl`, registered in `test/experiments/runtests.jl` after the D94 files. Reuses the D86 and D94 helpers; the only new helper is `d96_canon` (canonical `path = repr(value)` text of a nested table, keys sorted). No existing test or source file changed.
+
+| Criterion | Test | Expected now |
+|-----------|------|--------------|
+| D96a, R28, P116 (first run completes, no table entry) | `D96a closure-only indicator specs`: block with ref (each_round, L1 and L5 on P) and closure arms tc (tg, D) and wc (fq, D_B, wrapped); first `ex_campaign` with an empty log has status complete, the manifest has no `indicators` entry for tg and fq, no closure arm chunk exists | RED |
+| D96a (closure run lists the specs) | same testset: rounds 2 and 3 (log closes), then the closure run: `indicators` holds tg and fq with kind, spec (text), spec_sha256, budget, bytes_per_orbit (M, R, S, B, total), chain; fq has windows [16, 32] and run_length 64, tg has neither | RED (not reached) |
+| D96b, I38 (spec in an each_round and a closure arm) | `D96b golden indicator tables`: block tr (each_round: tg, fq) and tc (closure: tg); `EX.indicator_manifest` of the plan before closure, SHA-256 of `d96_canon` | PASS |
+| D96b, I38 (block without rounds) | same testset: `d86_all_block()` (six kinds), plan without rounds | PASS |
+| D96c | unchanged full suite | no existing test edited |
+| D96d, O27 | stage 04 (verify), not a package test | not in the suite |
+| I39 (no other output changes) | covered by D94/D86 golden chunk hashes already in the suite (D86b, D94 plan hashes); no new test | existing |
+
+RED result (experiments suite, `julia --project=verify -t 4`, 7m12s): 9246 pass, 1 fail, 1 error, 9248 total. The error is the new D96a: `ArgumentError: collection must be non-empty` from `first(i for i in plan.items if i.method == id)` in `_indicator_manifest` (src/Experiments/run_indicator_report.jl), reached from the first `ex_campaign`. D96b: 3 pass. The one fail is not new: `D86b absence of change: a block without specs` (ex_d86_grammar.jl:207, chunk file SHA-256 list differs from the golden, 17 of 18 entries) in this run environment (`--project=verify`); the D96 files load after it and cannot affect it. To be checked in the project environment.
+
+Goldens (SHA-256 of `d96_canon(EX.indicator_manifest(plan))`, taken at commit 8c3bac0, before D96, by running the helpers outside the suite; the table is a pure function of the plan):
+
+- both (`d96_block_both`, plan with an open empty log): `2d0bb10a68d859cdaa97c026f4d82ea7b20e0a4c1c7887a74df35e0e2e649d9a`
+- no rounds (`d86_all_block()`, std panel): `331567fafe4b4d3dfbdc92ce6ce10f203daab261d73bbfffe5c4f5a212834f1e`
+
+Not testable in the suite: O27 (real-runner fixture campaign through `bin/chaoslab.jl run --round-log` and byte-identity of the CLI and library logs) is stage 04. The golden covers the table (R19 terms), not the manifest bytes as a whole: the manifest also holds run-time fields, and I38 for the whole manifest rests on the existing golden manifests of D86 and D94.
+
+RED confirmed by the whole package suite (`Pkg.test()`, default environment, 28 min 13 s): 1404601 pass, 1 error (D96a, `ArgumentError: collection must be non-empty` in `_indicator_manifest`), 1 broken (existing, weighted-birkhoff). D86b "a block without specs" fails under `--project=verify` (17 of 18 chunk hashes) and passes in the default environment: environmental, not a D96 effect. Approved by the owner on 2026-11-03.

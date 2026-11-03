@@ -44,3 +44,5 @@ include(joinpath(@__DIR__, "ex_d94_streams.jl"))   # D94c, D94f, D94h, D94i (fun
 include(joinpath(@__DIR__, "ex_d94_panel.jl"))     # D94c to D94j, D94p, D94t (builder level)
 include(joinpath(@__DIR__, "ex_d94_plan.jl"))      # D94i, D94l, D94m
 include(joinpath(@__DIR__, "ex_d94_run.jl"))       # D94n, D94o
+# Amendment D96 (indicator specs held only by closure arms)
+include(joinpath(@__DIR__, "ex_d96.jl"))   # D96a, D96b

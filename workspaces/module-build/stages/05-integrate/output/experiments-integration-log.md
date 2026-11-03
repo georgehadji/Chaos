@@ -335,3 +335,46 @@ Spec text (owner decisions M3 and V3): `experiments-spec.md`, "Clarifications at
 | Status matches evidence (no catalog row; D94s deferred to P69 and named; findings V1 to V4 recorded) | pass |
 | Log names the commit SHAs and every file changed | pass |
 | `CHANGELOG.md` has an entry for the amendment | pass |
+
+## Amendment D96 (indicator specs held only by closure arms), stage 05
+
+Branch: `main` (commits pushed, no force-push). Decision D96 (stage 01; owner decision P116 approved as proposed).
+
+### Catalog rows flipped
+
+None: the amendment adds no catalog method or indicator.
+
+Evidence: `stages/04-verify/output/experiments-d96-verification.md`, accepted at the stage 04 checkpoint (2026-11-03). Criteria D96a to D96d and O27 pass; full `Pkg.test()` 1404618 pass, 0 fail, 1 broken (existing); Aqua and JET clean; independent review: no CRITICAL, HIGH or MEDIUM, one LOW recorded (empty table before closure, consistent with R28). Test correction at stage 03 (D96a budget line, owner decision), recorded in the test plan. `python scripts/icm_validate.py`: all checks pass.
+
+### Open (not verified or deferred)
+
+- The count side of O27 ran with the scratch Analysis patches of the discovery (cell form M1 and the tg horizon); the Analysis amendment D97 reruns `verify/experiments-d96*.jl` without them, which closes O24 on the Analysis side.
+- Byte identity across machines; one machine only. `_config/risks.md` review: due at the M4 exit.
+
+### Commits
+
+- `8c3bac0` stage 01: R28, I38, I39, O27, D96a to D96d, P116; decision log row
+- `ee66bc6` stage 02: failing tests (`ex_d96.jl`), test plan section
+- `c41d085` stage 03: the guard in `_indicator_manifest`, D96a budget line corrected, impl notes
+- `8c34f37` stage 04: O27 scripts, verification report, verify log
+- (this log) `experiments integration log (D96)`: the commit that adds this section and the documentation edits.
+
+### Files changed on `main` for D96
+
+- `_config/decision-log.md` (8c3bac0)
+- `workspaces/module-build/stages/01-spec/output/experiments-spec.md` (8c3bac0)
+- `test/experiments/ex_d96.jl` (ee66bc6, c41d085), `test/experiments/runtests.jl` (ee66bc6)
+- `workspaces/module-build/stages/02-tests/output/experiments-test-plan.md` (ee66bc6, c41d085)
+- `src/Experiments/run_indicator_report.jl` (c41d085)
+- `workspaces/module-build/stages/03-implement/output/experiments-d96-impl-notes.md` (c41d085)
+- `verify/experiments-d96.jl`, `verify/experiments-d96-cli.sh` (8c34f37)
+- `workspaces/module-build/stages/04-verify/output/experiments-d96-verification.md`, `experiments-d96-verify-log.txt` (8c34f37)
+- `src/Experiments/CONTEXT.md`, `CHANGELOG.md`, `workspaces/module-build/stages/05-integrate/output/experiments-integration-log.md` (this log)
+
+### Audit
+
+| Check | Result |
+|-------|--------|
+| Status matches evidence (no catalog row; the patched count side named and deferred to D97) | pass |
+| Log names the commit SHAs and every file changed | pass |
+| `CHANGELOG.md` has an entry for the amendment | pass |

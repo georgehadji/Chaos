@@ -27,15 +27,15 @@ function p3t_scan(store, slug, panel_hash, prereg_hash, on_read)
     return out
 end
 
-# One chunk file as a record: arm ref or closure, the cell, the round and the K index of a ref cell (`k<K index>:r<round>`).
+# One chunk file as a record: arm ref or closure, the cell, the round, the K index and the class of a cell of the form of E74 (`k<K index>:<class>:r<round>`).
 function _p3t_chunk(f, path, a)
     cell = something(match(r"cell=(\S+)", String(a["chunk_key"])), (captures = [""],)).captures[1]
-    m = match(r"^k(\d+):r(\d+)$", cell)
+    m = match(r"^k(\d+):([A-Za-z0-9]+):r(\d+)$", cell)
     arms = String.(a["arms"])
-    "ref" in arms && m === nothing && _fail("chunk file $f: the cell \"$cell\" of a ref chunk is not of the form k<K index>:r<round>")
+    "ref" in arms && m === nothing && _fail("chunk file $f: the cell \"$cell\" of a ref chunk is not of the form k<K index>:<class>:r<round>")
     return (file = f, path = path, ordinal = parse(Int, f[7:11]), key = String(a["chunk_key"]), hash = String(a["chunk_hash"]), arms = arms, ref = "ref" in arms, cell = String(cell),
-            kindex = m === nothing ? 0 : parse(Int, m.captures[1]), round = m === nothing ? 0 : parse(Int, m.captures[2]), method = String(a["method"]), status = String(a["status"]),
-            complete = a["complete"] === true, attrs = a)
+            kindex = m === nothing ? 0 : parse(Int, m.captures[1]), class = m === nothing ? "" : String(m.captures[2]), round = m === nothing ? 0 : parse(Int, m.captures[3]),
+            method = String(a["method"]), status = String(a["status"]), complete = a["complete"] === true, attrs = a)
 end
 
 "The panel file of the test run: the orbit tables, each with the round (D94 R23) and the flag `in_D`; an `ArgumentError` naming the orbit and the key otherwise (E61 e)."
@@ -53,8 +53,11 @@ function p3t_read_panel(panel, r_max)
     return orbits
 end
 
-# The cells expected for round r from the panel (E62 c): one per K index of the orbits of that round; both L1 and L5 chunks are expected in each.
-p3t_cells(panel_orbits, r) = sort!(unique(["k$(Int(o["k_index"])):r$r" for o in panel_orbits if Int(o["round"]) == r]))
+# The cell of E74 of an orbit of the panel.
+p3t_cell_of(o) = "k$(Int(o["k_index"])):$(o["class"]):r$(Int(o["round"]))"
+
+# The cells expected for round r from the panel (E62 c, E74): one per (K index, class) of the orbits of that round; both L1 and L5 chunks are expected in each.
+p3t_cells(panel_orbits, r) = sort!(unique([p3t_cell_of(o) for o in panel_orbits if Int(o["round"]) == r]))
 
 # Whether the ref chunks of round r are all present and complete; returns the problems as texts (the missing cells are named).
 function p3t_round_problems(chunks, panel_orbits, r)
@@ -69,9 +72,6 @@ end
 
 "The digest of E62 a: the SHA-256 of the chunk hashes of the ref chunks of the rounds up to `r`, ascending as byte strings, each followed by LF."
 p3t_ref_digest(chunks, r) = bytes2hex(sha256(codeunits(join(sort!([c.hash for c in chunks if c.ref && c.complete && 1 <= c.round <= r]) .* "\n"))))
-
-# The orbit ids of a ref cell (round, K index) by the panel.
-p3t_cell_ids(panel_orbits, r, k) = Int[Int(o["id"]) for o in panel_orbits if Int(o["round"]) == r && Int(o["k_index"]) == k]
 
 # ---------------------------------------------------------------- the ref state: one row per orbit with K > 0 of the rounds read
 

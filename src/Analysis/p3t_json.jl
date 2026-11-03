@@ -21,11 +21,11 @@ const P3T_READINGS = [
     "P109: the ladder bound of T3 is read from the P1 parameter table; T3 reads the L5 value at the recorded step N_B (the last recorded step not above it)",
     "P110: the data of F2 and F3 are written with digests; no figure is drawn",
     "P112, P113: T1 transcribes the by-source rows of the record; the round of an orbit is the panel attribute round",
-    "P114: the measured costs are the manifest values per spec of the arms ref and ind; a spec without a value makes that sensitivity not decidable",
-    "P115: the arm names ref, ind, d64, chk are read from the manifest; items are found by content; the coordinate mode of an item is read from the item"]
+    "P114: the measured costs (E78): tg, fq1, bk1 from the specs of the arm ind, pa1 from the specs of the arm ind_pa1, L1 as 1e9 times the thread seconds over the steps of the ok L1 chunk entries of the arm ref; the manifest status is complete, or complete with failed chunks when a chunk entry failed (E76); a spec without a value makes that sensitivity not decidable",
+    "P115: the six arms ref, ind, ind_pa1, d64, d64_pa1, chk are read from the manifest; items are found by content and attributed to their arm by their chunk; tg is read at the horizon N_c of the arms ind and d64 (E75, E81); the coordinate mode of an item is read from the item"]
 
 const P3T_DEVIATIONS = [
-    "E64 (P115): the tg item of the ind arm is read at the horizon N_1 of the p2 items, as the calibration reads it; E65 names N_c",
+    "P120: the column labels agree of table T3 is omitted: the items of the arm chk run at their own horizon N_B with the label BigFloat(256) and have no steps at the scale of N_1, so the labels cannot be formed in three precisions (to be stated in study amendment A2)",
     "P95: the strata of HA are not disjoint by definition (an orbit can be in T_s and S2); the first stratum an orbit qualifies for holds it",
     "P100: a gate orbit without verdict items makes HA not decidable and is listed",
     "P104: D orbits without Double64 verdicts of V* leave the HC set"]
@@ -118,5 +118,5 @@ function p3t_results(A, files)
             decisions = dec, ha = _p3t_ha_json(A), hb = hbj, hc = _p3t_hc_json(A),
             sensitivities = (round_down = _p3t_sens_json(A.sens.round_down), pilot = _p3t_sens_json(A.sens.pilot), measured = _p3t_sens_json(A.sens.measured), without_le = _p3t_sens_json(A.sens.without_le)),
             power = (hb = A.power.hb, hc = A.power.hc), flags = flags, r_ab = (pairs = A.rab.pairs, overrides = A.rab.overrides, orbits = A.rab.orbits),
-            readings = P3T_READINGS, exploratory = String[])
+            readings = vcat(P3T_READINGS, P3T_DEVIATIONS), exploratory = String[])
 end

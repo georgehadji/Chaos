@@ -18,11 +18,12 @@ end
 
 function _p3t_t2(A)
     O, E = A.O, A.O.rows
-    rds = sort!(unique(Int(o["round"]) for o in A.c.panel_orbits))
-    rows = [[r, count(o -> Int(o["round"]) == r, A.c.panel_orbits), count(o -> Int(o["round"]) == r && Float64(o["K"]) == 0, A.c.panel_orbits), count(x -> x.round == r, E),
+    rds = collect(1:A.entries[end].round)      # E80: the rounds up to the closing round of the log; a later round of the panel is not counted anywhere
+    po = [o for o in A.c.panel_orbits if Int(o["round"]) in rds]
+    rows = [[r, count(o -> Int(o["round"]) == r, po), count(o -> Int(o["round"]) == r && Float64(o["K"]) == 0, po), count(x -> x.round == r, E),
              count(x -> x.round == r && x.W2, E), count(x -> x.round == r && x.Ts, E), count(x -> x.round == r && x.S2, E)] for r in rds]
     rho = [count(x -> x.rho === s, A.st.rows) for s in (:C, :R, :U)]
-    L = ["The test draw. Orbits in the panel file: $(length(A.c.panel_orbits)); rounds $(length(rds)).", ""]
+    L = ["The test draw. Orbits of the rounds up to the closing round: $(length(po)) (the panel file holds $(length(A.c.panel_orbits))); rounds $(length(rds)).", ""]
     append!(L, mdt(["round", "orbits", "K = 0", "E_test", "W2", "T_s", "S2"], rows))
     append!(L, ["", "Labels of the orbits with K > 0 read (rho = C, R, U): $(rho[1]), $(rho[2]), $(rho[3]); excluded $(count(x -> x.excluded, A.st.rows)), drift on L1 or L5 (as the round log counts) $(count(x -> x.drift, A.st.rows)); dropped as drift on any item read (E64 b) $(count(d -> d.reason == "drift", A.O.drops)).", ""])
     cnt = (E_test = length(E), W2 = count(r -> r.W2, E), T_s = count(r -> r.Ts, E), S2 = count(r -> r.S2, E), D = length(O.vd), D_B = length(A.dB), gate = length(O.gate.ids))
@@ -41,28 +42,36 @@ end
 # The ladder test (a) in exact rationals: the stored exponents as binary64 values (M5), the bound as its decimal text (M9).
 _p3t_ladder(lam, tol) = any(abs(Rational{BigInt}(lam[i]) - Rational{BigInt}(lam[i + 1])) > p3_rat(tol) for i in 1:2)
 
+# E79: the chk items of D_B by content: method L5, the precision label without its bit count, the horizon of the item itself, which must be the key N_B of the P1 table.
+function _p3t_chk_items(A, nB)
+    out = Dict{Tuple{Int, String}, Any}()
+    for (k, it) in A.idx
+        (k[2] == "L5" && "chk" in it.arms) || continue
+        it.horizon == nB || _fail("the check item of orbit $(k[1]) (L5, $(k[3])) has the horizon $(it.horizon), not the key N_B = $nB of the P1 parameter table")
+        out[(k[1], replace(k[3], r"\(\d+\)" => ""))] = it
+    end
+    return out
+end
+
 function _p3t_t3(A, files)
     if files.p1_params === nothing || !isfile(files.p1_params)
         return ["The P1 parameter table was not given: the reference check on D_B is not computed."]
     end
     p1, p2, d1 = read_params(files.p1_params), A.c.p2, A.c.p2.directions[1]
-    itm(prec) = id -> get(A.idx, p2_key(id, "L5", prec, p2.N_1, 1, d1), nothing)
-    rows, agree, forced = Vector{Any}[], 0, Dict{Symbol, Int}()
-    rho_of(id, it5) = it5 === nothing ? nothing : (c0 = _p3_c0_inputs(it5, get(A.idx, p2_key(id, "L1", "Float64", p2.N_1, 1, d1), nothing), p2.N_1, _p3t_xl(it5)); c0.data === nothing ? nothing : p3_relabel(c0.data, p2).rho)
+    chk = _p3t_chk_items(A, p1.N_B)
+    rows, forced = Vector{Any}[], Dict{Symbol, Int}()
     for id in A.dB
-        its = [itm("Float64")(id), itm("Double64")(id), itm("BigFloat")(id)]
+        its = [get(A.idx, p2_key(id, "L5", "Float64", p2.N_1, 1, d1), nothing), get(chk, (id, "Double64"), nothing), get(chk, (id, "BigFloat"), nothing)]
         lam = [_p3t_lam_nb(it, p1.N_B) for it in its]
-        labs = [rho_of(id, it) for it in its]
         ladder = any(x -> x === nothing || !isfinite(x), lam) ? nothing : _p3t_ladder(lam, p1.ladder_tol)
-        same = any(isnothing, labs) ? nothing : allequal(labs)
-        same === true && (agree += 1)
         rho = haskey(A.byid, id) ? A.byid[id].rho : :dropped      # an orbit of D_B may have left E_test (drift on an item read, E64 b)
         ladder === true && (forced[rho] = get(forced, rho, 0) + 1)
-        push!(rows, Any[id, p1.N_B, lam[1], lam[2], lam[3], ladder, same, rho])
+        push!(rows, Any[id, p1.N_B, lam[1], lam[2], lam[3], ladder, rho])
     end
-    L = ["The reference check on D_B (N_B = $(p1.N_B), ladder bound $(p1.ladder_tol) of the P1 parameter table): the three L5 values at the recorded step N_B, the ladder test (a), and whether the labels at N_B agree in the three precisions. No label changes (D1).", ""]
-    append!(L, mdt(["orbit", "N_B", "L5 Float64", "L5 Double64", "L5 BigFloat", "ladder would force", "labels agree", "rho"], rows))
-    append!(L, ["", "Labels that agree in the three precisions: $agree of $(length(A.dB)). Orbits on which the ladder would have made rho unresolved: C $(get(forced, :C, 0)), R $(get(forced, :R, 0))."])
+    L = ["The reference check on D_B (N_B = $(p1.N_B), ladder bound $(p1.ladder_tol) of the P1 parameter table): the three L5 values at the recorded step N_B and the ladder test (a). No label changes (D1). " *
+         "The column labels agree of the preregistration is omitted: the items of the arm chk run at their own horizon N_B and have no steps at the scale of N_1, so the labels cannot be formed in three precisions (study amendment A2 states it).", ""]
+    append!(L, mdt(["orbit", "N_B", "L5 Float64", "L5 Double64", "L5 BigFloat", "ladder would force", "rho"], rows))
+    append!(L, ["", "Orbits on which the ladder would have made rho unresolved: C $(get(forced, :C, 0)), R $(get(forced, :R, 0))."])
     return L
 end
 
@@ -162,12 +171,8 @@ function _p3t_t11(A)
     return L
 end
 
-# The orbits of a cell of a chunk that failed twice, by the panel: `k<K>:r<round>` for a ref cell, `k<K>` for an ind cell.
-function _p3t_cell_orbits(A, cell)
-    m = match(r"^k(\d+)(?::r(\d+))?$", cell)
-    m === nothing && return Int[]
-    return sort!(Int[Int(o["id"]) for o in A.c.panel_orbits if Int(o["k_index"]) == parse(Int, m.captures[1]) && (m.captures[2] === nothing || Int(o["round"]) == parse(Int, m.captures[2]))])
-end
+# The orbits of a cell of E74 of a chunk that failed twice, by the panel (E80).
+_p3t_cell_orbits(A, cell) = sort!(Int[Int(o["id"]) for o in A.c.panel_orbits if p3t_cell_of(o) == cell])
 
 "The tables file of E73; `sha` is the SHA-256 of the machine file."
 function p3t_tables(A, files, sha, rec)

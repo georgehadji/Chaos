@@ -27,31 +27,42 @@ function p3t_check_identity(items, panel_orbits)
     end
 end
 
-# The verdict items of E65 that an orbit lacks (Float64, arm ind) and the cells of the ind chunks that failed twice.
+# The verdict items of E65 that an orbit lacks (Float64, arms ind and ind_pa1; tg at N_c, E75).
 function _p3t_missing_items(idx, p2, id)
     d1, F = p2.directions[1], "Float64"
-    need = (("tg", p2.N_1, d1), ("fq1", p2.N_c, nothing), ("pa1", p2.N_c + 1, nothing), ("bk1", p2.N_c, nothing))
+    need = (("tg", p2.N_c, d1), ("fq1", p2.N_c, nothing), ("pa1", p2.N_c + 1, nothing), ("bk1", p2.N_c, nothing))
     return String[s for (s, h, d) in need if !haskey(idx, p2_key(id, s, F, h, 1, d))]
 end
 
-_p3t_failed_ind_cells(chunks) = Set(parse(Int, c.cell[2:end]) for c in chunks if "ind" in c.arms && c.status == "failed" && occursin(r"^k\d+$", c.cell))
+# The cells (E74) of the chunks of the arms ind and ind_pa1 that failed twice (E77).
+_p3t_failed_ind_cells(chunks) = Set(String(c.cell) for c in chunks if ("ind" in c.arms || "ind_pa1" in c.arms) && c.status == "failed" && c.kindex > 0)
 
 # The orbits with the drift flag on any item read (E64 b); the counts of the round log use the flag of L1 and L5 only (E62 b), the difference is reported (I46).
 _p3t_drifted(idx) = Set(k[1] for (k, it) in idx if "drift" in it.flags)
 
 # The reason an orbit leaves E_test (E64 b), or "" to keep it. An item that E65 needs and an orbit lacks, outside a chunk that failed twice, refuses (E61 k).
-function _p3t_reason(r, idx, p2, failed_ind, drifted)
+function _p3t_reason(r, idx, p2, failed_ind, drifted, cell)
     r.excluded && return "excluded"
     (r.drift || r.id in drifted) && return "drift"
     r.rho === :U && return "unresolved"
     miss = _p3t_missing_items(idx, p2, r.id)
     isempty(miss) && return ""
-    r.kindex in failed_ind && return "no verdict data"
+    cell in failed_ind && return "no verdict data"
     _fail("item $(join(miss, ", ")) is missing from the store for orbit $(r.id), which the manifest does not list as excluded (E61 k)")
 end
 
 # The verdict tables of the orbits `ids` (E65): table R1 on the Float64 items, ten budgets per indicator of I_7.
-p3t_verdict_tables(ctx, ids) = p3_verdicts(ctx, ids)
+# E75: SALI, FLI and MEGNO read the tg item at N_c, the horizon of the arms ind and d64; every other indicator keeps the horizon of its item.
+_p3t_hor(p2, X) = X in (:SALI, :FLI, :MEGNO) ? (horizon = p2.N_c,) : (;)
+
+function p3t_verdict_tables(ctx, ids)
+    out = Dict{Tuple{Int, Symbol}, Vector{Symbol}}()
+    for id in ids, X in P2_I7
+        vals = p2_values(ctx, id, X; _p3t_hor(ctx.p, X)...)
+        out[(id, X)] = vals === nothing ? fill(:undecided, length(ctx.p.budgets)) : Symbol[p2_verdict(X, :R1, v, ctx.p) for v in vals]
+    end
+    return out
+end
 
 """
     p3t_orbits(c, st, idx, theta) -> NamedTuple
@@ -66,7 +77,7 @@ function p3t_orbits(c, st, idx, theta)
     panel = Dict(Int(o["id"]) => o for o in c.panel_orbits)
     rows, drops, kept = NamedTuple[], NamedTuple[], NamedTuple[]
     for r in sort(st.rows; by = x -> x.id)
-        why = _p3t_reason(r, idx, p2, failed_ind, drifted)
+        why = _p3t_reason(r, idx, p2, failed_ind, drifted, p3t_cell_of(panel[r.id]))
         isempty(why) ? push!(kept, r) : push!(drops, (id = r.id, reason = why, round = r.round, k_index = r.kindex))
     end
     V = p3t_verdict_tables(ctx, [r.id for r in kept])
@@ -97,7 +108,7 @@ function _p3t_double(rows, ctx, theta)
     out = Dict{Int, Dict{Symbol, Vector{Symbol}}}()
     for r in rows
         r.in_D || continue
-        vals = [p2_values(ctx, r.id, X; prec = "Double64") for X in theta.V]
+        vals = [p2_values(ctx, r.id, X; prec = "Double64", _p3t_hor(ctx.p, X)...) for X in theta.V]
         any(isnothing, vals) && continue
         out[r.id] = Dict{Symbol, Vector{Symbol}}(X => Symbol[p2_verdict(X, :R1, v, ctx.p) for v in vs] for (X, vs) in zip(theta.V, vals))
     end

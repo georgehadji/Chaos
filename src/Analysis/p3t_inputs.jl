@@ -42,10 +42,18 @@ function p3t_read_closed_log(path)
     return text
 end
 
-# E61 i: the manifest of the test run: the study, the status, the arm names of the run block, and every chunk file against its manifest entry.
+# E76: the manifest status is `complete`, or `complete with failed chunks` exactly when a chunk entry has status failed.
+function _p3t_check_status(man)
+    st = String(get(man, "status", "absent"))
+    nf = count(e -> get(e, "status", "ok") == "failed", man["chunks"])
+    ok = st == "complete" ? nf == 0 : st == "complete with failed chunks" && nf > 0
+    ok || _fail("manifest status is \"$st\" with $nf failed chunk entries: the status must be complete (no failed entry) or complete with failed chunks (at least one)")
+end
+
+# E61 i, E76, E81: the manifest of the test run: the study, the status, the six arm names of the run block, and every chunk file against its manifest entry.
 function p3t_check_manifest(man, c, store)
     get(man, "study", nothing) == c.slug || _fail("manifest study \"$(get(man, "study", "absent"))\" is not the study $(c.slug)")
-    get(man, "status", "") == "complete" || _fail("manifest status is \"$(get(man, "status", "absent"))\", not complete")
+    _p3t_check_status(man)
     arms = get(man, "arms", Dict())
     for a in P3T_ARMS
         haskey(arms, a) || _fail("the manifest has no arm \"$a\" in its run block (the arms of the test run are $(join(P3T_ARMS, ", ")))")
@@ -63,7 +71,7 @@ function p3t_check_manifest(man, c, store)
     end
 end
 
-const P3T_ARMS = ("ref", "ind", "d64", "chk")
+const P3T_ARMS = ("ref", "ind", "ind_pa1", "d64", "d64_pa1", "chk")
 
 # E61 l: a chunk of a closure arm that is not complete and not a chunk that failed twice.
 function p3t_check_closure_complete(c)

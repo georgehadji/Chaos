@@ -35,15 +35,20 @@ function p3t_hb_run(rows, qt, M, theta; down::Bool = false)
     return (hb = hb, cov = cov, sizes = sizes, without_le = p3t_hb(cmp12, cov12, sizes, qt; capped), bx = bx)
 end
 
-# The measured costs of the manifest (thread-ns per orbit-step per spec, P114) as the cost keys they replace; the specs without a value are listed.
+# E78: L1 has no `specs` entry (arm ref): 1e9 times the thread seconds over the steps of the ok L1 chunk entries of the manifest, the rule of the cost report of the runner; `nothing` for no steps.
+function _p3t_cost_l1(man)
+    es = [e for e in man["chunks"] if "ref" in e["arms"] && startswith(e["key"], "method=L1 ") && get(e, "status", "ok") == "ok"]
+    steps = sum((e["steps"] for e in es); init = 0)
+    return steps > 0 ? 1.0e9 * sum((e["thread_seconds"] for e in es); init = 0.0) / steps : nothing
+end
+
+# The measured costs of the manifest (thread-ns per orbit-step per spec, E78, P119) as the cost keys they replace: tg, fq1, bk1 from the specs of the arm ind, pa1 from those of ind_pa1
+# (the Float64 arms), L1 from the chunk entries; the specs without a value are listed.
 function p3t_measured_costs(man)
     vals, miss = Dict{Symbol, Float64}(), String[]
-    for (key, spec) in ((:cost_l1, "L1"), (:cost_tg, "tg"), (:cost_pa1, "pa1"), (:cost_bk1, "bk1"), (:cost_fq1, "fq1"))
-        v = nothing
-        for a in ("ref", "ind")
-            s = get(get(get(get(man, "arms", Dict()), a, Dict()), "specs", Dict()), spec, nothing)
-            s !== nothing && haskey(s, "measured_ns_per_orbit_step") && (v = Float64(s["measured_ns_per_orbit_step"]))
-        end
+    for (key, spec, arm) in ((:cost_l1, "L1", ""), (:cost_tg, "tg", "ind"), (:cost_pa1, "pa1", "ind_pa1"), (:cost_bk1, "bk1", "ind"), (:cost_fq1, "fq1", "ind"))
+        s = get(get(get(get(man, "arms", Dict()), arm, Dict()), "specs", Dict()), spec, Dict())
+        v = spec == "L1" ? _p3t_cost_l1(man) : haskey(s, "measured_ns_per_orbit_step") ? Float64(s["measured_ns_per_orbit_step"]) : nothing
         v === nothing ? push!(miss, spec) : (vals[key] = v)
     end
     return vals, miss

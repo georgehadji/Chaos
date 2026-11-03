@@ -1087,3 +1087,39 @@ Text only; no behaviour, hash or golden value changes. The readings below are th
 - V3, class-bit vector (R23 item 3). One byte per point in point id order, the bit of T 0x01, of C 0x02, of S 0x04 (a point may carry several); `bits_sha256` is the SHA-256 of these M bytes.
 - P70 (D94v). No orbit attribute `round` in the run store; the panel file is the home of the round (`schema/run-store.md`, "Added by Amendment D94").
 - Recorded deviations of the stage 04 review, accepted and not changed: L1 (R24 asserts part of its list: no assert of the cell sizes, the D count, the id gap or the round range; D94 tests and O23 check them); L2 (R27: the manifest has no per-chunk round and no "rounds run" field; the round is in the chunk key and the plan text); L3 (`run_campaign` takes the keywords `arms` and `up_to` beyond R26 item 3, library only, not on the entry point); L8 (an item identical in a closure arm and an each_round arm is merged into one item; the study design has none).
+
+## Amendment D96: indicator specs held only by closure arms (2026-11-03)
+
+Fifth scope of the module (decision D96, recorded in `_config/decision-log.md`), a correction of Amendment D94 found while drafting the machine-readable blocks of study `p3-abstention` (P69). In the drafted block of that study every indicator spec is held by closure arms only (ind, ind_pa1, d64, d64_pa1), and the ref arm runs L1 and L5. The plan of a run before closure therefore holds no item of any indicator spec. The plan accepts this (review fix C1 of the D94 verification), but the indicator table of the manifest (R19) is built from the first item of each spec of the block, so `run_campaign` and the entry point `run` stop with an error at the first run of the campaign, before any chunk. Found by a fixture campaign with the real runner (scratchpad discovery `d96`, 46 orbits, 3 rounds); with a process-local guard the whole campaign, the round log of `count-round` and the closure run passed. Everything else of the base and of D51 to D94 is unchanged.
+
+### R28 Indicator table of a plan without items of a spec
+
+The indicator table of the manifest (R19, R27) lists the specs of the block that have at least one item in the plan, each built from its first item as before. A spec with no item in the plan is not listed. At closure, when the closure arms are planned, the table lists their specs. A plan in which every spec has an item gives the table it gave before, byte for byte.
+
+### Invariants (amendment)
+
+- I38. For every plan in which every indicator spec of the block has at least one item, the manifest is byte-identical to the one before this amendment (the golden manifests and plan hashes of the existing suites are unchanged).
+- I39. No other output changes: chunk files, chunk keys and hashes, the plan text and the plan hash do not depend on the indicator table.
+
+### Oracle (amendment)
+
+- O27 (V). The fixture campaign of the discovery (a p3-shaped block with the arm structure of the drafted A2 block, a panel of at most 80 orbits in 3 rounds, short horizons) runs by rounds with `count-round` between the runs and to closure without any patch, through `run_campaign` and through `bin/chaoslab.jl run --round-log` (exit 0); the log written by the CLI flow is byte-identical to the library flow's. This also gives the runner side of check O24 of the analysis Amendment D95 on a store written by the runner.
+
+### Acceptance criteria (amendment)
+
+- D96a (S) A block whose indicator specs are all held by closure arms: the first run of a campaign (before closure) completes, its manifest has no indicator table entry for those specs, and the closure run lists them with the fields of R19.
+- D96b (S) A block with an indicator spec held by both an each_round arm and a closure arm, and a block without rounds: manifests equal to the golden values (I38).
+- D96c (S) The whole package suite passes unchanged: no existing test changes.
+- D96d (V) O27 passes.
+
+### Open points for the owner (amendment)
+
+- P116 A spec with no item is omitted from the table (proposed), rather than listed with empty fields: an empty entry would carry no first item for the terms of bytes(orbit), and the closure run lists the spec in full.
+
+### Out of scope
+
+The Analysis readings of the runner's store (cell names, the pa1 arms, the tg horizon, manifest status, measured costs, the T3 check): Amendment D97 of the analysis module. The study amendment A2.
+
+### Owner decisions at the D96 stage 01 checkpoint (2026-11-03)
+
+The owner approved the amendment as drafted, with P116 as proposed (a spec with no item is omitted from the indicator table). Structure decided with it: the Analysis readings of the real store are a separate amendment D97 of the analysis module (one module per run).

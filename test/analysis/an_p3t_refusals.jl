@@ -47,7 +47,7 @@ function p3t_cases(S, I, st)
     add("chunk-study", ["study"], :both, c -> (p3t_set_attr(joinpath(c.store, "chunk-00003.h5"), "study", "p2-indicators"); (;)))
     add("chunk-panel-attr", ["panel"], :both, c -> (p3t_set_attr(joinpath(c.store, "chunk-00003.h5"), "panel_sha256", "f"^64); (;)))
     add("chunk-prereg-attr", ["prereg"], :both, c -> (p3t_set_attr(joinpath(c.store, "chunk-00003.h5"), "prereg_sha256", "f"^64); (;)))
-    add("chunk-duplicate", ["cell"], :both, c -> (cp(joinpath(c.store, "chunk-00003.h5"), joinpath(c.store, "chunk-00099.h5")); (;)))
+    add("chunk-duplicate", ["cell"], :both, c -> (cp(joinpath(c.store, "chunk-00003.h5"), joinpath(c.store, "chunk-00900.h5")); (;)))
     # (h) the round log: absent, empty, open (analyze only)
     add("log-absent", ["round log"], :analyze, c -> (rm(c.log); (;)))
     add("log-empty", ["round log"], :analyze, c -> (write(c.log, ""); (;)))
@@ -58,10 +58,10 @@ function p3t_cases(S, I, st)
     add("manifest-status", ["status"], :analyze, c -> (json_edit(c.manifest, m -> m["status"] = "running"); (;)))
     add("manifest-chunk-hash", ["hash"], :analyze, c -> (json_edit(c.manifest, m -> m["chunks"][1]["hash"] = "f"^64); (;)))
     add("manifest-arms", ["chk"], :analyze, c -> (json_edit(c.manifest, m -> (m["arms"]["check"] = pop!(m["arms"], "chk"))); (;)))
-    # (j) the identity of an orbit (the start text of the panel against the stored one), built from an instance with a consistent panel hash
-    add("identity", ["ic", "12"], :analyze, c -> (p2_set_attr(joinpath(c.store, "chunk-00007.h5"), "orbits/12", "ic", "0.1,0.2"); (;)))
+    # (j) the identity of an orbit (the start text of the panel against the stored one), built from an instance with a consistent panel hash (the ref chunk of orbit 12; D97: the file is found by the cell table, not by its ordinal)
+    add("identity", ["ic", "12"], :analyze, c -> (p2_set_attr(joinpath(c.store, "chunk-" * lpad(string(first(x.ordinal for x in S.chunks if x.arm == "ref" && x.status == "ok" && 12 in x.ids)), 5, '0') * ".h5"), "orbits/12", "ic", "0.1,0.2"); (;)))
     # (k) an item that is needed is missing for an orbit that is not listed as excluded: orbit 12 is dropped from the tg chunk of K index 4 without a manifest entry
-    add("item-missing", ["tg", "12"], :analyze, c -> (p3t_alter_chunk(S, c, I, first(x.ordinal for x in S.chunks if x.arm == "ind" && x.spec == "tg" && x.cell == "k4"); drop = [12]); (;)))
+    add("item-missing", ["tg", "12"], :analyze, c -> (p3t_alter_chunk(S, c, I, first(x.ordinal for x in S.chunks if x.arm == "ind" && x.spec == "tg" && x.cell == "k4:C:r1"); drop = [12]); (;)))
     # (l) a chunk of a closure arm is incomplete without being listed as failed twice
     add("closure-incomplete", ["complete"], :analyze, c -> (p3t_set_attr(p3t_chunk(S, c; arm = "d64", role = :tg), "complete", false); (;)))
     # (m) --out inside data/, and --round-log inside data/

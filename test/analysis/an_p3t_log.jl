@@ -36,7 +36,7 @@ end
     # drop reasons by hand (I46): round 2 has the drift orbit 14 and the excluded orbit 24 inside count.orbits; the U orbit 23 is counted among the orbits only
     @test res[2].counts.orbits == 22 && res[2].counts.drift == 1 && res[2].counts.excluded == 1 && res[2].counts.t_s == 4 && res[2].counts.w2 == 7
     # the digest of round r covers the ref chunks of the rounds up to r only (a failed chunk included)
-    @test occursin("ref_digest=$(p3t_digest(S, 2))\n", ents[2]) && p3t_digest(S, 1) != p3t_digest(S, 2) && length(p3t_ref_hashes(S, 3)) == 24
+    @test occursin("ref_digest=$(p3t_digest(S, 2))\n", ents[2]) && p3t_digest(S, 1) != p3t_digest(S, 2) && length(p3t_ref_hashes(S, 3)) == 28
 end
 
 @testset "D95d the decision at the boundaries of the targets and at r_max" begin
@@ -81,12 +81,12 @@ end
     ents, _ = p3t_log_entries(S, I)
     # a ref chunk of round 1 missing: the round is not finished, the missing cell is named, nothing is appended, the file is not created
     inst = p3t_instance(S, I, "miss"; rounds = 1, closure = false)
-    rm(p3t_chunk(S, inst; arm = "ref", role = :L5, cell = "k3:r1"))
-    @test an_rejects(() -> AN.count_round(; p3t_cr_args(I, st, inst)...), ["k3:r1"]) && !isfile(inst.log)
+    rm(p3t_chunk(S, inst; arm = "ref", role = :L5, cell = "k3:C:r1"))
+    @test an_rejects(() -> AN.count_round(; p3t_cr_args(I, st, inst)...), ["k3:C:r1"]) && !isfile(inst.log)
     # a ref chunk of round 1 incomplete (attribute complete false)
     inst = p3t_instance(S, I, "incomplete"; rounds = 1, closure = false)
-    p3t_set_attr(p3t_chunk(S, inst; arm = "ref", role = :L1, cell = "k2:r1"), "complete", false)
-    @test an_rejects(() -> AN.count_round(; p3t_cr_args(I, st, inst)...), ["k2:r1", "complete"]) && !isfile(inst.log)
+    p3t_set_attr(p3t_chunk(S, inst; arm = "ref", role = :L1, cell = "k2:C:r1"), "complete", false)
+    @test an_rejects(() -> AN.count_round(; p3t_cr_args(I, st, inst)...), ["k2:C:r1", "complete"]) && !isfile(inst.log)
     # ref chunks of a round above r (the guard of the runner was bypassed): refused, naming the round
     inst = p3t_instance(S, I, "above"; rounds = 2, closure = false)
     @test an_rejects(() -> AN.count_round(; p3t_cr_args(I, st, inst)...), ["round 2"]) && !isfile(inst.log)
@@ -97,7 +97,7 @@ end
     reads = NamedTuple[]
     @test an_rejects(() -> AN.count_round(; p3t_cr_args(I, st, inst)..., on_read = (kind, path) -> push!(reads, (kind = kind, path = String(path)))), ["closure"]) && !isfile(inst.log)
     clo = Set(basename(f) for f in p3t_files(inst.store) if !("ref" in AX.read_chunk_attrs(f)["arms"]))
-    @test length(clo) == 26 && all(r -> !(basename(r.path) in clo && r.kind === :datasets), reads)
+    @test length(clo) == 94 && all(r -> !(basename(r.path) in clo && r.kind === :datasets), reads)
     # a failed write leaves the old bytes: a read-only log file (a defect that is not a refusal of the inputs)
     inst = p3t_instance(S, I, "readonly"; rounds = 2, closure = false)
     write(inst.log, ents[1]); chmod(inst.log, 0o444)

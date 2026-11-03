@@ -65,3 +65,9 @@ include(joinpath(@__DIR__, "an_p3t_log.jl"))         # D95d, D95e
 include(joinpath(@__DIR__, "an_p3t_refusals.jl"))    # D95c
 include(joinpath(@__DIR__, "an_p3t_dispatch.jl"))    # D95a, D95p
 include(joinpath(@__DIR__, "an_p3t_pipeline.jl"))    # D95f to D95l, D95n, D95o end to end
+
+# D97 stage 02 (Amendment D97, study p3-abstention, the test side reads the store of the runner). The toy campaign of an_p3t_helpers.jl is written in the shape of the runner (E82); the shape
+# guard runs the real runner on a tiny campaign. The module reads the shape of the D95 toy: the files below are RED except the fixture and shape self-tests (an_p3t_shape.jl, the "fixture
+# side" testsets of an_p3t_d97.jl). The D95 files above that read the toy store (fixture, log, refusals, pipeline) are RED for the same reason until stage 03.
+include(joinpath(@__DIR__, "an_p3t_shape.jl"))       # D97i: the toy campaign against a campaign of the real runner (cells, arms, manifest keys, attributes, item labels)
+include(joinpath(@__DIR__, "an_p3t_d97.jl"))         # D97a to D97i and O30

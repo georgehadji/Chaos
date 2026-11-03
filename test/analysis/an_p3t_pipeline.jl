@@ -29,7 +29,7 @@ end
     fp = m["fingerprints"]
     @test fp["preregistration"] == I.prereg_hash && fp["p3_parameters"] == p3ref_sha256_file(I.params) && fp["test_parameters"] == p3ref_sha256_file(I.tparams) && fp["calibration_record"] == p3ref_sha256_file(I.record) &&
           fp["panel"] == p3ref_sha256_file(inst.panel) && fp["manifest"] == p3ref_sha256_file(inst.manifest) && fp["round_log"] == p3ref_sha256_file(inst.log) && fp["p2_manifest"] == I.q.p2_manifest_sha256 &&
-          haskey(fp, "p1_parameters") && haskey(fp, "git_commit") && fp["git_clean"] isa Bool && length(fp["chunks"]) == 50 && all(v -> occursin(r"^[0-9a-f]{64}$", v), values(fp["chunks"]))
+          haskey(fp, "p1_parameters") && haskey(fp, "git_commit") && fp["git_clean"] isa Bool && length(fp["chunks"]) == 122 && all(v -> occursin(r"^[0-9a-f]{64}$", v), values(fp["chunks"]))
     # the tables file: header, the decisions, T1 to T11, the data blocks of F2 and F3 with digests, the readings, the deviations, the exploratory list; the machine file's hash is stated
     mh = match(r"results SHA-256:? ([0-9a-f]{64})", tab)
     @test mh !== nothing && mh.captures[1] == p3ref_sha256_file(res.results)
@@ -135,12 +135,14 @@ end
     (; X, m, S, I, st, inst) = p3t_run_main()
     qt = I.qt
     sv = m["sensitivities"]
-    # (i) the round-down budgets, (ii) the pilot costs, (iii) the costs measured in the test run (the manifest has no value for L1: not decidable, P114), (iv) without LE
+    # (i) the round-down budgets, (ii) the pilot costs, (iii) the costs measured in the test run (D97, E78: tg, fq1, bk1 and pa1 from the specs of the arms ind and ind_pa1, L1 from the chunk
+    # entries of the ref arm, 250.0 here), (iv) without LE
     rd = p3t_hb_variant(X, qt; down = true)
     @test sv["round_down"]["decidable"] == rd.decidable && sv["round_down"]["verdict"] == rd.verdict && rd.decidable
     pc = p3t_hb_variant(X, qt; costs = (; cost_l1 = qt.pilot_cost_l1, cost_tg = qt.pilot_cost_tg, cost_pa1 = qt.pilot_cost_pa1, cost_bk1 = qt.pilot_cost_bk1, cost_fq1 = qt.pilot_cost_fq1))
     @test sv["pilot"]["decidable"] == pc.decidable && sv["pilot"]["verdict"] == pc.verdict
-    @test sv["measured"]["decidable"] == false && sv["measured"]["verdict"] == "not decidable" && occursin("L1", sv["measured"]["reason"])
+    mvm = p3t_hb_variant(X, qt; costs = (; cost_l1 = 250.0, cost_tg = 237.5, cost_pa1 = 1810.5, cost_bk1 = 3000.25, cost_fq1 = 16850.5))
+    @test sv["measured"]["decidable"] == mvm.decidable && sv["measured"]["verdict"] == mvm.verdict && !occursin("manifest has no", sv["measured"]["reason"])      # (D97: every spec has a value, the old reading named L1)
     @test sv["without_le"]["verdict"] == p3tref_hb(Dict(k => v for (k, v) in X.cmp if k != (:W2, :LE)), X.cov, X.sizes, qt).decision
     @test Set(Symbol.(sv["round_down"]["failing"] .|> s -> replace(s, "T_s" => "Ts"))) == Set(Symbol("$(k[1]):$(k[2])") for k in rd.failing)
     @test m["decisions"]["HB"]["verdict"] == X.hb.decision                                                                                       # no sensitivity changes a decision
@@ -153,19 +155,17 @@ end
     @test m["power"]["hc"] === nothing                                                                  # failures 7 >= target_f 6: no recomputation (and no type-I check is repeated)
 end
 
-@testset "D95j no recomputation when both targets are met; the sensitivity (iii) with the costs of the manifest" begin
+@testset "D95j no recomputation when both targets are met; the sensitivity (iii) with the costs of the store" begin
     S, I0, st = p3t_cached(), p3t_cached_inputs(), p3_cached("d95")
     I = p3t_inputs(S, st, "met"; target_t_s = 5, target_w2 = 10)                 # the final sizes (5 and 10) meet the targets
     inst = p3t_instance(S, I, "met"); write(inst.log, join(first(p3t_log_entries(S, I))))
     m = AX.read_json(AN.analyze(; p3t_an_args(I, st, inst)..., threads = 2).results)
     @test m["power"]["hb"] === nothing && m["flags"]["underpowered_hb"] == false && m["hb"]["underpowered"] == false
-    # the measured costs: the manifest gets a value for every spec; tg is measured at 237.5 against 2658, so the matching of SALI, FLI, MEGNO is capped: not decidable (a non-LE comparator capped)
-    man = AX.read_json(inst.manifest)
-    man["arms"]["ref"]["specs"]["L1"] = Dict{String, Any}("budget_line_ns" => 300.0, "measured_ns_per_orbit_step" => 207.0)
-    AX._write_json(inst.manifest, man)
-    m2 = AX.read_json(AN.analyze(; p3t_an_args(I, st, inst)..., out = joinpath(inst.dir, "out2")).results)
+    # the measured costs (E78, D97): every spec has a value (L1 250.0 from the chunk entries of the ref arm); tg is measured at 237.5 against 2658, so the matching of SALI, FLI, MEGNO is capped:
+    # not decidable (a non-LE comparator capped)
+    m2 = m
     X = p3t_expected(S, I.qt)
-    mv = p3t_hb_variant(X, I.qt; costs = (; cost_l1 = 207.0, cost_tg = 237.5, cost_pa1 = 1810.5, cost_bk1 = 3000.25, cost_fq1 = 16850.5))
+    mv = p3t_hb_variant(X, I.qt; costs = (; cost_l1 = 250.0, cost_tg = 237.5, cost_pa1 = 1810.5, cost_bk1 = 3000.25, cost_fq1 = 16850.5))
     @test mv.decidable == false && m2["sensitivities"]["measured"]["decidable"] == false && m2["sensitivities"]["measured"]["verdict"] == "not decidable" && !occursin("L1", m2["sensitivities"]["measured"]["reason"])
 end
 

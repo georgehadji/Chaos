@@ -3,9 +3,12 @@
 # Spec: workspaces/module-build/stages/01-spec/output/analysis-spec.md, "Amendment D95". API assumed: analysis-test-plan.md, "Amendment D95 (stage 02)", "Contract proposed by the tests".
 #
 # The toy campaign (scaled, 31 orbits, 3 rounds): the orbits are copies of designed orbits of the D93 fixture (templates: grid orbits 21 to 43, whose labels rho_new and verdict
-# histories are known), written into a store of 50 chunk files by the real chunk writer: the ref arm (L1 and L5, Float64, N_1, one chunk pair per cell (round, K index)), the ind
-# arm (tg, fq1, bk1, pa1, Float64, one chunk per K index and spec), the d64 arm (Double64, the orbits of D), the chk arm (L5 in Double64 and BigFloat, the orbits of D_B).
-# The panel file carries the rounds (D94 R23). Uses an_helpers.jl, the p2 helpers and the D93 helpers (an_p3_*.jl) without changing them.
+# histories are known), written by the real chunk writer in the SHAPE OF THE RUNNER (Amendment D97, E82; before D97 the toy had the shape of the module, D95). One chunk per cell
+# `k<K index>:<class>:r<round>` and item, in six arms: ref (L1 and L5, Float64, N_1, every orbit), ind (tg, fq1, bk1, Float64, N_c, every orbit), ind_pa1 (pa1, Float64, N_c + 1),
+# d64 (tg, fq1, bk1, Double64, N_c, the orbits of D), d64_pa1 (pa1, Double64, N_c + 1), chk (L5 in Double64 and BigFloat(256), at its own horizon N_B, the orbits of D_B). The keys of
+# the chunks and of the manifest entries are those of the runner, the manifest status is `complete with failed chunks` when a chunk failed, the specs sit on the indicator arms only.
+# The shape is guarded by an_p3t_shape.jl against a real campaign of the runner. The panel file carries the rounds (D94 R23). Uses an_helpers.jl, the p2 helpers and the D93 helpers
+# (an_p3_*.jl) without changing them.
 
 p3t_seed(letter::Char, sub::Integer = 0) = AN_SEED + 36000 + 50 * (letter - 'a' + 1) + sub      # D95<letter> draws use 36000 + 50 n + sub, sub < 50
 const P3T_KTEXT = ["0", "0.5", "1.5", "2.5", "3.5"]                  # K text of the K index 1 to 5 (index 1 is the K = 0 gate cell)
@@ -35,6 +38,12 @@ const P3T_LIST = [
 const P3T_D = [3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 18, 20, 21, 25]       # in_D (14 is a drift orbit, 8 and 9 and 20 and 21 are regular, 3 4 15 16 25 are sticky T_s orbits)
 const P3T_DB = [3, 6, 8, 12]                                                  # D_B: the orbits of the arm chk (all in D)
 const P3T_ROUNDS = 3
+const P3T_RCLASS = [9, 13, 28]                                                 # panel class R (all others C): the cells of a round and a K index split by class (E74)
+const P3T_ARMS = ["ref", "ind", "ind_pa1", "d64", "d64_pa1", "chk"]            # the six arms of the test run (E81)
+const P3T_NB = 1000                                                            # the horizon of the arm chk = N_B of the P1 table of the fixture (an_fx_params)
+const P3T_GC = sort(unique(vcat(filter(<=(P3T_NB), P2_GA), [P3T_NB])))         # recorded steps of the chk items
+# the L5 values of the chk items are the reference value plus an offset (Double64, BigFloat): orbit 6 flips the ladder (0.02 > 5e-3), orbit 8 differs below the bound, orbits 3 and 12 equal
+const P3T_CHK_OFF = Dict{Int, Tuple{Float64, Float64}}(3 => (0.0, 0.0), 6 => (0.0, 0.02), 8 => (0.004, 0.004), 12 => (0.0, 0.0))
 # the Float64 votes of orbit 12 (a regular template) are changed to three chaotic ones at b_P (a failure of HC), and the Double64 verdicts of some voters differ at b_P (s_P > 0)
 const P3T_OV = Dict{Tuple{Int, Symbol}, String}((12, :SALI) => "rrrrrrcccc", (12, :FLI) => "rrrrrrcccc", (12, :MEGNO) => "rrrrrrcccc")
 const P3T_OVD = Dict{Tuple{Int, Symbol}, Tuple{Int, Char}}((3, :SALI) => (7, 'c'), (4, :SALI) => (7, 'c'), (15, :FLI) => (7, 'r'), (15, :MEGNO) => (7, 'c'), (25, :E2) => (7, 'r'),
@@ -69,18 +78,20 @@ function p3t_orbits()
     out = NamedTuple[]
     for (id, t, r, k, tag) in P3T_LIST
         x0, p0 = 2pi * rand(rng), 2pi * rand(rng)
-        push!(out, (id = id, tmpl = t, round = r, kidx = k, tag = tag, x0 = x0, p0 = p0, ktext = P3T_KTEXT[k], ic = "$(x0),$(p0)", in_D = id in P3T_D, in_DB = id in P3T_DB))
+        push!(out, (id = id, tmpl = t, round = r, kidx = k, tag = tag, x0 = x0, p0 = p0, ktext = P3T_KTEXT[k], ic = "$(x0),$(p0)", in_D = id in P3T_D, in_DB = id in P3T_DB,
+                    cls = id in P3T_RCLASS ? "R" : "C"))
     end
     return out
 end
-p3t_info(o) = (x0 = o.x0, p0 = o.p0, ic = o.ic, params = o.ktext, cls = "C", system = "standard", kind = "none", K = parse(Float64, o.ktext), id = o.id)
+p3t_info(o) = (x0 = o.x0, p0 = o.p0, ic = o.ic, params = o.ktext, cls = o.cls, system = "standard", kind = "none", K = parse(Float64, o.ktext), id = o.id)
+p3t_cell(o) = "k$(o.kidx):$(o.cls):r$(o.round)"                       # the cell of an orbit (E74)
 
 function p3t_write_panel(path, orbits, h; r_max = P3T_ROUNDS, drop = Symbol[], extra = Dict{String, Any}())
     man = Dict{String, Any}("format_version" => 1, "controls" => Int[], "r_max" => r_max, "gate_rounds" => [1], "db_size" => length(P3T_DB),
                             "prereg" => Dict{String, Any}("header_sha256" => h, "computed_sha256" => h))
     tab = Dict{String, Any}[]
     for o in orbits
-        d = Dict{String, Any}("id" => o.id, "class" => "C", "control" => false, "control_kind" => "none", "k_index" => o.kidx, "K_text" => o.ktext, "K" => parse(Float64, o.ktext),
+        d = Dict{String, Any}("id" => o.id, "class" => o.cls, "control" => false, "control_kind" => "none", "k_index" => o.kidx, "K_text" => o.ktext, "K" => parse(Float64, o.ktext),
             "system" => "standard", "x0" => o.x0, "p0" => o.p0, "x0_dec" => string(o.x0), "p0_dec" => string(o.p0), "draw_index" => o.id, "run_seed" => "20261030",
             "orbit_seed" => string(2000 + o.id), "in_SD" => false, "in_SL" => false, "round" => o.round, "in_D" => o.in_D)
         for k in drop; delete!(d, string(k)); end
@@ -153,26 +164,38 @@ function p3t_write_values(path, t, q; drop = Symbol[], extra = Dict{String, Any}
 end
 
 # ---------------------------------------------------------------- the store, the manifest and the panel
+# the items of an arm (E75, E81): `kind` is the arm name; ref and chk have no indicator specs, the indicator arms hold the specs of the runner (ids tg, fq1, bk1, pa1)
 function p3t_specs(kind::Symbol, p)
     S = NamedTuple[]
     add(role, id, prec, hor, grid, arm; kd = "") = push!(S, (; role, id, precision = prec, horizon = hor, grid, arms = [arm], dindex = 1, direction = P2_DIRS[1], kind = kd))
     if kind === :ref
         add(:L1, "L1", "Float64", P2_N1, P2_GA, "ref"); add(:L5, "L5", "Float64", P2_N1, P2_GA, "ref")
-    elseif kind === :ind
-        add(:tg, "tg", "Float64", P2_N1, P2_GA, "ind"; kd = "tangent"); add(:fq1, "fq1", "Float64", P2_NC, P2_GB, "ind"; kd = "frequency")
-        add(:bk1, "bk1", "Float64", P2_NC, P2_GB, "ind"; kd = "birkhoff"); add(:pa1, "pa1", "Float64", P2_NC + 1, P2_GB1, "ind"; kd = "phase_advance")
-    elseif kind === :d64
-        add(:tg, "tg", "Double64", P2_N1, P2_GA, "d64"; kd = "tangent"); add(:fq1, "fq1", "Double64", P2_NC, P2_GB, "d64"; kd = "frequency")
-        add(:bk1, "bk1", "Double64", P2_NC, P2_GB, "d64"; kd = "birkhoff"); add(:pa1, "pa1", "Double64", P2_NC + 1, P2_GB1, "d64"; kd = "phase_advance")
+    elseif kind in (:ind, :d64)
+        pr = kind === :ind ? "Float64" : "Double64"; a = string(kind)
+        add(:tg, "tg", pr, P2_NC, P2_GB, a; kd = "tangent"); add(:fq1, "fq1", pr, P2_NC, P2_GB, a; kd = "frequency"); add(:bk1, "bk1", pr, P2_NC, P2_GB, a; kd = "birkhoff")
+    elseif kind in (:ind_pa1, :d64_pa1)
+        add(:pa1, "pa1", kind === :ind_pa1 ? "Float64" : "Double64", P2_NC + 1, P2_GB1, string(kind); kd = "phase_advance")
     else
-        add(:L5, "L5", "Double64", P2_N1, P2_GA, "chk"); add(:L5, "L5", "BigFloat", P2_N1, P2_GA, "chk")
+        add(:L5, "L5", "Double64", P3T_NB, P3T_GC, "chk"); add(:L5, "L5", "BigFloat(256)", P3T_NB, P3T_GC, "chk")
     end
     return S
+end
+const P3T_KINDS = [:ref, :ind, :ind_pa1, :d64, :d64_pa1, :chk]
+p3t_allspecs(p) = vcat((p3t_specs(k, p) for k in P3T_KINDS)...)
+
+# the key of a chunk as the runner writes it: `method=<id>[ kind=<kind> spec=<16 hex>] precision=<p> horizon=<h> tau=1 eps=- direction=<d or -> mode=wrapped cell=<cell>`
+function p3t_key(sp, cell)
+    spec = ""
+    if sp.kind != ""
+        kd, _ = P2_SPEC_INFO[sp.id]
+        spec = " kind=$(kd) spec=" * p3ref_sha256("indicator.id = \"$(sp.id)\"\nindicator.kind = \"$kd\"\n")[1:16]
+    end
+    return "method=$(sp.id)$(spec) precision=$(sp.precision) horizon=$(sp.horizon) tau=1 eps=- direction=$(sp.role in (:L1, :L5, :tg) ? sp.direction : "-") mode=wrapped cell=$(cell)"
 end
 
 # the root attributes of a chunk (as the p2 fixture), with the cell in the chunk key; a failed chunk has status "failed" and attempt 2
 function p3t_root(sp, ord, p, ph, h, cell; status = "ok", attempt = 1, qh = nothing)
-    key = "method=$(sp.id) kind=$(sp.kind) precision=$(sp.precision) horizon=$(sp.horizon) tau=1 direction=$(sp.direction) mode=wrapped cell=$(cell)"
+    key = p3t_key(sp, cell)
     ch = p3ref_sha256("p3t-chunk-$ord-$key")
     root = Dict{String, Any}("schema_version" => 2, "study" => P3_SLUG, "chunk" => ord, "chunk_key" => key, "chunk_hash" => ch, "plan_sha256" => p.plan_sha256,
         "panel_sha256" => ph, "prereg_sha256" => h, "git_sha" => "a"^40, "code_version" => "an-code-1", "backend_request" => "cpu", "backend" => "cpu",
@@ -180,7 +203,7 @@ function p3t_root(sp, ord, p, ph, h, cell; status = "ok", attempt = 1, qh = noth
         "vectors" => sp.role in (:tg, :L5) ? 2 : 1, "coordinate_mode" => "wrapped", "grid_sha256" => "g"^64,
         "status" => status, "attempt" => attempt, "setup_check" => "not applicable", "first_attempt_reasons" => String[], "failure_reasons" => status == "ok" ? String[] : ["failed twice (fixture)"],
         "pilot" => false, "arms" => sp.arms, "session" => 1, "control_stop" => false, "dirty" => false, "created_utc" => "2026-11-01T00:00:00Z")
-    sp.role in (:L1, :L5, :tg, :st) && (root["direction"] = sp.direction)
+    sp.role in (:L1, :L5, :tg) && (root["direction"] = sp.direction)
     if sp.kind != ""
         kd, mem = P2_SPEC_INFO[sp.id]
         st_text = "indicator.id = \"$(sp.id)\"\nindicator.kind = \"$kd\"\n"
@@ -193,7 +216,64 @@ end
 
 p3t_flags(o, sp) = (f = String[]; o.tag === :drift && push!(f, "drift"); (o.tag === :U && sp.arms == ["ref"] && sp.role === :L5) && push!(f, "diagnostics exceeded"); f)
 
-# the whole campaign: dir, panel, store (50 chunk files), manifest; returns the table of chunks (arm, round, hash, cell, status, ids)
+# ---------------------------------------------------------------- the records of the items at the horizons of the runner
+# the first recorded step not below x and the recorded step nearest to x (a tie goes to the larger step), written here from E26
+p3t_first(t, x) = t[searchsortedfirst(t, x)]
+function p3t_near(t, x)
+    i = searchsortedfirst(t, x)
+    i > length(t) && return t[end]
+    i == 1 && return t[1]
+    return x - t[i - 1] < t[i] - x ? t[i - 1] : t[i]
+end
+# the tangent items on a grid of any horizon: the encoding of p2_tg (an_p2_study.jl) with n(b_k) the first recorded step not below b_k and n' the recorded step nearest to n / 10; on
+# the grid of N_1 this is p2_tg, on the grid of N_c (n = ..., 5632, 10240, 20480) it is the item of the arm ind (E75)
+function p3t_tg(id, t, V)
+    M = repeat([5.0 5.0 2.0 2.0 2.0 2.0 2.0 2.0 0.1 -1.0], length(t))
+    for k in 0:9
+        n = p3t_first(t, P2_BUDGETS[k + 1]); np = p3t_near(t, n / 10)
+        i, ip = p2_ix(t, n), p2_ix(t, np)
+        vs, vf, vm = V[:SALI][k + 1], V[:FLI][k + 1], V[:MEGNO][k + 1]
+        M[ip, 10], M[i, 10] = vs === :undecided ? (0.5, -3.0) : (-1.0, -p2_rv(vs, id, k))
+        M[i, 9] = vs === :chaotic ? 1e-10 : (vs === :regular && id % 3 == 0) ? 1e-9 : 0.1
+        M[ip, 1], M[i, 1] = vf === :undecided ? (0.0, 3.0) : vf === :chaotic ? (5.0, 5.0 * p2_rv(vf, id, k)) : (2.0, 2.0 * p2_rv(vf, id, k))
+        M[ip, 5], M[i, 5] = vm === :undecided ? (0.0, 2.0) : vm === :chaotic ? (5.0, 5.0 * p2_rv(vm, id, k)) : (2.0 / p2_rv(vm, id, k), 2.0)
+    end
+    return M
+end
+
+# an item record: the p2 record, except the tangent item (any grid) and the L5 item of the arm chk (own horizon N_B, the values of P3T_CHK_OFF)
+function p3t_record(sp, info, design, p; flags = String[])
+    if sp.role === :tg
+        id, t = info.id, collect(sp.grid)
+        Vd = Dict{Symbol, Vector{Symbol}}(X => copy(design.V[id][X]) for X in keys(design.V[id]))
+        state, wind = p2_points(info, t, design)
+        at = Dict{String, Any}("system" => info.system, "params" => info.params, "ic" => info.ic, "class_label" => info.cls, "seed" => string(1000 + id), "item_hash" => "i"^64,
+            "design_class" => info.cls, "flags" => String.(flags), "steps_recorded" => length(t))
+        n = length(t)
+        diag = Dict{String, Vector{Float64}}(nm => fill(1e-16, n) for nm in ("det", "symp")); thr = Dict{String, Float64}(nm => 1e-12 for nm in ("det", "symp")); fe = Dict{String, Int}(nm => 0 for nm in ("det", "symp"))
+        return AX.OrbitRecord(id, at, Int64.(t), state, wind, Dict{String, Matrix{Float64}}(), diag, thr, fe, Dict(sp.id => Float64[sp.horizon, 1, 0.01, 0.1, 1e5]), "",
+                              Dict{String, NamedTuple}("tg" => AX._ind_nt(series = p3t_tg(id, t, Vd), columns = P2_TGCOLS)))
+    elseif sp.arms == ["chk"]
+        d2 = merge(design, (; rho = Dict{Int, Symbol}(k => :C for k in keys(design.rho))))          # no R shape of the L5 item of the p2 fixture (the grid has no step N_1 / 10)
+        rec = p2_orbit_record(merge(sp, (; arms = ["x"])), info, d2, p; flags)
+        off = get(P3T_CHK_OFF, info.id, (0.0, 0.0))[sp.precision == "Double64" ? 1 : 2]
+        rec.lyap["L5"][:, 1] .+= off; rec.lyap["L5"][:, 2] .-= off
+        return rec
+    end
+    return p2_orbit_record(sp, info, design, p; flags)
+end
+
+# the cells of a set of orbits: (cell, ids) in the order of round, K index, class
+function p3t_cells_of(orbits, ids)
+    cells = Dict{String, Vector{Int}}()
+    for i in ids; push!(get!(cells, p3t_cell(orbits[i]), Int[]), i); end
+    key(c) = (m = match(r"^k(\d+):(\w+):r(\d+)$", c); (parse(Int, m.captures[3]), parse(Int, m.captures[1]), m.captures[2]))
+    return [(c, cells[c]) for c in sort(collect(keys(cells)); by = key)]
+end
+
+const P3T_NS_PER_STEP = 250.0                       # the thread-ns per orbit-step of the ok chunks of the toy: the cost of L1 of E78 is 250.0
+
+# the whole campaign: dir, panel, store (one chunk per cell and item), manifest; returns the table of chunks (arm, round, hash, cell, status, ids)
 function p3t_build(tag::AbstractString; q = p3t_q(), h = nothing)
     dir = an_path("p3t-$tag")
     rm(dir; recursive = true, force = true); mkpath(dir)
@@ -211,54 +291,61 @@ function p3t_build(tag::AbstractString; q = p3t_q(), h = nothing)
         recs = AX.OrbitRecord[]
         status == "ok" && for id in ids
             o = orbits[id]
-            push!(recs, p2_orbit_record(sp, p3t_info(o), design, p; flags = flagfn(id, sp)))
+            push!(recs, p3t_record(sp, p3t_info(o), design, p; flags = flagfn(id, sp)))
         end
         root, ch = p3t_root(sp, ord, p, ph, h0, cell; status, attempt = status == "ok" ? 1 : 2)
         AX.write_chunk(joinpath(store, "chunk-" * lpad(string(ord), 5, '0') * ".h5"), root, recs)
+        steps = length(recs) * sp.horizon
+        # a failed chunk entry carries the steps and the seconds of its attempts (large on purpose: a cost that includes it is wrong, E78)
         ent = Dict{String, Any}("ordinal" => ord, "key" => root["chunk_key"], "hash" => ch, "arms" => sp.arms, "status" => status, "attempt" => status == "ok" ? 1 : 2, "orbits" => length(recs),
-            "backend" => "cpu", "steps" => sp.horizon * length(recs), "wall_seconds" => 1.0, "thread_seconds" => 2.0, "fallback_reason" => "", "first_attempt_reasons" => String[],
-            "setup_check" => "not applicable", "control_stop" => false, "control_info" => Any[],
+            "backend" => "cpu", "steps" => status == "ok" ? steps : 3 * sp.horizon, "wall_seconds" => 1.0, "thread_seconds" => status == "ok" ? steps * P3T_NS_PER_STEP * 1e-9 : 7.0,
+            "fallback_reason" => "", "first_attempt_reasons" => String[], "setup_check" => "not applicable", "control_stop" => false, "control_info" => Any[],
             "flags" => Dict{String, Any}("diagnostics exceeded" => Int[], "drift" => [i for i in ids if orbits[i].tag === :drift && status == "ok"], "excluded" => status == "ok" ? Int[] : collect(ids), "breakdown_tau" => Int[]))
         sp.kind != "" && (ent["indicator_flags"] = Dict{String, Any}(k => v for (k, v) in p2_flag_counts(recs)))
         push!(chunks, ent)
-        push!(table, (; ordinal = ord, arm = sp.arms[1], role = sp.role, spec = sp.id, precision = sp.precision, round = rnd, cell, hash = ch, status, ids = collect(ids)))
+        push!(table, (; ordinal = ord, arm = sp.arms[1], role = sp.role, spec = sp.id, precision = sp.precision, round = rnd, cell, hash = ch, status, ids = collect(ids), horizon = sp.horizon))
     end
     flags(id, sp) = p3t_flags(orbits[id], sp)
-    for r in 1:P3T_ROUNDS, k in 1:5
-        ids = [o.id for o in orbits if o.round == r && o.kidx == k]
-        isempty(ids) && continue
-        failed = any(i -> orbits[i].tag === :excl, ids)
-        for sp in p3t_specs(:ref, p)
-            emit(sp, ids, "k$(k):r$(r)", des.f; status = failed ? "failed" : "ok", rnd = r, flagfn = flags)
+    allids = [o.id for o in orbits]
+    # per arm: the orbits it holds, the failed cells (a cell of ref fails with its excluded orbit, a cell of ind and ind_pa1 with its orbit without verdict data), the design of its items
+    for (kind, ids, design) in ((:ref, allids, des.f), (:ind, allids, des.f), (:ind_pa1, allids, des.f), (:d64, P3T_D, des.d), (:d64_pa1, P3T_D, des.d), (:chk, P3T_DB, des.f))
+        for (cell, cids) in p3t_cells_of(orbits, ids)
+            failed = (kind === :ref && any(i -> orbits[i].tag === :excl, cids)) || (kind in (:ind, :ind_pa1) && any(i -> orbits[i].tag === :nov, cids))
+            rnd = orbits[first(cids)].round
+            for sp in p3t_specs(kind, p)
+                emit(sp, cids, cell, design; status = failed ? "failed" : "ok", rnd, flagfn = flags)
+            end
         end
-    end
-    for k in 1:5
-        ids = [o.id for o in orbits if o.kidx == k]
-        failed = any(i -> orbits[i].tag === :nov, ids)
-        for sp in p3t_specs(:ind, p)
-            emit(sp, ids, "k$(k)", des.f; status = failed ? "failed" : "ok", flagfn = flags)
-        end
-    end
-    for sp in p3t_specs(:d64, p)
-        emit(sp, P3T_D, "D", des.d; flagfn = flags)
-    end
-    for sp in p3t_specs(:chk, p)
-        emit(sp, P3T_DB, "DB", des.f; flagfn = flags)
-    end
-    arms = Dict{String, Any}()
-    for a in ("ref", "ind", "d64", "chk")
-        arms[a] = Dict{String, Any}("status" => "complete", "steps" => 0, "cost_ns_per_orbit_step" => 100.0, "budget_ns" => 415.2, "specs" => Dict{String, Any}())
-    end
-    for sp in vcat(p3t_specs(:ref, p), p3t_specs(:ind, p), p3t_specs(:d64, p))
-        haskey(P2_COST, sp.id) && (arms[sp.arms[1]]["specs"][sp.id] = Dict{String, Any}("budget_line_ns" => P2_COST[sp.id][1], "measured_ns_per_orbit_step" => P2_COST[sp.id][2]))
     end
     manifest = joinpath(dir, "$P3_SLUG-test-manifest.json")
-    AX._write_json(manifest, Dict{String, Any}("study" => P3_SLUG, "schema_version" => 2, "status" => "complete", "plan_sha256" => p.plan_sha256,
+    p3t_write_manifest(manifest, p, chunks, h0, ph, p3t_arms(chunks, p))
+    return (; dir, store, panel, manifest, panel_hash = ph, orbits, design = des, chunks = table, q, p, files = length(table))
+end
+
+# the arm blocks of the manifest (the keys of the runner: budget_ns, cost_ns_per_orbit_step, status, steps, thread_seconds, wall_seconds; `specs` on the indicator arms only, E78)
+function p3t_arms(chunks, p)
+    arms = Dict{String, Any}()
+    for a in P3T_ARMS
+        es = [c for c in chunks if a in c["arms"]]
+        steps = sum(c["steps"] for c in es); thr = sum(c["thread_seconds"] for c in es)
+        arms[a] = Dict{String, Any}("status" => "complete", "steps" => steps, "cost_ns_per_orbit_step" => 1e9 * thr / max(steps, 1), "budget_ns" => 415.2, "thread_seconds" => thr, "wall_seconds" => thr / 4)
+    end
+    for sp in p3t_allspecs(p)
+        sp.kind == "" && continue
+        # the specs of the Double64 arms differ from those of the Float64 arms (a reader of the wrong arm is caught, P119)
+        mult = startswith(sp.arms[1], "d64") ? 10.0 : 1.0
+        haskey(P2_COST, sp.id) && (get!(arms[sp.arms[1]], "specs", Dict{String, Any}())[sp.id] = Dict{String, Any}("budget_line_ns" => P2_COST[sp.id][1], "measured_ns_per_orbit_step" => mult * P2_COST[sp.id][2]))
+    end
+    return arms
+end
+
+function p3t_write_manifest(path, p, chunks, h0, ph, arms; status = nothing)
+    failed = any(c -> c["status"] == "failed", chunks)
+    AX._write_json(path, Dict{String, Any}("study" => P3_SLUG, "schema_version" => 2, "status" => status === nothing ? (failed ? "complete with failed chunks" : "complete") : status, "plan_sha256" => p.plan_sha256,
         "plan_counts" => Dict("items" => sum(length(c["orbits"]) for c in chunks), "chunks" => length(chunks), "steps_before" => 1, "steps_after" => 1),
         "git" => Dict("sha" => "b"^40, "clean" => true), "sessions" => Any[Dict("clean" => true, "git_sha" => "b"^40, "index" => 1, "threads_used" => 4, "wall_seconds" => 10.0)],
         "prereg" => Dict("header" => h0, "sha256_start" => h0, "sha256_end" => h0), "panel" => Dict("sha256_start" => ph, "sha256_end" => ph, "build_hash" => "e"^64),
         "overrides" => Dict{String, Any}(), "control_stops" => Any[], "reasons" => String[], "chunks" => chunks, "arms" => arms, "indicators" => Dict{String, Any}()))
-    return (; dir, store, panel, manifest, panel_hash = ph, orbits, design = des, chunks = table, q, p, files = length(table))
 end
 
 # ---------------------------------------------------------------- the inputs of the test side: record, 71-key table, test-side table, preregistration (one set per target pair)
@@ -331,13 +418,14 @@ function p3t_log_entries(S, I; upto = P3T_ROUNDS, prereg = I.prereg_hash, panel 
 end
 
 # ---------------------------------------------------------------- an instance of the campaign for one set of inputs: the store with the preregistration hash of the inputs patched into
-# the root attributes, the manifest rewritten; `rounds` limits the ref chunks (the state of a campaign after that round), `closure` keeps or drops the closure arms
-function p3t_instance(S, I, tag::AbstractString; rounds::Int = P3T_ROUNDS, closure::Bool = true, panel_edit = nothing)
+# the root attributes, the manifest rewritten; `rounds` limits the ref chunks (the state of a campaign after that round), `closure` keeps or drops the closure arms, `clo_rounds` limits the
+# closure chunks to the cells of the rounds up to it (the runner releases the closure arms only up to the closing round)
+function p3t_instance(S, I, tag::AbstractString; rounds::Int = P3T_ROUNDS, closure::Bool = true, panel_edit = nothing, clo_rounds::Int = P3T_ROUNDS)
     dir = an_path("p3t-inst-$tag"); rm(dir; recursive = true, force = true); mkpath(dir)
     store = joinpath(dir, "store"); mkpath(store)
     keep = Set{Int}()
     for c in S.chunks
-        ((c.arm == "ref" && c.round <= rounds) || (c.arm != "ref" && closure)) && push!(keep, c.ordinal)
+        ((c.arm == "ref" && c.round <= rounds) || (c.arm != "ref" && closure && c.round <= clo_rounds)) && push!(keep, c.ordinal)
     end
     panel = joinpath(dir, "panel.toml")
     if panel_edit === nothing
@@ -360,13 +448,14 @@ function p3t_instance(S, I, tag::AbstractString; rounds::Int = P3T_ROUNDS, closu
     man["prereg"] = Dict("header" => I.prereg_hash, "sha256_start" => I.prereg_hash, "sha256_end" => I.prereg_hash)
     man["panel"] = Dict("sha256_start" => ph, "sha256_end" => ph, "build_hash" => "e"^64)
     man["chunks"] = [c for c in man["chunks"] if c["ordinal"] in keep]
+    man["status"] = any(c -> c["status"] == "failed", man["chunks"]) ? "complete with failed chunks" : "complete"
     manifest = joinpath(dir, "manifest.json"); AX._write_json(manifest, man)
     return (; dir, store, manifest, panel, panel_hash = ph, log = joinpath(dir, "round-log.txt"), out = joinpath(dir, "out"), keep)
 end
 p3t_write_log(inst, ents) = (write(inst.log, join(ents)); inst.log)
 
 # the expected quantities of the analysis, from the design (the independent reference): sets, strata, outputs, HA, HB, HC
-function p3t_expected(S, qt)
+function p3t_expected(S, qt; noD = Int[])
     D, Dd = S.design.f, S.design.d
     th = (V = P3T_THETA.V, qC = P3T_THETA.qC, qR = P3T_THETA.qR, w = P3T_THETA.w, v = P3T_THETA.v)
     kP = p3ref_kP(qt)
@@ -399,14 +488,14 @@ function p3t_expected(S, qt)
     hb = p3tref_hb(cmp, cov, sizes, qt; capped)
     hcrows = NamedTuple[]
     for r in E
-        r.id in P3T_D || continue
+        (r.id in P3T_D && !(r.id in noD)) || continue
         nC = count(X -> D.V[r.id][X][kP + 1] === :chaotic, th.V); nR = count(X -> D.V[r.id][X][kP + 1] === :regular, th.V)
         sP = P3T_R(count(X -> (a = D.V[r.id][X][kP + 1]; b = Dd.V[r.id][X][kP + 1]; a !== :undecided && b !== :undecided && a != b), th.V)) // length(th.V)
         push!(hcrows, (id = r.id, rho = r.rho, nC = nC, nR = nR, sP = sP))
     end
     hc = p3tref_hc(hcrows, qt)
     vfun(id, Y) = D.V[id][Y]
-    return (; E, drops, gate, ha, hb, hc, cmp, cov, sizes, M, th, kP, hcrows, byid, vfun)
+    return (; E, drops, gate, ha, hb, hc, cmp, cov, sizes, M, th, kP, hcrows, byid, vfun, D = [r.id for r in hcrows])
 end
 
 # ---------------------------------------------------------------- shared objects (built once) and small utilities
@@ -452,13 +541,52 @@ end
 # the first chunk file of the instance that matches the arm, role and cell prefix
 p3t_chunk(S, inst; arm, role, cell = "") = joinpath(inst.store, "chunk-" * lpad(string(first(c for c in S.chunks if c.arm == arm && c.role === role && startswith(c.cell, cell) && c.status == "ok").ordinal), 5, '0') * ".h5")
 # rewrite a chunk of the instance from a changed design (same root attributes, other items); `drop` removes orbits from the chunk
-function p3t_alter_chunk(S, inst, I, ordinal::Integer; design = S.design.f, drop = Int[])
+function p3t_alter_chunk(S, inst, I, ordinal::Integer; design = nothing, drop = Int[], edit = Dict{String, Any}(), sp_edit = identity)
     c = first(c for c in S.chunks if c.ordinal == ordinal)
     file = joinpath(inst.store, "chunk-" * lpad(string(ordinal), 5, '0') * ".h5")
     attrs = AX.read_chunk_attrs(file)
-    sp = first(s for s in vcat(p3t_specs(:ref, S.p), p3t_specs(:ind, S.p), p3t_specs(:d64, S.p), p3t_specs(:chk, S.p)) if s.arms == [c.arm] && s.id == c.spec && s.precision == c.precision)
-    recs = AX.OrbitRecord[p2_orbit_record(sp, p3t_info(S.orbits[id]), design, S.p; flags = p3t_flags(S.orbits[id], sp)) for id in c.ids if !(id in drop)]
+    sp = sp_edit(first(s for s in p3t_allspecs(S.p) if s.arms == [c.arm] && s.id == c.spec && s.precision == c.precision))
+    design === nothing && (design = c.arm in ("d64", "d64_pa1") ? S.design.d : S.design.f)
+    recs = AX.OrbitRecord[p3t_record(sp, p3t_info(S.orbits[id]), design, S.p; flags = p3t_flags(S.orbits[id], sp)) for id in c.ids if !(id in drop)]
     rm(file)
-    AX.write_chunk(file, attrs, recs)
+    AX.write_chunk(file, merge(attrs, edit), recs)
     return file
 end
+
+# ---------------------------------------------------------------- derived instances (Amendment D97): failed and healed chunks, the same campaign with other tags
+# chunks of an instance rewritten as failed twice: no orbit record, status failed, attempt 2; the manifest entry gets status failed, the steps and seconds of the attempts, the orbits as excluded
+function p3t_fail_chunks(S, inst, ordinals)
+    man = AX.read_json(inst.manifest)
+    for o in ordinals
+        c = first(c for c in S.chunks if c.ordinal == o)
+        file = joinpath(inst.store, "chunk-" * lpad(string(o), 5, '0') * ".h5")
+        attrs = AX.read_chunk_attrs(file)
+        merge!(attrs, Dict{String, Any}("status" => "failed", "attempt" => 2, "failure_reasons" => ["failed twice (fixture)"]))
+        rm(file); AX.write_chunk(file, attrs, AX.OrbitRecord[])
+        e = first(e for e in man["chunks"] if e["ordinal"] == o)
+        merge!(e, Dict{String, Any}("status" => "failed", "attempt" => 2, "orbits" => 0, "steps" => 3 * c.horizon, "thread_seconds" => 7.0))
+        e["flags"]["excluded"] = collect(c.ids); e["flags"]["drift"] = Int[]
+    end
+    man["status"] = "complete with failed chunks"
+    AX._write_json(inst.manifest, man)
+    return inst
+end
+# the failed chunks of an instance rewritten as ok chunks with their items (the campaign without failures); the manifest status is `complete` if no entry is left failed
+function p3t_heal_chunks(S, inst, I, ordinals)
+    man = AX.read_json(inst.manifest)
+    for o in ordinals
+        c = first(c for c in S.chunks if c.ordinal == o)
+        p3t_alter_chunk(S, inst, I, o; edit = Dict{String, Any}("status" => "ok", "attempt" => 1, "failure_reasons" => String[]))
+        e = first(e for e in man["chunks"] if e["ordinal"] == o)
+        steps = length(c.ids) * c.horizon
+        merge!(e, Dict{String, Any}("status" => "ok", "attempt" => 1, "orbits" => length(c.ids), "steps" => steps, "thread_seconds" => steps * P3T_NS_PER_STEP * 1e-9))
+        e["flags"]["excluded"] = Int[]
+    end
+    man["status"] = any(e -> e["status"] == "failed", man["chunks"]) ? "complete with failed chunks" : "complete"
+    AX._write_json(inst.manifest, man)
+    return inst
+end
+# the same campaign with the tags of some orbits changed (the design of the verdict histories does not depend on the tag, except :U and :drift)
+p3t_retag(S, ids, tag) = merge(S, (; orbits = [o.id in ids ? merge(o, (; tag)) : o for o in S.orbits]))
+# the ordinals of the chunks of an arm (and a spec, a cell) in the table of the campaign
+p3t_ords(S; arm, spec = nothing, cell = nothing, precision = nothing) = [c.ordinal for c in S.chunks if c.arm == arm && (spec === nothing || c.spec == spec) && (cell === nothing || c.cell == cell) && (precision === nothing || c.precision == precision)]

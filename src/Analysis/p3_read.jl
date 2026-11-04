@@ -2,6 +2,7 @@
 # items of the p2 and P1 stores that E49 and E51 read (nothing else is read, so nothing else is checked).
 
 # The inputs by option or by the layout of the study (workspaces/study/stages): the files of studies p1-le-benchmark and p2-indicators next to the preregistration.
+# The input files of calibrate; the output folder defaults to the stage 04 output folder, the one count-round and analyze read the record from (D99 E86).
 function _p3_inputs(prereg, params, out, kw)
     stages = joinpath(dirname(abspath(prereg)), "..", "..")
     st(sub, name) = normpath(joinpath(stages, sub, name))
@@ -11,7 +12,7 @@ function _p3_inputs(prereg, params, out, kw)
     for (k, _) in kw
         k in (:p2_store, :p2_manifest, :p2_prereg, :p2_params, :panel, :p1_store, :p1_manifest, :p1_prereg, :p1_params) || throw(ArgumentError("unknown keyword $k of calibrate"))
     end
-    return (prereg = prereg, params = params, out = out === nothing ? dirname(abspath(prereg)) : out, p2_prereg = p2_prereg, p1_prereg = p1_prereg,
+    return (prereg = prereg, params = params, out = out === nothing ? st("04-analyze", "output") : out, p2_prereg = p2_prereg, p1_prereg = p1_prereg,
             p2_manifest = pick(:p2_manifest, st("03-run/output", P2_SLUG * "-manifest.json")), p2_params = pick(:p2_params, st("04-analyze/references", P2_SLUG * "-analysis-parameters.toml")),
             panel = pick(:panel, st("02-panel/output", P1_SLUG * "-panel.toml")), p1_manifest = pick(:p1_manifest, st("03-run/output", P1_SLUG * "-manifest.json")),
             p1_params = pick(:p1_params, st("04-analyze/references", P1_SLUG * "-analysis-parameters.toml")),

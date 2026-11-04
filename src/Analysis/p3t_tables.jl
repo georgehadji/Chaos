@@ -27,7 +27,7 @@ function _p3t_t2(A)
     append!(L, mdt(["round", "orbits", "K = 0", "E_test", "W2", "T_s", "S2"], rows))
     append!(L, ["", "Labels of the orbits with K > 0 read (rho = C, R, U): $(rho[1]), $(rho[2]), $(rho[3]); excluded $(count(x -> x.excluded, A.st.rows)), drift on L1 or L5 (as the round log counts) $(count(x -> x.drift, A.st.rows)); dropped as drift on any item read (E64 b) $(count(d -> d.reason == "drift", A.O.drops)).", ""])
     cnt = (E_test = length(E), W2 = count(r -> r.W2, E), T_s = count(r -> r.Ts, E), S2 = count(r -> r.S2, E), D = length(O.vd), D_B = length(A.dB), gate = length(O.gate.ids))
-    append!(L, mdt(["set", "size", "target"], [["E_test", cnt.E_test, nothing], ["W2", cnt.W2, A.c.t.target_w2], ["T_s", cnt.T_s, A.c.t.target_t_s], ["S2", cnt.S2, nothing], ["D", cnt.D, A.c.t.target_f],
+    append!(L, mdt(["set", "size", "target"], [["E_test", cnt.E_test, nothing], ["W2", cnt.W2, A.c.t.target_w2], ["T_s", cnt.T_s, A.c.t.target_t_s], ["S2", cnt.S2, nothing], ["D", cnt.D, nothing],
                                               ["D_B", cnt.D_B, nothing], ["gate", cnt.gate, nothing]]))
     return L
 end
@@ -68,7 +68,7 @@ function _p3t_t3(A, files)
         push!(rows, Any[id, p1.N_B, lam[1], lam[2], lam[3], ladder, rho])
     end
     L = ["The reference check on D_B (N_B = $(p1.N_B), ladder bound $(p1.ladder_tol) of the P1 parameter table): the three L5 values at the recorded step N_B and the ladder test (a). No label changes (D1). " *
-         "The column labels agree of the preregistration is omitted: the items of the arm chk run at their own horizon N_B and have no steps at the scale of N_1, so the labels cannot be formed in three precisions (study amendment A2 states it).", ""]
+         "The column labels agree of the preregistration is omitted: the items of the arm chk run at their own horizon N_B and have no steps at the scale of N_1, so the labels cannot be formed in three precisions (a deviation of the analysis).", ""]
     append!(L, mdt(["orbit", "N_B", "L5 Float64", "L5 Double64", "L5 BigFloat", "ladder would force", "rho"], rows))
     append!(L, ["", "Orbits on which the ladder would have made rho unresolved: C $(get(forced, :C, 0)), R $(get(forced, :R, 0))."])
     return L
@@ -86,15 +86,20 @@ function _p3t_t4(A)
     return vcat(["Outputs of the rule R_a with theta* at b_P, per set, K index and round (counts).", ""], mdt(["set", "K index", "round", "chaotic supported", "regular supported", "unresolved"], rows))
 end
 
+# D99 E83: the own condition of one row of HA item 3, the two comparisons the decision rule applies to it (an undefined bound fails)
+_p3t_q(x) = x isa Rational ? x : p3_rat(x)
+_p3t_own3(pt, lo, da) = pt !== nothing && lo.value !== nothing && _p3t_q(pt) >= _p3t_q(da) && _p3t_q(lo.value) > 0 ? "ok" : "fails"
+
 function _p3t_t5(A)
     h = A.ha
     b(x) = x.value === nothing ? "undefined ($(x.dropped) dropped)" : "$(_c(x.value)) ($(x.dropped) dropped)"
     rows = [["1", "e (error among decided)", h.point.e, "upper bound " * b(h.bounds.e_up), "e_max = $(A.qt.e_max)", 1 in h.failed ? "fails" : "ok"],
             ["2", "a(E_test)", h.point.aE, "upper bound " * b(h.bounds.aE_up), "a_max = $(A.qt.a_max)", 2 in h.failed ? "fails" : "ok"],
-            ["3", "a(W2) - a(S2)", h.point.dw, "lower bound " * b(h.bounds.dw_lo), "delta_a = $(A.qt.delta_a)", 3 in h.failed ? "fails" : "ok"],
-            ["3", "a(T_s) - a(S2)", h.point.dt, "lower bound " * b(h.bounds.dt_lo), "delta_a = $(A.qt.delta_a)", 3 in h.failed ? "fails" : "ok"],
+            ["3", "a(W2) - a(S2)", h.point.dw, "lower bound " * b(h.bounds.dw_lo), "delta_a = $(A.qt.delta_a)", _p3t_own3(h.point.dw, h.bounds.dw_lo, A.qt.delta_a)],
+            ["3", "a(T_s) - a(S2)", h.point.dt, "lower bound " * b(h.bounds.dt_lo), "delta_a = $(A.qt.delta_a)", _p3t_own3(h.point.dt, h.bounds.dt_lo, A.qt.delta_a)],
             ["4", "g (gate orbits chaotic-supported)", h.point.g, "", "g_max = $(A.qt.g_max)", 4 in h.failed ? "fails" : "ok"]]
-    L = ["HA: $(h.decision). Strata sizes (T_s, W2 minus T_s, S2, other C, R): $(join(h.strata, ", ")); overlap of T_s and S2: $(count(r -> r.Ts && r.S2, A.O.rows)).", ""]
+    L = ["HA: $(h.decision). Status of item 3: $(3 in h.failed ? "fails" : "ok"). Strata sizes (T_s, W2 minus T_s, S2, other C, R): $(join(h.strata, ", ")); overlap of T_s and S2: $(count(r -> r.Ts && r.S2, A.O.rows)).",
+         "The status of a row of item 3 is the status of its own condition (point at least delta_a, lower bound above 0); item 3 holds when both rows hold.", ""]
     append!(L, mdt(["item", "statistic", "point", "bound", "threshold", "status"], rows))
     append!(L, ["", "Unresolved share a(A) per set:"], mdt(["set", "a"], [["E_test", h.point.a[:E]], ["W2", h.point.a[:W2]], ["T_s", h.point.a[:Ts]], ["S2", h.point.a[:S2]]]))
     return L
@@ -127,7 +132,8 @@ end
 
 function _p3t_t8(A)
     h, pw = A.hc, A.power
-    L = ["HC: $(h.decision). Set size $(length(h.rows)), failures $(h.failures), non-failures $(h.nonfailures), underpowered: $(h.underpowered); dropped replicates $(h.dropped).", ""]
+    L = ["HC: $(h.decision). Set size $(length(h.rows)), failures $(h.failures), non-failures $(h.nonfailures), underpowered: $(h.underpowered); dropped replicates $(h.dropped).",
+         "Target failures n_f: $(A.c.t.target_f); achieved failures: $(h.failures)", ""]
     append!(L, mdt(["statistic", "value"], [["AUC_I", h.auc_i], ["AUC_P", h.auc_p], ["Delta_AUC", h.delta], ["lower bound", h.lower], ["upper bound", h.upper]]))
     append!(L, ["", "Power at the achieved failures: " * (pw.hc === nothing ? "not recomputed (target reached)" : "$(pw.hc.successes) of $(pw.hc.runs), power $(_fmt(pw.hc.power)), standard error $(_fmt(pw.hc.se)), planned $(_fmt(pw.hc.planned))"), ""])
     append!(L, mdt(["orbit", "rho", "n_C", "n_R", "f", "s_I", "s_P"], [[r.id, r.rho, r.nC, r.nR, r.f, r.sI, r.sP] for r in h.rows]))

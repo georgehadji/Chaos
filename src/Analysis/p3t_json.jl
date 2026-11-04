@@ -25,7 +25,7 @@ const P3T_READINGS = [
     "P115: the six arms ref, ind, ind_pa1, d64, d64_pa1, chk are read from the manifest; items are found by content and attributed to their arm by their chunk; tg is read at the horizon N_c of the arms ind and d64 (E75, E81); the coordinate mode of an item is read from the item"]
 
 const P3T_DEVIATIONS = [
-    "P120: the column labels agree of table T3 is omitted: the items of the arm chk run at their own horizon N_B with the label BigFloat(256) and have no steps at the scale of N_1, so the labels cannot be formed in three precisions (to be stated in study amendment A2)",
+    "P120: the column labels agree of table T3 is omitted, a deviation of the analysis: the items of the arm chk run at their own horizon N_B with the label BigFloat(256) and have no steps at the scale of N_1, so the labels cannot be formed in three precisions",
     "P95: the strata of HA are not disjoint by definition (an orbit can be in T_s and S2); the first stratum an orbit qualifies for holds it",
     "P100: a gate orbit without verdict items makes HA not decidable and is listed",
     "P104: D orbits without Double64 verdicts of V* leave the HC set"]
@@ -71,7 +71,7 @@ end
 function _p3t_hc_json(A)
     h = A.hc
     return (verdict = h.decision, auc_i = h.auc_i, auc_p = h.auc_p, delta = h.delta, lower = h.lower, upper = h.upper, failures = h.failures, nonfailures = h.nonfailures,
-            failure_ids = Int[r.id for r in h.rows if r.f], dropped = h.dropped, underpowered = h.underpowered, set_size = length(h.rows))
+            failure_ids = Int[r.id for r in h.rows if r.f], dropped = h.dropped, underpowered = h.underpowered, set_size = length(h.rows), target_failures = A.c.t.target_f)
 end
 
 _p3t_sens_json(s) = (decidable = s.decidable, verdict = s.verdict, failing = _p3t_fail_names(s.failing), reason = s.reason)

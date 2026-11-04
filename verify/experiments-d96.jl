@@ -65,5 +65,5 @@ elseif MODE == "lib"
     run_step("closure again (resume)")
     println("O27 | round log sha256 | ", bytes2hex(sha256(read(LOG))), " | - | INFO")
 else
-    error("mode must be lib or count")
+    error("mode must be lib, count or analyze")
 end

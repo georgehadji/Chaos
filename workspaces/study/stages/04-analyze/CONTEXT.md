@@ -11,7 +11,7 @@ Produce the preregistered figures and tables, then the findings.
 
 ## Process
 
-1. Run `julia --project bin/chaoslab.jl analyze` (no AI): figures and tables exactly as preregistered.
+1. Run `julia --project bin/chaoslab.jl analyze` (no AI): figures and tables exactly as preregistered. Where `analyze` writes only figure data (p3: reading P110), draw the PDFs from those data sections with a verify script that recomputes nothing (`julia --project=verify verify/p3-abstention-figures.jl`).
 2. Draft findings (Sonnet subagent): one decision per hypothesis (confirmatory), then exploratory results labelled as such.
 3. **[Checkpoint]** Present figures and findings.
 4. Run the audit, write the outputs.

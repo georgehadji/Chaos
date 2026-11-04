@@ -171,7 +171,7 @@ Everything in this section is reported without a decision rule. The tables file 
 
 ## E. Limits and what is not done
 
-- No figures were drawn. The analysis writes the data of F2 and F3 with digests only (reading P110). There is no PDF in this folder, so there is no owner visual check to record. F1 (calibration landscape) belongs to the calibration tables, not to this run.
+- The analysis draws no figure: it writes the data of F2 and F3 with digests only (reading P110). The figures were drawn afterwards from those data sections by `verify/p3-abstention-figures.jl` (no number recomputed): `p3-abstention-fig-F1.pdf` (from "F1 data" of the calibration tables), `p3-abstention-fig-F2.pdf` and `p3-abstention-fig-F3.pdf` in this folder. The owner saw them on 2026-11-04.
 - Power. HB was run at 172 T_s and 1379 W2 orbits. Power at these sizes is 0.16625 (planned 0.30815 at the cap). HB passed all 13 comparisons, but this is not evidence that the test was powerful.
 - The orbits are treated as independent in the bootstrap and in the McNemar test. Orbits of one cell and round are not independent. The preregistration states this limit.
 - HA, HB and HC use one system, the standard map, and K values that also occur in the calibration data. Nothing is claimed for other maps or for flows.

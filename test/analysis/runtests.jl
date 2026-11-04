@@ -72,3 +72,7 @@ include(joinpath(@__DIR__, "an_p3t_pipeline.jl"))    # D95f to D95l, D95n, D95o 
 include(joinpath(@__DIR__, "an_p3t_shape.jl"))       # D97i: the toy campaign against a campaign of the real runner (cells, arms, manifest keys, attributes, item labels)
 include(joinpath(@__DIR__, "an_p3t_d97.jl"))         # D97a to D97i and O30
 include(joinpath(@__DIR__, "an_p3t_d97r.jl"))        # D97 rework after the stage 04 review: chk and d64 missing items, panel class, zero-step specs
+
+# D99 stage 02 (Amendment D99, corrections of the p3 test side and of the calibrate default). The D99 testsets are RED: the T5 row status, the texts of P120 and T3, the target of D, the added
+# line of T8 and the default folder of calibrate are the old ones. D99g and D99h are stage 04 (the real store); D99i is the existing golden testsets (see the test plan).
+include(joinpath(@__DIR__, "an_p3t_d99.jl"))         # D99a to D99f

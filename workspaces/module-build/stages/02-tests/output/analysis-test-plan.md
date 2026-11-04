@@ -944,3 +944,62 @@ Owner decision ("fix lows too"): the LOW items 5 to 12 of the review. Six testse
 | 12 | D97r12 | the first ok L1 ref entry without `steps`, `thread_seconds`, `key`, `arms` (one run each): ArgumentError naming the field and the ordinal, no output folder (4) | E78 |
 
 RED (log `d97/low-red.log`, code at 0d56640): 22 pass (the 21 of the MEDIUM rework and the run guard of D97r10), 10 fail, 0 error.
+
+## Amendment D99 (stage 02)
+
+Spec: `analysis-spec.md`, Amendment D99 (E83 to E86, I52, I53, O31, O32, criteria D99a to D99i, owner decisions P122 to P125). One new file, `test/analysis/an_p3t_d99.jl`, registered in `test/analysis/runtests.jl` after `an_p3t_d97r.jl`. It reuses the helpers of `an_p3t_helpers.jl` and the readers of `an_p3t_d97.jl` (`d97_*`); the helpers it adds (`d99_*`) are in the file. No existing test and no helper is edited. No random draw is made (the toy campaign draws with `p3t_seed('a')`); no regression value.
+
+### Contract proposed by the tests (where the spec fixes the behaviour but not the form)
+
+1. T5 row writer (O32). The hand fixtures call the T5 writer (`Chaoslab.Analysis._p3t_t5`) with a hand-built state that holds only what T5 prints: `ha` (`decision`, `failed`, `point` with `e aE dw dt g a`, `bounds` with `e_up aE_up dw_lo dt_lo` as `(value, dropped)`, `strata`), `qt` (`e_max a_max delta_a g_max`) and `O.rows`. Stage 03 may change the internals; if the new row status needs another field, only `d99_ha` changes.
+2. The decision line is the line of T5 that begins `HA:`. It must state item 3 as failing with the words `item 3` then, within two words, `fails` (regex `item 3\W{0,3}(\w+\W+){0,2}fails`), and the line must still begin `HA: <decision>.`. When item 3 as a whole is ok the line must not match. The spec fixes no wording (P124: decision line only).
+3. The added sentence of T5 contains the words `status of a row of item 3` and `own condition` (E83 sentence, case-insensitive).
+4. E84 text: `deviation of the analysis`, and the cause by the words `chk`, `N_B`, `three precisions`; P120 also `BigFloat(256)` (it already has it). No `A2` and no `study amendment` in P120 (both files), in the introduction of T3 (the lines of the T3 section before its first table, without the heading and the count sentence), nor anywhere in the machine file or the tables file.
+5. E85 line: `Target failures n_f: <n_f>; achieved failures: <failures>` on its own line between the opening sentence `HC: ...` and the first table of T8. The machine file: the data of T8 is `hc`; `failures` already holds the achieved failures. The target is read from a key of `hc` whose name contains `target` (any name) with the value n_f. The spec fixes no key name: if stage 03 uses another name without `target`, change `d99_t8_check`.
+6. E86: the default folder is tested through `calibrate` (keywords and the command line, no `--out`) and the reader keywords of `count-round` and `analyze` (`Chaoslab.Analysis._p3t_keywords`, the one function both commands use, `cli.jl`). The layout is built by hand in a temporary folder, `stages/01-design/output/<prereg>` (a byte copy) and `stages/04-analyze/output`; the other inputs are given by option.
+
+### Criterion to test
+
+Tags of the spec: (S) package suite on the fixtures, (V) verification environment.
+
+| Criterion | Tag | Test file, testset | Notes |
+|-----------|-----|--------------------|-------|
+| D99a | S | `an_p3t_d99.jl` "D99a T5: each row of item 3 shows the status of its own condition ..." with one inner testset for each of the four fixtures of the spec (delta_a = 0.1): 1 (0.0527 / 0.043 and 0.2069 / 0.158: rows fails, ok; item 3 fails in the decision line), 2 (both ok), 3 (both points below 0.1, both fails), 4 (point 0.15, lower bound -0.01: fails; other row ok). Each checks the six statuses, the line `HA: <hand decision>.`, the item-3 words, the points and thresholds, the added sentence. Also "D99a/D99b the T5 of the run": on the toy run every row of item 3 equals the own condition computed from the point, the bound and delta_a it prints | the toy run has a row whose item-level status differs from its own condition, so this testset fails now too |
+| D99b | S | in the same testsets: the rows of items 1, 2, 4 per fixture (fixture 3: item 1 fails, fixture 4: item 4 fails, others ok), and on the toy run each of them equals "its number is in `decisions.HA.failed`" | guard: passes now |
+| D99c | S | "D99c P120 and the T3 introduction" (three inner testsets: P120 in the tables file, P120 in the machine file, the T3 introduction: phrase, cause words, no `A2`, no `study amendment`); the last assertion: 0 matches of `\bA2\b` and `study amendment` in either whole file | the D97h/D97f assertions on the words `labels agree`, `chk`, `omitted` stay and pass |
+| D99d | S | "D99d T2: the row D has `n.a.` as target" (D: `n.a.`, not the failure target; W2 and T_s targets 11 and 5 by hand from the toy table; E_test, S2, D_B, gate `n.a.`; the seven rows in order) | |
+| D99e | S | "D99e T8 has the line ..." on the main toy run (n_f = 6, failures equal the reference count and `hc.failures`, the underpowered flag equals `failures < n_f`) and "D99e the same with n_f = 37" (a fresh instance with the parameter table edited, so the line cannot match by chance; the flag is true) | machine file: contract item 5 |
+| D99f | S | "D99f calibrate without --out writes the record and the tables to the folder from which count-round and analyze read the record" (hand layout; folder equal to the stage 04 folder, equal to the folder of `_p3t_keywords`, the same file name, nothing in the stage 01 folder; and the command line without `--out`) and "D99f an explicit output folder is used as given" (record and tables in the folder given and only there, no stage 04 folder created; the record has the same bytes in the default and in an explicit folder, I53) | the second testset passes now (guard) |
+| D99g | V | stage 04: the chain on the fixture campaign of D96 (the runner's own campaign): `calibrate`, `count-round` after each round, `analyze`, all defaults, no path option, exit 0, the record read is the one `calibrate` wrote, no file copied | package tests cannot run the runner's campaign; the package side of the chain is D99f (the commands name one folder) |
+| D99h | V | stage 04: O31, `analyze` before and after on the committed inputs of `p3-abstention`, each into its own empty folder; compare the tables files cell by cell (0 differing numeric cells in T1 to T11; the differing lines are exactly those of I52); the machine files and the data of F2 and F3 | needs the real store (`data/`); the package suite checks the same on the toy run through the unchanged D95 and D97 assertions (every number, decision and count of the toy is asserted there; 793 existing assertions pass before the change and must pass after) |
+| D99i | S | no new test: the goldens of the P1 and P2 paths and of `calibrate` with an explicit folder are the existing testsets `an_p2_dispatch.jl` (33 assertions, "D89a P1 path unchanged" and the P2 goldens) and "D93a I36 the P1 and P2 pipelines are unchanged" in `an_p3_dispatch.jl` (37 assertions); `calibrate` with `--out` is also in `an_p3_pipeline.jl` and in the new explicit-folder testset | the whole package suite is run at stage 03. No existing assertion pins `A2`, `study amendment`, the old status of the item 3 rows or the old default folder (D97f and D97h only look for `labels agree`, `chk`, `omitted`), so no existing test is expected to change |
+
+### What the tests cannot cover
+
+- D99g and D99h (above): the real runner campaign and the committed inputs.
+- The wording of the decision line and the machine-file key of n_f are not fixed by the spec (contract items 2 and 5).
+- The state given to `_p3t_t5` is hand-built (O32); that `analyze` builds the same fields is covered by the toy-run testset.
+
+### RED log (2026-11-04)
+
+Driver in the scratch area (`d99/driver.jl`, the driver of the D97 run): loads the helper chain, then runs the files named on the command line. Julia 1.13.2, 4 threads, code at HEAD 15bf6d7 plus the new file.
+
+Command (from the repository root; `<scratch>` is the scratch folder of the session): `julia --project=. -t 4 <scratch>/d99/driver.jl an_p3t_fixture.jl an_p3t_shape.jl an_p3t_stats.jl an_p3t_params.jl an_p3t_log.jl an_p3t_refusals.jl an_p3t_dispatch.jl an_p3t_pipeline.jl an_p3t_d97.jl an_p3t_d97r.jl an_p3t_d99.jl` (log `d99/d99-red.log`, 3 minutes). The package suite has no filter to the analysis suite; the whole suite is run at stage 03.
+
+| File | Pass | Fail | Error | Total |
+|------|------|------|-------|-------|
+| `an_p3t_fixture.jl` | 41 | 0 | 0 | 41 |
+| `an_p3t_shape.jl` | 52 | 0 | 0 | 52 |
+| `an_p3t_stats.jl` | 327 | 0 | 0 | 327 |
+| `an_p3t_params.jl` | 49 | 0 | 0 | 49 |
+| `an_p3t_log.jl` | 45 | 0 | 0 | 45 |
+| `an_p3t_refusals.jl` | 5 | 0 | 0 | 5 |
+| `an_p3t_dispatch.jl` | 22 | 0 | 0 | 22 |
+| `an_p3t_pipeline.jl` | 111 | 0 | 0 | 111 |
+| `an_p3t_d97.jl` | 109 | 0 | 0 | 109 |
+| `an_p3t_d97r.jl` | 32 | 0 | 0 | 32 |
+| `an_p3t_d99.jl` (new) | 48 | 25 | 0 | 73 |
+
+Existing tests of these files: 793 of 793 pass. New file: 25 fail, 0 error, 48 pass. Causes of the 25 failures, each a missing part of the amendment: the T5 rows of item 3 read the item-level status (fixtures 1 and 4: `["fails", "fails"]` against `["fails", "ok"]`, and the toy run); the decision line has no statement on item 3 (fixtures 1, 3, 4 and the toy run); the added sentence of T5 is absent (4 fixtures); P120 and the T3 introduction say `study amendment A2` and lack `deviation of the analysis` (9 in the three inner testsets, plus the whole-file check); the target of D is the failure target, not `n.a.` (1); there is no line `Target failures n_f` in T8 (2); `calibrate` without `--out` writes to the stage 01 folder (4). The 48 passes are the guards (rows of items 1, 2, 4, points and thresholds, both rows of fixture 2, the other rows of T2, the T8 values read before the line check, the explicit-folder testset) and the first assertions of the failing testsets. No parse error, no undefined name, no error inside a helper.
+
+Audit: Coverage of spec (D99a to D99f map to tests; D99g and D99h are (V) stage 04; D99i is the existing goldens), RED (every new failing assertion fails on the old text, status or path), Reproducible (no random draw), No memory values (hand values of the spec fixtures and of the toy table): pass.

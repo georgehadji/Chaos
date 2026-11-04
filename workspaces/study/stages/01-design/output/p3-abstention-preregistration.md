@@ -11,8 +11,8 @@ FROZEN 2026-10-30. Scope and value types were agreed by the owner at checkpoint 
 | Claims tested | HC tests a consequence of claim C3 (diagnostic inequivalence): that indicator disagreement carries information about label failure. HA and HB test hypotheses of research idea 23 (`/_config/research-ideas.md`, row 23; research lines R1 and R2 of that row) restricted to maps, with preregistered rules. Idea-23 H1 (refinement and indicator disagreement predict label failure better than energy error at matched cost) becomes HC in a changed form: there is no energy error on a map, so HC compares the two disagreement sources with each other. Idea-23 H3 (adaptive allocation with abstention beats uniform refinement) becomes HB in a changed form: a fixed-budget abstaining rule against single indicators; adaptive allocation is NOT tested (Known limits). HA is the accounting of error and abstention that both need |
 | Value types | FALSIFIES (HC as a test of a consequence of C3; HA and HB as tests of the idea-23 hypotheses; the decision rules are fixed before any test data exist), NEGATIVE allowed (a hypothesis that is not supported is reported with the same figures and tables). NOT claimed: NOVEL (no prior-art check for this study; `research-ideas.md` says shadowing-based reliability work narrows any novelty claim for idea 23), REPRODUCES, TOOL |
 | Git SHA at freeze | 6d8dbe8d600d4338d313d90ed2ea7e56b3e0e6c9 (parent commit of the freeze commit) |
-| SHA-256 of this file (current version) | de9490168d609f6e56ebc12edb2b088a115477b8481c6dd633a45d5723fb303a (rule as p2: the whole cell is replaced by the word SELF before hashing, UTF-8, LF) |
-| Amendment log | none yet. Planned: A1 (calibration freeze: theta*, the power calculation and the targets n_T, n_W, n_f; section "Amendment rule"), logged before any test data exist |
+| SHA-256 of this file (current version) | f614a38449f611a42c56a0aa79bbc2d106dfaab679d1972a2b5349011df1a072 (rule as p2: the whole cell is replaced by the word SELF before hashing, UTF-8, LF) |
+| Amendment log | A2 (2026-11-04, section "Amendment A2"; parent commit eae6babd565740ebef0c34e249798c3bc13c8253; replaces hash de9490168d609f6e56ebc12edb2b088a115477b8481c6dd633a45d5723fb303a). Planned: amendment A1, the calibration freeze (theta*, the power calculation and the targets n_T, n_W, n_f; section "Amendment rule"), then amendment A3, the seal of the panel hash list (section "Amendment A2", item 4); all logged before any test data exist |
 
 Value types, in the words of `value-types.md`:
 - FALSIFIES: HA, HB, HC each have a metric and a numeric decision rule below; the numbers are in the register.
@@ -419,3 +419,238 @@ All of it is built and verified by a module-build amendment before study stage 0
 - The search-space size (2088) and the round, orbit-count and budget arithmetic were computed by script. The illustrative power numbers come from Python (numpy, scipy) in the scratch area. None of it is in the repo; the real power calculation is procedure PP, run at calibration, and it has not been run.
 - Not checked: that the builder supports fresh screening; that the P1 store allows the relabelling; that the Analysis module can compute the rule; the calibration itself (no calibration was run, so nothing is claimed about the feasibility of F or about what theta* will be); the sizes of the pools at the test K values.
 - Nothing was frozen, committed or pushed; this file is the only file written.
+
+## Amendment A2 (2026-11-04)
+
+Approved by the owner at the checkpoint of study amendment P69 of module amendment D94 (2026-11-04), before any test data exist: no test screening, panel, draw, label, indicator run or pilot on a panel orbit exists. Base sections above are left as frozen; where they differ, this section wins. A2 adds the machine-readable panel input block and run block that the library reads (`experiments-spec.md`, "Amendment D94", R22 and R25). It changes no hypothesis, no threshold of the register, no set, no rule, no arm content and no budget line other than the BigFloat line of the chk arm and the screening note, both in item 6. Every value in the two blocks equals the frozen prose (Panel, "Test draw (fresh, held out)"; Methods; Budget; Stopping rules; Thresholds register), the P1 panel block by the rule "P1 selection rule with these changes only", the p2 run block by the rule "the run block is derived from the p2 run block" (Methods, "Indicator verdicts (unchanged from p2)"), or a library default stated in the notes of item 2 and item 3. Section "Amendment A1" (calibration freeze) is still planned and comes after A2.
+
+1. Order of work. A2 (this section); the dry campaign of the round loop (`workspaces/study/stages/03-run/references/round-loop.md`, the gate before the A1 freeze run: a small panel that is not the test panel); the calibration freeze run and Amendment A1; Amendment A3, the seal of item 4; the build of the test panel; the rounds. The build of the test panel is the first test screening and therefore the first test data; no amendment follows it (Amendment rule). The panel is built under the file as A1 leaves it, by the rule of item 4.
+
+2. Panel input block. It is the first TOML block of this file and holds the `[panel]` table, as the library requires. Sources: the P1 panel block (`p1-le-benchmark-preregistration.md`, Amendment A1 item 7, with A2 and A3 as they stand: the key `sn_trace` is absent) for every key of the P1 selection rule; the keys of Amendment D94 from the frozen text of "Test draw (fresh, held out)" and the register. Notes. (a) `n_c` is replaced by the table `quota` (a repeated definition is refused). (b) `quota`: per round and K index; the K = 0 row is drawn in the rounds of `gate_rounds` only. The class S size at K = 10 is 0 (the frozen text lists S sizes for K_c, pi/2, K = 0.5 and 2 pi only; 250 + 250 + 25 + 25 = 550). (c) `d_fraction`: 0.30 for class S and for class C at K = 0.5 and K_c, 0.05 for every other cell including the K = 0 gate cells (2 of 40 per class, 4 in all). With m = floor(f n + 1/2) (exact rationals) the S cells at K = 0.5 and 2 pi (n = 25, f = 0.30) give 8, so a fully populated round has |D| = 262, not the 261 of the frozen text, and the worst case over 5 rounds is 5 x 262 + 4 = 1314; the frozen 261 and 1309 are read as "about" values (the text says "at most about 261"), about 0.4 percent of the d64 cost; the S fraction at K = 10 is inert (size 0). (d) `grid_side` is required by the library and has no role with the random screening source; it keeps the P1 value, and `newton_grid_side` keeps the P1 value so that the periodic set is that of the P1 panel. (e) `seed` is test_seed of the register; `tau` and `bigfloat_bits` are absent and take the defaults of `_config/numerics-defaults.toml` (`renorm_interval_tau` = 1, `bigfloat_bits`), as Methods, "Precision", states. (f) `s_D`, `cap_D`, `s_L`, `cap_L`, `n_ctrl_max`, `mu` are required keys with the P1 values; no arm of this study uses S_D or S_L and there are no controls. (g) K index i counts from 1 in the order of `K`: 1 is K = 0, 2 is K = 0.5, 3 is K_c, 4 is pi/2, 5 is 2 pi, 6 is K = 10.
+
+```toml
+[panel]
+K = ["0", "0.5", "0.971635406", "pi/2", "2pi", "10"]
+grid_side = 256
+N_scr = 100000
+alpha = "pi/4"
+theta_T = 5e-4
+g_T = 5.0
+r_T = 0.05
+theta_C = 0.01
+r_C = 0.3
+theta_S = 1e-3
+w = 1000
+f_S = 0.2
+L_S = 20000
+log10_r = [-4.0, -2.0]
+q_max = 6
+rho = 1e-12
+delta_R = 1e-3
+newton_max = 50
+delta_dup = 1e-8
+n_ctrl_max = 12
+mu = "(3 + sqrt(5))/2"
+s_D = 7
+cap_D = 210
+s_L = 4
+cap_L = 110
+seed = 20261030
+screen_source = "random"
+screen_points = 262144
+r_max = 5
+gate_rounds = [1]
+db_size = 100
+newton_grid_side = 256
+controls = "none"
+
+[panel.quota]
+"1" = { T = 40, R = 40 }
+"2" = { T = 40, R = 40, C = 100, S = 25, X = 40 }
+"3" = { T = 40, R = 40, C = 100, S = 250, X = 40 }
+"4" = { T = 40, R = 40, C = 40, S = 250, X = 40 }
+"5" = { T = 40, R = 40, C = 40, S = 25, X = 40 }
+"6" = { T = 40, R = 40, C = 40, S = 0, X = 40 }
+
+[panel.d_fraction]
+"1" = { T = 0.05, R = 0.05 }
+"2" = { T = 0.05, R = 0.05, C = 0.30, S = 0.30, X = 0.05 }
+"3" = { T = 0.05, R = 0.05, C = 0.30, S = 0.30, X = 0.05 }
+"4" = { T = 0.05, R = 0.05, C = 0.05, S = 0.30, X = 0.05 }
+"5" = { T = 0.05, R = 0.05, C = 0.05, S = 0.30, X = 0.05 }
+"6" = { T = 0.05, R = 0.05, C = 0.05, S = 0.30, X = 0.05 }
+```
+
+3. Run block. Arms are those of "Arms of the test run (draft)". Notes. (a) The window specs fix the horizon of every arm that uses them (the library refuses an arm that mixes fq1 or bk1, whose run length is 102400, with pa1, whose run length is 102401). The rows "ind" and "d64" of the draft table are therefore two arms each: `ind` and `d64` hold tg, fq1, bk1 at 102400; `ind_pa1` and `d64_pa1` hold pa1 at 102401. No item, orbit set or horizon changes. (b) `ref` is released each round; every other arm is a closure arm (Stopping rules, "Rounds": no peeking). (c) Coordinates are wrapped in every arm, tau = 1, direction pi/4, as the indicator specs of p2 (Methods, "Indicator verdicts"); LE is read from the L1 item of `ref`. (d) There are no controls, so `control_methods`, `control_bound`, `control_scope` and the control classes of `setup_check_steps` are required by the library and inert; they keep the p2 values. (e) The Float64 and Double64 budget lines of the four indicator specs are the lines of "Cost model and matched budget" and Budget; the lines of `ref` and `chk` are the lines of the Budget table, except the BigFloat line (item 6). No `ns_gpu` line is given (Budget: the GPU is not needed); the library then charges the CPU line. (f) The test run records its own K19 values before the first run, at 23 threads. (g) The pilot uses no panel orbit and writes outside the study store (item 5). (h) `panel_prereg_sha256_accepted` is governed by item 4: the entry shown is the placeholder of 64 zeros that Amendment A3 replaces.
+
+```toml
+[run]
+panel_prereg_sha256_accepted = ["0000000000000000000000000000000000000000000000000000000000000000"]
+
+[run.primary]
+tau = 1
+eps = 1e-8                    # required by the library; unused (no L2 item in this study)
+direction = "pi/4"
+coordinate_mode = "wrapped"
+
+[run.grid]
+points_per_decade = 20
+first_steps = 100
+extra_fractions = [0.1, 0.5]
+
+[run.backend]
+Float64 = "auto"
+Double64 = "cpu"
+BigFloat = "cpu"
+
+[run.health]
+fail_fraction = 0.05
+control_bound = 1e-8          # inert: no controls
+control_methods = ["L1"]      # inert: no controls
+control_scope = "exact_start" # inert: no controls
+setup_check_steps = { T = 100, R = 100, control_elliptic = 100, control_hyperbolic = 5, C = 5, S = 5, X = 5, h4 = 5 }
+setup_check_tol = 1e-10
+drift_bound = 1e6
+rerun_attempts = 1
+stop_failed_fraction = 0.05
+first_chunk_cost_factor = 2.0
+wall_cap_hours = 12
+
+[run.budget.Float64]
+ns_cpu_thread = 207.6
+safety = 2
+
+[run.budget.Double64]
+ns_cpu_thread = 6634.6
+safety = 3
+
+[run.budget.BigFloat]
+ns_cpu_thread = 341296.4
+safety = 3
+
+[run.k19]
+threads = 23
+
+[run.verify]
+backend_agreement = { per_orbit_sigma = 6.0, mean_standard_errors = 4.0 }
+rerun_sample = 20
+
+[run.pilot]
+orbits_per_k = 4
+horizon = 100000
+seed_label = "p3-abstention-pilot"
+
+[[run.indicator]]
+id = "tg"
+kind = "tangent"
+members = ["FLI", "MEGNO", "SALI"]
+[run.indicator.budget.Float64]
+ns_cpu_thread = 2658.0
+safety = 2
+[run.indicator.budget.Double64]
+ns_cpu_thread = 6000
+safety = 3
+
+[[run.indicator]]
+id = "fq1"
+kind = "frequency"
+observable = "exp_i_q"
+windows = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200]
+order = 1
+positions = "half"
+pad = 8
+mean_removal = true
+mirror_ratio = 0.9
+floor_multiplier = 32.0
+[run.indicator.budget.Float64]
+ns_cpu_thread = 16850.4
+safety = 2
+[run.indicator.budget.Double64]
+ns_cpu_thread = 28100
+safety = 3
+
+[[run.indicator]]
+id = "pa1"
+kind = "phase_advance"
+observable = "lifted"
+windows = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200]
+birkhoff_order = 1
+[run.indicator.budget.Float64]
+ns_cpu_thread = 1810.5
+safety = 2
+[run.indicator.budget.Double64]
+ns_cpu_thread = 4200
+safety = 3
+
+[[run.indicator]]
+id = "bk1"
+kind = "birkhoff"
+observables = [
+  { kind = "cos", coordinate = 1, frequency = 1 },
+  { kind = "sin", coordinate = 1, frequency = 1 },
+  { kind = "cos", coordinate = 2, frequency = 1 },
+  { kind = "sin", coordinate = 2, frequency = 1 },
+]
+windows = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200]
+birkhoff_order = 1
+[run.indicator.budget.Float64]
+ns_cpu_thread = 3000.6
+safety = 2
+[run.indicator.budget.Double64]
+ns_cpu_thread = 5000
+safety = 3
+
+[[run.arm]]
+name = "ref"
+orbits = "P"
+methods = ["L1", "L5"]
+precisions = ["Float64"]
+horizons = [10000000]
+release = "each_round"
+
+[[run.arm]]
+name = "ind"
+orbits = "P"
+indicators = ["tg", "fq1", "bk1"]
+precisions = ["Float64"]
+horizons = [102400]
+release = "closure"
+
+[[run.arm]]
+name = "ind_pa1"
+orbits = "P"
+indicators = ["pa1"]
+precisions = ["Float64"]
+horizons = [102401]
+release = "closure"
+
+[[run.arm]]
+name = "d64"
+orbits = "D"
+indicators = ["tg", "fq1", "bk1"]
+precisions = ["Double64"]
+horizons = [102400]
+release = "closure"
+
+[[run.arm]]
+name = "d64_pa1"
+orbits = "D"
+indicators = ["pa1"]
+precisions = ["Double64"]
+horizons = [102401]
+release = "closure"
+
+[[run.arm]]
+name = "chk"
+orbits = "D_B"
+methods = ["L5"]
+precisions = ["Double64", "BigFloat"]
+horizons = [1000000]
+release = "closure"
+```
+
+4. Panel validity and the hash of this file. The library accepts a panel only if the hash under which the panel was built, which the panel records, is in `panel_prereg_sha256_accepted`. That list is inside the hashed file, and the hash rule replaces only the header cell by SELF, so a file cannot list the hash of its own final version. Rule. (a) The panel is built under the version of this file that Amendment A1 leaves; call its header hash H_1. In that version the list holds the placeholder of 64 zeros shown above. (b) Amendment A3, the seal, is logged after A1 and before the panel build. It replaces the placeholder by H_1 and changes nothing else except the header hash cell and the amendment log cell; its log entry names H_1 as the hash it replaces. (c) The panel build reads the file as of the commit that makes A1 (a copy kept in the stage 02 output folder next to the panel; its path is the `prereg` path in the panel manifest), not the sealed file. (d) The round log, the chunk files and the run manifest carry the header hash of the sealed file. (e) The sealed file and the build copy differ in exactly three places: the list entry, the header hash cell and the amendment log cell; the check is the diff of the two. A3 is allowed only between A1 and the panel build and its content is a hash; it touches no other value.
+
+5. Additions to "Amendment rule". (a) A pilot run (experiments spec R9) that uses no panel orbit and no test screening, and writes outside the study store, is not test data. (b) The order of amendments is A2, A1, A3 (item 1). (c) The build of the test panel is the first test screening; after it the file is not changed, A3 included, because the round log and the chunk files carry its header hash.
+
+6. Budget note (screening of K = 0). The panel builder screens K = 0 with the same rule and size as the other K (module amendment D94, P71), because the K = 0 class T needs a screening and the P1 lattice would reuse the P1 start cells. Screening is 6 x 262144 x 1e5 x 207.6 ns = 9.07 thread-hours before the safety factor (frozen Budget: 5 K, 7.6), 18.1 with the factor 2. The worst-case total with safety becomes 52.4 thread-hours (97.0 with the T17 lines), 4.6 wall hours (8.4 with the T17 lines) at 11.5 effective threads, below the wall cap of the register. BigFloat line of the chk arm: the frozen Budget charges BigFloat L5 at 18200 ns per orbit-step ("P1 line"), the 4-thread value of P1 Amendment A4, which P1 Amendment A5 replaced after the 23-worker pilot; the pilot table gives BigFloat L5 alone as 341296.4 ns (module-build stage 04, `experiments-runner-verify-log.txt`, PILOT-COST L5 BigFloat cpu). The block uses 341296.4 ns, safety 3 unchanged, so that the first-chunk cost cap (2 x 3 x 18200 = 109,200 ns against the measured cost) does not pause the arm at its first chunk. The chk line becomes 100 x 1e6 x (341296.4 + 6634.6) ns = 9.66 thread-hours before safety, 29.0 with the factor 3 (frozen: 0.7 and 2.1). The worst-case total with safety becomes 79.3 thread-hours (123.9 with the T17 lines), 6.9 wall hours (10.8 with the T17 lines) at 11.5 effective threads, below the wall cap of 12 hours. No other Budget line changes.

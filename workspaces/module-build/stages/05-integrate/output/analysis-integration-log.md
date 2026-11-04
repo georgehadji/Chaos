@@ -408,3 +408,54 @@ Updated in this stage: `analysis-spec.md` ("Clarifications at stage 05" of D97: 
 | Status matches evidence (no catalog row; no open D97 criterion; O24 on the A2 block is a study gate) | pass |
 | Log names the commit SHAs and every file changed | pass |
 | `CHANGELOG.md` has an entry for the amendment | pass |
+
+## Amendment D99 (corrections of the p3 test side and calibrate default found at the p3-abstention study run), stage 05
+
+Branch: `main` (commits pushed, no force-push). Decision D99 (stage 01; owner decisions P122 to P125 approved as proposed).
+
+### Catalog rows flipped
+
+None, as for the base module.
+
+Evidence: `stages/04-verify/output/analysis-d99-verification.md`, accepted at the stage 04 checkpoint (2026-11-04) with the rework of review finding 1 (owner "Fix, tests first"). D99a to D99f by tests (`an_p3t_d99.jl` 81 of 81, `an_p3t_d99r.jl` 12 of 12); D99g chain with default paths on the D96 fixture layout (calibrate default folder equals the record folder of count-round and analyze; 3 rounds, closure, analyze exit 0, record fingerprint equal); D99h O31 on the committed p3 inputs: 7 lines named by I52 plus the results digest, machine file 4 leaves, 0 numeric cells, decisions HA, HB, HC equal; D99i calibrate rerun on the real stores 2 of 2 293 leaves differ (fingerprints). Independent review: finding 1 MEDIUM fixed, finding 2 LOW unreachable. Full `Pkg.test()` after the rework 1404905 pass, 0 fail, 1 broken (existing).
+
+Updated in this stage: `analysis-spec.md` ("Clarifications at stage 05" of D99: the reading of the rework), `src/Analysis/CONTEXT.md` (D99 sentence; 78 lines), `CHANGELOG.md` (new section "Fixed", entry). `scripts/icm_validate.py`: all checks pass.
+
+### Open (not verified or deferred)
+
+- D99g ran with the fixture record placed in the default folder of `calibrate`: the D96 fixture record is synthetic and pinned in the test-side table, so `calibrate` cannot write it (verification note 1).
+- The committed study outputs of `p3-abstention` are not regenerated (P125).
+- The default manifest and round log of `run` are repo-rooted, not relative to the preregistration (verification note 3); outside D99.
+
+### Commits
+
+- `15bf6d7` stage 01: D99 spec, decision log row
+- `d5946d2` stage 02: failing tests, plan
+- `15f22d3` stage 03: implementation, impl notes
+- `e9df9f5` stage 04: verification, chain script, log; rework of review finding 1 (tests first)
+- (this log) the commit that adds this section and the documentation edits
+
+### Files changed on `main` for D99 (short hashes of the commits above that touched the file)
+
+- `_config/decision-log.md` (15bf6d7)
+- `workspaces/module-build/stages/01-spec/output/analysis-spec.md` (15bf6d7, this log)
+- `test/analysis/an_p3t_d99.jl` (d5946d2)
+- `test/analysis/runtests.jl` (d5946d2, e9df9f5)
+- `test/analysis/an_p3t_d99r.jl` (e9df9f5)
+- `workspaces/module-build/stages/02-tests/output/analysis-test-plan.md` (d5946d2, e9df9f5)
+- `src/Analysis/p3_read.jl`, `p3t_json.jl` (15f22d3)
+- `src/Analysis/p3t_tables.jl` (15f22d3, e9df9f5)
+- `workspaces/module-build/stages/03-implement/output/analysis-d99-impl-notes.md` (15f22d3, e9df9f5)
+- `verify/analysis-d99-chain.jl` (e9df9f5)
+- `workspaces/module-build/stages/04-verify/output/analysis-d99-verification.md`, `analysis-d99-verify-log.txt` (e9df9f5)
+- `src/Analysis/CONTEXT.md` (this log)
+- `CHANGELOG.md` (this log)
+- `workspaces/module-build/stages/05-integrate/output/analysis-integration-log.md` (this log)
+
+### Audit
+
+| Check | Result |
+|-------|--------|
+| Status matches evidence (no catalog row; no open D99 criterion; the D99g shortcut is named) | pass |
+| Log names the commit SHAs and every file changed | pass |
+| `CHANGELOG.md` has an entry for the amendment | pass |

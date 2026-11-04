@@ -10,7 +10,7 @@ Julia is the language of the core library `Chaoslab`. Needed by module-build and
 ## Verify
 
 - `julia --version` prints the version.
-- From the repo root: `julia --project -e "using Pkg; Pkg.instantiate(); Pkg.test()"` installs the pinned packages from `Manifest.toml` and runs the tests.
+- From the repo root: `julia --project -e "using Pkg; Pkg.instantiate(); Pkg.test()"` installs the pinned packages from `Manifest-v1.13.toml` (Julia 1.13 or later, D100) and runs the tests.
 
 ## How this repo uses it
 

@@ -4,7 +4,7 @@ Julia library for Lyapunov exponents, chaos indicators and their numerical check
 
 ## Install
 
-Julia 1.11 or later:
+Julia 1.13 or later:
 
 ```julia
 using Pkg

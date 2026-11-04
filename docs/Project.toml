@@ -9,4 +9,4 @@ Chaoslab = {path = ".."}
 [compat]
 Documenter = "1"
 StaticArrays = "1.9"
-julia = "1.11"
+julia = "1.13"

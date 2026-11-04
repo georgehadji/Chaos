@@ -44,7 +44,7 @@ end
 """
     analyze(; prereg, manifest, panel, params, store, out, figures = false, threads, seed, p1_prereg, p1_manifest, p1_params, p1_store) -> NamedTuple
 
-Run the analysis of the study named by the preregistration (E21): `p1-le-benchmark` runs [`analyze_p1`](@ref) unchanged, `p2-indicators` runs [`analyze_p2`](@ref) with the P1
+Run the analysis of the study named by the preregistration (E21): `p1-le-benchmark` runs `analyze_p1` unchanged, `p2-indicators` runs `analyze_p2` with the P1
 reference inputs `p1_*` (default: the files of study `p1-le-benchmark` by the study layout). The `p1_*` keywords are an error for `p1-le-benchmark`.
 """
 function analyze(; prereg, manifest, panel, params, store, out, figures::Bool = false, threads::Integer = Threads.nthreads(), seed::Union{Nothing, Integer} = nothing,

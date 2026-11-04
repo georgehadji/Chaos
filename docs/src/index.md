@@ -6,7 +6,7 @@ Version 0.1 covers the standard map and linear symplectic maps, the Benettin, QR
 
 ## Installation
 
-Chaoslab needs Julia 1.11 or later. It is not in the General registry; add it from the repository:
+Chaoslab needs Julia 1.13 or later. It is not in the General registry; add it from the repository:
 
 ```julia
 using Pkg

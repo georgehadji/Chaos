@@ -1003,3 +1003,13 @@ Command (from the repository root; `<scratch>` is the scratch folder of the sess
 Existing tests of these files: 793 of 793 pass. New file: 25 fail, 0 error, 48 pass. Causes of the 25 failures, each a missing part of the amendment: the T5 rows of item 3 read the item-level status (fixtures 1 and 4: `["fails", "fails"]` against `["fails", "ok"]`, and the toy run); the decision line has no statement on item 3 (fixtures 1, 3, 4 and the toy run); the added sentence of T5 is absent (4 fixtures); P120 and the T3 introduction say `study amendment A2` and lack `deviation of the analysis` (9 in the three inner testsets, plus the whole-file check); the target of D is the failure target, not `n.a.` (1); there is no line `Target failures n_f` in T8 (2); `calibrate` without `--out` writes to the stage 01 folder (4). The 48 passes are the guards (rows of items 1, 2, 4, points and thresholds, both rows of fixture 2, the other rows of T2, the T8 values read before the line check, the explicit-folder testset) and the first assertions of the failing testsets. No parse error, no undefined name, no error inside a helper.
 
 Audit: Coverage of spec (D99a to D99f map to tests; D99g and D99h are (V) stage 04; D99i is the existing goldens), RED (every new failing assertion fails on the old text, status or path), Reproducible (no random draw), No memory values (hand values of the spec fixtures and of the toy table): pass.
+
+### Rework after stage 04 review (2026-11-04)
+
+Owner decision: fix finding 1 of the D99 stage 04 review ("Fix, tests first"). When HA is not decidable the failed list is empty, so the decision line printed "Status of item 3: ok" while a row of item 3 read "fails" (seen on the D96 fixture). One new file, `test/analysis/an_p3t_d99r.jl`, registered after `an_p3t_d99.jl`; it reuses `d99_ha`, `d99_t5_fixture`, `d99_i3_fails` and the `d97_*` readers. No existing test is edited.
+
+| Criterion | Test | Note |
+|---|---|---|
+| E83 (item 3 as a whole in the decision line) | "D99 rework: when HA is not decidable ..." with three hand fixtures (delta_a = 0.1, decision not decidable, failed list empty): T_s row undefined (rows ok, fails; item fails), both rows ok (item ok), both points below delta_a (rows fails, fails; item fails) | the row statuses and the decision are guards (pass now); a decided HA is covered by D99a |
+
+RED (driver with `an_p3t_d97.jl`, `an_p3t_d99.jl`, `an_p3t_d99r.jl`): `an_p3t_d99r.jl` 10 pass, 2 fail, 0 error; the two failures are the fixtures where a row fails and the line says "ok".

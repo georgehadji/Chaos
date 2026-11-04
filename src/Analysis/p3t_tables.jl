@@ -98,7 +98,8 @@ function _p3t_t5(A)
             ["3", "a(W2) - a(S2)", h.point.dw, "lower bound " * b(h.bounds.dw_lo), "delta_a = $(A.qt.delta_a)", _p3t_own3(h.point.dw, h.bounds.dw_lo, A.qt.delta_a)],
             ["3", "a(T_s) - a(S2)", h.point.dt, "lower bound " * b(h.bounds.dt_lo), "delta_a = $(A.qt.delta_a)", _p3t_own3(h.point.dt, h.bounds.dt_lo, A.qt.delta_a)],
             ["4", "g (gate orbits chaotic-supported)", h.point.g, "", "g_max = $(A.qt.g_max)", 4 in h.failed ? "fails" : "ok"]]
-    L = ["HA: $(h.decision). Status of item 3: $(3 in h.failed ? "fails" : "ok"). Strata sizes (T_s, W2 minus T_s, S2, other C, R): $(join(h.strata, ", ")); overlap of T_s and S2: $(count(r -> r.Ts && r.S2, A.O.rows)).",
+    # item 3 as a whole from its two rows (equal to the failed list when HA is decided; the failed list is empty when it is not)
+    L = ["HA: $(h.decision). Status of item 3: $(rows[3][6] == rows[4][6] == "ok" ? "ok" : "fails"). Strata sizes (T_s, W2 minus T_s, S2, other C, R): $(join(h.strata, ", ")); overlap of T_s and S2: $(count(r -> r.Ts && r.S2, A.O.rows)).",
          "The status of a row of item 3 is the status of its own condition (point at least delta_a, lower bound above 0); item 3 holds when both rows hold.", ""]
     append!(L, mdt(["item", "statistic", "point", "bound", "threshold", "status"], rows))
     append!(L, ["", "Unresolved share a(A) per set:"], mdt(["set", "a"], [["E_test", h.point.a[:E]], ["W2", h.point.a[:W2]], ["T_s", h.point.a[:Ts]], ["S2", h.point.a[:S2]]]))

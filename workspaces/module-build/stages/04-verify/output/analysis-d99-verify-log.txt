@@ -1,0 +1,109 @@
+# analysis D99 stage 04 raw output (2026-11-04, code 15f22d3, before = git archive d5946d2, Julia 1.13.2)
+
+## A. Fixture inputs (scratch d99v/build.jl, test helpers, n_s = 1000)
+fixture input p2-indicators-manifest.json | same bytes | PASS
+fixture input p2-indicators-preregistration.md | same bytes | PASS
+fixture input p2-indicators-analysis-parameters.toml | same bytes | PASS
+fixture input p1-le-benchmark-preregistration.md | same bytes | PASS
+fixture input p1-le-benchmark-parameters.toml | same bytes | PASS
+
+## B. D99g chain (verify/analysis-d99-chain.jl on d99v/study/stages; record line label renamed after this run, see report)
+D99g | default folder of calibrate equals the record folder of count-round and analyze | C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\d99v\study\stages\04-analyze\output | C:\Users\tesse\AppData\Local\Temp\claude\C--Users-tesse-Documents-Vibe-Coding-Chaos\5df15ee1-47df-4875-85bd-1bd4d7c665a6\scratchpad\d99v\study\stages\04-analyze\output | PASS
+D99g | record source | fixture record placed in the default folder of calibrate | - | INFO
+D99g | record at the default folder of count-round and analyze | true | true | PASS
+D99g | files in the stage 04 output folder before the rounds | p3-abstention-calibration-record.json | - | INFO
+D99g | run round 1 exit | 0 | 0 | PASS
+D99g | count-round after round 1 exit | 0 | 0 | PASS
+D99g | run round 2 exit | 0 | 0 | PASS
+D99g | count-round after round 2 exit | 0 | 0 | PASS
+D99g | run round 3 exit | 0 | 0 | PASS
+D99g | count-round after round 3 exit | 0 | 0 | PASS
+D99g | round log closed | true | true | PASS
+D99g | closure run exit | 0 | 0 | PASS
+D99g | count-round on the closed log exit | 0 | 0 | PASS
+D99g | analyze exit | 0 | 0 | PASS
+D99g | analyze outputs at the default folder | true | true | PASS
+D99g | record read by analyze (fingerprint) is the record calibrate wrote | bfd14662e98b | bfd14662e98b | PASS
+D99g | record unchanged after the chain | bfd14662e98b | bfd14662e98b | PASS
+D99g | round log sha256 | 6d1eba1427179f8216af3db16d47337268ac6fcf9c4a45d53ef4a29f86239f09 | - | INFO
+targets: t_s 5, w2 11; decision: continue
+targets: t_s 5, w2 11; decision: continue
+targets: t_s 5, w2 11; decision: close
+targets: t_s 5, w2 11; decision: close
+
+## C. O31 tables: committed (b2c1df0) vs before (d5946d2), scratch outputs
+5c5
+< results SHA-256: 452eeabb56d090915ae36da1affe2d7c68c3391a887883fb13068b9ba8a6b98a
+---
+> results SHA-256: 4030a3f417587ea81918b1d30bc0c19a1656553493f94ac7cc6eaebd6bee6ef3
+
+## D. O31 tables: before vs after (15f22d3)
+5c5
+< results SHA-256: 4030a3f417587ea81918b1d30bc0c19a1656553493f94ac7cc6eaebd6bee6ef3
+---
+> results SHA-256: 70819e60fd9893bfd7cecc125e0b00d6ef6a6e4240b25da9ffaab8a86692c0ab
+70c70
+< | D | 1218 | 45 |
+---
+> | D | 1218 | n.a. |
+76c76
+< The reference check on D_B (N_B = 1000000, ladder bound 0.005 of the P1 parameter table): the three L5 values at the recorded step N_B and the ladder test (a). No label changes (D1). The column labels agree of the preregistration is omitted: the items of the arm chk run at their own horizon N_B and have no steps at the scale of N_1, so the labels cannot be formed in three precisions (study amendment A2 states it).
+---
+> The reference check on D_B (N_B = 1000000, ladder bound 0.005 of the P1 parameter table): the three L5 values at the recorded step N_B and the ladder test (a). No label changes (D1). The column labels agree of the preregistration is omitted: the items of the arm chk run at their own horizon N_B and have no steps at the scale of N_1, so the labels cannot be formed in three precisions (a deviation of the analysis).
+296c296,297
+< HA: not supported. Strata sizes (T_s, W2 minus T_s, S2, other C, R): 172, 1207, 819, 2975, 1260; overlap of T_s and S2: 1.
+---
+> HA: not supported. Status of item 3: fails. Strata sizes (T_s, W2 minus T_s, S2, other C, R): 172, 1207, 819, 2975, 1260; overlap of T_s and S2: 1.
+> The status of a row of item 3 is the status of its own condition (point at least delta_a, lower bound above 0); item 3 holds when both rows hold.
+303c304
+< | 3 | a(T_s) - a(S2) | 3647/17630 | lower bound 5575/35303 (0 dropped) | delta_a = 0.1 | fails |
+---
+> | 3 | a(T_s) - a(S2) | 3647/17630 | lower bound 5575/35303 (0 dropped) | delta_a = 0.1 | ok |
+352a354
+> Target failures n_f: 45; achieved failures: 76
+1687c1689
+< - P120: the column labels agree of table T3 is omitted: the items of the arm chk run at their own horizon N_B with the label BigFloat(256) and have no steps at the scale of N_1, so the labels cannot be formed in three precisions (to be stated in study amendment A2)
+---
+> - P120: the column labels agree of table T3 is omitted, a deviation of the analysis: the items of the arm chk run at their own horizon N_B with the label BigFloat(256) and have no steps at the scale of N_1, so the labels cannot be formed in three precisions
+
+## E. O31 machine file, leaf compare
+committed vs before: 14042 leaves, 2 differ
+  /fingerprints/git_clean | True | False
+  /fingerprints/git_commit | b2c1df032da10b954565aa55b73b0217236eaa3a | unknown
+before vs after: 14043 leaves, 4 differ
+  /fingerprints/git_clean | False | True
+  /fingerprints/git_commit | unknown | 15f22d3469933cabfef93dce7d11bf306115d102
+  /hc/target_failures | <absent> | 45
+  /readings[21] | P120: the column labels agree of table T3 is omitted: the items of the arm chk run at their own horizon N_B with the lab | P120: the column labels agree of table T3 is omitted, a deviation of the analysis: the items of the arm chk run at their
+
+## F. D99c, D99e on the after outputs
+p3-abstention-tables.md: 'A2' 0, 'study amendment' 0, 'deviation of the analysis' 2
+p3-abstention-test-results.json: 'A2' 0, 'study amendment' 0, 'deviation of the analysis' 1
+HC: supported. Set size 1218, failures 76, non-failures 1142, underpowered: false; dropped replicates 0.
+Target failures n_f: 45; achieved failures: 76
+
+## G. calibrate --out scratch (15f22d3) vs committed calibration outputs
+3c3
+< record SHA-256: a8cfdbe12a56697fba17db12b26cafced06647fd05dfa0db79af9a1319b3680a
+---
+> record SHA-256: 01a21cbb5cf743d7b212ce18c32d0b6c74dc3c9aa65b454faa9a674d55a84186
+7c7
+< - preregistration header SHA-256 (recomputed under the rule of the SELF cell): f614a38449f611a42c56a0aa79bbc2d106dfaab679d1972a2b5349011df1a072
+---
+> - preregistration header SHA-256 (recomputed under the rule of the SELF cell): e4809007aea5ad2302b804f2ba34ebcc838c2d09e6af22559144fa81b9072c77
+17c17
+< - git commit: 02994688354738e11405605e8a0074481a7ccb80
+---
+> - git commit: 15f22d3469933cabfef93dce7d11bf306115d102
+
+## H. Rework of review finding 1 (decision line from the two rows of item 3)
+after (15f22d3) vs after-r (rework), real p3 run, tables:
+5c5
+< results SHA-256: 70819e60fd9893bfd7cecc125e0b00d6ef6a6e4240b25da9ffaab8a86692c0ab
+---
+> results SHA-256: 235260f0e72f1126ffe8ba4a368f4d117651a0ac21f376184406ccae0cafab55
+machine file leaves that differ: /fingerprints/git_clean True | False (working tree dirty during the run)
+D96 fixture (store of section B), after-r:
+HA: not decidable. Status of item 3: fails. Strata sizes (T_
+| 3 | a(W2) - a(S2) | 2/5 | lower bound 1/10 (0 dropped) | delta_a = 0.1 | ok |
+| 3 | a(T_s) - a(S2) | n.a. | lower bound undefined (100 dropped) | delta_a = 0.1 | fails |

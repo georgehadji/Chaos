@@ -76,3 +76,4 @@ include(joinpath(@__DIR__, "an_p3t_d97r.jl"))        # D97 rework after the stag
 # D99 stage 02 (Amendment D99, corrections of the p3 test side and of the calibrate default). The D99 testsets are RED: the T5 row status, the texts of P120 and T3, the target of D, the added
 # line of T8 and the default folder of calibrate are the old ones. D99g and D99h are stage 04 (the real store); D99i is the existing golden testsets (see the test plan).
 include(joinpath(@__DIR__, "an_p3t_d99.jl"))         # D99a to D99f
+include(joinpath(@__DIR__, "an_p3t_d99r.jl"))        # D99 rework after the stage 04 review: item 3 in the decision line when HA is not decidable

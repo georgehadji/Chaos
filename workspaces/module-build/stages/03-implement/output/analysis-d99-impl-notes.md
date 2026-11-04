@@ -24,7 +24,7 @@ Logs (scratchpad `d99/`): `d99-green.log`, `full.log`.
 | `p3t_tables.jl` | 12/6 | E83: `_p3t_own3` gives each row of HA item 3 the status of its own condition (point at least delta_a, lower bound above 0, an undefined bound fails); the T5 decision line states the status of item 3 and the rule sentence. E84: the T3 introduction names the omission a deviation of the analysis. E85: T2 row D has no target (`n.a.`); T8 has the line `Target failures n_f: ...; achieved failures: ...` after the `HC:` line. |
 | `p3t_json.jl` | 2/2 | E84: the P120 text names the deviation of the analysis, the arm chk, N_B and the three precisions, and no study amendment. E85: `hc.target_failures` holds n_f. |
 
-Largest changed function: `_p3t_t3` (21 lines). All files stay under 400 lines (`p3t_tables.jl` 197). The files keep their CRLF working-tree endings. No em dash, no `@fastmath`. No decision moves: `_p3t_own3` only labels rows; the decision of HA is still the one of `p3t_stats.jl` (I52).
+Largest changed function: `_p3t_t3` (21 lines). All files stay under 400 lines (`p3t_tables.jl` 197). The working copies of the three files were written with LF endings (git stores LF; with core.autocrlf true the next checkout writes CRLF); the content is unchanged by this. No em dash, no `@fastmath`. No decision moves: `_p3t_own3` only labels rows; the decision of HA is still the one of `p3t_stats.jl` (I52).
 
 ## Readings
 
@@ -39,3 +39,7 @@ The implementation was written directly in this session, not by a Sonnet subagen
 ## Not done here
 
 Coverage of the changed functions was not measured by a tool. No benchmark change. D99g (chain on the D96 fixture), D99h (O31 before and after on the committed p3 inputs, in empty scratch folders) and D99i (p1 and p2 goldens) are stage 04. Nothing committed.
+
+## Rework after stage 04 review (2026-11-04)
+
+Owner decision: fix review finding 1, tests first (`an_p3t_d99r.jl`, RED 10 pass, 2 fail). `_p3t_t5` (`p3t_tables.jl`, +2/-1): the status of item 3 in the decision line is "ok" when both rows of item 3 are "ok", else "fails". When HA is decided this equals "3 not in the failed list"; when HA is not decidable the failed list is empty and the old text printed "ok" next to a failing row. GREEN: p3 subset 956 of 956; whole package suite 1 404 905 pass, 0 fail, 1 existing broken (weighted-birkhoff); quality 12 of 12, layering 2 of 2, analysis 2 763.

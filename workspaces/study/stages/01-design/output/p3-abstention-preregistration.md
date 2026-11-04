@@ -11,8 +11,8 @@ FROZEN 2026-10-30. Scope and value types were agreed by the owner at checkpoint 
 | Claims tested | HC tests a consequence of claim C3 (diagnostic inequivalence): that indicator disagreement carries information about label failure. HA and HB test hypotheses of research idea 23 (`/_config/research-ideas.md`, row 23; research lines R1 and R2 of that row) restricted to maps, with preregistered rules. Idea-23 H1 (refinement and indicator disagreement predict label failure better than energy error at matched cost) becomes HC in a changed form: there is no energy error on a map, so HC compares the two disagreement sources with each other. Idea-23 H3 (adaptive allocation with abstention beats uniform refinement) becomes HB in a changed form: a fixed-budget abstaining rule against single indicators; adaptive allocation is NOT tested (Known limits). HA is the accounting of error and abstention that both need |
 | Value types | FALSIFIES (HC as a test of a consequence of C3; HA and HB as tests of the idea-23 hypotheses; the decision rules are fixed before any test data exist), NEGATIVE allowed (a hypothesis that is not supported is reported with the same figures and tables). NOT claimed: NOVEL (no prior-art check for this study; `research-ideas.md` says shadowing-based reliability work narrows any novelty claim for idea 23), REPRODUCES, TOOL |
 | Git SHA at freeze | 6d8dbe8d600d4338d313d90ed2ea7e56b3e0e6c9 (parent commit of the freeze commit) |
-| SHA-256 of this file (current version) | b1e1059f9e9553d0d7ba6ff6e0236c4b8c1ac507847b57adc3138823573ad0d5 (rule as p2: the whole cell is replaced by the word SELF before hashing, UTF-8, LF) |
-| Amendment log | A2 (2026-11-04, section "Amendment A2"; parent commit eae6babd565740ebef0c34e249798c3bc13c8253; replaces hash de9490168d609f6e56ebc12edb2b088a115477b8481c6dd633a45d5723fb303a); A1 (2026-11-04, section "Amendment A1"; parent commit 02994688354738e11405605e8a0074481a7ccb80; replaces hash f614a38449f611a42c56a0aa79bbc2d106dfaab679d1972a2b5349011df1a072). Planned: amendment A3, the seal of the panel hash list (section "Amendment A2", item 4), logged after A1 and before the panel build, before any test data exist |
+| SHA-256 of this file (current version) | e4809007aea5ad2302b804f2ba34ebcc838c2d09e6af22559144fa81b9072c77 (rule as p2: the whole cell is replaced by the word SELF before hashing, UTF-8, LF) |
+| Amendment log | A2 (2026-11-04, section "Amendment A2"; parent commit eae6babd565740ebef0c34e249798c3bc13c8253; replaces hash de9490168d609f6e56ebc12edb2b088a115477b8481c6dd633a45d5723fb303a); A1 (2026-11-04, section "Amendment A1"; parent commit 02994688354738e11405605e8a0074481a7ccb80; replaces hash f614a38449f611a42c56a0aa79bbc2d106dfaab679d1972a2b5349011df1a072); A3 (2026-11-04, the seal of section "Amendment A2", item 4: panel_prereg_sha256_accepted lists the hash of the A1 version; parent commit d56fc34c8aa31e94efc9a70ba6ce1efc9a365b7b; replaces hash b1e1059f9e9553d0d7ba6ff6e0236c4b8c1ac507847b57adc3138823573ad0d5). No amendment follows: the next step is the build of the test panel under the A1 version (build copy p3-abstention-preregistration-build.md in study stage 02 output), the first test data |
 
 Value types, in the words of `value-types.md`:
 - FALSIFIES: HA, HB, HC each have a metric and a numeric decision rule below; the numbers are in the register.
@@ -485,7 +485,7 @@ controls = "none"
 
 ```toml
 [run]
-panel_prereg_sha256_accepted = ["0000000000000000000000000000000000000000000000000000000000000000"]
+panel_prereg_sha256_accepted = ["b1e1059f9e9553d0d7ba6ff6e0236c4b8c1ac507847b57adc3138823573ad0d5"]
 
 [run.primary]
 tau = 1

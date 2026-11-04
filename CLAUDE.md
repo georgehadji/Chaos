@@ -33,6 +33,7 @@ Chaos/
 - No em dashes. Names in `workspaces/`, `_config/`, `setup/`, `schema/` are lowercase-with-hyphens; code and tooling files follow their ecosystem (`Project.toml`, `src/Chaoslab.jl`, `scripts/icm_validate.py`).
 - Each fact has one home (see `_config/CONTEXT.md`). Point to it; do not copy it.
 - Structural decisions go into `_config/decision-log.md`; review `_config/risks.md` at every milestone exit.
+- When the documentation and existing code conflict, follow the code's conventions, and in your final reply, list all the inconsistencies you found.
 
 ## Triggers
 

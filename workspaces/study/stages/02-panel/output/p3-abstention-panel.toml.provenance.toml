@@ -1,0 +1,6 @@
+backend = "cpu"
+backend_fallback_reason = ""
+backend_requested = "auto"
+julia_version = "1.13.2"
+ntasks = 23
+threads = 23

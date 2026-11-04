@@ -1,0 +1,16 @@
+# Line endings of the files whose raw bytes are hashed in a committed record (decision D98): each keeps the form its records hold,
+# on every OS and every core.autocrlf. A file newly hashed by a record gets its line here in the same commit.
+Manifest-v1.13.toml text eol=lf
+workspaces/module-build/stages/04-verify/output/analysis-p2-independent-results.txt text eol=lf
+workspaces/study/stages/01-design/output/p1-le-benchmark-preregistration.md text eol=lf
+workspaces/study/stages/01-design/output/p2-indicators-preregistration.md text eol=lf
+workspaces/study/stages/01-design/references/p3-abstention-calibration-parameters.toml text eol=lf
+workspaces/study/stages/01-design/references/p3-abstention-test-parameters.toml text eol=lf
+workspaces/study/stages/02-panel/output/p1-le-benchmark-panel.toml text eol=crlf
+workspaces/study/stages/02-panel/output/p3-abstention-panel.toml text eol=lf
+workspaces/study/stages/03-run/output/p3-abstention-round-log.txt text eol=lf
+workspaces/study/stages/04-analyze/output/p3-abstention-calibration-record.json text eol=lf
+workspaces/study/stages/04-analyze/output/p3-abstention-calibration-tables.md text eol=lf
+workspaces/study/stages/04-analyze/output/p3-abstention-test-results.json text eol=lf
+workspaces/study/stages/04-analyze/references/p1-le-benchmark-analysis-parameters.toml text eol=crlf
+workspaces/study/stages/04-analyze/references/p2-indicators-analysis-parameters.toml text eol=lf

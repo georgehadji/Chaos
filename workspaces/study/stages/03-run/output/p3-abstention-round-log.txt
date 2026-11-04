@@ -1,0 +1,13 @@
+round=1
+decision=continue
+count.drift=0
+count.excluded=0
+count.orbits=1345
+count.t_s=40
+count.target_t_s=285
+count.target_w2=1235
+count.w2=285
+panel_sha256=d9a365603c9710cc960ebd7a3e17fd7c9068d7255f16c32d0eaad4b67be6f0ce
+prereg_sha256=e4809007aea5ad2302b804f2ba34ebcc838c2d09e6af22559144fa81b9072c77
+ref_digest=4b0e4f297e8c357ae43ed2f2a2f7cafe6c07a8f7c7efcc12ce3a92012f058230
+prev_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

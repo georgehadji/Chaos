@@ -352,3 +352,59 @@ Updated in this stage: `analysis-spec.md` ("Clarifications at stage 05" of D95: 
 | Status matches evidence (no catalog row; no open D95 criterion; O24 deferred to a study gate by owner decision, findings V2 to V4 recorded) | pass |
 | Log names the commit SHAs and every file changed | pass |
 | `CHANGELOG.md` has an entry for the amendment | pass |
+
+## Amendment D97 (test side of study p3-abstention reads the store of the runner), stage 05
+
+Branch: `main` (commits pushed, no force-push). Decision D97 (stage 01; owner decisions P117 to P121 approved as proposed).
+
+### Catalog rows flipped
+
+None, as for the base module.
+
+Evidence: `stages/04-verify/output/analysis-d97-verification.md`, accepted at the stage 04 checkpoint (2026-11-03) and after each rework (2026-11-04). Fixture campaign of the real runner (discovery d96 inputs, 46 orbits, 3 rounds, six arms), no Analysis patch: O28 clean campaign 956 of 956 quantities equal to the independent oracle; O29 chunks failed twice in all six arms 951 of 951; CLI round log and outputs byte-identical to the library; the independent round log equals the module's; the runner accepts the log (32 of 39 alterations refused, 7 accepted, as in D94 O26). Independent review: no CRITICAL or HIGH; 4 MEDIUM fixed (owner "Fix MEDIUMs"); 8 LOW, 7 fixed and item 9 kept as E64 b states (owner "fix lows too"). Oracle compare rerun after each rework: equal, 0 differ. Full `Pkg.test()` after the LOW rework 1404812 pass, 0 fail, 1 broken (existing).
+
+Updated in this stage: `analysis-spec.md` ("Clarifications at stage 05" of D97: the readings of the two reworks), `src/Analysis/CONTEXT.md` (D97 sentence and limits; 78 lines), `CHANGELOG.md` (entry). `scripts/icm_validate.py`: all checks pass.
+
+### Open (not verified or deferred)
+
+- O24 on the A2 block (study gate after P69, before the A1 freeze run): D96 and D97 verified it on the fixture campaign only.
+- No real-size test store: time and memory at study size not measured.
+- The 46-orbit fixture gives HA, HB and HC "not decidable" and an empty T_s; it never reaches a round above the closing round (E80, P121 by tests only).
+- Not done here: the study amendment P69 (A2), the O24 dry campaign, the calibration freeze run, A1, A3, D94s; `_config/risks.md` review is due at the M4 exit.
+
+### Commits
+
+- `09ae1f3` stage 01: D97 spec, decision log row
+- `f385423` stage 02: failing tests, runner-shape fixture, shape guard, plan
+- `cc38b10` stage 03: Analysis reads the store of the runner, impl notes
+- `0d56640` stage 04: verification, verify and oracle scripts, log; rework of the MEDIUM findings
+- `61d1429` stage 04: rework of the LOW findings
+- (this log) the commit that adds this section and the documentation edits
+
+### Files changed on `main` for D97 (short hashes of the commits above that touched the file)
+
+- `_config/decision-log.md` (09ae1f3)
+- `workspaces/module-build/stages/01-spec/output/analysis-spec.md` (09ae1f3, this log)
+- `test/analysis/an_p3t_d97.jl`, `an_p3t_shape.jl`, `an_p3t_fixture.jl`, `an_p3t_helpers.jl`, `an_p3t_log.jl`, `an_p3t_pipeline.jl`, `an_p3t_refusals.jl` (f385423)
+- `test/analysis/runtests.jl` (f385423, 0d56640)
+- `test/analysis/an_p3t_d97r.jl` (0d56640, 61d1429)
+- `workspaces/module-build/stages/02-tests/output/analysis-test-plan.md` (f385423, 0d56640, 61d1429)
+- `src/Analysis/p3t_json.jl` (cc38b10)
+- `src/Analysis/p3t_inputs.jl`, `p3t_tables.jl` (cc38b10, 61d1429)
+- `src/Analysis/p3t_data.jl`, `p3t_run.jl`, `p3t_store.jl` (cc38b10, 0d56640, 61d1429)
+- `src/Analysis/p3t_pipeline.jl`, `p3_verdict.jl` (61d1429)
+- `src/Analysis/CONTEXT.md` (this log)
+- `workspaces/module-build/stages/03-implement/output/analysis-d97-impl-notes.md` (cc38b10, 0d56640, 61d1429)
+- `verify/analysis-d97-cli.sh`, `analysis-d97-compare.py`, `analysis-d97-oracle.py`, `analysis-d97-runner.jl`, `experiments-d96.jl` (0d56640)
+- `workspaces/module-build/stages/04-verify/output/analysis-d97-verify-log.txt` (0d56640)
+- `workspaces/module-build/stages/04-verify/output/analysis-d97-verification.md` (0d56640, 61d1429)
+- `CHANGELOG.md` (this log)
+- `workspaces/module-build/stages/05-integrate/output/analysis-integration-log.md` (this log)
+
+### Audit
+
+| Check | Result |
+|-------|--------|
+| Status matches evidence (no catalog row; no open D97 criterion; O24 on the A2 block is a study gate) | pass |
+| Log names the commit SHAs and every file changed | pass |
+| `CHANGELOG.md` has an entry for the amendment | pass |

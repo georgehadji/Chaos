@@ -1122,3 +1122,16 @@ Tags and tolerances as D95: integers, rationals, texts, flags and decisions exac
 ### Out of scope
 
 The text of study amendment A2 (including the statement of the T3 deviation), the study gate and the A1 freeze run, any real size run, the drawers of the figures (D95 P110). Not reached by the discovery and therefore not checked here: statistics with T_s > 0, early close, class S, drift flags, a paused arm, kill and resume.
+
+### Clarifications at stage 05 (2026-11-04)
+
+Readings fixed by the stage 04 review and its two reworks (owner decisions "Fix MEDIUMs" and "fix lows too"; evidence `analysis-d97-verification.md`). No rule, threshold or key of a table changes.
+
+- E70, P104 b, E77: an orbit that leaves D by a chunk of d64 or d64_pa1 that failed twice is counted through the size of D only; no separate key.
+- E64 c, E77: the Double64 check of a D orbit covers its four Double64 items (tg, fq1, bk1 in d64; pa1 in d64_pa1). An item missing from a chunk not listed as failed refuses (E61 k).
+- E77, E79: an orbit is known to be in D_B by either chk item. The other item, if missing from a chunk not listed as failed, refuses. An orbit missing both items is not known to D_B.
+- E79: two chk items of one orbit with one precision label without its bit count refuse. With D_B not empty, `analyze` refuses without the P1 parameter table; with D_B empty, T3 states that the check is not computed.
+- E74, E77, E81: a chunk with an arm outside the six arms refuses; a failed chunk whose cell is not of the form of E74 refuses, naming the file and the cell.
+- E64 b: the drift set is over every item read, all arms, as written.
+- I50: the opening sentence of T2 is the D95 sentence; the counts stop at the closing round (E80).
+- E78: a manifest chunk entry without a field that `analyze` reads refuses, naming the field and the ordinal.

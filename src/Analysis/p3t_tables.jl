@@ -23,7 +23,7 @@ function _p3t_t2(A)
     rows = [[r, count(o -> Int(o["round"]) == r, po), count(o -> Int(o["round"]) == r && Float64(o["K"]) == 0, po), count(x -> x.round == r, E),
              count(x -> x.round == r && x.W2, E), count(x -> x.round == r && x.Ts, E), count(x -> x.round == r && x.S2, E)] for r in rds]
     rho = [count(x -> x.rho === s, A.st.rows) for s in (:C, :R, :U)]
-    L = ["The test draw. Orbits of the rounds up to the closing round: $(length(po)) (the panel file holds $(length(A.c.panel_orbits))); rounds $(length(rds)).", ""]
+    L = ["The test draw. Orbits in the panel file: $(length(A.c.panel_orbits)); rounds $(length(rds)).", ""]
     append!(L, mdt(["round", "orbits", "K = 0", "E_test", "W2", "T_s", "S2"], rows))
     append!(L, ["", "Labels of the orbits with K > 0 read (rho = C, R, U): $(rho[1]), $(rho[2]), $(rho[3]); excluded $(count(x -> x.excluded, A.st.rows)), drift on L1 or L5 (as the round log counts) $(count(x -> x.drift, A.st.rows)); dropped as drift on any item read (E64 b) $(count(d -> d.reason == "drift", A.O.drops)).", ""])
     cnt = (E_test = length(E), W2 = count(r -> r.W2, E), T_s = count(r -> r.Ts, E), S2 = count(r -> r.S2, E), D = length(O.vd), D_B = length(A.dB), gate = length(O.gate.ids))
@@ -45,10 +45,9 @@ _p3t_ladder(lam, tol) = any(abs(Rational{BigInt}(lam[i]) - Rational{BigInt}(lam[
 # E79: the chk items of D_B by content: method L5, the precision label without its bit count, the horizon of the item itself, which must be the key N_B of the P1 table.
 function _p3t_chk_items(A, nB)
     out = Dict{Tuple{Int, String}, Any}()
-    for (k, it) in A.idx
-        (k[2] == "L5" && "chk" in it.arms) || continue
-        it.horizon == nB || _fail("the check item of orbit $(k[1]) (L5, $(k[3])) has the horizon $(it.horizon), not the key N_B = $nB of the P1 parameter table")
-        out[(k[1], replace(k[3], r"\(\d+\)" => ""))] = it
+    for (key, x) in p3t_chk_items(A.idx)
+        x.item.horizon == nB || _fail("the check item of orbit $(key[1]) (L5, $(x.precision)) has the horizon $(x.item.horizon), not the key N_B = $nB of the P1 parameter table")
+        out[key] = x.item
     end
     return out
 end

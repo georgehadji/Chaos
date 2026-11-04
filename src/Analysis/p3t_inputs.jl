@@ -60,9 +60,9 @@ function p3t_check_manifest(man, c, store)
     end
     byfile = Dict(x.file => x for x in c.chunks)
     for e in man["chunks"]
-        f = basename(chunk_path("", e["ordinal"]))
+        f = basename(chunk_path("", _p3t_entry(e, "ordinal")))
         haskey(byfile, f) || _fail("chunk file $f is listed in the manifest but missing from the store")
-        byfile[f].hash == e["hash"] || _fail("chunk hash of $f differs from the hash in the manifest")
+        byfile[f].hash == _p3t_entry(e, "hash") || _fail("chunk hash of $f differs from the hash in the manifest")
         (byfile[f].status == get(e, "status", "ok")) || _fail("chunk $f has status \"$(byfile[f].status)\" in the file and \"$(get(e, "status", "ok"))\" in the manifest")
     end
     listed = Set(basename(chunk_path("", e["ordinal"])) for e in man["chunks"])
@@ -72,6 +72,9 @@ function p3t_check_manifest(man, c, store)
 end
 
 const P3T_ARMS = ("ref", "ind", "ind_pa1", "d64", "d64_pa1", "chk")
+
+# A field of a manifest chunk entry that analyze reads; a missing field is a refusal naming it.
+_p3t_entry(e, k) = haskey(e, k) ? e[k] : _fail("the manifest chunk entry with ordinal $(get(e, "ordinal", "absent")) has no field \"$k\"")
 
 # E61 l: a chunk of a closure arm that is not complete and not a chunk that failed twice.
 function p3t_check_closure_complete(c)

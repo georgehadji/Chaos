@@ -37,9 +37,9 @@ end
 
 # E78: L1 has no `specs` entry (arm ref): 1e9 times the thread seconds over the steps of the ok L1 chunk entries of the manifest, the rule of the cost report of the runner; `nothing` for no steps.
 function _p3t_cost_l1(man)
-    es = [e for e in man["chunks"] if "ref" in e["arms"] && startswith(e["key"], "method=L1 ") && get(e, "status", "ok") == "ok"]
-    steps = sum((e["steps"] for e in es); init = 0)
-    return steps > 0 ? 1.0e9 * sum((e["thread_seconds"] for e in es); init = 0.0) / steps : nothing
+    es = [e for e in man["chunks"] if "ref" in _p3t_entry(e, "arms") && startswith(_p3t_entry(e, "key"), "method=L1 ") && get(e, "status", "ok") == "ok"]
+    steps = sum((_p3t_entry(e, "steps") for e in es); init = 0)
+    return steps > 0 ? 1.0e9 * sum((_p3t_entry(e, "thread_seconds") for e in es); init = 0.0) / steps : nothing
 end
 
 # The measured costs of the manifest (thread-ns per orbit-step per spec, E78, P119) as the cost keys they replace: tg, fq1, bk1 from the specs of the arm ind, pa1 from those of ind_pa1

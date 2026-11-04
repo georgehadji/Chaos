@@ -1,16 +1,16 @@
 # Study p3-abstention (Amendment D93): the verdicts of I_7 at the ten budgets (E51, table R1 of D89 unchanged), the orbit rows of the calibration and the rows of R_ab (P63).
 
 """
-    p3_verdicts(ctx, ids) -> Dict{(id, X), Vector{Symbol}}
+    p3_verdicts(ctx, ids; hor = X -> (;)) -> Dict{(id, X), Vector{Symbol}}
 
 The verdicts of the seven indicators of I_7 at the ten budgets for the orbits `ids` (E51): table R1 of D89 on the value records of the p2 items at the recorded steps. An item that
-the manifest lists as not applicable gives undecided verdicts. `ctx = (p, idx)` with the p2 table and the item index.
+the manifest lists as not applicable gives undecided verdicts. `ctx = (p, idx)` with the p2 table and the item index; `hor(X)` gives the keyword arguments of `p2_values` (the horizon of E75 on the test side).
 """
-function p3_verdicts(ctx, ids)
+function p3_verdicts(ctx, ids; hor = X -> (;))
     p = ctx.p
     out = Dict{Tuple{Int, Symbol}, Vector{Symbol}}()
     for id in ids, X in P2_I7
-        vals = p2_values(ctx, id, X)
+        vals = p2_values(ctx, id, X; hor(X)...)
         out[(id, X)] = vals === nothing ? fill(:undecided, length(p.budgets)) : Symbol[p2_verdict(X, :R1, v, p) for v in vals]
     end
     return out

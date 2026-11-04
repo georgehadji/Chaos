@@ -33,6 +33,8 @@ function _p3t_chunk(f, path, a)
     m = match(r"^k(\d+):([A-Za-z0-9]+):r(\d+)$", cell)
     arms = String.(a["arms"])
     "ref" in arms && m === nothing && _fail("chunk file $f: the cell \"$cell\" of a ref chunk is not of the form k<K index>:<class>:r<round>")
+    for x in arms; x in P3T_ARMS || _fail("chunk file $f: the arm \"$x\" is not an arm of the test run ($(join(P3T_ARMS, ", ")))"); end
+    String(a["status"]) == "failed" && m === nothing && _fail("chunk file $f: the cell \"$cell\" of a failed chunk is not of the form k<K index>:<class>:r<round> (E74, E77)")
     return (file = f, path = path, ordinal = parse(Int, f[7:11]), key = String(a["chunk_key"]), hash = String(a["chunk_hash"]), arms = arms, ref = "ref" in arms, cell = String(cell),
             kindex = m === nothing ? 0 : parse(Int, m.captures[1]), class = m === nothing ? "" : String(m.captures[2]), round = m === nothing ? 0 : parse(Int, m.captures[3]),
             method = String(a["method"]), status = String(a["status"]), complete = a["complete"] === true, attrs = a)

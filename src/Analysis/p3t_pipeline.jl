@@ -65,6 +65,7 @@ function analyze_p3t(; prereg, manifest, panel, params, store, out, threads::Int
     rec = read_json(calibration_record)
     R = _p3t_reports(I, H, rec, threads)
     dB = p3t_dB(I.c, I.idx)
+    isempty(dB) || p1_params !== nothing || _fail("the P1 parameter table (p1_params) is needed: D_B has $(length(dB)) orbits and table T3 reads N_B and the ladder bound from it")
     decisions = (HA = H.ha.decision, HB = H.hb.decision, HC = H.hc.decision)
     A = (c = I.c, qt = H.qt, theta = H.theta, st = I.st, entries = I.v.entries, man = I.man, items = I.items, idx = I.idx, O = H.O, dB = dB, M = H.M, ha = H.ha, hbr = H.hbr, hb = H.hb, hc = H.hc,
          rab = H.rab, sens = R.sens, power = R.power, f2 = R.f2, f3 = R.f3, decisions = decisions, byid = Dict(r.id => r for r in H.O.rows))

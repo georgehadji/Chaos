@@ -61,3 +61,17 @@ Readings chosen:
 3. chk: D_B is not recorded outside the chk items (the run plan draws it at closure). A missing chk item is refused only where the orbit is known to be in D_B, that is, it carries the other chk item. An orbit missing both items of unlisted chunks is not detectable and is not in D_B.
 
 Results: analysis subset (fixture 41, shape 52, stats 327, params 49, log 45, refusals 5, dispatch 22, pipeline 111, d97 109, d97r 21) all pass, log `d97/d97r-green.log`. Whole suite: 1404801 pass, 0 fail, 0 error, 1 broken (existing weighted-birkhoff), 26m29s, log `d97/d97r-pkg-test.log`; analysis 2659 pass. I47 untouched (no non-p3t file changed). Oracle rerun in `d97v/rework/` (clean and FAULTS=1): 956 of 956 and 951 of 951 equal, 0 differ.
+
+## Rework of the LOW findings (2026-11-04)
+
+Owner decision: the LOW items 5 to 12 are fixed (tests first, test plan "Rework of the LOW findings"; tests not edited after the RED run). Changes in `src/Analysis` (+33/-23):
+
+- 5, `p3t_pipeline.jl`: `analyze_p3t` refuses when D_B is not empty and `p1_params` is not given (T3 reads N_B and the ladder bound from it). With D_B empty the T3 sentence of D95 stays.
+- 6, `p3t_data.jl`: new `p3t_chk_items(idx)`, the chk items by (orbit, precision label without its bit count); a second item for the same pair refuses naming the orbit and both labels. `p3t_dB` and `_p3t_chk_items` (T3) read it, so the refusal comes before any table.
+- 7, 8, `p3t_store.jl`: a chunk with an arm outside the six arms is refused naming the file and the arm; a failed chunk whose cell is not of the form of E74 is refused naming the file and the cell (before: an unnamed "item missing" refusal later).
+- 9: no change. E64 b says "drift on any item read"; the drift set covers every arm read, as written.
+- 10, `p3t_tables.jl`: the T2 opening sentence is the D95 sentence again (I50 allows only the named line changes). The counts stay up to the closing round (E80).
+- 11, `p3_verdict.jl`: `p3_verdicts` takes `hor = X -> (;)`, the keyword arguments of `p2_values`; `p3t_verdict_tables` is now one line over it. The default keeps the calibration path as before (I47; the suite's golden values pass).
+- 12, `p3t_inputs.jl`, `p3t_run.jl`: `_p3t_entry(e, k)` reads a field of a manifest chunk entry or refuses naming the field and the ordinal; used for ordinal, hash, arms, key, steps, thread_seconds.
+
+Results: `an_p3t_d97r.jl` 32 pass (log `d97/low-green.log`). Whole suite: `Chaoslab | 1404812 pass, 1 broken, 1404813 total` (24m01s; broken: existing weighted-birkhoff; analysis 2670), log `d97/low-pkg-test.log`. Oracle compare rerun on copies of the two closed fixture stores (`d97v/low/`): 956 of 956 and 951 of 951 equal, 0 differ.

@@ -76,3 +76,54 @@ end
         @test tryparse(Float64, t10[spec][2]) === nothing && all(o -> tryparse(Float64, t10[o][2]) !== nothing, others)
     end
 end
+
+# ---------------------------------------------------------------- the LOW findings 5 to 12 (owner decision 2026-11-03: fix them too); 9 is E64 b as written and 11 is a refactor, both without a testset here
+@testset "D97r5 analyze without the P1 parameter table refuses when D_B is not empty, naming the P1 parameter table; nothing is written" begin
+    S, I, st = p3t_cached(), p3t_cached_inputs(), p3_cached("d95")
+    c = p3t_clone(p3t_full(), "d97r5")
+    @test an_rejects(() -> AN.analyze(; p3t_an_args(I, st, c)..., p1_params = nothing), ["P1 parameter", "D_B"]) && !ispath(c.out)
+end
+
+@testset "D97r6 two chk items of one orbit and one precision without its bit count (BigFloat(256) and BigFloat(512)) are refused, naming the orbit and the precision" begin
+    S, I, st = p3t_cached(), p3t_cached_inputs(), p3_cached("d95")
+    c = p3t_clone(p3t_full(), "d97r6")
+    p3t_alter_chunk(S, c, I, only(p3t_ords(S; arm = "chk", cell = "k3:C:r1", precision = "Double64")); edit = Dict{String, Any}("precision" => "BigFloat(512)"),
+                    sp_edit = s -> merge(s, (; precision = "BigFloat(512)")))
+    @test an_rejects(() -> AN.analyze(; p3t_an_args(I, st, c)...), ["6", "BigFloat", "twice"]) && !ispath(c.out)
+end
+
+@testset "D97r7 a chunk of an arm outside the six arms of the test run is refused, naming the chunk file and the arm" begin
+    S, I, st = p3t_cached(), p3t_cached_inputs(), p3_cached("d95")
+    c = p3t_clone(p3t_full(), "d97r7")
+    o = first(p3t_ords(S; arm = "chk"))
+    p3t_set_attr(joinpath(c.store, d97_file(o)), "arms", ["zz"])
+    @test an_rejects(() -> AN.analyze(; p3t_an_args(I, st, c)...), [d97_file(o), "\"zz\""]) && !ispath(c.out)
+    @test an_rejects(() -> AN.count_round(; p3t_cr_args(I, st, c)...), [d97_file(o), "\"zz\""])
+end
+
+@testset "D97r8 a failed chunk whose cell is not of the form of E74 is refused, naming the chunk file and the cell" begin
+    S, I, st = p3t_cached(), p3t_cached_inputs(), p3_cached("d95")
+    c = p3t_clone(p3t_full(), "d97r8")
+    o = only(p3t_ords(S; arm = "d64", spec = "tg", cell = "k2:C:r1"))
+    p3t_fail_chunks(S, c, [o])
+    f = joinpath(c.store, d97_file(o))
+    p3t_set_attr(f, "chunk_key", replace(AX.read_chunk_attrs(f)["chunk_key"], r"cell=\S+" => "cell=bogus"))
+    @test an_rejects(() -> AN.analyze(; p3t_an_args(I, st, c)...), [d97_file(o), "\"bogus\""]) && !ispath(c.out)
+end
+
+@testset "D97r10 the T2 sentence is the sentence of D95 (I50): the orbits of the panel file and the rounds counted" begin
+    R = d97_multi()
+    @test d97_ok(R.res)
+    d97_ok(R.res) || return
+    n = length(TOML.parsefile(R.inst.panel)["orbit"])
+    @test occursin("The test draw. Orbits in the panel file: $n; rounds ", d97_sec(R.tab, 2)) && !occursin("the panel file holds", R.tab)
+end
+
+@testset "D97r12 a manifest chunk entry without a field that analyze reads is refused, naming the field and the ordinal" begin
+    S = p3t_cached()
+    o = first(c.ordinal for c in S.chunks if c.arm == "ref" && c.spec == "L1" && c.status == "ok")
+    for k in ("steps", "thread_seconds", "key", "arms")
+        R = d97_costs("d97r12-$k", m -> delete!(first(e for e in m["chunks"] if e["ordinal"] == o), k))
+        @test R.res isa ArgumentError && occursin("\"$k\"", sprint(showerror, R.res)) && occursin("$o", sprint(showerror, R.res)) && !ispath(R.c.out)
+    end
+end

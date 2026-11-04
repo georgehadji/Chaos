@@ -51,26 +51,30 @@ Fresh Sonnet subagent, given the spec and the diff `f385423..cc38b10 -- src/Anal
 | 2 | `p3t_data.jl` `_p3t_double`: a D orbit missing a Double64 item leaves D silently whether or not its d64 or d64_pa1 chunk failed (E77: unlisted chunk, refusal); no separate count of orbits that left D by failure | MEDIUM | fixed in the rework: refused for all four Double64 items of an unlisted chunk; a failed chunk leaves D, counted in abs(D) (E70 and P104 b name no other place) |
 | 3 | `p3t_store.jl:48`: the panel key `class` is not in the required keys; a panel without it gives a bare `KeyError`, not a named refusal | MEDIUM | fixed in the rework: `class` required, named refusal |
 | 4 | `p3t_run.jl:49-55`: the runner writes `measured_ns_per_orbit_step = 0.0` for a spec with zero steps; Analysis accepts 0.0, so E78 "zero sum of steps, not decidable naming the spec" is missed for tg, fq1, bk1, pa1 (L1 handled) | MEDIUM | fixed in the rework: 0.0 is no value, (iii) not decidable naming the spec |
-| 5 | T3 is skipped without the P1 parameters, so the N_B check is not evaluated | LOW | as D95; no change |
-| 6 | `_p3t_chk_items`: duplicate (id, label) after the bit count is stripped overwrite silently; Dict order picks the named mismatch | LOW | owner decision |
-| 7 | `p3t_inputs.jl:56-59`: the six arm names are required in the manifest, but a chunk of an unknown arm is not refused (I51 part) | LOW | owner decision |
-| 8 | `p3t_data.jl:38`: a failed closure chunk with an off-form cell is not recognised; ends in an unnamed "item missing" refusal | LOW | owner decision |
-| 9 | `p3t_data.jl:41`: the drift set is over all items of all arms, now including ind_pa1, d64, d64_pa1, chk (E64 b "any item read") | LOW | owner to confirm intended |
-| 10 | `p3t_tables.jl:26`: the T2 header sentence text changed (I50 allows only named lines) | LOW | owner to accept |
-| 11 | `p3t_verdict_tables` duplicates the body of `p3_verdicts` with a horizon added | LOW | optional |
-| 12 | `p3t_run.jl:36-38`: chunk entry fields indexed directly; a missing field gives a bare `KeyError` | LOW | optional |
-| 13 | size, I47, exact arithmetic: no function over 50 lines, no file over 400; no non-p3t file changed; ladder and lambda stay `Rational{BigInt}` | none | confirmed |
+| 5 | T3 is skipped without the P1 parameters, so the N_B check is not evaluated | LOW | fixed (LOW rework): refused when D_B is not empty |
+| 6 | `_p3t_chk_items`: duplicate (id, label) after the bit count is stripped overwrite silently; Dict order picks the named mismatch | LOW | fixed (LOW rework): refused, naming the orbit and both labels |
+| 7 | `p3t_inputs.jl:56-59`: the six arm names are required in the manifest, but a chunk of an unknown arm is not refused (I51 part) | LOW | fixed (LOW rework): refused, naming the file and the arm |
+| 8 | `p3t_data.jl:38`: a failed closure chunk with an off-form cell is not recognised; ends in an unnamed "item missing" refusal | LOW | fixed (LOW rework): refused, naming the file and the cell |
+| 9 | `p3t_data.jl:41`: the drift set is over all items of all arms, now including ind_pa1, d64, d64_pa1, chk (E64 b "any item read") | LOW | no change: E64 b as written |
+| 10 | `p3t_tables.jl:26`: the T2 header sentence text changed (I50 allows only named lines) | LOW | fixed (LOW rework): D95 sentence restored |
+| 11 | `p3t_verdict_tables` duplicates the body of `p3_verdicts` with a horizon added | LOW | fixed (LOW rework): one body, `hor` keyword |
+| 12 | `p3t_run.jl:36-38`: chunk entry fields indexed directly; a missing field gives a bare `KeyError` | LOW | fixed (LOW rework): refusal naming the field and the ordinal |
+| 13 | size, I47, exact arithmetic: no function over 50 lines, no file over 400; no non-p3t file changed (the LOW rework changes `p3_verdict.jl`, item 11, default unchanged; I47 golden values pass); ladder and lambda stay `Rational{BigInt}` | none | confirmed |
 
 ## Rework after the review (2026-11-03)
 
 Owner decision: fix items 1 to 4. Tests `test/analysis/an_p3t_d97r.jl` (7 testsets, 21 assertions; RED 14 fail, 7 pass guards), code in `p3t_data.jl`, `p3t_store.jl`, `p3t_run.jl` (+33/-8). Analysis subset GREEN; whole package suite `Chaoslab | 1404801 pass, 1 broken, 1404802 total` (broken: existing weighted-birkhoff). Oracle rerun on both campaigns (scratchpad `d97v/rework`): 956 and 951 quantities equal, 0 differ; CLI outputs byte-identical to the library. Readings: the count of orbits that leave D by a failed chunk stays in abs(D); a missing chk item is detectable only when the orbit carries the other chk item (D_B is drawn at closure and not recorded elsewhere).
+
+## Rework of the LOW findings (2026-11-04)
+
+Owner decision: fix items 5 to 12. Six testsets added to `an_p3t_d97r.jl` (RED 10 fail, 22 pass), code in `p3t_pipeline.jl`, `p3t_data.jl`, `p3t_store.jl`, `p3t_tables.jl`, `p3_verdict.jl`, `p3t_inputs.jl`, `p3t_run.jl` (+33/-23; impl notes, "Rework of the LOW findings"). Whole package suite `Chaoslab | 1404812 pass, 1 broken, 1404813 total` (broken: existing weighted-birkhoff). Oracle compare rerun on copies of the two closed fixture stores (scratchpad `d97v/low`): 956 and 951 quantities equal, 0 differ. The CLI comparison was not rerun (the CLI calls the same library code).
 
 ## Audit
 
 | Check | Result |
 |---|---|
 | Evidence | every criterion has a number or run line; D97g, O30, I49 carried by tests only |
-| Review closed | no open CRITICAL, HIGH or MEDIUM (items 1 to 4 fixed in the rework); LOW items 5 to 12 open for the owner |
+| Review closed | no open finding: items 1 to 4 fixed in the rework, items 5 to 8 and 10 to 12 in the LOW rework, item 9 is E64 b as written |
 | Analysis defect found by the oracle | none |
 
 ## Notes for the owner

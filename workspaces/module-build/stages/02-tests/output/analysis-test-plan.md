@@ -929,3 +929,18 @@ Owner decision: the four MEDIUM findings of the independent review (`analysis-d9
 Reading for finding 2: E70 and P104 b say "leaves the set and is counted"; they name no table line or key. The test pins the count through |D| (`sets.counts.D`), no new key (D95n).
 
 RED run (log `d97/d97r-red.log`, driver `d97/driver.jl` with the D95 and D97 files, code at cc38b10): D95 and D97 files unchanged and green (fixture 41, shape 52, stats 327, params 49, log 45, refusals 5, dispatch 22, pipeline 111, d97 109); `an_p3t_d97r.jl`: 7 pass (guards), 14 fail, 0 error. Causes: the module accepts the missing chk and d64 items (no refusal), the panel without class gives no ArgumentError (a later `KeyError`), and a spec of 0.0 is read as a measured cost (sensitivity decidable).
+
+### Rework of the LOW findings (2026-11-04)
+
+Owner decision ("fix lows too"): the LOW items 5 to 12 of the review. Six testsets appended to `test/analysis/an_p3t_d97r.jl` (no existing test edited, no helper changed). Item 9 is E64 b as written (drift on any item read) and item 11 is a refactor without a change of behaviour: no testset for either; the whole suite covers 11.
+
+| Item | Testset | Assertions | Pins |
+|---|---|---|---|
+| 5 | D97r5 | `analyze` with `p1_params = nothing` on the full store (D_B not empty): refusal naming the P1 parameter table and D_B, no output folder (1) | E79, I50 |
+| 6 | D97r6 | the chk Double64 chunk of cell k3:C:r1 relabelled BigFloat(512): orbit 6 carries BigFloat(256) and BigFloat(512); refusal naming `6`, `BigFloat` and `twice` (1) | E79, E61 k |
+| 7 | D97r7 | one chk chunk with the arms attribute `["zz"]`: `analyze` and `count_round` refuse naming the chunk file and `"zz"` (2) | E81, I51 |
+| 8 | D97r8 | a d64 tg chunk failed twice with the cell `bogus` in its key: refusal naming the chunk file and `"bogus"` (1) | E74, E77 |
+| 10 | D97r10 | on the multi-failure store: T2 opens with the D95 sentence `Orbits in the panel file: <n>; rounds ` and has no `the panel file holds` (2, with the run guard) | I50 |
+| 12 | D97r12 | the first ok L1 ref entry without `steps`, `thread_seconds`, `key`, `arms` (one run each): ArgumentError naming the field and the ordinal, no output folder (4) | E78 |
+
+RED (log `d97/low-red.log`, code at 0d56640): 22 pass (the 21 of the MEDIUM rework and the run guard of D97r10), 10 fail, 0 error.

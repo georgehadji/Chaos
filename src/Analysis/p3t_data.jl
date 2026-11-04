@@ -58,14 +58,7 @@ end
 # E75: SALI, FLI and MEGNO read the tg item at N_c, the horizon of the arms ind and d64; every other indicator keeps the horizon of its item.
 _p3t_hor(p2, X) = X in (:SALI, :FLI, :MEGNO) ? (horizon = p2.N_c,) : (;)
 
-function p3t_verdict_tables(ctx, ids)
-    out = Dict{Tuple{Int, Symbol}, Vector{Symbol}}()
-    for id in ids, X in P2_I7
-        vals = p2_values(ctx, id, X; _p3t_hor(ctx.p, X)...)
-        out[(id, X)] = vals === nothing ? fill(:undecided, length(ctx.p.budgets)) : Symbol[p2_verdict(X, :R1, v, ctx.p) for v in vals]
-    end
-    return out
-end
+p3t_verdict_tables(ctx, ids) = p3_verdicts(ctx, ids; hor = X -> _p3t_hor(ctx.p, X))
 
 """
     p3t_orbits(c, st, idx, theta) -> NamedTuple
@@ -130,12 +123,24 @@ function _p3t_double(rows, ctx, theta, c, panel)
     return out
 end
 
+# E79: the chk items by (orbit, precision label without its bit count); two items of one orbit and one such label refuse (E61 k).
+function p3t_chk_items(idx)
+    out = Dict{Tuple{Int, String}, Any}()
+    for (k, it) in idx
+        (k[2] == "L5" && "chk" in it.arms) || continue
+        key = (k[1], replace(k[3], r"\(\d+\)" => ""))
+        haskey(out, key) && _fail("orbit $(k[1]) carries the check item L5 in $(key[2]) twice (arm chk, labels $(out[key].precision) and $(k[3])): the check reads one item per precision (E61 k, E79)")
+        out[key] = (precision = k[3], item = it)
+    end
+    return out
+end
+
 """
 The orbits of D_B (E64 c): the orbits that carry the L5 item in Double64 in a chunk of the arm chk; their flag in_D must be set. An orbit with only one of the two chk items is known to be in D_B by that item: the
 other is a refusal unless its chunk failed twice (E61 k, E77); an orbit whose Double64 chunk failed has no Double64 item and leaves D_B (P118). An orbit with neither item is not known to D_B.
 """
 function p3t_dB(c, idx)
-    have = Set((k[1], replace(k[3], r"\(\d+\)" => "")) for (k, it) in idx if k[2] == "L5" && "chk" in it.arms)
+    have = Set(keys(p3t_chk_items(idx)))
     cell = Dict(Int(o["id"]) => p3t_cell_of(o) for o in c.panel_orbits)
     for (id, _) in have, prec in ("Double64", "BigFloat")
         (id, prec) in have || _p3t_failed_in(c.chunks, "chk", get(cell, id, ""), prec) ||

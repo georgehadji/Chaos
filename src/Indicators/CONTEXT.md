@@ -1,9 +1,9 @@
 # Indicators
 
-Chaos indicators as reducers of the tangent stream and the pure functions behind them. Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer), so the shared norm `safe_norm` comes from Foundation (D69). Runs: sali (I2), fli-ofli (I5, FLI only; OFLI to M5), megno (I8), rli (I9), stretching-numbers (I10, L13; added the reducer workspace to Tangent), naff-fma (I12, I12b: frequency map analysis of an orbit series, the one module that reads the orbit, not the deviation matrix; no Tangent change), weighted-birkhoff (I13: weighted Birkhoff averages of K observables of the orbit; a second reader, reuses the naff weight and sums).
+Chaos indicators as reducers of the tangent stream and the pure functions behind them. Imports Foundation, Systems and Tangent; never a Lyapunov module (a peer layer), so the shared norm `safe_norm` comes from Foundation (D69). Runs: sali (I2), gali (I3: GALI_k, k = 2..K, nested QR; spec G1, D106, D107), fli-ofli (I5, FLI only; OFLI to M5), megno (I8), rli (I9), stretching-numbers (I10, L13; added the reducer workspace to Tangent), naff-fma (I12, I12b: frequency map analysis of an orbit series, the one module that reads the orbit, not the deviation matrix; no Tangent change), weighted-birkhoff (I13: weighted Birkhoff averages of K observables of the orbit; a second reader, reuses the naff weight and sums).
 
 - Per run, in `workspaces/module-build/stages/`: spec `01-spec/output/<run>-spec.md`, test plan `02-tests/output/<run>-test-plan.md`, notes `03-implement/output/<run>-impl-notes.md`; sali also `04-verify/output/sali-verification.md`.
-- Spec labels and decisions: sali A1 to A16, criteria 1 to 18 (D66, D67, D68); fli-ofli Q1 to Q13, 1 to 16 (D71, D72); megno M1 to M13, 1 to 15 (D73, D74); rli RL1 to RL13, 1 to 15 (D75 to D77); stretching-numbers SN1 to SN17, 1 to 16 (D78, D79); naff-fma NF1 to NF34, criteria 1 to 15, D80a to D80c, D81a, D81b (D80, D81, D82); weighted-birkhoff WB1 to WB18, criteria 1 to 13 (D83, D84, D85).
+- Spec labels and decisions: sali A1 to A16, criteria 1 to 18 (D66, D67, D68); gali B1 to B13, criteria 1 to 21 (D106, D107); fli-ofli Q1 to Q13, 1 to 16 (D71, D72); megno M1 to M13, 1 to 15 (D73, D74); rli RL1 to RL13, 1 to 15 (D75 to D77); stretching-numbers SN1 to SN17, 1 to 16 (D78, D79); naff-fma NF1 to NF34, criteria 1 to 15, D80a to D80c, D81a, D81b (D80, D81, D82); weighted-birkhoff WB1 to WB18, criteria 1 to 13 (D83, D84, D85).
 
 ## Files
 
@@ -11,6 +11,7 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 |------|-------|
 | `Indicators.jl` | module, exports, include order |
 | `sali.jl`, `alignment.jl` | `SALI` reducer and its isbits state `SALIState` (`k = 2`); `alignment_indices`, `sali_pair`, `sali_from_log`, `sali_floor`, `check_frame` (SALI method) |
+| `gali.jl` | `GALI` reducer and its isbits state `GALIState` (`2 <= k <= d`), `gali_values`, `gali_value`, `gali_floor`, `check_frame` (GALI method); loops over `MMatrix` stack buffers (d = 200 compiles in 0.1 s) |
 | `fli.jl` | `FLI` reducer and its isbits state `FLIState` (`k = 2`), `check_frame` (FLI method), `fli_unlogged` |
 | `megno.jl` | `MEGNO` reducer and its isbits state `MEGNOState` (`k = 2`, five compensated sums per column), `check_frame` (MEGNO method) |
 | `rli.jl` | `RLI` reducer and its isbits state `RLIState` (`k = 2`, pair frame), `check_frame` (RLI method), `pair_start`, `pair_distance` |
@@ -23,8 +24,8 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 | Name | What it does |
 |------|--------------|
 | `SALI()` | reducer for `k = 2`: compensated `ln` of both column norms, columns renormalised, `SALI(n) = min(d_-, d_+)` from the stored unit columns; final `(n, sali, L, sum, comp, floor)` with `L = -(S_1 + S_2)` |
-| `alignment_indices(a, b)`, `sali_pair(a, b)`, `sali_from_log(L)`, `sali_floor(T)` | `(d_minus, d_plus)` of two nonzero vectors; their `min`; SALI from `L = ln GALI_2` without cancellation (spec A4); the floor `4 effective_eps(T)` |
-| `check_frame(SALI(), W0; orbit)` | `SALI(0)` of a supplied frame, or `NumericalHealthError("initial frame")` below `10 sali_floor(T)` |
+| `alignment_indices(a, b)`, `sali_pair(a, b)`, `sali_from_log(L)`, `sali_floor(T)`, `check_frame(SALI(), W0; orbit)` | `(d_minus, d_plus)` of two nonzero vectors; their `min`; SALI from `L = ln GALI_2` without cancellation (spec A4); the floor `4 effective_eps(T)`; `SALI(0)` of a supplied frame, or `NumericalHealthError("initial frame")` below `10 sali_floor(T)` |
+| `GALI()`, `gali_values(W)`, `gali_value(W, k)`, `gali_floor(T, k)`, `check_frame(GALI(), W0; orbit)` | reducer for `k = K` columns: `(G_2..G_K)` from a twice-orthogonalised nested QR of the unit columns, `L` (K = d, bitwise the sali `L` at d = 2); the pure evaluation; the floor `2 k effective_eps(T)`; `G_K(0)` or `"initial frame"` below `10 gali_floor` |
 | `FLI(; replace = true)` | reducer for `k = 2`: compensated `ln` of both column lengths read before normalisation, running maxima `FLI_B` (basis, primary) and `FLI_1` (first column) including the `s = 0` term, maximisers; `replace = false` leaves `W` to a later reducer; final `(n, fli, fli1, sum, comp, stepB, colB, step1)` |
 | `MEGNO(; replace = true)` | reducer for `k = 2`: per column the compensated log sum (bitwise that of SALI, FLI, L1) and the weighted sums `R1 = sum n a`, `R2 = sum n^2 a`, `Q = sum Y`, `Q2 = sum 3 R2`; delivers `Y`, `Ybar` (standard (1,-1) form) and `Ybar20` (the (2,0) mean, regular level 1/2) per column, column 1 primary; `replace = false` leaves `W` to a later reducer; final `(n, handoffs, Y, Ybar, Ybar20, sum, comp, R1, R2, Q, Q2)`, the series `SVector{2}` |
 | `check_frame(FLI() or MEGNO(), W0; orbit)` | larger norm defect of a supplied frame, or `NumericalHealthError("initial frame")` above `8 eps` |
@@ -66,10 +67,10 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 
 ## Limits
 
-- Deferred: GALI_k (D70) and OFLI (flows, D71) go to M5; L14 (FTLE grids) is an Experiments product (D78).
+- Deferred: OFLI (flows, D71) goes to M5; L14 (FTLE grids) is an Experiments product (D78).
 - Callers that supply an initial frame must run `check_frame` on it before the stream (D67); the stream does not, and a dependent frame would read as SALI = 0.
 - `sali_from_log` loses accuracy near SALI = sqrt 2 (condition number about 1 / cos(phi), spec Amendment D68, R1); use the direct form there.
-- The computed SALI lies in [0, sqrt 2 (1 + 2 eps)] (R2). For BigFloat the floor follows the default precision at call time.
+- The computed SALI lies in [0, sqrt 2 (1 + 2 eps)] (R2). For BigFloat the floor follows the default precision at call time. GALI: values below `gali_floor(T, k)` are unresolved, never clipped; `L` (K = d) carries the depth; `check_frame` is the caller's (D107e).
 - One replacer per chain, placed last (D71): `FLI(replace = false)` and `MEGNO(replace = false)` before `SALI`; `FLI()` or `MEGNO()` alone. A wrong position gives wrong numbers without an error (fli review R2), and the run record does not show `replace` or the chain (R1). Experiments builds and records chains under this rule (`src/Experiments/CONTEXT.md`).
 - MEGNO needs a supplied frame to be unit-length (`check_frame(MEGNO(), W0)` before the stream), else `s(0) = 0` is wrong. The regular level 2 (0.5 for `Ybar20`) needs a deviation with a component across the invariant curve (spec F3, M9); `Y` of a vector along it is 0. Level and growth laws are approached slowly (O(ln K / K)); thresholds are pre-registered per study, the module never stops an orbit.
 - MEGNO in Double64 over long lifted orbits: the log sums inherit the Double64 sin and cos floor at large lifted arguments from L1 (a factor 1.64 over 8 eps Psi_n at |x| near 1e6, K = 10); use the wrapped state there. For bounded or regular orbits Y carries about n eps / 10 absolute from the products of the weights and the increments (megno spec, stage 04 notes, R3).

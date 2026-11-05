@@ -7,21 +7,26 @@
 function ga_check_orbit(b, snaps, K::Int, ::Type{T}) where {T}
     d, epsT = b.d, ga_eps(T)
     bits = T === BigFloat ? 2 * GA_BITS : GA_BITS            # the reference of an oracle-grade (BigFloat) run is at twice the precision
-    r = (G = 0.0, L = 0.0, agree = 0.0, floorbad = 0, nonfinite = 0)
+    r = (G = 0.0, L = 0.0, agree = 0.0, floorbad = 0, nonfinite = 0, skipped = 0)    # skipped: handoffs below the reference depth GA_GREF_MIN (D108c), reported
     for s in snaps
         ic = findfirst(==(s.n), b.cps)
         psi, lam, Gref = b.psi[ic], b.lam[ic], b.ref.G[s.n]
         for k in 2:K
             gr = Float64(Gref[k - 1])
             B = ga_BG(epsT, k, lam[k], gr, psi)
-            r = merge(r, (G = max(r.G, ga_err(s.gali[k - 1], Gref[k - 1]; bits = bits) / B),))
-            gr < ga_meas(T, k) && (r = merge(r, (floorbad = r.floorbad + (s.gali[k - 1] <= 2 * ga_meas(T, k) ? 0 : 1),)))
+            if gr >= GA_GREF_MIN
+                r = merge(r, (G = max(r.G, ga_err(s.gali[k - 1], Gref[k - 1]; bits = bits) / B),))
+            else
+                r = merge(r, (skipped = r.skipped + 1,))
+            end
+            # D108b: below the floor the value is at most 2 B_meas + B_G^k (a reference of exactly 0 or a non-finite bound is neither a pass nor a fail)
+            gr < ga_meas(T, k) && gr > 0 && isfinite(B) && (r = merge(r, (floorbad = r.floorbad + (s.gali[k - 1] <= 2 * ga_meas(T, k) + B ? 0 : 1),)))
         end
         if K == d
             isfinite(s.L) || (r = merge(r, (nonfinite = r.nonfinite + 1,)))
-            r = merge(r, (L = max(r.L, ga_err(s.L, ga_Lref(b.ref, s.n; bits = bits); bits = bits) / ga_BL(epsT, psi)),))
+            r = merge(r, (L = max(r.L, ga_err(s.L, ga_Lref(b.ref, s.n; bits = bits); bits = bits) / ga_BL(epsT, psi, b.amax[ic])),))
             gd = Float64(Gref[d - 1])
-            if gd >= 10 * ga_meas(T, d)
+            if gd >= max(10 * ga_meas(T, d), GA_GREF_MIN)
                 Bd = ga_BG(epsT, d, lam[d], gd, psi) + 8 * epsT * gd * sum(psi)
                 r = merge(r, (agree = max(r.agree, Float64(abs(s.gali[d - 1] - exp(s.L))) / Bd),))
             end
@@ -89,7 +94,7 @@ end
                 (-sum(b.ref.S[n][1:(d - 1)]), ga_Lref(b.ref, n))
             end
             total += 1
-            bad += ga_err(Lp, Lr) > 10 * ga_BL(ga_eps(Float64), b.psi[ic]) ? 1 : 0
+            bad += ga_err(Lp, Lr) > 10 * ga_BL(ga_eps(Float64), b.psi[ic], b.amax[ic]) ? 1 : 0
         end
     end
     @test total > 0 && bad == total
@@ -114,7 +119,7 @@ end
                 worstG = max(worstG, Float64(abs(runs[tau].snaps[i].gali[k - 1] - runs[1].snaps[i].gali[k - 1])) / (2 * B))
             end
             for tau in (2, 5, 10)
-                worstL = max(worstL, Float64(abs(runs[tau].snaps[i].L - runs[1].snaps[i].L)) / (2 * ga_BL(ga_eps(T), psi)))
+                worstL = max(worstL, Float64(abs(runs[tau].snaps[i].L - runs[1].snaps[i].L)) / (2 * ga_BL(ga_eps(T), psi, b.amax[ic])))
             end
         end
     end
@@ -208,20 +213,21 @@ end
     # Counts of unresolved orders are reported (BigFloat(256) resolves only about ln(1/(10 B_meas)) = 174, Double64 66, so the high orders are carried by the log form).
     cases = vcat([(ga_y3(6.0, 0.1, 0.3), "Y3 nu=6"), (ga_y3(4.04, 0.1, 0.3), "Y3 nu=4.04")],
                  [(ga_y4(N, 0.05, 0.04; ring = ring), "Y4 N=$N ring=$ring") for N in (GA_FULL ? (2, 3, 5, 10) : (2, 3, 5)) for ring in (false, true) if !(ring && N < 3)])
-    ns = [40, 80, 100, 200]
     tot, early = (ok = 0, bad = 0, unres = 0), 0
     for (ci, (c, label)) in enumerate(cases), j in 1:ga_size(2, 5)
         d = ga_d(c)
         K = d <= 10 ? d : 6
+        ns = d <= 10 ? [40, 80, 100, 200] : [40, 80, 100, 200, 400, 800]    # D108d: gated window (100, 200) for d <= 10, (400, 800) for d > 10
+        g1, g2 = d <= 10 ? (3, 4) : (5, 6)
         l = ga_exponents(c)
         E = Float64[Float64(ga_Ek(l, k)) for k in 1:K]
         for T in (BigFloat, Double64)
             T === BigFloat && !GA_FULL && d > 6 && continue
             r = ga_fixed_run(c, T, K, (ga_seed(11, 1), 10 * ci + j), ns)
-            ok, bad, unres = ga_law_counts(r.snaps[3], r.snaps[4], E, K, T)
+            ok, bad, unres = ga_law_counts(r.snaps[g1], r.snaps[g2], E, K, T)
             tot = (ok = tot.ok + ok, bad = tot.bad + bad, unres = tot.unres + unres)
             @test bad == 0
-            early += ga_law_counts(r.snaps[1], r.snaps[2], E, K, T)[2]
+            early += ga_law_counts(r.snaps[d <= 10 ? 1 : 3], r.snaps[d <= 10 ? 2 : 4], E, K, T)[2]    # the other window, reported
         end
         if K == d
             r = ga_fixed_run(c, Float64, K, (ga_seed(11, 1), 10 * ci + j), ns)
@@ -248,7 +254,7 @@ end
     # Y3 origin at (0.5, 0.1, 1e-3) and Y4 origin N in {2, 3} (N = 5 with GA_FULL), K = -1, eps = 0.3 (elliptic modes), seeded frames (D38: 2 per system), K = d, n <= 2000,
     # Float64: G_k in [0.05, 1 + B_meas] for all k = 2..K and every handoff, and the fitted slope of ln G_k against ln n over [100, 2000] has absolute value at most 0.2 (G_k
     # constant, B8 Eq. (38)); the slopes are reported.
-    cases = vcat([(GA_Y3A, "Y3")], [(ga_y4(N, -1.0, 0.3), "Y4 N=$N") for N in (GA_FULL ? (2, 3, 5) : (2, 3))])
+    cases = vcat([(GA_Y3A, "Y3")], [(ga_y4(N, -1.0, N == 5 ? 0.2 : 0.3), "Y4 N=$N") for N in (GA_FULL ? (2, 3, 5) : (2, 3))])    # D108e: eps = 0.2 at N = 5 (eps = 0.3 is hyperbolic there)
     for (ci, (c, label)) in enumerate(cases), j in 1:ga_size(2, 5)
         d = ga_d(c)
         r = ga_fixed_run(c, Float64, d, (ga_seed(12, 1), 10 * ci + j), collect(1:2000))

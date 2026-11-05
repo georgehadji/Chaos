@@ -171,3 +171,27 @@ Approved by the owner at the stage 02 checkpoint (test plan `../../02-tests/outp
 - D107j (criterion 15(a)): the floor ratio is taken on the chaotic panel (2, 0.5, 0.1) over starts that reach both floors, at least half of them.
 - D107k (criterion 18(b)): applied where the wrapped and lifted orbits stay together (regular starts n in {10, 100}, chaotic starts n = 10).
 - D107l (criteria 3(e), 16(c), 17, 20): scale factors 2^+-498 (exact); 4D overflow map diag(mu, 1, 1/mu, 1); in 17(a) the read-only trace precedes the replacer; for d = 200 the frames are seeded Gaussian frames.
+
+## Amendment D108 (2026-11-05)
+
+Approved by the owner at the stage 04 checkpoint ("Amend spec, fix MEDIUM"). Evidence: `../../04-verify/output/gali-verification.md`, "Evidence table" and "Findings" 1 to 7, and its "Independent review" finding 1. In none of the failures does the module disagree with its 256-bit reference; the bounds, data or references of the criteria are corrected. Items a to i override the criteria they name; item j changes the health rule.
+
+### Acceptance criteria (amendment)
+
+- D108a (B10, criteria 9(b), 10(a), 21(a)): the log-form bound carries the lifted-state factor of coupled-maps criterion 1: B_L(n) = 32 eps (1 + a_max(n)) sum_{i<=d} Psi_n^(i), a_max(n) the largest absolute coordinate of the realised state up to n (wrapped state: at most 2 pi plus the momentum range). Reason: the tangent is evaluated at rounded sums of large lifted coordinates (a_max 9e3 to 3e4 on chaotic Y3 starts at n 500 to 700); realised error over the new form at most 0.15 (Float64), 0.0026 (Double64). The 9(c) and 5 forms are unchanged.
+- D108b (criteria 9(d), 21(a) floor control): where G_k,ref < B_meas(T, k) the computed value is at most 2 B_meas(T, k) + B_G^k(n) (the full direct-form bound, whose Lambda term exceeds the floor on chaotic starts). Realised: 3 order-handoffs (Y4 N = 5) and 53 (GPU, Y4 N = 2) were above 2 B_meas and inside B_G^k.
+- D108c (criteria 9(a), 9(c), 15(b), reference depth): the same-orbit reference is valid where G_k,ref >= 1e-70 (256-bit unit columns resolve the volume above 2^-232); handoffs below are counted and reported, and a reference of exactly 0 or a non-finite Lambda term is never a pass or a fail. The log form 9(b) is gated at every handoff (D107b reference).
+- D108d (criterion 11): the gated window is (100, 200) for d <= 10 and (400, 800) for d > 10 (Y4 N = 10); the other window is reported. Reason: for N = 10 the transient of the 20 exponents lasts past n = 200 (28 of 50 orders outside 0.5 at (100, 200), 0 at (400, 800)).
+- D108e (criterion 12(a), data): Y4 N = 5 uses eps = 0.2. With K = -1, eps = 0.3 the open chain N = 5 has mode value K + eps lambda_max = +0.0854 (hyperbolic, lambda_max = 3.618); "elliptic modes" holds for N <= 3 at eps = 0.3 and for N = 5 at eps = 0.2 (mode value -0.276). Realised at eps = 0.2: slope at most 0.0072.
+- D108f (criterion 13): the exponents come from singular values whose log sum is within 1e-6 of ln abs(det) of the product (0 for symplectic products); handoffs failing this check are counted and reported, not gated (6 of 61 orbits at n = 800 at 256 bits). The stability bound abs(c_k(n_2) - c_k(100)) is 5.0 (was 1.0, a P6 proposal; realised 4.0 on one Y4 N = 3 start whose exponents converge slowly); abs(c_k) <= 15 stays (realised 14.83).
+- D108g (criterion 14): the full-size pass rate is 50 percent, as the package suite (D107i); the realised rate (56.7 percent, 34 of 60) is reported. The bands of orbit C stay gated. Reason: the law is loose (K18), and the share of starts on lower-dimensional or resonant tori depends on the start box, not on the module.
+- D108h (criterion 19(b)): the 10 percent exclusion allowance applies to regular starts; on chaotic starts the exclusion share at n = 1000 is a property of the Float64 floor and is reported (59 and 65 percent realised). Where the oracle orbit is not bitwise the stream orbit, each side is checked against the 256-bit reference at its own orbit (the orbit-divergence form of 19(a)).
+- D108i (criterion 21(b), chaotic class): gated as each backend against its own 256-bit reference at its own orbit points (21(a) with D108a, D108b); the CPU-GPU gap is reported in units of the plain bound sum. The orbit-divergence term D_orb of B11 for d >= 4 is not formed (open, as sali criterion 18 for d = 2).
+
+### Health (amendment)
+
+- D108j (review finding 1, A16, criterion 7(b), 16): a column with a raw norm below floatmin(T) (subnormal) is a health failure like a zero column: `reducer_step` sets the failure code with that column, kind "deviation matrix", threshold floatmin(T); `gali_values` and `check_frame` treat it as non-finite input (no finite value above the bound 1). Reason: the unit column of a subnormal column is rounded to a few ulps of the subnormal grid; `gali_values([1,2,3],[5e-324,5e-324,0])` gave 1.1649 (true 0.8238). Tests first (stage 02 rework). The sali reducer has the same guard (zero or non-finite only); it is not changed here.
+
+### Test-side (amendment)
+
+- D108k: the package tests follow D108a to g (helpers `ga_BL` with the a_max factor, `ga_Lambda` and the reference gate of D108c, the criterion 11 window by d, the criterion 12 eps for N = 5, the criterion 13 singular-value check and constant, the criterion 14 full-size rate); `verify/gali.jl` and the gali section of `verify/gpu.jl` follow D108a to i.

@@ -115,3 +115,25 @@ red            |    5     46     51  7.8s
 ```
 
 The other suites were not run in this stage (the driver runs the gali suite alone; the main project lacks the test extras).
+
+## Rework D108 (2026-11-05)
+
+Owner approval of spec Amendment D108 at the stage 04 checkpoint. Tests first for the code change (D108j), then the test-side changes (D108k). Nothing else in `test/gali/` changed.
+
+New file `test/gali/ga_d108.jl` (included last from `runtests.jl`), one testset "D108j subnormal column norm is a health failure" with 20 assertions, Float64 and Double64 (BigFloat has no reachable subnormal range: `floatmin(BigFloat)` is 2e-323228497, so the guard is the same code but cannot be exercised): `reducer_step` on a frame with the column `[5e-324, 5e-324, 0]` fails with column 2, kind "deviation matrix", threshold `floatmin(T)` in `reducer_error`, finite value below `floatmin(T)`, `W` unchanged; `reducer_update` throws the same error; `gali_values` returns no finite value above 1 (non-finite for the orders containing that column); `check_frame` rejects the frame ("initial frame", step 0, the orbit id); a column of norm just above `floatmin(T)` (2 `floatmin` times a direction) is accepted, gives the values of the scaled frame within 1e-12 and passes `check_frame`.
+
+RED (against the stage 03 code, standalone, helpers only): 6 pass, 14 fail, 0 error (the 14 are the assertions on the failure code, the threshold, `gali_values` and `check_frame`; the 6 are the accepted-column assertions). GREEN after the code change: 20 of 20.
+
+Test-side changes (D108k):
+
+| Item | Change |
+|---|---|
+| D108a | `ga_BL(epsT, psi, amax = 0.0) = 32 eps (1 + amax) sum(psi)`; the bundle carries `amax` (largest absolute coordinate of the realised orbit up to each checkpoint); `ga_check_orbit` and AC9(b), AC10a use it (AC11 fixed point: a_max 0) |
+| D108b | AC9(d) floor control: computed value at most `2 B_meas + B_G^k` where the reference is below `B_meas` (reference exactly 0 or non-finite bound: neither pass nor fail) |
+| D108c | `ga_Lambda` drops terms whose log ratio is not finite; AC9(a) is gated where `G_ref >= GA_GREF_MIN = 1e-70` (skipped handoffs counted in `skipped`), AC9(c) requires `G_d,ref >= max(10 B_meas, 1e-70)`; the log form 9(b) stays gated at every handoff |
+| D108d | AC11 window: `(100, 200)` for `d <= 10`, `(400, 800)` for `d > 10` (snapshots at 40, 80, 100, 200, 400, 800 for Y4 N = 10); the other window is counted as before |
+| D108e | AC12a: Y4 N = 5 uses eps = 0.2 |
+| D108f | AC13: `ga_offsets` returns `valid[n]` (the log sum of the 256-bit singular values within 1e-6 of ln abs(det) of the product); invalid handoffs are counted and reported, not gated; stability bound `abs(c_k(n_2) - c_k(100)) <= 5.0`; `abs(c_k) <= 15` unchanged |
+| D108g | AC14: pass rate 0.5 at every size (was 0.7 at the full size) |
+
+Package-size result after the rework: gali suite 2724 of 2724 (2704 before plus the 20 of `ga_d108.jl`), 0 fail. At the package sizes none of the changes alters a verdict (the failures D108 corrects appear at the full sizes of `verify/gali.jl`).

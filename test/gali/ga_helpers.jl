@@ -296,14 +296,18 @@ function ga_psis(Ms::AbstractVector{<:AbstractMatrix{Float64}}, W0::AbstractMatr
 end
 
 # Lambda_n^(k) = sum_{j=1..n} G_k,ref(n) / G_k,ref(j) (the sali A15 form with k columns); the ratio is clipped at e^700 (a scale, not a value).
-ga_Lambda(lnGk::AbstractVector{Float64}, n::Int) = sum(j -> exp(min(lnGk[n] - lnGk[j], 700.0)), 1:n)
+# D108c: NaN-safe, a term whose log ratio is not finite (a reference of exactly 0, ln = -Inf, or a NaN) is dropped, never propagated.
+ga_Lambda(lnGk::AbstractVector{Float64}, n::Int) = sum(j -> (v = lnGk[n] - lnGk[j]; isfinite(v) ? exp(min(v, 700.0)) : 0.0), 1:n)
+# D108c: the same-orbit reference is valid above this volume (256-bit unit columns resolve it above 2^-232 ~ 1e-70).
+const GA_GREF_MIN = 1e-70
 # B10: direct form bound B_G^k(n) and log form bound B_L(n); epsT = effective eps of the element type, psi the K-vector Psi_n^(i).
 # The multiplier of B_L is 32 here, the spec proposes 8: the reference stub of stage 02 realises error / (8 eps sum Psi) up to 1.54 on strongly chaotic starts
 # (the per-handoff rounding of ln alpha_i is a few eps per column, more than the 2 eps of the direction error the 8 was derived from), so the gate carries a
 # factor 4; stage 04 reports the realised ratios (P5).
 const GA_BL_MULT = 32
 ga_BG(epsT, k, Lam, Gref, psi) = 4 * k * epsT * (Lam + Gref * sum(view(psi, 1:k))) + 2 * k * epsT
-ga_BL(epsT, psi) = GA_BL_MULT * epsT * sum(psi)
+# D108a: B_L(n) = 32 eps (1 + a_max(n)) sum Psi, a_max the largest absolute coordinate of the realised state up to n (default 0: no state, K = 0 shear).
+ga_BL(epsT, psi, amax = 0.0) = GA_BL_MULT * epsT * (1 + amax) * sum(psi)
 
 const GA_CACHE = Dict{Any, Any}()
 
@@ -316,7 +320,8 @@ function ga_bundle_core(sysT, c, x0, W0, N::Int, cps; bits = GA_BITS, sysB = not
     psi = ga_psis(Ms, W0, cps)
     K = size(W0, 2)
     lam = [[ga_Lambda(ref.lnG[k, :], n) for k in 1:K] for n in cps]
-    return (x0 = x0, W0 = W0, cps = collect(Int, cps), ref = ref, psi = psi, lam = lam, d = size(W0, 1))
+    amaxs = accumulate(max, [Float64(maximum(abs, Float64.(p))) for p in pts])
+    return (x0 = x0, W0 = W0, cps = collect(Int, cps), ref = ref, psi = psi, lam = lam, amax = [amaxs[n] for n in cps], d = size(W0, 1))
 end
 
 # Everything a same-orbit criterion needs for one start of Y3 or Y4: realised orbit in T, seeded frame (K = d columns unless W0 is given), reference, Psi and Lambda

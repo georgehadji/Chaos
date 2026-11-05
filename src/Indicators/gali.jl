@@ -11,7 +11,7 @@ sum `S_i`, replaces `W` by its column-normalised matrix and evaluates `G_k = GAL
 `(n, gali, L, sum, comp, floor)`: `gali` the `SVector{K - 1}` `(G_2, ..., G_K)` at the last handoff `n`; `L = -(S_1 + ... + S_d)` the
 log form `ln GALI_d` of an orthonormal initial frame when `K = d` (for `d = 2` bitwise the [`SALI`](@ref) `L`), `nothing` when
 `K < d`; `sum` and `comp` the `K` sums and their compensation terms; `floor` the measurement floors [`gali_floor`](@ref) of the
-orders `2..K`. A zero or non-finite column norm is recorded as a health failure ("deviation matrix", the first failing column) and
+orders `2..K`. A zero, subnormal (below `floatmin(T)`) or non-finite column norm is recorded as a health failure ("deviation matrix", the first failing column) and
 leaves the sums and `W` unchanged. Isbits state, no allocation after warm-up, no library factorisation (the stream kernel compiles).
 """
 struct GALI end
@@ -100,11 +100,13 @@ end
 `(G_2, ..., G_K)` of the `d x K` matrix `W` (`SMatrix` or `Matrix`, any element type, BigFloat included): each column is divided by
 its scaled norm, then a nested QR (modified Gram-Schmidt, each column orthogonalised twice) gives `G_k = prod_{i <= k} abs(R_ii)` for
 every `k` at once (spec B2 iv): the volume of the parallelepiped of the first `k` unit columns, `0` for dependent columns, within
-[`gali_floor`](@ref) of the true value. A non-finite column gives non-finite values. Written for fixed sizes, no library call.
+[`gali_floor`](@ref) of the true value. A non-finite or subnormal column norm gives non-finite values for the orders that contain that column. Written for fixed sizes, no library call.
 """
 function gali_values(W::SMatrix{D, K}) where {D, K}
     K >= 2 || throw(ArgumentError("GALI needs a matrix with at least 2 columns, got $K"))
-    return _gram_inplace!(_unit_buffer(W, ntuple(j -> _norm_col(W, j, Val(D)), Val(K))), Val(D), Val(K))
+    a = ntuple(j -> _norm_col(W, j, Val(D)), Val(K))
+    a = map(x -> 0 < x < floatmin(typeof(x)) ? oftype(x, NaN) : x, a)    # D108j: a subnormal column is non-finite input
+    return _gram_inplace!(_unit_buffer(W, a), Val(D), Val(K))
 end
 gali_values(W::AbstractMatrix) = gali_values(SMatrix{size(W, 1), size(W, 2)}(W))
 
@@ -118,10 +120,11 @@ function gali_value(W::AbstractMatrix, k::Integer)
     return gali_values(Matrix(W)[:, 1:k])[k - 1]
 end
 
-# First column with a zero or non-finite norm, 0 if none.
+# First column with a norm below floatmin (zero or subnormal, D108j) or non-finite, 0 if none.
 @inline function _first_bad(a::NTuple{K}) where {K}
+    fm = floatmin(eltype(a))
     for i in 1:K
-        (isfinite(a[i]) && a[i] > 0) || return i
+        (isfinite(a[i]) && a[i] >= fm) || return i
     end
     return 0
 end
@@ -151,7 +154,8 @@ reducer_failed(::GALI, st::GALIState) = st.code != 0
 
 function reducer_error(::GALI, st::GALIState, orbit, backend)
     value = Float64(st.value)
-    return NumericalHealthError("deviation matrix", value, isfinite(value) ? 0.0 : Inf, st.step, orbit, backend, st.column)
+    threshold = !isfinite(value) ? Inf : iszero(value) ? 0.0 : Float64(floatmin(typeof(st.value)))
+    return NumericalHealthError("deviation matrix", value, threshold, st.step, orbit, backend, st.column)
 end
 
 # Left-to-right sums of the K sums and of the K compensation terms, then the negative of their total (d = 2: the sali form).

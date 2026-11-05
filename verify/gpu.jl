@@ -13,7 +13,7 @@ CHILD || @eval using CUDA
 
 const SEED = 20261012
 const ROOT = normpath(joinpath(@__DIR__, ".."))
-# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli, stretching, naff, weighted-birkhoff, coupled-maps) runs only those sections; the
+# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli, stretching, naff, weighted-birkhoff, coupled-maps, gali) runs only those sections; the
 # default runs everything. Skipping "record" needs an existing data/gpu-benchmark.toml for the launch budget.
 const ONLY = get(ENV, "GPU_ONLY", "")
 want(tag) = isempty(ONLY) || tag in strip.(split(ONLY, ','))
@@ -2289,6 +2289,160 @@ want("coupled-maps") && let
             probe_run = on_gpu(sys, [SVector{d,Double64}(ntuple(i -> Double64(i) / 7, d))], 2; k = 4, seed = CM_SEED)[2]
             row("AC18", "Double64 kernel gate, $nm: compile or reason (explicit :gpu run ends on the CPU with the reason recorded in provenance)",
                 probe_run === nothing ? "ran on GPU" : probe_run, "compile or reason", fb(reason))
+        end
+    end
+end
+
+
+# ---------------------------------------------------------------------------- AC21 (gali, spec criterion 21, B11, Amendment D107a)
+# Panels of sali criterion 18 transposed to Y3 (0.5, 0.1, 1e-3) / (2, 0.5, 0.1) and Y4 (N = 2, 5): regular class (small-amplitude starts, 1024 orbits, lifted, n = 4e4; N = 5: n = 1e4)
+# and chaotic class (uniform starts, 1024 orbits, n = 8), K = 4 (= d for Y3 and Y4 N = 2: the log form L is checked too), seeded frames passed explicitly (W0), tau = 1, Float64 on the
+# device; Double64: the compile gate (FALLBACK with the recorded reason is the pass). (a) Each backend against the 256-bit product at its OWN realised orbit points (the GPU orbit is read
+# with a trace kernel and its final state is checked bitwise against the propagate result), on the first NREF orbits (the reference costs about a second per 1e4 steps and orbit):
+# |G_k - G_ref| <= B_G^k(n) for the orders with G_ref >= B_meas (D108b; was 10 B_meas), the floor control for the others, |L - L_ref| <= B_L(n) = 32 eps (1 + a_max(n)) sum Psi (D108a; the floor control allows 2 B_meas + B_G^k, D108b). (b) Orbits whose final states agree
+# within 1e-9: |G_cpu - G_gpu| <= B_cpu + B_gpu (2 B_G^k) and |L_cpu - L_gpu| <= B_L,cpu + B_L,gpu (the sum of the two single-backend log bounds; the B11 form 16 eps sum Psi is reported
+# as a ratio too). D108i: in the chaotic class (b) is reported in units of the plain bound sum (INFO, not gated; the orbit-divergence term D_orb of B11 is not formed) and 21(a) gates it; in the regular class (b) is gated.
+# The realised gap is reported in units of the bound.
+MODTAG[] = "gali: "
+if want("gali")
+    include(joinpath(ROOT, "test", "gali", "ga_helpers.jl"))      # ga_*: GACase, ga_ref, ga_psis, bounds (definitions only; no @test runs at load)
+    for f in ("ga_ac01_04.jl", "ga_ac05_08.jl", "ga_ac09_12.jl")
+        for e in Meta.parseall(read(joinpath(ROOT, "test", "gali", f), String)).args
+            e isa Expr && e.head in (:function, :const, :(=)) && Core.eval(Main, e)
+        end
+    end
+end
+const GSEED = 20261012 + 40950
+
+function gali_gpu_trace_kernel!(D, X, sys, steps)
+    j = (blockIdx().x - 1) * blockDim().x + threadIdx().x
+    if j <= length(X)
+        x = X[j]
+        for i in 1:steps
+            D[j, i] = x
+            x = forward(sys, x)
+        end
+        X[j] = x
+    end
+    return nothing
+end
+function gali_gpu_trace(sys, x0::Vector{S}, N; chunk = 5000) where {S}
+    m = length(x0)
+    X = CuArray(x0)
+    P = Matrix{S}(undef, m, N)
+    for s0 in 0:chunk:N-1
+        s1 = min(s0 + chunk, N)
+        D = CuArray{S}(undef, m, s1 - s0)
+        @cuda threads = 256 blocks = cld(m, 256) gali_gpu_trace_kernel!(D, X, sys, s1 - s0)
+        P[:, s0+1:s1] = Array(D)
+        CUDA.unsafe_free!(D)
+    end
+    return P, Array(X)
+end
+
+# reference data of one orbit at the points pts (any backend): 256-bit reference at the final step, Psi, Lambda
+function gali_ref_at(c, sysT, pts, W0, N)
+    ref = ga_ref(c, pts, W0, [N])
+    Ms = [Float64.(Matrix(tangent(sysT, p))) for p in pts]
+    psi = ga_psis(Ms, W0, [N])[1]
+    lam = [ga_Lambda(ref.lnG[k, :], N) for k in 1:size(W0, 2)]
+    return (ref = ref, psi = psi, lam = lam)
+end
+
+function gali_gpu_row(tag, c, T, Z, N, K; nref, chaotic = false)
+    d = ga_d(c); m = length(Z); epsT = ga_eps(T)
+    sysT = ga_sys(T, c)
+    W0s = [ga_frame(GSEED, j, T, d, K) for j in 1:m]
+    kw = (k = K, tau = 1, seed = GSEED, reducers = (GALI(),))
+    lab = "$tag, $T, K = $K, $m orbits, n = $N, tau = 1"
+    propagate(sysT, Z[1:8], 2; kw..., W0 = W0s[1:8], backend = :cpu)
+    cpu = propagate(sysT, Z, N; kw..., W0 = W0s, backend = :cpu)
+    gpu, why = on_gpu(sysT, Z, N; kw..., W0 = W0s)
+    why === nothing || return row("AC21", lab * ": each backend against its own BigFloat reference", "-", "<= 1", fb(why))
+    P, XN = gali_gpu_trace(sysT, Z[1:nref], N)
+    same_g = count(j -> XN[j] == gpu.x[j], 1:nref); same_c = count(j -> ga_pts(sysT, Z[j], N)[2] == cpu.x[j], 1:nref)
+    row("AC21", lab * ": the reference orbit reproduces the backend's final state bitwise (first $nref orbits), CPU / GPU", "$same_c / $same_g of $nref", "$nref / $nref", "INFO")
+    wG = Dict(:cpu => 0.0, :gpu => 0.0); wL = Dict(:cpu => 0.0, :gpu => 0.0); fl = Dict(:cpu => 0, :gpu => 0)
+    pairG = 0.0; pairL = 0.0; pairL16 = 0.0; nenter = 0; nout = 0
+    for j in 1:nref
+        ptsc, _ = ga_pts(sysT, Z[j], N)
+        ptsg = [P[j, i] for i in 1:N]
+        bc = gali_ref_at(c, sysT, ptsc, W0s[j], N); bg = gali_ref_at(c, sysT, ptsg, W0s[j], N)
+        rows = Dict()
+        amx = Dict(:cpu => maximum(maximum(abs, Float64.(p)) for p in ptsc), :gpu => maximum(maximum(abs, Float64.(p)) for p in ptsg))    # D108a: a_max up to n
+        for (nm, res, b) in ((:cpu, cpu, bc), (:gpu, gpu, bg))
+            f = res.finals[j][1]
+            for k in 2:K
+                gr = Float64(b.ref.G[N][k - 1])
+                B = ga_BG(epsT, k, b.lam[k], gr, b.psi)
+                if gr >= ga_meas(T, k)      # D108b: the floor control is for G_ref < B_meas only; above it the direct bound B_G^k holds
+                    wG[nm] = max(wG[nm], ga_err(f.gali[k - 1], b.ref.G[N][k - 1]) / B)
+                else
+                    fl[nm] += (f.gali[k - 1] <= 2 * ga_meas(T, k) + B || !isfinite(B)) ? 0 : 1    # D108b
+                end
+            end
+            K == d && (wL[nm] = max(wL[nm], ga_err(f.L, ga_Lref(b.ref, N)) / ga_BL(epsT, b.psi, amx[nm])))
+            rows[nm] = (f = f, b = b)
+        end
+        dx = maximum(abs, cpu.x[j] .- gpu.x[j])
+        if dx <= 1e-9
+            nenter += 1
+            for k in 2:K
+                grc = Float64(bc.ref.G[N][k - 1]); grg = Float64(bg.ref.G[N][k - 1])
+                (grc >= 10 * ga_meas(T, k) && grg >= 10 * ga_meas(T, k)) || continue
+                Bc = ga_BG(epsT, k, bc.lam[k], grc, bc.psi); Bg = ga_BG(epsT, k, bg.lam[k], grg, bg.psi)
+                pairG = max(pairG, Float64(abs(rows[:cpu].f.gali[k - 1] - rows[:gpu].f.gali[k - 1])) / (Bc + Bg))
+            end
+            if K == d
+                pairL = max(pairL, Float64(abs(rows[:cpu].f.L - rows[:gpu].f.L)) / (ga_BL(epsT, bc.psi, amx[:cpu]) + ga_BL(epsT, bg.psi, amx[:gpu])))
+                pairL16 = max(pairL16, Float64(abs(rows[:cpu].f.L - rows[:gpu].f.L)) / (16 * epsT * (sum(bc.psi) + sum(bg.psi)) / 2))
+            end
+        else
+            nout += 1
+        end
+    end
+    for nm in (:cpu, :gpu)
+        row("AC21", lab * ": backend $nm: max |G_k - G_ref| / B_G^k over resolved orders, first $nref orbits (floor-control violations: $(fl[nm]))", wG[nm], "<= 1", pf(wG[nm] <= 1 && fl[nm] == 0))
+        K == d && row("AC21", lab * ": backend $nm: max |L - L_ref| / B_L (B_L = 32 eps (1 + a_max) sum Psi, D108a)", wL[nm], "<= 1", pf(wL[nm] <= 1))
+    end
+    dxall = [maximum(abs, cpu.x[j] .- gpu.x[j]) for j in 1:m]
+    row("AC21", lab * ": orbits with final states apart by more than 1e-9, CPU vs GPU, of $m (bitwise equal: $(count(==(0), dxall)); max $(fmt(maximum(dxall))))", count(>(1e-9), dxall), "reported", "INFO")
+    row("AC21", lab * ": orbits of the first $nref entering part (b) (final states within 1e-9): $nenter, others $nout", nenter, "reported", "INFO")
+    row("AC21", lab * ": entering orbits: max |G_cpu - G_gpu| / (B_cpu + B_gpu)" * (chaotic ? " (D108i: reported, plain bound sum without D_orb)" : ""), pairG, chaotic ? "reported" : "<= 1", chaotic ? "INFO" : pf(pairG <= 1))
+    K == d && row("AC21", lab * ": entering orbits: max |L_cpu - L_gpu| / (B_L,cpu + B_L,gpu); in units of the B11 form 16 eps sum Psi (mean of the two) it is $(fmt(pairL16))" * (chaotic ? " (D108i: reported)" : ""), pairL, chaotic ? "reported" : "<= 1", chaotic ? "INFO" : pf(pairL <= 1))
+end
+
+function gali_try(label, f)
+    try
+        f()
+    catch e
+        row("AC21", label * ": kernel on the device compile / run error", sprint(showerror, e)[1:min(end, 1500)], "compiles", "FAIL")
+    end
+end
+
+want("gali") && let
+    rng = StableRNG(GSEED)
+    for (nm, c, Nreg, nref) in (("Y3 (0.5, 0.1, 1e-3)", GA_Y3A, 40_000, 8), ("Y4 N=2 (K=-1, eps=0.3)", ga_y4(2, -1.0, 0.3), 40_000, 8), ("Y4 N=5 (K=-1, eps=0.2)", ga_y4(5, -1.0, 0.2), 10_000, 4))
+        d = ga_d(c)
+        Zr = [SVector{d,Float64}(ga_draw_regular(rng, c)) for _ in 1:1024]
+        gali_try(nm * " regular", () -> gali_gpu_row(nm * " regular class (small-amplitude starts)", c, Float64, Zr, Nreg, 4; nref = nref))
+    end
+    for (nm, c) in (("Y3 (2, 0.5, 0.1)", GA_Y3B), ("Y4 N=2 (K=3, eps=0.6102)", ga_y4(2, 3.0, 0.6102)), ("Y4 N=5 (K=3, eps=0.2)", ga_y4(5, 3.0, 0.2)))
+        d = ga_d(c)
+        Zc = [SVector{d,Float64}(ga_draw_chaotic(rng, c)) for _ in 1:1024]
+        gali_try(nm * " chaotic", () -> gali_gpu_row(nm * " chaotic class (uniform starts)", c, Float64, Zc, 8, 4; nref = 1024, chaotic = true))
+    end
+    # Double64 compile gate
+    reason = gpu_reason(Double64)
+    for (nm, c) in (("Y3 (2, 0.5, 0.1)", GA_Y3B), ("Y4 N=2 (K=3, eps=0.6102)", ga_y4(2, 3.0, 0.6102)), ("Y4 N=5 (K=3, eps=0.2)", ga_y4(5, 3.0, 0.2)))
+        d = ga_d(c)
+        if isempty(reason)
+            Zc = [SVector{d,Double64}(Double64.(ga_draw_chaotic(rng, c))) for _ in 1:256]
+            gali_try(nm * " Double64", () -> gali_gpu_row(nm * " chaotic class", c, Double64, Zc, 8, 4; nref = 256))
+        else
+            sysD = ga_sys(Double64, c)
+            probe_run = on_gpu(sysD, [SVector{d,Double64}(ntuple(i -> Double64(i) / 7, d))], 2; k = 4, seed = GSEED, reducers = (GALI(),))[2]
+            row("AC21", "Double64 kernel gate, $nm, K = 4: compile or reason (explicit :gpu run ends on the CPU with the reason recorded in provenance)", probe_run === nothing ? "ran on GPU" : probe_run, "compile or reason", fb(reason))
         end
     end
 end

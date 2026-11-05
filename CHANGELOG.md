@@ -4,6 +4,10 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 ## Unreleased
 
+## 0.2.0 (2026-11-05)
+
+M4 release (D101): the chaos indicators layer, studies p2-indicators and p3-abstention. Julia 1.13 or later (D100).
+
 ### Added
 
 - `Chaoslab.Indicators` layer with the `SALI` reducer (Smaller Alignment Index and its log form for `k = 2`), `alignment_indices`, `sali_pair`, `sali_from_log`, `sali_floor` and `check_frame`. Verified at module-build stage 04 against closed forms, the Lyapunov L1 estimator on the identical orbit, ChaosTools GALI_2 and the local GPU (catalog row I2 `verified`; decisions D66, D67, D68).

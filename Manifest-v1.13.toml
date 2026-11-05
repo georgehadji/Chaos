@@ -71,7 +71,7 @@ version = "0.5.0"
 deps = ["Dates", "DoubleFloats", "HDF5", "JSON", "KernelAbstractions", "LinearAlgebra", "PrecompileTools", "SHA", "StableRNGs", "StaticArrays", "TOML"]
 path = "."
 uuid = "1d9ee621-a3a2-43c0-acfa-d3a4a467f53c"
-version = "0.1.2"
+version = "0.2.0"
 
     [deps.Chaoslab.extensions]
     ChaoslabCUDAExt = "CUDA"

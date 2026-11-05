@@ -8,7 +8,7 @@ Julia 1.13 or later:
 
 ```julia
 using Pkg
-Pkg.add(url = "https://github.com/georgehadji/Chaos", rev = "v0.1.2")
+Pkg.add(url = "https://github.com/georgehadji/Chaos", rev = "v0.2.0")
 ```
 
 ## Example

@@ -10,7 +10,7 @@ Chaoslab needs Julia 1.13 or later. It is not in the General registry; add it fr
 
 ```julia
 using Pkg
-Pkg.add(url = "https://github.com/georgehadji/Chaos", rev = "v0.1.2")
+Pkg.add(url = "https://github.com/georgehadji/Chaos", rev = "v0.2.0")
 ```
 
 The GPU path is a package extension: it loads when `CUDA` is installed and imported. The figures of the analysis layer are an extension on `CairoMakie`.

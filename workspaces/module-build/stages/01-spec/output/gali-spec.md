@@ -205,3 +205,9 @@ Owner instruction after stage 05: form the CPU-GPU orbit term for d >= 4 (the op
 - D109c (review finding 3): `gali_values(::AbstractMatrix)` and `check_frame(GALI(), W0)` with a non-static matrix are type-stable (concrete inferred return type) and bitwise equal to the `SMatrix` path on the same input; first-call time at d = 200, K = 4 reported. The non-static path returns a `Vector{T}` of G_2..G_K (the `SMatrix` path keeps the `SVector{K-1}`).
 - D109d (review finding 4): non-float `Real` element types are converted to `float(T)` before evaluation in `gali_values`, `gali_value` and `check_frame` (`effective_eps(float(T))`).
 - D109e (tests): `test/gali/ga_d109.jl` carries b to d, tests first; a is a verify-environment item (`verify/gpu.jl`, gali section).
+
+## Amendment D110 (2026-11-06)
+
+Owner decision ("Skip under forced checks") after CI failed AC17c on every gali commit from stage 03 (8 assertions, Julia 1 and 1.13, Ubuntu and Windows).
+
+- D110a (criterion 17(c), test-side): the 0-byte claim holds for runs with the default bounds checking. Under `--check-bounds=yes` (the `julia-runtest` default in CI) every `@inbounds` is ignored and the `MMatrix` work buffer escapes to the heap (144 bytes per handoff for Y3, K = 4, Float64; locally 1 440 000 bytes over 1e4 steps, the CI value; coverage alone allocates 0). The AC17c assertions record `@test_skip` when `Base.JLOptions().check_bounds == 1`; the claim stays gated by every local `Pkg.test()` and the stage 03 and 04 runs. No code change.

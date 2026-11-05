@@ -149,3 +149,7 @@ Review findings 2 to 4 (LOW), spec Amendment D109 b, c, d. Tests first. New file
 | D109d | Integer matrices (exact 0/1 entries, general `Int`, `Int32`, `Rational`) give `float(T)` values equal to the Float64 evaluation, on the `Matrix` and `SMatrix` paths; `check_frame` returns a `Float64`, rejects dependent integer columns with `NumericalHealthError` |
 
 RED (against the D108 code, standalone with the helpers, `scratchpad/ga05/red109.out`): 6 pass, 18 fail, 5 error, 29 counted. A testset stops at its first error, so D109c (error at its first `@inferred`) and part of D109d (`effective_eps(Int)` in `check_frame`) are counted short. GREEN: 103 of 103; whole gali suite 2827 of 2827 (2724 + 103).
+
+## Rework D110 (2026-11-06)
+
+CI (`julia-runtest`, `--check-bounds=yes`) failed the 8 AC17c assertions from stage 03 on: forced bounds checks move the `MMatrix` buffer to the heap (local reproduction: 1 440 000 bytes for Y3, Float64, tau = 1, 1e4 steps, as in CI; `--code-coverage=user` alone gives 0). `ga_ac17_20.jl`, AC17c: when `Base.JLOptions().check_bounds == 1` the 8 assertions are `@test_skip` (counted as broken), else unchanged. No other test changed.

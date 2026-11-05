@@ -186,3 +186,14 @@ Verified keys used (all in `_config/bibliography/references.bib`; none listed in
 - P10. Published numbers are loose (criterion 20, risk K18): proposed unscored for pass/fail of the build, reported to the owner. The 5 x 10^-2 versus 8 x 10^-3 discrepancy (Findings (d)): proposed to use 8 x 10^-3.
 - P11. Catalog and benchmarks edits at stage 05: fix the source column of rows Y3 and Y4 (Findings (a)); add benchmark rows for SALI of orbits C and D and for the origin spectra; whether Y3 and Y4 flip to verified together. Proposed: together.
 - P12. For the later gali k > 2: this module supplies the fixed orbits C and D and the identities of Equations item 10; a ChaosTools k > 2 oracle does not exist (P8 of gali-spec stays open). Proposed: gali k > 2 is verified against the exact tangent products of criterion 13 and against the closed forms of Skokos2007 Eq. (43) with the pairing, not against an external package.
+
+## Amendment D104 (2026-11-05)
+
+Approved by the owner at the stage 02 checkpoint (test plan `../../02-tests/output/coupled-maps-test-plan.md`, "Readings of the spec", R4 and R13; the measured numbers are there).
+
+### Acceptance criteria (amendment)
+
+- D104a (replaces the off-block bound of criterion 12): the off-block entries of (U (+) U)^T M(0) (U (+) U) are below 16 N eps_T (1 + a_max). Reason: for an eigensolver of the symmetric matrix G(0) the orthogonality error of U grows with N; the base bound gave ratios 0.02, 0.6, 20 and 44 at N = 2, 10, 50, 100, the amended one 0.44 at N = 100.
+- D104b (reading of criteria 11 and 12): a mode whose trace lies within the rounding band of +2 or -2 (exactly parabolic in the grid, for example K = 1, eps = -0.5 at even N) is not classed; its trace is checked, its class and exponent are asserted only outside the band.
+- D104c (criterion 18): the comparison of 1 and 8 CPU threads runs at stage 04 (one process cannot change its thread count); the package suite compares a serial loop with the threaded loop of the running process.
+

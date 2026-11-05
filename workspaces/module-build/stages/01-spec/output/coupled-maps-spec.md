@@ -197,3 +197,14 @@ Approved by the owner at the stage 02 checkpoint (test plan `../../02-tests/outp
 - D104b (reading of criteria 11 and 12): a mode whose trace lies within the rounding band of +2 or -2 (exactly parabolic in the grid, for example K = 1, eps = -0.5 at even N) is not classed; its trace is checked, its class and exponent are asserted only outside the band.
 - D104c (criterion 18): the comparison of 1 and 8 CPU threads runs at stage 04 (one process cannot change its thread count); the package suite compares a serial loop with the threaded loop of the running process.
 
+
+## Amendment D105 (2026-11-05)
+
+Owner decision after stage 03 (2e7228c): rework the chain state first, so that Y4 runs through the tangent stream and the GPU path like Y3. Approved by the owner at the stage 02 checkpoint of the rework (test plan, "Rework D105"). P8 is settled: the Y4 systems (lifted and wrapped) accept, besides any vector state, a fixed-size state of length 2N (lifted) or 4N (wrapped, layout (q, p, q-counts, p-counts)); with a fixed-size state the step returns a fixed-size state of the same length, and the one-step tangent (and inverse tangent) at a fixed-size state is a banded operator, not a dense matrix: its entries equal the dense tangent, and its product with a fixed-size frame of k vectors returns a fixed-size frame computed with the banded structure (operations linear in N). The system value is plain data (no heap fields), so it can be passed to a GPU kernel.
+
+### Acceptance criteria (amendment)
+
+- D105a (fixed-size state, equality): for N in {2, 3, 5, 10, 100}, open and ring, the parameter grid of criterion 1, Float64 and Double64: forward, inverse, the entries of tangent and inverse tangent, and their frame products at a fixed-size state are bitwise equal to the vector-state results (and to the banded frame action of criterion 17), lifted and wrapped.
+- D105b (stream): the tangent stream on the CPU backend with Y4 at N in {2, 5}, 2000 seeded orbits, k = 4, lifted and wrapped: final states and deviation frames bitwise equal to a plain serial loop of forward and banded tangent products (as criterion 18 for Y3).
+- D105c (plain data and allocation): the Y4 system values are isbits; one step and one frame product at a fixed-size state allocate 0 bytes after warm-up for N in {2, 10, 100}.
+- D105d (criterion 18 for Y4, stage 04): the GPU against CPU comparison of criterion 18 for Y4 at N in {2, 5}, 10^4 orbits, runs through the stream with fixed-size states.

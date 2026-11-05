@@ -118,3 +118,41 @@ Command (repo root): `julia --project=<scratchpad>/cm02/testenv -t2 <scratchpad>
 | AC19 zero allocation | | 5 | UndefVarError `FroeschleMap` / `StandardMapChain` |
 
 Because a missing name aborts most testsets at their first helper call, the bodies of the later assertions are validated by the stub run above, not by the RED run.
+
+## Rework D105 (2026-11-05)
+
+Stage 02 rework for spec Amendment D105 (fixed-size Y4 states and a banded tangent operator). New file `test/coupled-maps/cm_d105.jl` (122 lines), included by one line in `test/coupled-maps/runtests.jl`; no other test changed. D105d is stage 04.
+
+| Criterion | Test (testset) | What it checks |
+|-----------|----------------|----------------|
+| D105a | `D105a fixed-size state equals vector state` (18 nested testsets, one per T, N, boundary) | N in {2, 3, 5, 10, 100}, open and ring (ring N >= 3), Float64 and Double64, lifted and wrapped: `forward`, `inverse` return an SVector bitwise equal to the Vector result; `Matrix(tangent)` and `Matrix(inverse_tangent)` at an SVector are bitwise the dense Vector-state tangents; `ChainTangent * SMatrix` is an SMatrix bitwise equal to `tangent_action!` and `inverse_tangent_action!`; `torus_state(wsys, ::SVector)` and `lift(wsys, ::SVector)` bitwise equal the Vector forms. N <= 10: six (K, eps) of the Y4 panel, 2 seeded points each (seed CM_SEED + 105001); N = 100: two parameter sets, 1 point |
+| D105b | `D105b tangent stream equals plain loop` (4 nested testsets) | `propagate` CPU backend, N in {2, 5}, K = 3, eps = 0.2, lifted and wrapped, 2000 seeded orbits (CM_SEED + 105002), k = 4, n = n_H, tau = n, explicit seeded W0: final x and W bitwise equal to the serial loop `W = tangent(sys, x) * W; x = forward(sys, x)`; plus `tangent(sys, SVector)` is a `ChainTangent` and the loop stays in SVector and SMatrix types |
+| D105c | `D105c plain data and allocation` | `isbitstype` of lifted and wrapped chain values (N in {2, 3, 10, 100}, both boundaries, both types); 0 bytes for `forward`, `inverse`, `tangent(..) * W`, `inverse_tangent(..) * W` at an SVector, N in {2, 10, 100}, lifted and wrapped, both types (seed CM_SEED + 105003) |
+| D105d | none (stage 04) | GPU against CPU comparison of criterion 18 for Y4, N in {2, 5}, 10^4 orbits, fixed-size states |
+
+### Assumed API (D105)
+
+- `ChainTangent`: banded tangent operator, `AbstractMatrix`, exported from Systems (so visible after `using Chaoslab`); `size` is `(2N, 2N)`, `Matrix(M)` gives the dense entries; `M * W` for an `SMatrix{2N, k}` returns an `SMatrix{2N, k}`. Modelled on `PairTangent` (src/Systems/pair.jl). Wrapped chain: the operator has size `(2N, 2N)`, from the first `2N` entries of the `4N` state.
+- `forward`, `inverse` on an `SVector` of length 2N (lifted) or 4N (wrapped) return an `SVector` of the same length and element type; `tangent`, `inverse_tangent` return a `ChainTangent`.
+- `torus_state(sys::WrappedStandardMapChain, z::SVector)` returns an `SVector` of length 4N; `lift(sys::WrappedStandardMapChain, s::SVector)` returns an `SVector` of length 2N.
+- The wrapped struct keeps the documented field `chain` (the test reads `wsys.chain` to call `tangent_action!` at a wrapped state; those actions read only the first `2N` entries).
+- `propagate(sys, x0::Vector{SVector{s, T}}, n; k, tau, seed, W0)` with `s = 2N` or `4N` (signature as in the AC18 Y3 test, plus `W0`).
+
+### Readings (D105)
+
+- RD1: "bitwise" is `isequal` on the results (so `-0.0` and `0.0` differ), as the house tests. A zero off the band in `Matrix(ChainTangent)` must therefore have the sign of the dense `tangent!` zero (`+0.0`).
+- RD2: the frame product of the wrapped chain is compared with the banded action of `wsys.chain` at the wrapped vector state; the dense `tangent(sys, v) * W` is not used as a bitwise reference (different accumulation order), only the entries of the operator are compared with the dense matrix.
+- RD3: D105b uses one handoff (`tau = n`, no reducers) and explicit `W0`, so the reference loop is the stream body without reorthonormalisation; random initial frames of `propagate` are not needed. The wrapped initial states carry random integer counts in -3:3.
+- RD4: the cost of N = 100 is limited by compile time, so N = 100 uses two parameter sets and one point per case; the other N use the whole panel.
+- RD5: D105c "allocate 0 bytes" is measured on the pure forms `forward`, `inverse`, `tangent(..) * W`, `inverse_tangent(..) * W` (not the `!` forms, which exist already and are covered by AC19); the isbits checks are guards that pass today.
+- RD6: spec text "(and to the banded frame action of criterion 17)" is taken as `tangent_action!` / `inverse_tangent_action!` of the existing chain, the AC17 reference.
+
+### RED log (D105)
+
+Command: the stage 02 RED command with `myred.jl` (coupled-maps suite only), 2 threads; wall time 34 s including compile (the N = 100 SVector cases: D105a 3.3 s in total, first N = 100 testsets 0.5 s Float64 and 1.0 s Double64, because they fail at the first `ChainTangent` use and compile only the vector paths; the real compile cost is measured at stage 03/04). Result: 592 Pass, 16 Fail, 22 Error, 0 Broken (630 records).
+
+- The 556 existing assertions all pass (592 = 556 + 36 new passing guards: 8 in D105b, 28 isbits in D105c).
+- D105a: 18 Error, all `UndefVarError: ChainTangent not defined` (one per T, N, boundary testset).
+- D105b: 4 Error (`UndefVarError: ChainTangent`), 4 Fail (the loop leaves SVector and SMatrix types: the current dense-Matrix fallback returns bitwise equal values, so the bitwise tests pass today and only the type checks fail), 8 Pass.
+- D105c: 12 Fail (nonzero allocation of `forward`, `inverse` and the frame products from the dense fallback; one failing case at N = 100 showed 3264 B per step and about 653 kB per frame product), 28 Pass (isbits guards).
+- No parse errors, no helper bugs, no warnings; the only exception kind is `UndefVarError` on `ChainTangent`.

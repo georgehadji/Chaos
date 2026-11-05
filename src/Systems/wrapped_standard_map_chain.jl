@@ -57,8 +57,8 @@ function inverse!(out, w::WrappedStandardMapChain, s)
     return _guard_counts!(out, 2N, 2N)
 end
 
-forward(w::WrappedStandardMapChain, s::AbstractVector) = forward!(similar(s), w, s)
-inverse(w::WrappedStandardMapChain, s::AbstractVector) = inverse!(similar(s), w, s)
+forward(w::WrappedStandardMapChain, s::AbstractVector) = forward!(similar(s, _promoted(w.chain, s)), w, s)
+inverse(w::WrappedStandardMapChain, s::AbstractVector) = inverse!(similar(s, _promoted(w.chain, s)), w, s)
 
 # W-E3: the tangent depends on the reduced positions only
 tangent!(M, w::WrappedStandardMapChain, s) = tangent!(M, w.chain, s)
@@ -93,9 +93,10 @@ function lift(w::WrappedStandardMapChain, s::AbstractVector)
     return [s[j] + tp * s[d + j] for j in 1:d]
 end
 
+# Error messages here are constant: string interpolation allocates and does not compile in a GPU kernel (D105d).
 # Fixed-size states (SVector of length 4N, amendment D105): the steps as tuples, same expressions and order as the in-place forms.
 function _check_wrapped(m, S)
-    (S % 4 == 0 && m.N == S ÷ 4) || throw(DimensionMismatch("chain of $(m.N) sites with a wrapped state of length $S"))
+    (S % 4 == 0 && m.N == S ÷ 4) || throw(DimensionMismatch("wrapped state length is not 4N for this chain"))
     return S ÷ 4
 end
 
@@ -140,14 +141,14 @@ function inverse_tangent(w::WrappedStandardMapChain, s::SVector{S}) where {S}
 end
 
 function torus_state(w::WrappedStandardMapChain, z::SVector{d, T}) where {d, T}
-    d == dimension(w) || throw(DimensionMismatch("lifted state of length $d for a chain of dimension $(dimension(w))"))
+    d == dimension(w) || throw(DimensionMismatch("lifted state length is not 2N for this chain"))
     tp = 2 * _pi(z[1])
     return vcat(_reduced(z, tp)...)
 end
 
 function lift(w::WrappedStandardMapChain, s::SVector{S}) where {S}
     d = S ÷ 2
-    (iseven(S) && d == dimension(w)) || throw(DimensionMismatch("wrapped state of length $S for a chain of dimension $(dimension(w))"))
+    (iseven(S) && d == dimension(w)) || throw(DimensionMismatch("wrapped state length is not 4N for this chain"))
     tp = 2 * _pi(s[1])
     return SVector{d}(ntuple(j -> s[j] + tp * s[d + j], Val(d)))
 end

@@ -13,14 +13,19 @@ struct StandardMapChain{T} <: AbstractMap
     K::T
     eps::T
     ring::Bool
+    function StandardMapChain{T}(N::Integer, K, eps, ring::Bool) where {T}
+        2 <= N <= 100 || throw(ArgumentError("number of sites N must be in 2:100, got $N"))
+        ring && N < 3 && throw(ArgumentError("a ring needs N >= 3, got $N"))
+        return new{T}(Int(N), K, eps, ring)
+    end
 end
 
+StandardMapChain(N::Integer, K::T, eps::T, ring::Bool) where {T} = StandardMapChain{T}(N, K, eps, ring)
+
 function StandardMapChain(N::Integer, K, eps; boundary::Symbol = :open)
-    2 <= N <= 100 || throw(ArgumentError("number of sites N must be in 2:100, got $N"))
     boundary in (:open, :ring) || throw(ArgumentError("boundary must be :open or :ring, got :$boundary"))
-    boundary === :ring && N < 3 && throw(ArgumentError("a ring needs N >= 3, got $N"))
     K, eps = promote(K, eps)
-    return StandardMapChain(Int(N), K, eps, boundary === :ring)
+    return StandardMapChain(N, K, eps, boundary === :ring)
 end
 
 dimension(m::StandardMapChain) = 2 * m.N

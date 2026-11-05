@@ -51,7 +51,7 @@ function _band(c::ChainTangent{T, N}, X::SMatrix{N, k}) where {T, N, k}
 end
 
 function Base.:*(c::ChainTangent{T, N}, W::SMatrix{D, k}) where {T, N, D, k}
-    D == 2N || throw(DimensionMismatch("tangent of size $(2N) times a matrix with $D rows"))
+    D == 2N || throw(DimensionMismatch("frame rows do not match the tangent size 2N"))
     Wq, Wp = _rows(W, 0, Val(N)), _rows(W, N, Val(N))
     if c.inv   # top = W_q - W_p, bottom = W_p + G (W_p - W_q)
         return vcat(Wq - Wp, Wp + _band(c, Wp - Wq))
@@ -66,17 +66,18 @@ end
 # The band of G at the positions q (indexable, at least N entries): diagonal K cos q_j + eps cos(left) + eps cos(right),
 # off-diagonal minus those cosines, as `_grow` (one entry per site and kind, no heterogeneous tuples).
 function _chain_tangent(m, q, ::Val{N}, ::Type{T}, inverse::Bool) where {N, T}
-    m.N == N || throw(DimensionMismatch("chain of $(m.N) sites with a state of $N sites"))
+    m.N == N || throw(DimensionMismatch("state sites do not match the chain"))
     g0 = SVector{N, T}(ntuple(j -> m.K * _cos(q[j]), Val(N)))
     cl = SVector{N, T}(ntuple(j -> (kl = _left(m, j); kl > 0 ? m.eps * _cos(q[j] - q[kl]) : zero(T)), Val(N)))
     cr = SVector{N, T}(ntuple(j -> (kr = _right(m, j); kr > 0 ? m.eps * _cos(q[j] - q[kr]) : zero(T)), Val(N)))
     return ChainTangent{T, N}(g0 + cl + cr, -cl, -cr, m.ring, inverse)
 end
 
+# Error messages here are constant: string interpolation allocates and does not compile in a GPU kernel (D105d).
 # Fixed-size states (SVector of length 2N): the step in blocks, same expressions and order as the in-place forms.
 function forward(m::StandardMapChain, z::SVector{S}) where {S}
     N = S ÷ 2
-    iseven(S) && m.N == N || throw(DimensionMismatch("chain of $(m.N) sites with a state of length $S"))
+    iseven(S) && m.N == N || throw(DimensionMismatch("state length is not 2N for this chain"))
     T = _promoted(m, z)
     p = SVector{N, T}(ntuple(j -> z[N + j] + _force(m, z, j), Val(N)))
     return vcat(SVector{N, T}(ntuple(j -> z[j] + p[j], Val(N))), p)
@@ -84,7 +85,7 @@ end
 
 function inverse(m::StandardMapChain, z::SVector{S}) where {S}
     N = S ÷ 2
-    iseven(S) && m.N == N || throw(DimensionMismatch("chain of $(m.N) sites with a state of length $S"))
+    iseven(S) && m.N == N || throw(DimensionMismatch("state length is not 2N for this chain"))
     T = _promoted(m, z)
     q = SVector{N, T}(ntuple(j -> z[j] - z[N + j], Val(N)))
     return vcat(q, SVector{N, T}(ntuple(j -> z[N + j] - _force(m, q, j), Val(N))))

@@ -156,3 +156,7 @@ Command: the stage 02 RED command with `myred.jl` (coupled-maps suite only), 2 t
 - D105b: 4 Error (`UndefVarError: ChainTangent`), 4 Fail (the loop leaves SVector and SMatrix types: the current dense-Matrix fallback returns bitwise equal values, so the bitwise tests pass today and only the type checks fail), 8 Pass.
 - D105c: 12 Fail (nonzero allocation of `forward`, `inverse` and the frame products from the dense fallback; one failing case at N = 100 showed 3264 B per step and about 653 kB per frame product), 28 Pass (isbits guards).
 - No parse errors, no helper bugs, no warnings; the only exception kind is `UndefVarError` on `ChainTangent`.
+
+## Rework after stage 04 review (2026-11-05)
+
+Owner decision "Fix all" (stage 04 review findings 2 and 3, and D105d). `cm_review.jl`, included from `runtests.jl`: "review 2" (wrapped chain vector `forward` and `inverse` return Double64 for a Float64 state with Double64 K and eps; guards: the state is Float64, the fixed-size form promotes), "review 3" (`StandardMapChain(N, K, eps, ring)` throws ArgumentError for N = 1, N = 101 and a ring at N = 2; guards: a ring at N = 3 and an open chain at N = 2 are accepted). RED: 7 fail of 13 (4 promotion, 3 constructor), 636 earlier assertions pass. D105d has no package test (it needs the device); it is checked by `verify/gpu.jl`.

@@ -13,7 +13,7 @@ CHILD || @eval using CUDA
 
 const SEED = 20261012
 const ROOT = normpath(joinpath(@__DIR__, ".."))
-# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli, stretching, naff, weighted-birkhoff) runs only those sections; the
+# GPU_ONLY="svd" (comma-separated tags record, tc, precision, diagnostics, standard-map, svd, gs, hh, hh-perf, l2, d44, d44c, sali, fli, megno, rli, stretching, naff, weighted-birkhoff, coupled-maps) runs only those sections; the
 # default runs everything. Skipping "record" needs an existing data/gpu-benchmark.toml for the launch budget.
 const ONLY = get(ENV, "GPU_ONLY", "")
 want(tag) = isempty(ONLY) || tag in strip.(split(ONLY, ','))
@@ -2220,6 +2220,77 @@ want("weighted-birkhoff") && let
     end
     wbg_d13d(0.5, N, x0)
     wbg_timing()
+end
+
+want("coupled-maps") && include(joinpath(ROOT, "test", "coupled-maps", "cm_helpers.jl"))   # cm_*: CMCase, n_H, tau, torus distance (definitions only)
+
+# ---------------------------------------------------------------------------- AC18 GPU parts and D105d (coupled-maps)
+# Y3 at the published parameters and at (2, 0.5, 0.1): 1e5 seeded orbits; Y4 (chain, N in {2, 5}, K = 3, eps = 0.2): 1e4 orbits through the tangent stream with
+# fixed-size (SVector) states, n = n_H, k = 4, tau = 1, W0 = the first four columns of the identity; wrapped Y3 (1e4) and wrapped chain N = 2 (1e4) as extra rows.
+# Bound tau(n) of the spec (Float64: eps 2^-52); the Double64 rows are the compile gate (run when the probe lets Double64 on the device, else the recorded reason).
+MODTAG[] = "coupled-maps: "
+cm_frame(::Type{T}, d) where {T} = SMatrix{d,4,T}(ntuple(i -> T(((i - 1) % d) == ((i - 1) ÷ d)), d * 4))
+function cmg_row(ac, label, c, T, Z, epsT; wrapped = false)
+    sys = wrapped ? cm_wsys(T, c) : cm_sys(T, c)
+    n = cm_nH(c); d = cm_d(c)
+    kw = (k = 4, tau = 1, seed = CM_SEED, W0 = fill(cm_frame(T, d), length(Z)))
+    cpu = propagate(sys, Z, n; kw..., backend = :cpu)
+    gpu, why = on_gpu(sys, Z, n; kw...)
+    why === nothing || return row(ac, label, "-", "1", fb(why))
+    lsys = cm_sys(T, c)
+    ratio = 0.0; dmax = 0.0
+    for j in eachindex(Z)
+        if wrapped
+            zl = cm_orbit(lsys, T.(lift(sys, Z[j])), n)
+            diff = cm_absdiff(lift(sys, cpu.x[j]), lift(sys, gpu.x[j]))
+            tau = cm_tau(epsT, c, zl, n)
+        else
+            diff = cm_tdist(cpu.x[j], gpu.x[j])
+            tau = cm_tau(epsT, c, cm_orbit(sys, Z[j], n), n)
+        end
+        ratio = max(ratio, diff / tau); dmax = max(dmax, diff)
+    end
+    wd = maximum(maximum(abs, cpu.W[j] .- gpu.W[j]) / max(1.0, maximum(abs, cpu.W[j])) for j in 1:min(2000, length(Z)))
+    row(ac, label * " (max $(wrapped ? "lifted" : "torus") distance over the ensemble $(fmt(dmax)); max relative frame difference over the first 2000 orbits $(fmt(wd)))", ratio, "1", pf(ratio <= 1))
+end
+function cmg_try(ac, label, f)
+    try
+        f()
+    catch e
+        row(ac, label * ": kernel on the device compile / run error", sprint(showerror, e)[1:min(end, 1500)], "compiles", "FAIL")
+    end
+end
+want("coupled-maps") && let
+    rng = StableRNG(CM_SEED + 41181)
+    lim = 4 * Float64(pi)
+    for p in ((0.5, 0.1, 1.0e-3), (2.0, 0.5, 0.1))
+        c = cm_y3(p...); n = cm_nH(c)
+        Z = [SVector{4,Float64}(ntuple(_ -> (2 * rand(rng) - 1) * lim, 4)) for _ in 1:100_000]
+        cmg_try("AC18", "Y3 $p", () -> cmg_row("AC18", "Y3 $p GPU vs CPU, n=n_H=$n, 100000 orbits through the stream (k = 4): max over orbits of torus distance / tau(n)", c, Float64, Z, cm_eps(Float64)))
+        Zw = [SVector{8,Float64}(ntuple(i -> i <= 4 ? 2 * Float64(pi) * rand(rng) : 0.0, 8)) for _ in 1:10_000]
+        cmg_try("AC18", "wrapped Y3 $p", () -> cmg_row("AC18", "wrapped Y3 $p GPU vs CPU, n=n_H=$n, 10000 orbits: max over orbits of lifted difference (256 bits) / tau(n)", c, Float64, Zw, cm_eps(Float64); wrapped = true))
+    end
+    for N in (2, 5)
+        c = cm_y4(N, 3.0, 0.2); n = cm_nH(c); d = 2N
+        Z = [SVector{d,Float64}(cm_draw(rng, d, lim)) for _ in 1:10_000]
+        cmg_try("D105d", "Y4 N=$N", () -> cmg_row("D105d", "Y4 N=$N (K=3, eps=0.2) GPU vs CPU, n=n_H=$n, 10000 orbits through the stream with fixed-size states (k = 4): max over orbits of torus distance / tau(n)", c, Float64, Z, cm_eps(Float64)))
+    end
+    c = cm_y4(2, 3.0, 0.2); n = cm_nH(c)
+    Zw = [SVector{8,Float64}(ntuple(i -> i <= 4 ? 2 * Float64(pi) * rand(rng) : 0.0, 8)) for _ in 1:10_000]
+    cmg_try("D105d", "wrapped Y4 N=2", () -> cmg_row("D105d", "wrapped Y4 N=2 GPU vs CPU, n=n_H=$n, 10000 orbits (state length 4N = 8): max over orbits of lifted difference (256 bits) / tau(n)", c, Float64, Zw, cm_eps(Float64); wrapped = true))
+    # Double64 compile gate
+    reason = gpu_reason(Double64)
+    for (nm, c, d) in (("Y3 (0.5, 0.1, 1e-3)", cm_y3(0.5, 0.1, 1.0e-3), 4), ("Y4 N=2", cm_y4(2, 3.0, 0.2), 4), ("Y4 N=5", cm_y4(5, 3.0, 0.2), 10))
+        if isempty(reason)
+            ZD = [SVector{d,Double64}(Double64.(cm_draw(rng, d, lim))) for _ in 1:5_000]
+            cmg_try("AC18", "Double64 $nm", () -> cmg_row("AC18", "Double64 kernel gate, $nm: GPU vs CPU, 5000 orbits: max torus distance / tau(n_H) (eps 2^-100)", c, Double64, ZD, cm_eps(Double64)))
+        else
+            sys = cm_sys(Double64, c)
+            probe_run = on_gpu(sys, [SVector{d,Double64}(ntuple(i -> Double64(i) / 7, d))], 2; k = 4, seed = CM_SEED)[2]
+            row("AC18", "Double64 kernel gate, $nm: compile or reason (explicit :gpu run ends on the CPU with the reason recorded in provenance)",
+                probe_run === nothing ? "ran on GPU" : probe_run, "compile or reason", fb(reason))
+        end
+    end
 end
 
 counts = Dict{String,Int}()

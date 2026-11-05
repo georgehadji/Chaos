@@ -1,0 +1,22 @@
+# gpu verification, julia 1.13.2, threads 4, cpu arrowlake-s, base seed 20261012
+# device type ChaoslabCUDAExt.CUDADevice, name 'NVIDIA GeForce RTX 5060 Laptop GPU'
+# CUDA.jl 6.4.2, runtime 13.4.0, driver 13.4.0, capability 12.0.0, free memory 6925.0 MiB, stack limit 4096 B (extension minimum D40)
+# Windows TDR registry values (GraphicsDrivers): TdrDelay    REG_DWORD    0x8; TdrDDIDelay    REG_DWORD    0xa; TdrLevel    REG_DWORD    0x3
+# record file: C:\Users\tesse\Documents\Vibe Coding\Chaos\data\gpu-benchmark.toml (exists at start)
+# probe Float64: (loadable = true, functional = true, device = "NVIDIA GeForce RTX 5060 Laptop GPU", compiles = true, gpu_faster = true)
+# probe Double64: (loadable = true, functional = true, device = "NVIDIA GeForce RTX 5060 Laptop GPU", compiles = false, gpu_faster = false)
+# format: AC<n> | quantity | value | bound | verdict
+# after the record: resolve_backend(:auto, Float64) = BackendChoice(:gpu, "NVIDIA GeForce RTX 5060 Laptop GPU", ""); (:auto, Double64) = BackendChoice(:cpu, "cpu", "kernel does not compile for the element type")
+AC18 | coupled-maps: Y3 (0.5, 0.1, 0.001) GPU vs CPU, n=n_H=18, 100000 orbits through the stream (k = 4): max over orbits of torus distance / tau(n) (max torus distance over the ensemble 1.464e-12; max relative frame difference over the first 2000 orbits 3.246e-12) | 2.068e-07 | 1 | PASS
+AC18 | coupled-maps: wrapped Y3 (0.5, 0.1, 0.001) GPU vs CPU, n=n_H=18, 10000 orbits: max over orbits of lifted difference (256 bits) / tau(n) (max lifted distance over the ensemble 3.837e-13; max relative frame difference over the first 2000 orbits 8.247e-13) | 1.114e-07 | 1 | PASS
+AC18 | coupled-maps: Y3 (2.0, 0.5, 0.1) GPU vs CPU, n=n_H=9, 100000 orbits through the stream (k = 4): max over orbits of torus distance / tau(n) (max torus distance over the ensemble 5.269e-11; max relative frame difference over the first 2000 orbits 6.408e-12) | 1.681e-05 | 1 | PASS
+AC18 | coupled-maps: wrapped Y3 (2.0, 0.5, 0.1) GPU vs CPU, n=n_H=9, 10000 orbits: max over orbits of lifted difference (256 bits) / tau(n) (max lifted distance over the ensemble 2.956e-12; max relative frame difference over the first 2000 orbits 1.589e-12) | 1.251e-05 | 1 | PASS
+D105d | coupled-maps: Y4 N=2 (K=3, eps=0.2) GPU vs CPU, n=n_H=7, 10000 orbits through the stream with fixed-size states (k = 4): max over orbits of torus distance / tau(n) (max torus distance over the ensemble 9.4e-12; max relative frame difference over the first 2000 orbits 8.66e-12) | 6.054e-06 | 1 | PASS
+D105d | coupled-maps: Y4 N=5 (K=3, eps=0.2) GPU vs CPU, n=n_H=7, 10000 orbits through the stream with fixed-size states (k = 4): max over orbits of torus distance / tau(n) (max torus distance over the ensemble 1.015e-11; max relative frame difference over the first 2000 orbits 3.81e-12) | 9.045e-06 | 1 | PASS
+D105d | coupled-maps: wrapped Y4 N=2 GPU vs CPU, n=n_H=7, 10000 orbits (state length 4N = 8): max over orbits of lifted difference (256 bits) / tau(n) (max lifted distance over the ensemble 9.784e-12; max relative frame difference over the first 2000 orbits 3.375e-12) | 1.75e-05 | 1 | PASS
+AC18 | coupled-maps: Double64 kernel gate, Y3 (0.5, 0.1, 1e-3): compile or reason (explicit :gpu run ends on the CPU with the reason recorded in provenance) | kernel does not compile for the element type | compile or reason | FALLBACK(kernel does not compile for the element type)
+AC18 | coupled-maps: Double64 kernel gate, Y4 N=2: compile or reason (explicit :gpu run ends on the CPU with the reason recorded in provenance) | kernel does not compile for the element type | compile or reason | FALLBACK(kernel does not compile for the element type)
+AC18 | coupled-maps: Double64 kernel gate, Y4 N=5: compile or reason (explicit :gpu run ends on the CPU with the reason recorded in provenance) | kernel does not compile for the element type | compile or reason | FALLBACK(kernel does not compile for the element type)
+┌ Warning: linking module flags 'Dwarf Version': IDs have conflicting values ('i32 4' from globals with 'i32 2' from start)
+└ @ LLVM C:\Users\tesse\.julia\packages\LLVM\tiRVR\src\core\context.jl:209
+# SUMMARY FALLBACK=3, PASS=7 (10 lines)

@@ -1,0 +1,311 @@
+# coupled-maps verification, julia 1.13.2, threads 8, base seed 20261012, scale 1.0, time 1.793880918e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# n_H (Y3 published) = 18, n_H (Y3 (2, 0.5, 0.1)) = 9; sigma published = 2.074 (spec: 2.07, n_H 19)
+# AC1 sample: Float64 14000 points (Y3: 5 sets + uniform, 1000 each; Y4 panel of 8 configs N <= 10, 1000 each), Double64 12000, N = 100 Float64 20
+AC1 | max ratio |M - J_ForwardDiff| / 16 eps (1 + a_max), Float64, N <= 10 | 0.05532 | <= 1 | PASS
+AC1 | max ratio |M - J_complexstep(1e-30)| / 16 eps (1 + a_max), Float64, N <= 10 | 0.08322 | <= 1 | PASS
+AC1 | max ratio |M - plain-formula tangent| / 16 eps (1 + a_max), Float64, N <= 10 | 0.05924 | <= 1 | PASS
+AC1 | max ratio |M - J_ForwardDiff| / 16 eps (1 + a_max), Float64, N = 100 | 0.03882 | <= 1 | PASS
+AC1 | max ratio |M - J_complexstep(1e-30)| / 16 eps (1 + a_max), Float64, N = 100 | 0.07763 | <= 1 | PASS
+AC1 | max ratio |M - plain-formula tangent| / 16 eps (1 + a_max), Float64, N = 100 | 0.03882 | <= 1 | PASS
+AC1 | max ratio |M - J_ForwardDiff| / 16 eps (1 + a_max), Double64 (eps 2^-100), 12000 pts | 0.001388 | <= 1 | PASS
+AC1 | max ratio |M - plain-formula tangent|, Double64 | 0.001157 | <= 1 | PASS
+AC1 | same Double64 ForwardDiff ratio against nominal eps 2^-104 (ratio x16) | 0.02221 | <= 1 | PASS
+AC2 | max ratio |M M_inv - I| / 16 eps (1 + a_max)^2, Float64, N <= 10 | 0.09 | <= 1 | PASS
+AC2 | max ratio |M_inv - J_ForwardDiff(inverse)| / 16 eps (1 + a_max), Float64, N <= 10 | 0.05208 | <= 1 | PASS
+AC2 | max ratio |M_inv - plain-formula inverse tangent| / 16 eps (1 + a_max), Float64, N <= 10 | 0.05208 | <= 1 | PASS
+AC2 | max ratio |M M_inv - I| / 16 eps (1 + a_max)^2, Double64, N <= 5 | 0.001844 | <= 1 | PASS
+AC2 | max ratio |M_inv - J_ForwardDiff(inverse)| / 16 eps (1 + a_max), Double64, N <= 5 | 0.001388 | <= 1 | PASS
+AC2 | max ratio |M_inv - plain-formula inverse tangent| / 16 eps (1 + a_max), Double64, N <= 5 | 0.001157 | <= 1 | PASS
+AC2 | max ratio |M M_inv - I| / 16 eps (1 + a_max)^2, Float64, N = 100 | 0.04972 | <= 1 | PASS
+AC2 | max ratio |M_inv - J_ForwardDiff(inverse)| / 16 eps (1 + a_max), Float64, N = 100 | 0.03882 | <= 1 | PASS
+AC2 | max ratio |M_inv - plain-formula inverse tangent| / 16 eps (1 + a_max), Float64, N = 100 | 0.01941 | <= 1 | PASS
+AC3 | max ratio |det M - 1| (256 bits) / 8 d eps ||M||_F ||M^-1||_F, Float64 | 0.004629 | <= 1 | PASS
+AC3 | max ratio |M' Om M - Om| (256 bits) / 8 d eps ||M||_max^2, Float64 | 0.01467 | <= 1 | PASS
+AC3 | max ratio of module det_residual / symplectic_residual to 64 d / 32 d times the same scales, Float64 | 0.005481 | <= 1 | PASS
+AC3 | lower-left block (A or G) not symmetric to the bit: count flag, Float64 | 0 | 0 | PASS
+AC3 | max ratio |det M - 1| (256 bits) / 8 d eps ||M||_F ||M^-1||_F, Double64 | 0.0001051 | <= 1 | PASS
+AC3 | max ratio |M' Om M - Om| (256 bits) / 8 d eps ||M||_max^2, Double64 | 0.0004231 | <= 1 | PASS
+AC3 | max ratio of module det_residual / symplectic_residual to 64 d / 32 d times the same scales, Double64 | 0.0001682 | <= 1 | PASS
+AC3 | lower-left block (A or G) not symmetric to the bit: count flag, Double64 | 0 | 0 | PASS
+AC4 | max ratio round-trip difference / tau(n), n in {1, n_H}, both orders, 200 orbits per case, Float64 | 0.01456 | <= 1 | PASS
+AC4 | max ratio round-trip difference / tau(n), n in {1, n_H}, both orders, 200 orbits per case, Double64 | 0.0004349 | <= 1 | PASS
+AC4 | same, Float64, N = 100 (20 orbits) | 0.005932 | <= 1 | PASS
+AC4 | Chaoslab 256-bit orbit and inverse vs independent plain 256-bit formulas, 20 orbits per case | 0 | <= 1 | PASS
+# section AC1-4 took 17.2 s
+AC5 | range [0, 2 pi) and integer counts hold at every step, Float64, 2400 orbits | true | true | PASS
+AC5 | max ratio torus distance wrapped state vs lifted orbit / tau(k), k <= n_H, Float64 | 0.01704 | <= 1 | PASS
+AC5 | max ratio |lift(state) at 256 bits - lifted orbit| / tau(k), Float64 | 0.01704 | <= 1 | PASS
+AC5 | counts equal the 256-bit increments for 50 teacher-forced steps, Float64, 2400 orbits | true | true | PASS
+AC5 | range [0, 2 pi) and integer counts hold at every step, Double64, 2400 orbits | true | true | PASS
+AC5 | max ratio torus distance wrapped state vs lifted orbit / tau(k), k <= n_H, Double64 | 0.0003362 | <= 1 | PASS
+AC5 | max ratio |lift(state) at 256 bits - lifted orbit| / tau(k), Double64 | 0.0003362 | <= 1 | PASS
+AC5 | counts equal the 256-bit increments for 50 teacher-forced steps, Double64, 2400 orbits | true | true | PASS
+AC5 | torus_state / lift round trip |lift(torus_state(z)) - z| <= 16 eps(100), z in [-100, 100]^d, 4 systems incl. N = 100: failures | 0 | 0 | PASS
+AC6 | counts exactly equal after n forward / n inverse (both orders), n in {1, n_H}, Float64, 2400 orbits | true | true | PASS
+AC6 | max ratio torus distance round trip / tau(n), Float64 | 0.03207 | <= 1 | PASS
+AC6 | counts exactly equal after n forward / n inverse (both orders), n in {1, n_H}, Double64, 2400 orbits | true | true | PASS
+AC6 | max ratio torus distance round trip / tau(n), Double64 | 0.0007489 | <= 1 | PASS
+AC6 | overflow guard: 10 checks (NaN in all components one below 2^53, finite and exact two below) | 10/10 | 10/10 | PASS
+# section AC5-6 took 7.2 s
+AC7 | orbit defects (q_j != q_j(0) + n p_j(0) or p_j != p_j(0)), 1000 steps, Y3: Float64 1000 orbits / Double64 200 orbits | 0 / 0 | 0 | PASS
+AC7 | orbit defects (q_j != q_j(0) + n p_j(0) or p_j != p_j(0)), 1000 steps, Y4 N=2: Float64 1000 orbits / Double64 200 orbits | 0 / 0 | 0 | PASS
+AC7 | orbit defects (q_j != q_j(0) + n p_j(0) or p_j != p_j(0)), 1000 steps, Y4 N=3: Float64 1000 orbits / Double64 200 orbits | 0 / 0 | 0 | PASS
+AC7 | orbit defects (q_j != q_j(0) + n p_j(0) or p_j != p_j(0)), 1000 steps, Y4 N=100 ring: Float64 1000 orbits / Double64 200 orbits | 0 / 0 | 0 | PASS
+AC7 | product of n tangents != [[I, nI], [0, I]] for n in {1, 2, 10, 100, 1000, 1e4}, Y3, Float64, 3 starts | 0 | 0 | PASS
+AC7 | product of n tangents != [[I, nI], [0, I]] for n in {1, 2, 10, 100, 1000, 1e4}, Y4 N=3, Float64, 3 starts | 0 | 0 | PASS
+AC7 | product of n tangents != [[I, nI], [0, I]] for n in {1, 2, 10, 100, 1000, 1e4}, Y4 N=5 ring, Float64, 3 starts | 0 | 0 | PASS
+AC7 | product of n tangents != [[I, nI], [0, I]] for n in {1, 2, 10, 100, 1000, 1e4}, Y4 N=10 ring, Float64, 3 starts | 0 | 0 | PASS
+AC7 | product of n tangents != [[I, nI], [0, I]] for n in {1, 2, 10, 100, 1000, 1e4}, Y3, Double64, 3 starts | 0 | 0 | PASS
+AC7 | product of n tangents != [[I, nI], [0, I]] for n in {1, 2, 10, 100, 1000, 1e4}, Y4 N=3, Double64, 3 starts | 0 | 0 | PASS
+AC8 | K=0 tangent state independent on 100 orbit points and M0^n == [[I, nI], [0, I]] for n up to 1e6, Y3, Float64 | true | true | PASS
+AC8 | max ratio |X(n) - ln(sqrt(n^2+1))/n| / 8 eps, n up to 1e6, w0 = one momentum component, Y3, Float64 | 0.02472 | <= 1 | PASS
+AC8 | max |X(n)| for a position component (exactly 0), Y3, Float64 | 0 | 0 | PASS
+AC8 | K=0 tangent state independent on 100 orbit points and M0^n == [[I, nI], [0, I]] for n up to 1e6, Y4 N=3, Float64 | true | true | PASS
+AC8 | max ratio |X(n) - ln(sqrt(n^2+1))/n| / 8 eps, n up to 1e6, w0 = one momentum component, Y4 N=3, Float64 | 0.02472 | <= 1 | PASS
+AC8 | max |X(n)| for a position component (exactly 0), Y4 N=3, Float64 | 0 | 0 | PASS
+AC8 | K=0 tangent state independent on 100 orbit points and M0^n == [[I, nI], [0, I]] for n up to 1e6, Y4 N=5 ring, Float64 | true | true | PASS
+AC8 | max ratio |X(n) - ln(sqrt(n^2+1))/n| / 8 eps, n up to 1e6, w0 = one momentum component, Y4 N=5 ring, Float64 | 0.02472 | <= 1 | PASS
+AC8 | max |X(n)| for a position component (exactly 0), Y4 N=5 ring, Float64 | 0 | 0 | PASS
+AC8 | K=0 tangent state independent on 100 orbit points and M0^n == [[I, nI], [0, I]] for n up to 1e6, Y4 N=10 ring, Float64 | true | true | PASS
+AC8 | max ratio |X(n) - ln(sqrt(n^2+1))/n| / 8 eps, n up to 1e6, w0 = one momentum component, Y4 N=10 ring, Float64 | 0.02472 | <= 1 | PASS
+AC8 | max |X(n)| for a position component (exactly 0), Y4 N=10 ring, Float64 | 0 | 0 | PASS
+AC8 | K=0 tangent state independent on 100 orbit points and M0^n == [[I, nI], [0, I]] for n up to 1e6, Y3, Double64 | true | true | PASS
+AC8 | max ratio |X(n) - ln(sqrt(n^2+1))/n| / 8 eps, n up to 1e6, w0 = one momentum component, Y3, Double64 | 0.0009313 | <= 1 | PASS
+AC8 | max |X(n)| for a position component (exactly 0), Y3, Double64 | 0 | 0 | PASS
+AC8 | K=0 tangent state independent on 100 orbit points and M0^n == [[I, nI], [0, I]] for n up to 1e6, Y4 N=3, Double64 | true | true | PASS
+AC8 | max ratio |X(n) - ln(sqrt(n^2+1))/n| / 8 eps, n up to 1e6, w0 = one momentum component, Y4 N=3, Double64 | 0.0009313 | <= 1 | PASS
+AC8 | max |X(n)| for a position component (exactly 0), Y4 N=3, Double64 | 0 | 0 | PASS
+# section AC7-8 took 45.7 s
+AC9 | (a) Y3 mu = 0 mapped by C vs Y1 with K = -nu, -kappa: steps with a difference, 200 orbits per (nu, kappa) x 5 sets x 1000 steps, Float64 | 0 | 0 | PASS
+AC9 | (a) Y3 mu = 0 mapped by C vs Y1 with K = -nu, -kappa: steps with a difference, 200 orbits per (nu, kappa) x 5 sets x 1000 steps, Double64 | 0 | 0 | PASS
+AC9 | (b) Y4 eps = 0, N in {2, 5, 10}, K in {1, 3}, open and ring: steps with a site differing from Y1, 200 orbits per config x 1000 steps, Float64 | 0 | 0 | PASS
+AC9 | (b) Y4 eps = 0, N in {2, 5, 10}, K in {1, 3}, open and ring: steps with a site differing from Y1, 200 orbits per config x 1000 steps, Double64 | 0 | 0 | PASS
+AC9 | (c) independence of the unperturbed pair / sites, 100 perturbations per case x 1000 steps, Float64 | 0 | 0 | PASS
+AC9 | (c) independence of the unperturbed pair / sites, 100 perturbations per case x 1000 steps, Double64 | 0 | 0 | PASS
+AC10 | max ratio torus distance of the shifted orbit at negated on-site parameters / tau(k), k <= n_H, 200 orbits per case, Float64 | 0.01961 | <= 1 | PASS
+AC10 | max ratio torus distance of the shifted orbit at negated on-site parameters / tau(k), k <= n_H, 200 orbits per case, Double64 | 0.0003048 | <= 1 | PASS
+AC10 | same, Float64, N = 100 (20 orbits) | 0.00485 | <= 1 | PASS
+# section AC9-10 took 50.6 s
+AC11 | origin stays for 1e4 steps, Y3 (0.5, 0.1, 0.001), Float64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (0.0, 0.0, 0.0), Float64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (1.0, 1.0, 0.0), Float64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (2.0, 0.5, 0.1), Float64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (-1.5, 3.0, 0.5), Float64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (-6.0, 3.0, 2.5), Float64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (4.0, 4.0, 5.0), Float64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (0.5, 0.1, 0.001), Double64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (0.0, 0.0, 0.0), Double64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (1.0, 1.0, 0.0), Double64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (2.0, 0.5, 0.1), Double64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (-1.5, 3.0, 0.5), Double64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (-6.0, 3.0, 2.5), Double64 | true | true | PASS
+AC11 | origin stays for 1e4 steps, Y3 (4.0, 4.0, 5.0), Double64 | true | true | PASS
+AC11 | off-pair entries of M(0) (exactly 0), 36 (nu, kappa) pairs, Float64 | 0 | 0 | PASS
+AC11 | max ratio |tr block - (2 - par)| / 8 eps (1 + |nu| + |kappa|), Float64 | 0 | <= 1 | PASS
+AC11 | max ratio |angle or ln lambda_+ - closed form| / 32 eps (1 + |par|) cond, Float64 | 0 | <= 1 | PASS
+AC11 | wrong classes (elliptic / hyperbolic), Float64 | 0 | 0 | PASS
+AC11 | off-pair entries of M(0) (exactly 0), 36 (nu, kappa) pairs, Double64 | 0 | 0 | PASS
+AC11 | max ratio |tr block - (2 - par)| / 8 eps (1 + |nu| + |kappa|), Double64 | 0 | <= 1 | PASS
+AC11 | max ratio |angle or ln lambda_+ - closed form| / 32 eps (1 + |par|) cond, Double64 | 0 | <= 1 | PASS
+AC11 | wrong classes (elliptic / hyperbolic), Double64 | 0 | 0 | PASS
+AC11 | nu = 4 Jordan block: |max entry of M^n / n - 4|, n in {10, 100, 1000}, Float64 | 0 | <= 1e-12 | PASS
+AC11 | nu = 4 Jordan block: |max entry of M^n / n - 4|, n in {10, 100, 1000}, Double64 | 0 | <= 1e-12 | PASS
+AC12 | origin stays for 1e4 steps, Y4 N=3 ring, Float64 | true | true | PASS
+AC12 | origin stays for 1e4 steps, Y4 N=100, Float64 | true | true | PASS
+AC12 | origin stays for 1e4 steps, Y4 N=100 ring, Float64 | true | true | PASS
+AC12 | origin stays for 1e4 steps, Y4 N=5, Double64 | true | true | PASS
+AC12 | max ratio |eig(G(0)) - (K + eps l_k)| / 16 eps (|K| + 4|eps|), 6 N x 2 boundaries x 4 K x 3 eps grid, Float64 | 0.2757 | <= 1 | PASS
+AC12 | max ratio off-block entries of (U+U)' M(0) (U+U) / 16 N eps (1 + a_max) (D104a) | 0.4427 | <= 1 | PASS
+AC12 | same off-block ratio with the base bound 16 eps (1 + a_max) of the spec before D104a (informational; spec D104a: 0.02, 0.6, 20, 44 at N = 2, 10, 50, 100) | 44.27 | informational | INFO
+AC12 | max ratio |trace per mode - (2 + K + eps l_k)| / 32 eps (1 + a_max) | 0.1164 | <= 1 | PASS
+AC12 | max ratio |ln lambda_+ or angle - closed form| / 32 eps (1 + a_max) cond, outside the parabolic band (D104b) | 0.1339 | <= 1 | PASS
+AC12 | wrong classes outside the parabolic band (D104b); modes inside the band (trace within 64 eps (1 + a_max) of +-2, class not asserted): 10 of 4056 | 0 | 0 | PASS
+# section AC11-12 took 0.3 s
+AC13 | max ratio |lambda_i(n) + lambda_{d+1-i}(n)| / (B(n)/n), n = 5, 110 orbits (Y3 sets, Y4 N in {2, 3, 5}) | 0.0001632 | <= 1 | PASS
+AC13 | max ratio |sum lambda_i(n)| / (B(n)/n), n = 5 | 0.0002401 | <= 1 | PASS
+AC13 | same pairing ratio at n = n_H | 3.61e-06 | <= 1 | PASS
+AC13 | same sum ratio at n = n_H | 3.528e-06 | <= 1 | PASS
+AC14 | total momentum, Float64: max |sum p(k) - sum p(0)| / 8 N eps M_k k over 200 orbits per config (N in {2,3,5,10}, eps in 4, open / ring), k <= n_H | 0.03157 | <= 1 | PASS
+AC14 | same, Double64 | 0.0007076 | <= 1 | PASS
+AC15 | max ratio torus distance printed unit-torus map (symplectic reading, converted) vs chain / tau(k), N = 2, beta in {0.1, 0.3051}, K in {1, 3}, 200 orbits each | 0.01046 | <= 1 | PASS
+# AC15 finding (not scored): determinant of the literal reading of the printed lines (force at old positions, position update with the old momentum) at 3 points: -2.781, -6.623, -2.669 (symplectic reading: 1)
+# section AC13-15 took 1.4 s
+AC16 | Float64 vs 256-bit at n_H: max ratio (lifted and torus difference) / tau(n_H), 2820 orbits (200 per case; N = 100: 20 orbits) | 4.394e-05 | <= 1 | PASS
+AC16 | same restricted to the N = 100 orbits | 1.638e-06 | <= 1 | PASS
+# Double64 sin/cos max relative error vs BigFloat-256: orbit arguments (128427 values) 6.78e-32, uniform [-4pi,4pi] (50000) 4.1e-32, uniform [-1e3,1e3] (20000) 2.11e-32
+AC16 | effective Double64 eps (max relative sin/cos error over the three samples; floor 2^-104) | 6.783e-32 | <= 2^-100 = 7.889e-31 | PASS
+AC16 | same, log2 | -103.5 | <= -100 | PASS
+AC16 | Double64 vs 256-bit at n_H with eps = effective value above, 2420 orbits | 1.751e-06 | <= 1 | PASS
+AC16 | same ratio with the nominal eps 2^-104 (informational) | 2.409e-06 | <= 1 | PASS
+AC16 | Double64 vs 256-bit, restricted to the N = 100 orbits | 4.49e-07 | <= 1 | PASS
+# section AC16 took 3.7 s
+AC17 | max ratio |banded action of M and M^-1 on 4 vectors - dense product| / 16 eps (1 + a_max), N in {10, 50, 100}, open and ring, 20 draws per case | 0.1 | <= 1 | PASS
+# section AC17 took 0.1 s
+# AC17 (V) timing: BenchmarkTools minimum over samples, frame of 4 vectors, 5 rounds interleaved N = 50 / 100; timer resolution on this host is 100 ns (see the standard-map notes)
+AC17 | time ratio N=100 / N=50, tangent_action! (vector state), open: N=10 134.7 ns, N=20 262.6 ns, N=50 664.2 ns, N=100 1380 ns | 2.078 | <= 2.6 (expected 2) | PASS
+AC17 | time ratio N=100 / N=50, inverse_tangent_action!, open: N=10 136.7 ns, N=20 280.4 ns, N=50 727.3 ns, N=100 1400 ns | 1.925 | <= 2.6 (expected 2) | PASS
+AC17 | time ratio N=100 / N=50, tangent(sys, SVector) * SMatrix (fixed-size, band built per call), open: N=10 103.8 ns, N=20 189.2 ns, N=50 521.8 ns, N=100 1160 ns | 2.223 | <= 2.6 (expected 2) | PASS
+AC17 | time ratio N=100 / N=50, dense M * W (mul!, tangent excluded; quadratic, informational), open: N=10 158 ns, N=20 466.3 ns, N=50 3725 ns, N=100 1.5e+04 ns | 4.027 | informational (expected 4) | INFO
+AC17 | time ratio N=100 / N=50, tangent_action! (vector state), ring: N=10 137.6 ns, N=20 269 ns, N=50 665.1 ns, N=100 1390 ns | 2.09 | <= 2.6 (expected 2) | PASS
+AC17 | time ratio N=100 / N=50, inverse_tangent_action!, ring: N=10 146 ns, N=20 289.9 ns, N=50 741.9 ns, N=100 1430 ns | 1.927 | <= 2.6 (expected 2) | PASS
+AC17 | time ratio N=100 / N=50, tangent(sys, SVector) * SMatrix (fixed-size, band built per call), ring: N=10 107.9 ns, N=20 197.5 ns, N=50 523.3 ns, N=100 1170 ns | 2.236 | <= 2.6 (expected 2) | PASS
+AC17 | time ratio N=100 / N=50, dense M * W (mul!, tangent excluded; quadratic, informational), ring: N=10 158 ns, N=20 467.7 ns, N=50 3725 ns, N=100 1.49e+04 ns | 4 | informational (expected 4) | INFO
+# section AC17-time took 293.3 s
+D105a | fixed-size vs vector-state results not bitwise equal (forward, inverse, tangent and inverse tangent entries, frame products vs banded actions, torus_state, lift; lifted and wrapped), Float64, N in {2,3,5,10,100} open / ring, 25 (K, eps) pairs (N=100: 4), 358 cases | 0 | 0 | PASS
+D105a | fixed-size vs vector-state results not bitwise equal (forward, inverse, tangent and inverse tangent entries, frame products vs banded actions, torus_state, lift; lifted and wrapped), Double64, N in {2,3,5,10,100} open / ring, 25 (K, eps) pairs (N=100: 4), 358 cases | 0 | 0 | PASS
+D105b | stream (CPU backend, 8 threads) vs plain serial loop, N=2 lifted, 2000 orbits, k = 4, n = 7: orbits with different final state / frame; fixed-size types kept | 0 / 0; true | 0 / 0; true | PASS
+D105b | stream (CPU backend, 8 threads) vs plain serial loop, N=2 wrapped, 2000 orbits, k = 4, n = 7: orbits with different final state / frame; fixed-size types kept | 0 / 0; true | 0 / 0; true | PASS
+D105b | stream (CPU backend, 8 threads) vs plain serial loop, N=5 lifted, 2000 orbits, k = 4, n = 7: orbits with different final state / frame; fixed-size types kept | 0 / 0; true | 0 / 0; true | PASS
+D105b | stream (CPU backend, 8 threads) vs plain serial loop, N=5 wrapped, 2000 orbits, k = 4, n = 7: orbits with different final state / frame; fixed-size types kept | 0 / 0; true | 0 / 0; true | PASS
+D105c | bytes allocated by forward, inverse, tangent * W, inverse_tangent * W after warm-up, N=2, Float64: lifted / wrapped; isbits system values | (0, 0, 0, 0) / (0, 0, 0, 0); true/true | (0,0,0,0) / (0,0,0,0); true/true | PASS
+D105c | bytes allocated by forward, inverse, tangent * W, inverse_tangent * W after warm-up, N=10, Float64: lifted / wrapped; isbits system values | (0, 0, 0, 0) / (0, 0, 0, 0); true/true | (0,0,0,0) / (0,0,0,0); true/true | PASS
+D105c | bytes allocated by forward, inverse, tangent * W, inverse_tangent * W after warm-up, N=100, Float64: lifted / wrapped; isbits system values | (0, 0, 0, 0) / (0, 0, 0, 0); true/true | (0,0,0,0) / (0,0,0,0); true/true | PASS
+D105c | bytes allocated by forward, inverse, tangent * W, inverse_tangent * W after warm-up, N=2, Double64: lifted / wrapped; isbits system values | (0, 0, 0, 0) / (0, 0, 0, 0); true/true | (0,0,0,0) / (0,0,0,0); true/true | PASS
+D105c | bytes allocated by forward, inverse, tangent * W, inverse_tangent * W after warm-up, N=10, Double64: lifted / wrapped; isbits system values | (0, 0, 0, 0) / (0, 0, 0, 0); true/true | (0,0,0,0) / (0,0,0,0); true/true | PASS
+D105c | bytes allocated by forward, inverse, tangent * W, inverse_tangent * W after warm-up, N=100, Double64: lifted / wrapped; isbits system values | (0, 0, 0, 0) / (0, 0, 0, 0); true/true | (0,0,0,0) / (0,0,0,0); true/true | PASS
+# section D105 took 15.7 s
+AC18 | Y3 (0.5, 0.1, 0.001) n=18: 100000 orbits, threaded forward loop (8 threads) vs serial loop, bitwise | true | true | PASS
+AC18 | Y3 (0.5, 0.1, 0.001): propagate (CPU kernel) x and W vs plain loops, bitwise (wall 0.2339 s) | true | true | PASS
+AC18 | Y3 (0.5, 0.1, 0.001): propagate with chunk 777 vs default chunk, bitwise | true | true | PASS
+AC18 | wrapped Y3 (0.5, 0.1, 0.001): 10000 orbits threaded vs serial; propagate x vs plain loop, bitwise | true | true | PASS
+AC18 | Y3 (2.0, 0.5, 0.1) n=9: 100000 orbits, threaded forward loop (8 threads) vs serial loop, bitwise | true | true | PASS
+AC18 | Y3 (2.0, 0.5, 0.1): propagate (CPU kernel) x and W vs plain loops, bitwise (wall 0.04882 s) | true | true | PASS
+AC18 | Y3 (2.0, 0.5, 0.1): propagate with chunk 777 vs default chunk, bitwise | true | true | PASS
+AC18 | wrapped Y3 (2.0, 0.5, 0.1): 10000 orbits threaded vs serial; propagate x vs plain loop, bitwise | true | true | PASS
+AC18 | Y4 N=2 n=7: 10000 orbits, Vector states threaded vs serial; SVector stream x and W vs plain loops, bitwise; SVector forward vs Vector forward | true; true; true | true; true; true | PASS
+AC18 | Y4 N=5 n=7: 10000 orbits, Vector states threaded vs serial; SVector stream x and W vs plain loops, bitwise; SVector forward vs Vector forward | true; true; true | true; true; true | PASS
+AC18 | GPU vs CPU (Y3 1e5, Y4 N in {2, 5} 1e4, Double64 gate): see verify/gpu.jl, log gpu-coupled-maps-verify-log.txt | - | tau(n) | STAGE04-GPU
+# section AC18 took 1.4 s
+# threads=8 | Y3 (0.5, 0.1, 0.001) propagate x and W | 100000 orbits | digest 12364334040745445251
+# threads=8 | Y3 (0.5, 0.1, 0.001) propagate x and W, random W0 (seed stream) | 100000 orbits | digest 15891612385477145242
+# threads=8 | Y3 (0.5, 0.1, 0.001) threaded forward loop | 100000 orbits | digest 15345628466754477189
+# threads=8 | Y3 (2.0, 0.5, 0.1) propagate x and W | 100000 orbits | digest 12987927685230051842
+# threads=8 | Y3 (2.0, 0.5, 0.1) propagate x and W, random W0 (seed stream) | 100000 orbits | digest 7675109102063100904
+# threads=8 | Y3 (2.0, 0.5, 0.1) threaded forward loop | 100000 orbits | digest 4113063865083566737
+# threads=8 | Y4 N=2 lifted stream x and W (random W0) | 10000 orbits | digest 6388141704778374409
+# threads=8 | Y4 N=2 wrapped stream x and W (random W0) | 10000 orbits | digest 13836902712513010387
+# threads=8 | Y4 N=5 lifted stream x and W (random W0) | 10000 orbits | digest 9863078253098660134
+# threads=8 | Y4 N=5 wrapped stream x and W (random W0) | 10000 orbits | digest 8408406376791221749
+# threads=8 | wrapped Y3 (0.5, 0.1, 0.001) propagate x and W | 10000 orbits | digest 10084076363027139050
+# threads=8 | wrapped Y3 (2.0, 0.5, 0.1) propagate x and W | 10000 orbits | digest 15906809223273622138
+# section threads took 1.5 s
+# O9 sample Y3: 10002 points, n = n_H, z0 uniform in [-4 pi, 4 pi]^d; bound = 8 n eps prod_k ||M_k||_F ||I||_F
+O9 | Y3: max ratio |J_ForwardDiff(n-step) - prod M_k| / bound | 0.008075 | <= 1 | PASS
+O9 | Y3: max ratio |prod M_k (Float64) - product at 256 bits, same realised points| / bound | 0.6094 | <= 1 | PASS
+O9 | Y3: max ratio |J_ForwardDiff - product at 256 bits| / bound | 0.6131 | <= 1 | PASS
+# O9 sample Y4 N in {2, 5} (4 configs, 1000 points each): 4000 points, n = n_H, z0 uniform in [-4 pi, 4 pi]^d; bound = 8 n eps prod_k ||M_k||_F ||I||_F
+O9 | Y4 N in {2, 5} (4 configs, 1000 points each): max ratio |J_ForwardDiff(n-step) - prod M_k| / bound | 0.003275 | <= 1 | PASS
+O9 | Y4 N in {2, 5} (4 configs, 1000 points each): max ratio |prod M_k (Float64) - product at 256 bits, same realised points| / bound | 0.01037 | <= 1 | PASS
+O9 | Y4 N in {2, 5} (4 configs, 1000 points each): max ratio |J_ForwardDiff - product at 256 bits| / bound | 0.01054 | <= 1 | PASS
+# section O9 took 2.1 s
+# AC20: parameters (nu, kappa, mu) = (0.5, 0.1, 0.001), item 1 form; C = [0.5, 0.5, 0.0, 0.0] (item 2 labelling (0.5, 0, 0.5, 0)), D = [3.0, 0.5, 0.0, 0.0] (item 2 labelling (3, 0, 0.5, 0)); deviation vectors (1,1,1,1) and (1,0,0,0); binary64; one pass of 1e6 steps each
+# AC20 SALI of C over n in [1e4, 1e5]: mean 0.2952, min 0.1034, max 0.5303 (reported 0.28; drafting check 0.14 to 0.39 for single times)
+AC20 | (a) time average of SALI of C over n in [1e4, 1e5] | 0.2952 | in [0.1, 0.5] (reported 0.28) | PASS
+AC20 | (b) SALI of D: first n with SALI < 1e-12 (reported about 4.7e3); SALI at n = 1e3 / 5e3 / 1e4 / 2e4: 1.335e-05 / 1.587e-18 / 0 / 0 | 3947 | some n in [1e3, 2e4] | PASS
+AC20 | (c) finite-time maximal exponent L_N of D at n = 1e6 (first deviation vector (1,1,1,1)); Skokos2010 Fig. 7 about 8e-3, Skokos2003a text 5e-2, Fig. 2b about 1e-2 | 0.0087 | in [5e-3, 1.5e-2] | PASS
+AC20 | (d) finite-time maximal exponent L_N of C at n = 1e6 (reported 1.6e-6 at 1e7); decay law ~ ln(n)/n | 1.072e-05 | <= 1e-4 | PASS
+AC20 | info: L_N of C at n = 1e5 / 1e6 (1/n law: ratio should be about 10 to 14): 8.147e-05 / 1.072e-05 | 7.601 | info | INFO
+AC20 | info: L_N of D at n = 1e3 / 5e3 / 1e4 / 2e4 / 1e5 / 1e6 (drafting check 0.0150, 0.0090, 0.0085, 0.0083, 0.0093): 0.01412 / 0.01001 / 0.00876 / 0.008218 / 0.008475 / 0.0087 | 0.0087 | info | INFO
+# AC20 QR spectrum of C at n = 100000: (7.728e-05, 5.8017e-05, -7.7278e-05, -5.8019e-05); pairing |l1+l4| = 1.93e-05, |l2+l3| = 1.93e-05; sum = -1.8e-18 (QR exponents; the exact pairing is for singular values, criterion 13)
+# AC20 QR spectrum of C at n = 1000000: (1.0297e-05, 8.4834e-06, -1.0297e-05, -8.4836e-06); pairing |l1+l4| = 1.81e-06, |l2+l3| = 1.81e-06; sum = 2.83e-19 (QR exponents; the exact pairing is for singular values, criterion 13)
+# AC20 QR spectrum of D at n = 100000: (0.0084823, 0.0002792, -0.00031387, -0.0084476); pairing |l1+l4| = 3.47e-05, |l2+l3| = 3.47e-05; sum = 0 (QR exponents; the exact pairing is for singular values, criterion 13)
+# AC20 QR spectrum of D at n = 1000000: (0.0087008, 0.00027197, -0.00027543, -0.0086973); pairing |l1+l4| = 3.47e-06, |l2+l3| = 3.47e-06; sum = -1.21e-17 (QR exponents; the exact pairing is for singular values, criterion 13)
+AC20 | cross-check at n = 10000, orbit C: |Benettin L_N - hand loop| / |SALI reducer - hand loop| / max |QRSpectrum(HouseholderQR) - hand-loop MGS spectrum|: 2.624e-17 / 3.503e-14 / 1.546e-16 | 1.546e-16 | <= 1e-9 (SALI: informational) | PASS
+AC20 | cross-check at n = 100000, orbit C: |Benettin L_N - hand loop| / |SALI reducer - hand loop| / max |QRSpectrum(HouseholderQR) - hand-loop MGS spectrum|: 1.618e-16 / 2.401e-12 / 2.24e-16 | 2.24e-16 | <= 1e-9 (SALI: informational) | PASS
+AC20 | cross-check at n = 1000000, orbit C: |Benettin L_N - hand loop| / |SALI reducer - hand loop| / max |QRSpectrum(HouseholderQR) - hand-loop MGS spectrum|: 9.246e-17 / 1.061e-11 / 1.807e-16 | 1.807e-16 | <= 1e-9 (SALI: informational) | PASS
+AC20 | cross-check at n = 10000, orbit D: |Benettin L_N - hand loop| / |SALI reducer - hand loop| / max |QRSpectrum(HouseholderQR) - hand-loop MGS spectrum|: 5.378e-17 / 0 / 3.868e-16 | 3.868e-16 | <= 1e-9 (SALI: informational) | PASS
+AC20 | cross-check at n = 100000, orbit D: |Benettin L_N - hand loop| / |SALI reducer - hand loop| / max |QRSpectrum(HouseholderQR) - hand-loop MGS spectrum|: 9.368e-17 / 0 / 2.156e-16 | 2.156e-16 | <= 1e-9 (SALI: informational) | PASS
+AC20 | cross-check at n = 1000000, orbit D: |Benettin L_N - hand loop| / |SALI reducer - hand loop| / max |QRSpectrum(HouseholderQR) - hand-loop MGS spectrum|: 9.714e-17 / 0 / 1.162e-16 | 1.162e-16 | <= 1e-9 (SALI: informational) | PASS
+# section AC20 took 1.9 s
+O7 | orbit C, n = 100: independent re-implementation (labelling of Skokos2003a Eq. 9, qr) spectrum 0.01158, -0.003244, -0.01158, 0.003243 vs Chaoslab QRSpectrum; max difference | 7.112e-17 | <= 1e-9 | PASS
+O7 | orbit C, n = 1000: independent re-implementation (labelling of Skokos2003a Eq. 9, qr) spectrum 0.003361, 0.002324, -0.003361, -0.002324 vs Chaoslab QRSpectrum; max difference | 1.908e-17 | <= 1e-9 | PASS
+O7 | orbit C, n = 100000: independent re-implementation (labelling of Skokos2003a Eq. 9, qr) spectrum 7.728e-05, 5.802e-05, -7.728e-05, -5.802e-05 vs Chaoslab QRSpectrum; max difference | 6.37e-18 | <= 1e-9 | PASS
+O7 | orbit C, n = 1000000: independent re-implementation (labelling of Skokos2003a Eq. 9, qr) spectrum 1.03e-05, 8.483e-06, -1.03e-05, -8.484e-06 vs Chaoslab QRSpectrum; max difference | 1.063e-15 | <= 1e-9 | PASS
+O7 | orbit D, n = 100: independent re-implementation (labelling of Skokos2003a Eq. 9, qr) spectrum 0.04595, -0.003778, -0.03064, -0.01153 vs Chaoslab QRSpectrum; max difference | 4.233e-16 | <= 1e-9 | PASS
+O7 | orbit D, n = 1000: independent re-implementation (labelling of Skokos2003a Eq. 9, qr) spectrum 0.0148, 0.002257, -0.005724, -0.01134 vs Chaoslab QRSpectrum; max difference | 1.508e-11 | <= 1e-9 | PASS
+O7 | orbit D, n = 100000: independent re-implementation (labelling of Skokos2003a Eq. 9, qr) spectrum 0.009267, 0.000187, -0.0002217, -0.009232 vs Chaoslab QRSpectrum; max difference | 0.0007845 | informational (chaotic, long n) | INFO
+O7 | orbit D, n = 1000000: independent re-implementation (labelling of Skokos2003a Eq. 9, qr) spectrum 0.009067, 0.0003061, -0.0003096, -0.009063 vs Chaoslab QRSpectrum; max difference | 0.000366 | informational (chaotic, long n) | INFO
+O7 | 10 seeded random starts, n = 200: max difference of the spectra, independent vs Chaoslab | 4.826e-13 | <= 1e-9 | PASS
+O7 | same starts, n = 2e4 (chaotic starts separate by rounding growth: informational) | 0.005645 | informational | INFO
+# O6b ChaosTools lyapunovspectrum, orbit C, n = 100000: (7.728e-05, -6.0653e-05, 4.1392e-05, -5.8019e-05); pairing |l1+l4| = 1.93e-05, |l2+l3| = 1.93e-05; sum = -1.93e-18
+O6b | orbit C, n = 100000: max |ChaosTools - Chaoslab QRSpectrum| over the four exponents (loose, K18; same frame and exponent order; the regular orbit C agrees to rounding, the chaotic orbit D differs by the separation of the two rounding-perturbed orbits) | 5.388e-15 | <= 1e-3 | PASS
+# O6b ChaosTools lyapunovspectrum, orbit C, n = 1000000: (1.0297e-05, -5.7058e-06, 3.8921e-06, -8.4836e-06); pairing |l1+l4| = 1.81e-06, |l2+l3| = 1.81e-06; sum = 1.18e-18
+O6b | orbit C, n = 1000000: max |ChaosTools - Chaoslab QRSpectrum| over the four exponents (loose, K18; same frame and exponent order; the regular orbit C agrees to rounding, the chaotic orbit D differs by the separation of the two rounding-perturbed orbits) | 5.477e-15 | <= 1e-3 | PASS
+# O6b ChaosTools lyapunovspectrum, orbit D, n = 100000: (0.0092668, 0.00015006, -0.00018472, -0.0092321); pairing |l1+l4| = 3.47e-05, |l2+l3| = 3.47e-05; sum = 3.12e-17
+O6b | orbit D, n = 100000: max |ChaosTools - Chaoslab QRSpectrum| over the four exponents (loose, K18; same frame and exponent order; the regular orbit C agrees to rounding, the chaotic orbit D differs by the separation of the two rounding-perturbed orbits) | 0.0007845 | <= 1e-3 | PASS
+# O6b ChaosTools lyapunovspectrum, orbit D, n = 1000000: (0.0090667, 0.00030244, -0.00030591, -0.0090633); pairing |l1+l4| = 3.47e-06, |l2+l3| = 3.47e-06; sum = -3.82e-17
+O6b | orbit D, n = 1000000: max |ChaosTools - Chaoslab QRSpectrum| over the four exponents (loose, K18; same frame and exponent order; the regular orbit C agrees to rounding, the chaotic orbit D differs by the separation of the two rounding-perturbed orbits) | 0.000366 | <= 1e-3 | PASS
+# O6b chain N = 2, K = 3, eps = 0.2, start (1, 2, 0.5, -0.5), n = 2e5: ChaosTools (0.7502, 0.4607, -0.4607, -0.7502), Chaoslab QR via the stream with fixed-size states (0.7502, 0.4607, -0.4607, -0.7502); sum -1.1e-16 / -1.1e-16; spec drafting check (0.749, 0.461, -0.461, -0.749) for one other orbit
+O6b | chain N = 2 spectrum: max |ChaosTools - Chaoslab stream QRSpectrum| | 1.282e-14 | <= 1e-3 | PASS
+# section O7-O6b took 8.1 s
+# AC21: ChaosTools 3.5.4 DeterministicIteratedMap + TangentDynamicalSystem(J = hand-coded), 100 seeded orbits per system, z0 uniform in [-4 pi, 4 pi]^d, n <= n_H; Q0 = identity
+# AC21 convention: Y3 hand system in the labelling of Skokos2003a Eq. (9) (x1, x2 = position, momentum of map 1; x3, x4 of map 2; right sides at the pre-step values); conversion to the module labelling (positions first) by the permutation [1, 3, 2, 4] of states and of the Jacobian product (rows and columns); Y4 hand system in radians, open chain, same ordering (q_1..q_N, p_1..p_N), eps = 2 beta
+AC21 | Y3 (0.5, 0.1, 0.001): max ratio torus distance (ChaosTools orbit vs module) / tau(k), k <= n_H | 0.0003005 | <= 1 | PASS
+AC21 | Y3 (0.5, 0.1, 0.001): max ratio |Q_ChaosTools - prod M_k| / 8 k eps prod ||M_k||_F, k <= n_H (each side along its own orbit; the bound of the spec) | 0.02674 | <= 1 | PASS
+AC21 | Y3 (0.5, 0.1, 0.001): same with the oracle Jacobian evaluated at the module's orbit points (teacher forced; isolates the formula) | 0.02674 | <= 1 | PASS
+AC21 | Y3 (2.0, 0.5, 0.1): max ratio torus distance (ChaosTools orbit vs module) / tau(k), k <= n_H | 0.001156 | <= 1 | PASS
+AC21 | Y3 (2.0, 0.5, 0.1): max ratio |Q_ChaosTools - prod M_k| / 8 k eps prod ||M_k||_F, k <= n_H (each side along its own orbit; the bound of the spec) | 0.4304 | <= 1 | PASS
+AC21 | Y3 (2.0, 0.5, 0.1): same with the oracle Jacobian evaluated at the module's orbit points (teacher forced; isolates the formula) | 0.1027 | <= 1 | PASS
+AC21 | Y4 N=2 K=1.0 eps=0.2: max ratio torus distance / tau(k), k <= n_H | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=1.0 eps=0.2: max ratio tangent product difference / 8 k eps prod ||M_k||_F (own orbits) | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=1.0 eps=0.2: same, oracle Jacobian at the module's orbit points (teacher forced) | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=1.0 eps=0.6102: max ratio torus distance / tau(k), k <= n_H | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=1.0 eps=0.6102: max ratio tangent product difference / 8 k eps prod ||M_k||_F (own orbits) | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=1.0 eps=0.6102: same, oracle Jacobian at the module's orbit points (teacher forced) | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=3.0 eps=0.2: max ratio torus distance / tau(k), k <= n_H | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=3.0 eps=0.2: max ratio tangent product difference / 8 k eps prod ||M_k||_F (own orbits) | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=3.0 eps=0.2: same, oracle Jacobian at the module's orbit points (teacher forced) | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=3.0 eps=0.6102: max ratio torus distance / tau(k), k <= n_H | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=3.0 eps=0.6102: max ratio tangent product difference / 8 k eps prod ||M_k||_F (own orbits) | 0 | <= 1 | PASS
+AC21 | Y4 N=2 K=3.0 eps=0.6102: same, oracle Jacobian at the module's orbit points (teacher forced) | 0 | <= 1 | PASS
+AC21 | Y4 N=3 K=1.0 eps=0.2: max ratio torus distance / tau(k), k <= n_H | 0.002752 | <= 1 | PASS
+AC21 | Y4 N=3 K=1.0 eps=0.2: max ratio tangent product difference / 8 k eps prod ||M_k||_F (own orbits) | 0.04257 | <= 1 | PASS
+AC21 | Y4 N=3 K=1.0 eps=0.2: same, oracle Jacobian at the module's orbit points (teacher forced) | 0 | <= 1 | PASS
+AC21 | Y4 N=3 K=1.0 eps=0.6102: max ratio torus distance / tau(k), k <= n_H | 0.004342 | <= 1 | PASS
+AC21 | Y4 N=3 K=1.0 eps=0.6102: max ratio tangent product difference / 8 k eps prod ||M_k||_F (own orbits) | 0.3076 | <= 1 | PASS
+AC21 | Y4 N=3 K=1.0 eps=0.6102: same, oracle Jacobian at the module's orbit points (teacher forced) | 0 | <= 1 | PASS
+AC21 | Y4 N=3 K=3.0 eps=0.2: max ratio torus distance / tau(k), k <= n_H | 0.002915 | <= 1 | PASS
+AC21 | Y4 N=3 K=3.0 eps=0.2: max ratio tangent product difference / 8 k eps prod ||M_k||_F (own orbits) | 0.2404 | <= 1 | PASS
+AC21 | Y4 N=3 K=3.0 eps=0.2: same, oracle Jacobian at the module's orbit points (teacher forced) | 0 | <= 1 | PASS
+AC21 | Y4 N=3 K=3.0 eps=0.6102: max ratio torus distance / tau(k), k <= n_H | 0.003329 | <= 1 | PASS
+AC21 | Y4 N=3 K=3.0 eps=0.6102: max ratio tangent product difference / 8 k eps prod ||M_k||_F (own orbits) | 0.1575 | <= 1 | PASS
+AC21 | Y4 N=3 K=3.0 eps=0.6102: same, oracle Jacobian at the module's orbit points (teacher forced) | 0 | <= 1 | PASS
+# section AC21 took 0.9 s
+# figure saved: coupled-maps-orbits-cd.png
+# section figure took 11.3 s
+# total wall time 473.0 s
+# coupled-maps verification, julia 1.13.2, threads 1, base seed 20261012, scale 1.0, time 1.793881397e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# n_H (Y3 published) = 18, n_H (Y3 (2, 0.5, 0.1)) = 9; sigma published = 2.074 (spec: 2.07, n_H 19)
+# threads=1 | Y3 (0.5, 0.1, 0.001) propagate x and W | 100000 orbits | digest 12364334040745445251
+# threads=1 | Y3 (0.5, 0.1, 0.001) propagate x and W, random W0 (seed stream) | 100000 orbits | digest 15891612385477145242
+# threads=1 | Y3 (0.5, 0.1, 0.001) threaded forward loop | 100000 orbits | digest 15345628466754477189
+# threads=1 | Y3 (2.0, 0.5, 0.1) propagate x and W | 100000 orbits | digest 12987927685230051842
+# threads=1 | Y3 (2.0, 0.5, 0.1) propagate x and W, random W0 (seed stream) | 100000 orbits | digest 7675109102063100904
+# threads=1 | Y3 (2.0, 0.5, 0.1) threaded forward loop | 100000 orbits | digest 4113063865083566737
+# threads=1 | Y4 N=2 lifted stream x and W (random W0) | 10000 orbits | digest 6388141704778374409
+# threads=1 | Y4 N=2 wrapped stream x and W (random W0) | 10000 orbits | digest 13836902712513010387
+# threads=1 | Y4 N=5 lifted stream x and W (random W0) | 10000 orbits | digest 9863078253098660134
+# threads=1 | Y4 N=5 wrapped stream x and W (random W0) | 10000 orbits | digest 8408406376791221749
+# threads=1 | wrapped Y3 (0.5, 0.1, 0.001) propagate x and W | 10000 orbits | digest 10084076363027139050
+# threads=1 | wrapped Y3 (2.0, 0.5, 0.1) propagate x and W | 10000 orbits | digest 15906809223273622138
+# section threads took 2.9 s
+# total wall time 15.0 s
+# coupled-maps verification, julia 1.13.2, threads 1, base seed 20261012, scale 1.0, time 1.793881417e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# n_H (Y3 published) = 18, n_H (Y3 (2, 0.5, 0.1)) = 9; sigma published = 2.074 (spec: 2.07, n_H 19)
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), Y3 (0.5, 0.1, 0.001) propagate x and W, 100000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), Y3 (0.5, 0.1, 0.001) propagate x and W, random W0 (seed stream), 100000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), Y3 (0.5, 0.1, 0.001) threaded forward loop, 100000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), Y3 (2.0, 0.5, 0.1) propagate x and W, 100000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), Y3 (2.0, 0.5, 0.1) propagate x and W, random W0 (seed stream), 100000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), Y3 (2.0, 0.5, 0.1) threaded forward loop, 100000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), Y4 N=2 lifted stream x and W (random W0), 10000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), Y4 N=2 wrapped stream x and W (random W0), 10000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), Y4 N=5 lifted stream x and W (random W0), 10000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), Y4 N=5 wrapped stream x and W (random W0), 10000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), wrapped Y3 (0.5, 0.1, 0.001) propagate x and W, 10000 orbits: orbits that differ | 0 | 0 | PASS
+AC18 | 1 vs 8 threads, per-orbit result hash (x and W bits), wrapped Y3 (2.0, 0.5, 0.1) propagate x and W, 10000 orbits: orbits that differ | 0 | 0 | PASS
+# section compare took 0.1 s
+# total wall time 12.1 s

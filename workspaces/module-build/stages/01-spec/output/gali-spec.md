@@ -152,3 +152,22 @@ Recorded lines (no threshold): R1. For 1000 chaotic starts of Y3 at (2, 0.5, 0.1
 - P7. Row I4 (LGALI): no source defines it (F6). Proposal: keep `planned`, correct the text at stage 05 to "GALI near periodic orbits and fixed points: laws of I3, tested in criterion 12; no separate indicator", or close it as merged. If the owner wants a literature search for a definition, ManosSkokosAntonopoulos2012 is the in-bib candidate and its full text would need the literature-review workspace; nothing in this spec depends on it.
 - P8. Catalog row I3 text and the benchmarks rows: "constant or power-law decay (torus dimension)" should state the maps case with the printed generic exponent 2(k - N) and the 2D-map n^-2 (F4); stage 05 flips I3 to `verified` for k = 2..d on Y3 and Y4 only after the owner confirms that the M4 clause "k = 2 module" (D70) is closed by this run. The ChaosTools k = 3, 4 oracle is added or withdrawn after stage 04 (criterion 19b).
 - P9. Rows of the p3 study: the study excludes I3 and I4 as "not run" (D70); once this module is verified the study spec decides whether GALI_3, GALI_4 enter the panel on Y3 and Y4. Not decided here.
+
+## Amendment D107 (2026-11-05)
+
+Approved by the owner at the stage 02 checkpoint (test plan `../../02-tests/output/gali-test-plan.md`, "Deviations and spec items not testable as written"; the measured numbers are there, from a throwaway stub of the API).
+
+### Acceptance criteria (amendment)
+
+- D107a (B10, criteria 9 to 11, 21): the log-form bound is B_L(n) = 32 eps sum_{i<=d} Psi_n^(i), not 8 eps. Reason: a faithful implementation rounds ln alpha_i by a few eps per column and handoff; the stub reached 1.54 times the 8 eps form on a chaotic Y4 N = 2 start. Stage 04 reports the realised ratio.
+- D107b (criterion 9(b), reference): L_ref = ln abs(det W_0) + sum_i ln abs(det M_i) - sum_i S_i, from the 256-bit product, not the logarithm of the 256-bit volume (which saturates near 2^-256).
+- D107c (criterion 5): the identity is gated by the absolute form of criterion 9(c), abs(G_d - abs(det W_0) exp(L)) <= B_G^d(n) + 8 eps G_ref sum_i Psi_n^(i), against a 512-bit reference (the bound 2 B_meas/G_ref holds for one evaluation, not after n handoffs: ratio 1.69). In 5(d) the elementary factors have amplitude 6.
+- D107d (criterion 4): the tolerance of (a) to (e) adds the SALI floor of the input, 2 B_meas(T, 2) + sali_floor(T); (d) reads SALI <= 1.0013 g + 2 times that tolerance.
+- D107e (criterion 7(c)): the agreement with the sali frame check is required except within 2 B_meas(T, 2) of the threshold (the factor 1.0013 is below the evaluation error there). Criterion 7(d): the chain and the frame source are recorded by the Experiments layer (as sali Amendment D67), the reducer records tau, k, precision, indicator and floors. `check_frame` is called by the Experiments layer before the first chunk, not by `propagate` (code fact).
+- D107f (criterion 6(d), 1(c)): the Gram-determinant control is required to fail in at least half of the sets at m = 9 to 13 (beyond m = 15 its value is 0 and below the bound).
+- D107g (criterion 11): the gated window is (n_1, n_2) = (100, 200); the deviations over (40, 80) are reported. Orders unresolved in BigFloat(256) are counted; for K = d the log form carries them.
+- D107h (criterion 13): only orders resolved in BigFloat(256) are gated; k = d goes through the log form. The singular values of the long products are taken from the product accumulated at higher precision.
+- D107i (criterion 14): the package suite gates a pass rate of 50 percent on 18 pooled starts; the full size (verify, 20 starts per system) keeps 70 percent. Stage 04 reports the full-size rate; P6 may lower it to 60 percent or widen the k = 2 band to 0.6.
+- D107j (criterion 15(a)): the floor ratio is taken on the chaotic panel (2, 0.5, 0.1) over starts that reach both floors, at least half of them.
+- D107k (criterion 18(b)): applied where the wrapped and lifted orbits stay together (regular starts n in {10, 100}, chaotic starts n = 10).
+- D107l (criteria 3(e), 16(c), 17, 20): scale factors 2^+-498 (exact); 4D overflow map diag(mu, 1, 1/mu, 1); in 17(a) the read-only trace precedes the replacer; for d = 200 the frames are seeded Gaussian frames.

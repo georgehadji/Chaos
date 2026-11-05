@@ -8,8 +8,8 @@ Layer 3, canonical. `Status` is `planned` or `verified`; only module-build/05 wr
 |----|--------|-----|------|--------------------|--------|-------|--------|
 | Y1 | Chirikov-Taylor standard map (lifted + wrapped coordinates) | 2 | P1/P2 workhorse | det DT = 1; K = 0 gives lambda = 0; large-K lambda_1 vs Chirikov estimate ln(K/2) | Chirikov1979, Greene1979 | M2 | verified |
 | Y2 | Henon area-preserving quadratic map | 2 | second 2D benchmark, escaping orbits | det = 1 | Henon1969 | M4 | planned |
-| Y3 | Coupled standard maps / Froeschle 4D map | 4 | GALI_k, full spectra, Arnold diffusion | pairing lambda_1 = -lambda_4, lambda_2 = -lambda_3 | Froeschle1972 | M5 | planned |
-| Y4 | N coupled standard maps (chain) | 2N | spectrum scaling, k-vector cost | pairing for all i | Skokos2004, Skokos2007 | M5 | planned |
+| Y3 | Coupled standard maps / Froeschle 4D map (variant of Skokos2010 Eq. (16), parameters nu, kappa, mu) | 4 | GALI_k, full spectra, Arnold diffusion | pairing lambda_1 = -lambda_4, lambda_2 = -lambda_3; mu = 0 is Y1 with K = -nu under the shear (x + p, p); orbits C and D of Skokos2003a (SALI of C about 0.28, lambda_1 of D about 8e-3) | Skokos2010, Skokos2003a (Froeschle1972 origin, not read) | M5 | verified |
+| Y4 | N coupled standard maps (chain, 2 <= N <= 100, open ends or ring for N >= 3, nearest-neighbour sine coupling eps = 2 beta; general N derived from the printed N = 2 map, D103) | 2N | spectrum scaling, k-vector cost | pairing for all i; eps = 0 is N copies of Y1 bitwise; exact origin spectrum from the chain Laplacian | Maffione2011a (N = 2, Sect. 6) | M5 | verified |
 | Y5 | Linear symplectic maps (rotation, hyperbolic) | 2N | exact exponents for unit tests | lambda = ln|eigenvalue| exactly | none needed | M2 | verified |
 
 ## B. Hamiltonian flows (need integrators)

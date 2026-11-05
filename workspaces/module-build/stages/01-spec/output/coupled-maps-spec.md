@@ -208,3 +208,8 @@ Owner decision after stage 03 (2e7228c): rework the chain state first, so that Y
 - D105b (stream): the tangent stream on the CPU backend with Y4 at N in {2, 5}, 2000 seeded orbits, k = 4, lifted and wrapped: final states and deviation frames bitwise equal to a plain serial loop of forward and banded tangent products (as criterion 18 for Y3).
 - D105c (plain data and allocation): the Y4 system values are isbits; one step and one frame product at a fixed-size state allocate 0 bytes after warm-up for N in {2, 10, 100}.
 - D105d (criterion 18 for Y4, stage 04): the GPU against CPU comparison of criterion 18 for Y4 at N in {2, 5}, 10^4 orbits, runs through the stream with fixed-size states.
+
+### Clarifications at stage 05 (2026-11-05)
+
+- n_H for the published Y3 parameters is 18, not 19: with sigma = 2.074, sigma^19 is about 1.03e6, above the limit 10^6 of Gamma_n (the code, the tests and the stage 04 report use 18; no result changes).
+- Criterion 9(c) (independence) holds for finite perturbations: with eps = 0 or mu = 0 the coupling term is still evaluated, so a non-finite neighbour gives a non-finite site (stage 04 review finding 1, no code change).

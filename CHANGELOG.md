@@ -4,6 +4,10 @@ All notable changes to `Chaoslab` and this repository. Versions follow Semantic 
 
 ## Unreleased
 
+### Added
+
+- Coupled standard maps in `Chaoslab.Systems` (catalog rows Y3 and Y4, module `coupled-maps`, decisions D103 to D105): `FroeschleMap` and `WrappedFroeschleMap` (the 4D map of Skokos2010 Eq. (16), state `SVector{4}`), `StandardMapChain` and `WrappedStandardMapChain` (N coupled standard maps, 2 <= N <= 100, open ends or ring, any vector state or a fixed-size `SVector` of length 2N, wrapped 4N), the banded tangent `ChainTangent` (isbits, its product with a fixed-size frame stays fixed-size and costs O(N)), in-place forms and banded frame actions that allocate nothing, and `symplectic_residual` for dense matrices. Verified at module-build stage 04: closed forms (K = 0, origin spectra from the chain Laplacian), bitwise decoupled limits against the standard map, 256-bit pairing, the published orbits C and D, ChaosTools, and GPU against CPU for Y3 and Y4 through the tangent stream.
+
 ## 0.2.0 (2026-11-05)
 
 M4 release (D101): the chaos indicators layer, studies p2-indicators and p3-abstention. Julia 1.13 or later (D100).

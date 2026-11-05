@@ -14,8 +14,9 @@ Spec: `workspaces/module-build/stages/01-spec/output/standard-map-spec.md` (SM-;
 | `linear_symplectic.jl` | `LinearSymplecticMap` and block builders for Y5 |
 | `pair.jl` | `PairMap` (product of a map with itself) and its block-diagonal `PairTangent` |
 | `froeschle_map.jl` | `FroeschleMap` (Y3, lifted `SVector{4}`) and `WrappedFroeschleMap` (`SVector{8}`), `torus_state`, `lift` |
-| `standard_map_chain.jl` | `StandardMapChain` (Y4, plain `Vector` state), in-place forms, banded frame actions |
-| `wrapped_standard_map_chain.jl` | `WrappedStandardMapChain` (state length `4N`), `torus_state`, `lift` |
+| `standard_map_chain.jl` | `StandardMapChain` (Y4, `Vector` state), in-place forms, banded frame actions |
+| `chain_tangent.jl` | `ChainTangent` (banded tangent, isbits) and the `SVector`-state `forward`, `inverse`, `tangent`, `inverse_tangent` of the chain (D105) |
+| `wrapped_standard_map_chain.jl` | `WrappedStandardMapChain` (state length `4N`), `torus_state`, `lift`, `SVector`-state forms (D105) |
 | `residuals.jl` | `symplectic_form`, `det_residual`, `symplectic_residual` |
 
 ## Exports
@@ -32,6 +33,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/standard-map-spec.md` (SM-;
 | `PairMap(sys)`, `PairTangent` | state (A; B) of two states of `sys`, dimension `2 d`; `forward`, `inverse` act on each half, `tangent` is `diag(M(A), M(B))` whose product with a frame acts block by block (rli, D76) |
 | `FroeschleMap(nu, kappa, mu)`, `WrappedFroeschleMap` | Y3 in the form of Skokos2010 Eq. (16): state `(x1, x2, p1, p2)`, force at the new positions; wrapped state adds one count per coordinate; dimension 4 |
 | `StandardMapChain(N, K, eps; boundary)`, `WrappedStandardMapChain` | Y4, `2 <= N <= 100`, `:open` or `:ring` (`N >= 3`), state `(q, p)` of length `2N`; wrapped `(q, p, count q, count p)`; dimension `2N`; `ArgumentError` outside the ranges |
+| `ChainTangent` | banded `2N x 2N` tangent at an `SVector` chain state (length `2N`, wrapped `4N`): entries equal the dense tangent, `M * W` for an `SMatrix` frame is the banded action; chain values are isbits, steps and products allocate 0 bytes (D105) |
 | `forward!`, `inverse!`, `tangent!`, `inverse_tangent!`, `tangent_action!`, `inverse_tangent_action!` | chain only: in-place forms (0 bytes after warm-up), dense `2N x 2N` tangent, `M W` and `M^-1 W` for a frame in cost linear in `N` |
 | `torus_state(sys, z)`, `lift(sys, s)` | two-argument forms for the wrapped Y3 and chain (state length does not identify the system) |
 | `symplectic_form(T, d)`, `det_residual(M)`, `symplectic_residual(M)` | `Omega`, `abs(det M - 1)`, max entry of `M' Omega M - Omega` (also for a dense `Matrix`) |
@@ -68,5 +70,5 @@ Spec: `workspaces/module-build/stages/01-spec/output/standard-map-spec.md` (SM-;
 | Reset of winding counts at each run checkpoint (the rule is set, no checkpoint writer exists yet) | D31 |
 | Counts beyond `maxintfloat(T)` (about 1e8 steps on an accelerator-mode orbit in Float64) | health error today, D28, D31 |
 | Float32 | D24 |
-| Chain (plain `Vector` state) in `propagate` and on the GPU: the kernel needs isbits states (P8) | later; Y3 works with `propagate` today |
+| Chain on the GPU: the CPU stream works with `SVector` states (D105); the GPU comparison is criterion D105d | stage 04 of the rework |
 | Flows and integrators | M5 |

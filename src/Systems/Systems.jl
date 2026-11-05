@@ -13,7 +13,7 @@ export AbstractMap, StandardMap, LinearSymplecticMap, WrappedStandardMap, torus_
 export rotation_block, hyperbolic_block, block_diagonal, conjugated
 export dimension, forward, inverse, tangent, inverse_tangent
 export PairMap, PairTangent
-export FroeschleMap, WrappedFroeschleMap, StandardMapChain, WrappedStandardMapChain
+export FroeschleMap, WrappedFroeschleMap, StandardMapChain, WrappedStandardMapChain, ChainTangent
 export forward!, inverse!, tangent!, inverse_tangent!, tangent_action!, inverse_tangent_action!
 export wrap, symplectic_form, det_residual, symplectic_residual
 
@@ -87,6 +87,7 @@ include("linear_symplectic.jl")
 include("pair.jl")
 include("froeschle_map.jl")
 include("standard_map_chain.jl")
+include("chain_tangent.jl")
 include("wrapped_standard_map_chain.jl")
 include("residuals.jl")
 

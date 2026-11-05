@@ -87,3 +87,72 @@ The banded action is 12 times cheaper than the dense product at N = 100 and 100 
 - `src/Systems/CONTEXT.md` says Systems imports nothing from Foundation; kept (the new files use only the Systems helpers `_sin`, `_cos`, `_pi`, `_reduce`).
 - Spec criterion 12 off-block bound and criterion 18 thread wording: see Amendment D104 (applied by the tests).
 - `Systems.jl` module docstring and the `forward` docstring still describe the Y1 `SVector` state; `docs/src/api/` was not checked for the new exports.
+
+## Rework D105 (2026-11-05)
+
+Fixed-size (SVector) Y4 states, lifted (2N) and wrapped (4N), and the banded `ChainTangent`, per spec Amendment D105. Tests untouched (`test/coupled-maps/cm_d105.jl` from 50fba26). Not committed.
+
+### Results
+
+| Check | Result |
+|-------|--------|
+| coupled-maps suite (`myred.jl`, 2 threads) | GREEN 630 of 630 (592 passing before, 16 fail + 22 error before; 556 existing + 74 D105: D105a 18, D105b 16, D105c 40) |
+| Whole suite (`Pkg.test()`, `-t 4`, 25 min 28 s) | 1 405 539 pass, 0 fail, 0 error, 1 broken (the existing weighted-birkhoff one) |
+| Quality | Aqua and JET clean (quality 12 of 12); layering 2 of 2 |
+| Coverage (`--code-coverage=user`, coupled-maps suite) | `chain_tangent.jl` 51 of 51, `wrapped_standard_map_chain.jl` 91 of 91, `standard_map_chain.jl` 110 of 110 executable lines (100 percent); the `.cov` files this run created were deleted (432 older `.cov` files from 10-29 and 10-31 stay, git-ignored, not mine) |
+| Size | functions at most 14 lines; files 96 (`chain_tangent.jl`), 153 (wrapped chain) |
+| Numerics | no `@fastmath`; no dependency added; no em dashes |
+
+### Change table
+
+| File | Diff | Change |
+|------|------|--------|
+| `src/Systems/chain_tangent.jl` | new, 96 lines | `ChainTangent{T,N}` (SVectors `g`, `gl`, `gr`, flags `ring`, `inv`; `size` (2N, 2N); `getindex` with the dense expressions so `Matrix` is bitwise the dense tangent; `*` with an `SMatrix` via `_band`, `vcat`, `_rows` of pair.jl); `forward`, `inverse`, `tangent`, `inverse_tangent` for `SVector` of the lifted chain |
+| `src/Systems/wrapped_standard_map_chain.jl` | +59, -0 | `forward`, `inverse`, `tangent`, `inverse_tangent`, `torus_state`, `lift` for `SVector`; helpers `_check_wrapped`, `_guard_counts`, `_reduced` |
+| `src/Systems/Systems.jl` | +2, -1 | export `ChainTangent`, include `chain_tangent.jl` |
+| `src/Systems/CONTEXT.md` | +3, -2 (74 lines) | files table, export row, deferred row |
+| `bench/coupled-maps.jl` | +13 | SVector entries |
+
+The Vector-state paths are not edited. The wrapped struct is unchanged (field `chain`, still isbits).
+
+### Compile times (first call, one session, Float64)
+
+| N | lifted forward | tangent * W | inverse_tangent * W | wrapped forward | wrapped tangent * W | wrapped inverse |
+|---|---|---|---|---|---|---|
+| 2 | 0.02 s | 0.10 s | 0.02 s | 0.02 s | 0.02 s | 0.03 s |
+| 10 | 0.03 s | 0.32 s | 0.05 s | 0.07 s | 0.04 s | 0.04 s |
+| 100 | 0.12 s | 3.08 s | 0.92 s | 0.76 s | 0.59 s | 0.60 s |
+
+Each N compiles its own methods (the sizes are types). The D105a testset (N = 100 included, both types) took 13 to 15 s.
+
+### Bench (BenchmarkTools, median; timer resolution on this Windows host is 100 ns, so N = 2 and N = 10 entries are at the floor), all 0 bytes
+
+| Entry | N = 2 | N = 10 | N = 100 |
+|-------|-------|--------|---------|
+| vector `forward!` | <100 ns | 100 ns | 700 ns |
+| SVector `forward` | <100 ns | 100 ns | 700 ns |
+| vector wrapped `forward!` | 100 ns | 100 ns | 1100 ns |
+| SVector wrapped `forward` | 100 ns | 100 ns | 1100 ns |
+| `tangent_action!` (4 vectors) | <100 ns | 100 ns | 1200 ns |
+| SVector `tangent(..) * W` (4 vectors, includes building the band) | <100 ns | 100 ns | 1400 ns |
+| `inverse_tangent_action!` | <100 ns | 100 ns | 1200 ns |
+| SVector `inverse_tangent(..) * W` | 100 ns | 100 ns | 1300 ns |
+| dense `tangent!` / dense times frame | <100 / 100 ns | 200 / 200 ns | 15 600 / 15 000 ns |
+
+The SVector forms cost the same as the in-place vector forms (within the timer floor and 15 percent at N = 100) and are 11 times cheaper than the dense tangent product at N = 100.
+
+### Readings and deviations
+
+- Bitwise equality is kept by the same expression order: the force and the band come from `_force` and the cosine expressions of `_grow` (written per kind: `K cos q_j`, `eps cos(q_j - q_left)` or `+0.0`, then `g0 + cl + cr`, `gl = -cl`, `gr = -cr`); `getindex` uses the dense `tangent!` / `inverse_tangent!` expressions (`G + e`, `-e`, `-G`), so `-0.0` appears where the dense matrix has it.
+- Allocation: the first version (tuple concatenation with `...`, tuples of 5-tuples and of pairs) allocated for N >= 10 (inference limits for long tuples, up to 95 kB at N = 100). Final form: `vcat` of SVector blocks, three homogeneous `ntuple`s for the band, `ntuple(j -> R[j][1], Val(N))` instead of `map(first, R)`, and `::Type{T}` in `_chain_tangent`. Cost of the wrapped step: no duplicate reduction.
+- A wrong state length throws `DimensionMismatch` (also `m.N` against the length), as `PairTangent` does for a frame.
+- The `ChainTangent` type holds `inv` as a field, not a type parameter (one type for both operators, so one compile per N).
+- The `StandardMapChain` and `Systems.jl` docstrings were not changed (`forward` still says SVector of Y1); `ChainTangent` has its docstring. `docs/src/api/` and `src/precompile.jl` not checked or edited.
+- Line endings: the working-copy files of this repo are mixed; `Systems.jl` and the wrapped file were normalised to LF (the index form), so git diffs only the real lines; `chain_tangent.jl` is LF.
+
+### Conflicts between spec, docs and code
+
+- Spec criterion text for D105a says "banded frame action of criterion 17" while the product is compared with `tangent_action!` of the chain (RD6 of the test plan); no code conflict.
+- `Systems.jl` generic docstrings (`forward`, `tangent`) still describe the Y1 `SVector` state; the chain now accepts both `Vector` and `SVector`, with the same results.
+- `src/Systems/CONTEXT.md` header says "(Y3, Y4)" built by coupled-maps; unchanged.
+- Carried from the first stage 03: `_config/architecture.md` Module map names `step`, `invariants`; code uses `forward`, `inverse`, `tangent`, `inverse_tangent`.

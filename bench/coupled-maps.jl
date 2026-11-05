@@ -34,3 +34,16 @@ for N in (2, 10, 100)
     SUITE["y4 N=$N inverse_tangent_action! (4 vectors)"] = @benchmarkable inverse_tangent_action!($WO, $sys, $z, $W)
     SUITE["y4 N=$N dense tangent times frame"] = @benchmarkable mul!($WO, $M, $W) setup = (tangent!($M, $sys, $z))
 end
+
+# Fixed-size chain states (D105): SVector step and ChainTangent frame product, as used by the tangent stream and the GPU kernel.
+for N in (2, 10, 100)
+    sys = StandardMapChain(N, 3.0, 0.6102; boundary = N >= 3 ? :ring : :open)
+    wsys = WrappedStandardMapChain(N, 3.0, 0.6102; boundary = N >= 3 ? :ring : :open)
+    z = SVector{2N}([0.1 * sin(j) + 1.0 for j in 1:(2N)])
+    s = SVector{4N}(vcat(mod.(z, 2pi), zeros(2N)))
+    W = SMatrix{2N, 4}([cos(i + 3j) for i in 1:(2N), j in 1:4])
+    SUITE["y4 N=$N sv forward"] = @benchmarkable forward($sys, $(Ref(z))[])
+    SUITE["y4 N=$N sv wrapped forward"] = @benchmarkable forward($wsys, $(Ref(s))[])
+    SUITE["y4 N=$N sv tangent * frame (4 vectors)"] = @benchmarkable tangent($sys, $(Ref(z))[]) * $(Ref(W))[]
+    SUITE["y4 N=$N sv inverse tangent * frame (4 vectors)"] = @benchmarkable inverse_tangent($sys, $(Ref(z))[]) * $(Ref(W))[]
+end

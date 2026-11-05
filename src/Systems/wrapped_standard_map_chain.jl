@@ -92,3 +92,62 @@ function lift(w::WrappedStandardMapChain, s::AbstractVector)
     tp = 2 * _pi(s[1])
     return [s[j] + tp * s[d + j] for j in 1:d]
 end
+
+# Fixed-size states (SVector of length 4N, amendment D105): the steps as tuples, same expressions and order as the in-place forms.
+function _check_wrapped(m, S)
+    (S % 4 == 0 && m.N == S ÷ 4) || throw(DimensionMismatch("chain of $(m.N) sites with a wrapped state of length $S"))
+    return S ÷ 4
+end
+
+function _guard_counts(x::SVector{S, T}, N) where {S, T}
+    lim = maxintfloat(T)
+    for i in (2N + 1):(4N)
+        abs(x[i]) < lim || return SVector{S, T}(ntuple(_ -> T(NaN), Val(S)))
+    end
+    return x
+end
+
+# Reduction of the entries v (an SVector) into [0, tp): the reduced values and the counts.
+@inline function _reduced(v::SVector{N}, tp) where {N}
+    R = ntuple(j -> _reduce(v[j], tp), Val(N))
+    return SVector{N}(ntuple(j -> R[j][1], Val(N))), SVector{N}(ntuple(j -> R[j][2], Val(N)))
+end
+
+function forward(w::WrappedStandardMapChain, s::SVector{S}) where {S}
+    m, N = w.chain, _check_wrapped(w.chain, S)
+    T, V, tp = _promoted(m, s), Val(N), 2 * _pi(s[1])
+    pp, a = _reduced(SVector{N, T}(ntuple(j -> s[N + j] + _force(m, s, j), V)) , tp)
+    nn = _blk(s, 3N, V) + a
+    qq, b = _reduced(_blk(s, 0, V) + pp, tp)
+    return _guard_counts(vcat(qq, pp, _blk(s, 2N, V) + nn + b, nn), N)
+end
+
+function inverse(w::WrappedStandardMapChain, s::SVector{S}) where {S}
+    m, N = w.chain, _check_wrapped(w.chain, S)
+    T, V, tp = _promoted(m, s), Val(N), 2 * _pi(s[1])
+    q, b = _reduced(_blk(s, 0, V) - _blk(s, N, V), tp)
+    mm = _blk(s, 2N, V) - _blk(s, 3N, V) + b
+    pp, a = _reduced(SVector{N, T}(ntuple(j -> s[N + j] - _force(m, q, j), V)), tp)
+    return _guard_counts(vcat(q, pp, mm, _blk(s, 3N, V) + a), N)
+end
+
+function tangent(w::WrappedStandardMapChain, s::SVector{S}) where {S}
+    return _chain_tangent(w.chain, s, Val(_check_wrapped(w.chain, S)), _promoted(w.chain, s), false)
+end
+function inverse_tangent(w::WrappedStandardMapChain, s::SVector{S}) where {S}
+    N = _check_wrapped(w.chain, S)
+    return _chain_tangent(w.chain, _Preimage(s, N), Val(N), _promoted(w.chain, s), true)
+end
+
+function torus_state(w::WrappedStandardMapChain, z::SVector{d, T}) where {d, T}
+    d == dimension(w) || throw(DimensionMismatch("lifted state of length $d for a chain of dimension $(dimension(w))"))
+    tp = 2 * _pi(z[1])
+    return vcat(_reduced(z, tp)...)
+end
+
+function lift(w::WrappedStandardMapChain, s::SVector{S}) where {S}
+    d = S ÷ 2
+    (iseven(S) && d == dimension(w)) || throw(DimensionMismatch("wrapped state of length $S for a chain of dimension $(dimension(w))"))
+    tp = 2 * _pi(s[1])
+    return SVector{d}(ntuple(j -> s[j] + tp * s[d + j], Val(d)))
+end

@@ -14,7 +14,9 @@ The I3 flip closes the M4 clause of D70 ("No gali module in M4", k = 2 only thro
 
 Evidence: `stages/04-verify/output/gali-verification.md`, accepted at the stage 04 checkpoint (2026-11-05): criteria 1 to 21 pass at full size under Amendments D107 and D108 (21(b) chaotic class reported, D108i; Double64 GPU FALLBACK with reason); ChaosTools `gali` k = 2, 3, 4; folder suite 2724 checks; whole package suite 1 408 277 pass, 0 fail, 1 broken (existing, weighted-birkhoff); independent review without CRITICAL or HIGH finding, its MEDIUM (subnormal column) fixed tests first (D108j).
 
-Open: the orbit-divergence term D_orb of B11 for d >= 4 (21(b) chaotic class, D108i); review findings 2 to 4 (LOW: no D >= K check in `gali_values`, type-unstable `gali_values(::AbstractMatrix)` and `check_frame` with a first call of 0.6 to 1.9 s at d = 200, integer element types); the sali reducer accepts a subnormal column norm (not changed, D108j). Recorded limits: the full-size verify and GPU groups of the D108 rerun ran before the last signature change of `_first_bad` (behaviour identical, whole suite rerun after it); the stage 04 timings were taken on a loaded machine.
+Amendment D109 (2026-11-05, after stage 05, owner instruction): the orbit-divergence term D_orb for d >= 4 is formed and gates 21(b) chaotic class (PASS on Y3, Y4 N = 2, 5; device ratio at c = 64 at most 0.024), and review findings 2 to 4 are fixed tests first (`ga_d109.jl` RED 18 fail, 5 error; GREEN 103 of 103; whole suite 1 408 380 pass, 0 fail, 1 broken). The I3 qualifier "(CPU-GPU orbit term D_orb for d >= 4 not formed, D108i)" is removed.
+
+Open: none for the module. Not run: the GPU log form for Y4 N = 5 at K = d = 10 (the section runs K = 4 there), horizons beyond n = 8 in the chaotic class. The sali reducer accepts a subnormal column norm (not changed, D108j). Recorded limits: the full-size verify and GPU groups of the D108 rerun ran before the last signature change of `_first_bad` (behaviour identical, whole suite rerun after it); the stage 04 timings were taken on a loaded machine.
 
 ## Commits
 
@@ -22,7 +24,8 @@ Open: the orbit-divergence term D_orb of B11 for d >= 4 (21(b) chaotic class, D1
 - e5281f0 module-build gali stage 02: RED tests and test plan; spec Amendment D107
 - f5e4469 module-build gali stage 03: implementation, bench, impl notes
 - 375cc59 module-build gali stage 04: verification, spec Amendment D108, review rework (D108j)
-- (this commit) module-build gali stage 05: catalog I3 verified, I4 text, benchmark row, changelog, docs, integration log
+- 5631b00 module-build gali stage 05: catalog I3 verified, I4 text, benchmark row, changelog, docs, integration log
+- (this commit) module-build gali Amendment D109: D_orb for d >= 4 (verify/gpu.jl), review findings 2 to 4 fixed tests first, I3 qualifier removed
 
 ## Files changed by the module
 
@@ -37,7 +40,7 @@ Short hashes of the gali commits that touched each file. Stage paths are relativ
 - `src/Indicators/CONTEXT.md` (f5e4469, stage 05)
 - `src/Indicators/Indicators.jl` (f5e4469)
 - `src/Indicators/gali.jl` (f5e4469, 375cc59)
-- `test/gali/` `runtests.jl` (e5281f0, 375cc59), `ga_helpers.jl`, `ga_ac09_12.jl`, `ga_ac13_16.jl` (e5281f0, 375cc59), `ga_ac01_04.jl`, `ga_ac05_08.jl`, `ga_ac17_20.jl` (e5281f0), `ga_d108.jl` (375cc59)
+- `test/gali/` `runtests.jl` (e5281f0, 375cc59), `ga_helpers.jl`, `ga_ac09_12.jl`, `ga_ac13_16.jl` (e5281f0, 375cc59), `ga_ac01_04.jl`, `ga_ac05_08.jl`, `ga_ac17_20.jl` (e5281f0), `ga_d108.jl` (375cc59), `ga_d109.jl` (D109 commit; `runtests.jl`, `src/Indicators/gali.jl`, `verify/gpu.jl`, the spec, test plan, impl notes, verification report and GPU log, `CHANGELOG.md`, `_config/catalogs/indicators.md` and `_config/decision-log.md` also in it)
 - `verify/gali.jl`, `verify/gpu.jl` (375cc59)
 - `data/literature/gali/` (SkokosManos2016 full text, owner-approved download at stage 01; git-ignored)
 - `01-spec/output/gali-spec.md` (cb2e7ce, e5281f0, 375cc59)

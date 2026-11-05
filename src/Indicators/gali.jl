@@ -43,7 +43,8 @@ end
 
 # Scaled Euclidean norm of column j of a matrix, the arithmetic of `safe_norm` as plain loops (a fixed-size loop, not an unrolled
 # expression: the unrolled form at d = 200 takes minutes to compile for Double64).
-@inline Base.@propagate_inbounds function _norm_col(M, j::Int, ::Val{D}) where {D}
+@inline Base.@propagate_inbounds _norm_col(M, j::Int, ::Val{D}) where {D} = _norm_col(M, j, D)
+@inline Base.@propagate_inbounds function _norm_col(M, j::Int, D::Int)
     m = abs(M[1, j])
     for i in 2:D
         m = max(m, abs(M[i, j]))
@@ -72,7 +73,13 @@ end
 # column orthogonalised twice against the earlier ones, so the first k values do not depend on K (nesting is bitwise). Destroys `Q`.
 # `@inbounds` is required: a bounds-error path that holds `Q` defeats the stack allocation (zero allocation per step at d = 200).
 @inline function _gram_inplace!(Q::AbstractMatrix{T}, ::Val{D}, ::Val{K}) where {T, D, K}
-    G, g = zeros(SVector{K, T}), one(T)
+    return _tail(_gram_core!(Q, D, K, zeros(SVector{K, T})))
+end
+# The loops for runtime sizes too (host path); `G` is an `SVector` (replaced through `setindex`) or a `Vector` (written in place).
+_put(G::SVector, j, g) = Base.setindex(G, g, j)
+_put(G::Vector, j, g) = (G[j] = g; G)
+@inline function _gram_core!(Q::AbstractMatrix{T}, D::Int, K::Int, G) where {T}
+    g = one(T)
     @inbounds for j in 1:K
         for _ in 1:2, p in 1:(j - 1)
             c = zero(T)
@@ -83,14 +90,14 @@ end
                 Q[i, j] -= c * Q[i, p]
             end
         end
-        r = _norm_col(Q, j, Val(D))
+        r = _norm_col(Q, j, D)
         s = iszero(r) ? one(T) : r    # r = 0 means a zero column: it stays zero (a ternary inside the loop defeats stack allocation)
         for i in 1:D
             Q[i, j] /= s
         end
-        j > 1 && (g *= r; G = Base.setindex(G, g, j))
+        j > 1 && (g *= r; G = _put(G, j, g))
     end
-    return _tail(G)
+    return G
 end
 @inline _tail(G::SVector{K, T}) where {K, T} = SVector{K - 1, T}(ntuple(i -> G[i + 1], Val(K - 1)))
 
@@ -100,15 +107,31 @@ end
 `(G_2, ..., G_K)` of the `d x K` matrix `W` (`SMatrix` or `Matrix`, any element type, BigFloat included): each column is divided by
 its scaled norm, then a nested QR (modified Gram-Schmidt, each column orthogonalised twice) gives `G_k = prod_{i <= k} abs(R_ii)` for
 every `k` at once (spec B2 iv): the volume of the parallelepiped of the first `k` unit columns, `0` for dependent columns, within
-[`gali_floor`](@ref) of the true value. A non-finite or subnormal column norm gives non-finite values for the orders that contain that column. Written for fixed sizes, no library call.
+[`gali_floor`](@ref) of the true value. A non-finite or subnormal column norm gives non-finite values for the orders that contain that column.
+Needs `size(W, 1) >= size(W, 2)` and at least 2 columns (`ArgumentError` otherwise). Non-float element types are converted with `float`. An `SMatrix` gives an
+`SVector` (fixed sizes, no library call); any other matrix runs the same loops on a heap buffer and gives a `Vector`, bitwise equal.
 """
-function gali_values(W::SMatrix{D, K}) where {D, K}
-    K >= 2 || throw(ArgumentError("GALI needs a matrix with at least 2 columns, got $K"))
+function gali_values(W::SMatrix{D, K, T}) where {D, K, T}
+    float(T) === T || return gali_values(float.(W))
+    K >= 2 || throw(ArgumentError("GALI needs a matrix with at least 2 columns"))   # constant messages: device code can reach this method
+    D >= K || throw(ArgumentError("GALI needs d >= k"))
     a = ntuple(j -> _norm_col(W, j, Val(D)), Val(K))
     a = map(x -> 0 < x < floatmin(typeof(x)) ? oftype(x, NaN) : x, a)    # D108j: a subnormal column is non-finite input
     return _gram_inplace!(_unit_buffer(W, a), Val(D), Val(K))
 end
-gali_values(W::AbstractMatrix) = gali_values(SMatrix{size(W, 1), size(W, 2)}(W))
+function gali_values(W::AbstractMatrix{T}) where {T}
+    float(T) === T || return gali_values(float.(W))
+    D, K = size(W)
+    K >= 2 || throw(ArgumentError("GALI needs a matrix with at least 2 columns, got $K"))
+    D >= K || throw(ArgumentError("GALI needs d >= k, got a $D x $K matrix"))
+    a = [_norm_col(W, j, D) for j in 1:K]
+    map!(x -> 0 < x < floatmin(T) ? oftype(x, NaN) : x, a, a)    # D108j, as the SMatrix method
+    U = Matrix{T}(undef, D, K)
+    for j in 1:K, i in 1:D
+        U[i, j] = W[i, j] / a[j]
+    end
+    return _gram_core!(U, D, K, zeros(T, K))[2:K]
+end
 
 """
     gali_value(W, k) -> T
@@ -117,6 +140,7 @@ gali_values(W::AbstractMatrix) = gali_values(SMatrix{size(W, 1), size(W, 2)}(W))
 """
 function gali_value(W::AbstractMatrix, k::Integer)
     2 <= k <= size(W, 2) || throw(ArgumentError("GALI order k must lie in 2..$(size(W, 2)), got $k"))
+    size(W, 1) >= size(W, 2) || throw(ArgumentError("GALI needs d >= k, got a $(size(W, 1)) x $(size(W, 2)) matrix"))
     return gali_values(Matrix(W)[:, 1:k])[k - 1]
 end
 
@@ -187,7 +211,7 @@ supplied frame before the stream starts; `propagate` does not.
 function check_frame(::GALI, W0::AbstractMatrix{T}; orbit::Integer = 0) where {T}
     size(W0, 2) >= 2 || throw(ArgumentError("GALI needs a frame with at least 2 columns, got $(size(W0, 2))"))
     g0 = gali_values(W0)[end]
-    threshold = 10 * gali_floor(T, size(W0, 2))
+    threshold = 10 * gali_floor(float(T), size(W0, 2))
     g0 >= threshold || throw(NumericalHealthError("initial frame", Float64(g0), Float64(threshold), 0, orbit, :cpu, 0))
     return g0
 end

@@ -2301,10 +2301,11 @@ end
 # with a trace kernel and its final state is checked bitwise against the propagate result), on the first NREF orbits (the reference costs about a second per 1e4 steps and orbit):
 # |G_k - G_ref| <= B_G^k(n) for the orders with G_ref >= B_meas (D108b; was 10 B_meas), the floor control for the others, |L - L_ref| <= B_L(n) = 32 eps (1 + a_max(n)) sum Psi (D108a; the floor control allows 2 B_meas + B_G^k, D108b). (b) Orbits whose final states agree
 # within 1e-9: |G_cpu - G_gpu| <= B_cpu + B_gpu (2 B_G^k) and |L_cpu - L_gpu| <= B_L,cpu + B_L,gpu (the sum of the two single-backend log bounds; the B11 form 16 eps sum Psi is reported
-# as a ratio too). D108i: in the chaotic class (b) is reported in units of the plain bound sum (INFO, not gated; the orbit-divergence term D_orb of B11 is not formed) and 21(a) gates it; in the regular class (b) is gated.
+# as a ratio too). D108i: in the chaotic class the plain bound sum is reported (INFO); D109a: (b) is gated with the orbit-divergence term D_orb of B11 (gali_orb above; entering orbits bnd_n <= 1e-4 and D_orb^(k) <= 0.1) and 21(a) gates it; in the regular class (b) is gated.
 # The realised gap is reported in units of the bound.
 MODTAG[] = "gali: "
 if want("gali")
+    isdefined(Main, :sl_mats_std) || include(joinpath(ROOT, "test", "sali", "sl_helpers.jl"))   # D109a self-check at d = 2 uses the sali helpers
     include(joinpath(ROOT, "test", "gali", "ga_helpers.jl"))      # ga_*: GACase, ga_ref, ga_psis, bounds (definitions only; no @test runs at load)
     for f in ("ga_ac01_04.jl", "ga_ac05_08.jl", "ga_ac09_12.jl")
         for e in Meta.parseall(read(joinpath(ROOT, "test", "gali", f), String)).args
@@ -2349,6 +2350,86 @@ function gali_ref_at(c, sysT, pts, W0, N)
     return (ref = ref, psi = psi, lam = lam)
 end
 
+# ---- D109a (spec Amendment D109a, derivation in the spec; criterion 21(b) chaotic class, B11): the CPU-GPU orbit-divergence term for d >= 4.
+# In BigFloat(256) on the CPU reference orbit: pts[k+1] = z_k (k = 0..n-1), zN = z_n, W0 (d x K) the seeded frame, cc the device constant (64), Lip the
+# Lipschitz constant of the tangent (spectral norm of the tangent difference per inf-norm of the state error). `mk()` is called at 256 bits and returns
+# tan(k, pt) = the d x d tangent at z_k. A_k = DM(z_k), P_{<k} = A_{k-1} .. A_0, P_{>k} = A_{n-1} .. A_{k+1}, M_k = max(1, max_{j<=k} |z_j|_inf over all lifted
+# components), Gamma_k = sum_{j<k} norm(A_{k-1} .. A_{j+1})_2 (empty product = I, Gamma_0 = 0), bnd_k = cc eps M_k Gamma_k, and
+#   T_i = Lip sum_{k<n} norm(P_{>k})_2 bnd_k norm(P_{<k} w_i) / norm(P w_i),  D^(d) = sum_{i<=d} T_i (det P = 1),
+#   D^(k) = sum_{i<=k} sqrt(1 - h_i^2) / h_i T_i for 2 <= k < d, h_i the distance of the unit column u_i = P w_i / norm(P w_i) to the span of the other k - 1.
+# (At k = d the L-form constant 1 is used: D^(d) is also the bound for ln G_d = ln abs det W0 - sum ln norm(P w_i).) Spectral norms are the Float64 svdvals of the
+# rounded 256-bit matrices (relative error 1e-15, far inside the slack of the constants). Returns T, Dk (index k - 1 for k = 2..K), bnd (index k + 1 for k = 0..n).
+function gali_orb(mk, pts, zN, W0, epsT, Lip, cc)
+    return setprecision(BigFloat, 256) do
+        tan = mk()
+        n = length(pts); d, K = size(W0)
+        A = [Matrix{BigFloat}(tan(k, pts[k+1])) for k in 0:n-1]               # A[k+1] = DM(z_k)
+        zs = vcat(pts, [zN])
+        Mk = accumulate(max, [max(1.0, maximum(abs, Float64.(z))) for z in zs])
+        sn(Q) = maximum(svdvals(Float64.(Q)))
+        Id = Matrix{BigFloat}(LinearAlgebra.I, d, d)
+        gam = map(0:n) do k
+            Q, g = Id, 0.0
+            for j in k-1:-1:0                                                  # Q = A_{k-1} .. A_{j+1}
+                g += sn(Q)
+                Q = Q * A[j+1]
+            end
+            g
+        end
+        bnd = [cc * epsT * Mk[k+1] * gam[k+1] for k in 0:n]
+        pg = Vector{Float64}(undef, n)                                         # pg[k+1] = norm(P_{>k})
+        pg[n] = 1.0
+        Q = Id
+        for k in n-1:-1:1
+            Q = Q * A[k+1]
+            pg[k] = sn(Q)
+        end
+        T = zeros(K); V = Vector{Vector{BigFloat}}(undef, K)
+        for i in 1:K
+            v = [BigFloat.(W0[:, i])]
+            for k in 0:n-1
+                push!(v, A[k+1] * v[end])
+            end
+            nv = [Float64(sqrt(sum(abs2, x))) for x in v]
+            T[i] = Lip * sum(pg[k+1] * bnd[k+1] * nv[k+1] / nv[n+1] for k in 0:n-1)
+            V[i] = v[end] ./ sqrt(sum(abs2, v[end]))
+        end
+        Dk = zeros(K - 1)
+        for k in 2:K
+            if k == d
+                Dk[k-1] = sum(T[1:k])
+            else
+                Gi = inv(BigFloat[sum(V[a] .* V[b]) for a in 1:k, b in 1:k])
+                h = [1 / sqrt(Gi[i, i]) for i in 1:k]
+                Dk[k-1] = sum(Float64(sqrt(max(1 - h[i]^2, zero(BigFloat))) / h[i]) * T[i] for i in 1:k)
+            end
+        end
+        (T = T, Dk = Dk, bnd = Float64.(bnd))
+    end
+end
+gali_lip(c) = c.kind === :y3 ? 2 * sqrt(2.0) * (max(abs(c.p[1]), abs(c.p[2])) + 4 * abs(c.p[3])) : sqrt(2.0) * (abs(c.p[1]) + 8 * abs(c.p[2]))
+gali_mk(c) = () -> (sysB = ga_sys(BigFloat, c); (k, pt) -> ga_tanB(sysB, c, pt))
+
+# Self-check at d = 2 (standard map, K = d = 2): D^(2) of gali_orb with cc = 16 and Lip = sqrt 2 |K| equals the sali d68_orb value D (same formula, svdvals
+# against the closed-form 2 x 2 norm), and D is linear in cc (cc = 64 gives 4 D). Returns the largest relative deviations over the orbits.
+function gali_d2_selfcheck(Kt, nn, nn_orb)
+    rng = StableRNG(GSEED + 7)
+    dev16, dev64 = 0.0, 0.0
+    for j in 1:nn_orb
+        sysS = StandardMap(Kt)
+        x0 = SVector{2,Float64}(2 * pi * rand(rng), 2 * pi * rand(rng))
+        pts, zN = ga_pts(sysS, x0, nn)
+        W0 = sl_frame(SEED, j, Float64)
+        od = d68_orb(Kt, pts, zN, W0, Float64(eps(Float64)))
+        mk = () -> (mats = sl_mats_std(Kt, pts); (k, pt) -> (m = mats(k + 1); BigFloat[m[1] m[2]; m[3] m[4]]))
+        g16 = gali_orb(mk, pts, zN, W0, Float64(eps(Float64)), sqrt(2.0) * abs(Kt), 16)
+        g64 = gali_orb(mk, pts, zN, W0, Float64(eps(Float64)), sqrt(2.0) * abs(Kt), 64)
+        dev16 = max(dev16, abs(g16.Dk[1] - od.D) / od.D)
+        dev64 = max(dev64, abs(g64.Dk[1] - 4 * od.D) / (4 * od.D))
+    end
+    return dev16, dev64
+end
+
 function gali_gpu_row(tag, c, T, Z, N, K; nref, chaotic = false)
     d = ga_d(c); m = length(Z); epsT = ga_eps(T)
     sysT = ga_sys(T, c)
@@ -2364,8 +2445,12 @@ function gali_gpu_row(tag, c, T, Z, N, K; nref, chaotic = false)
     row("AC21", lab * ": the reference orbit reproduces the backend's final state bitwise (first $nref orbits), CPU / GPU", "$same_c / $same_g of $nref", "$nref / $nref", "INFO")
     wG = Dict(:cpu => 0.0, :gpu => 0.0); wL = Dict(:cpu => 0.0, :gpu => 0.0); fl = Dict(:cpu => 0, :gpu => 0)
     pairG = 0.0; pairL = 0.0; pairL16 = 0.0; nenter = 0; nout = 0
+    d109 = chaotic && T === Float64                  # D109a: the orbit-divergence term, chaotic class, Float64
+    gD = Dict(k => (ent = Ref(0), non = Ref(0), gate = Float64[], gapD = Float64[], Dv = Float64[], nongate = Float64[]) for k in 2:K)
+    gL109 = Float64[]; gL109non = Float64[]; gL109gap = Float64[]
+    ratD = Float64[]; bndn = Float64[]; lip = d109 ? gali_lip(c) : 0.0
     for j in 1:nref
-        ptsc, _ = ga_pts(sysT, Z[j], N)
+        ptsc, zNc = ga_pts(sysT, Z[j], N)
         ptsg = [P[j, i] for i in 1:N]
         bc = gali_ref_at(c, sysT, ptsc, W0s[j], N); bg = gali_ref_at(c, sysT, ptsg, W0s[j], N)
         rows = Dict()
@@ -2400,6 +2485,53 @@ function gali_gpu_row(tag, c, T, Z, N, K; nref, chaotic = false)
         else
             nout += 1
         end
+        if d109
+            orb = gali_orb(gali_mk(c), ptsc, zNc, W0s[j], epsT, lip, 64)
+            zsC, zsG = vcat(ptsc, [zNc]), vcat(ptsg, [XN[j]])
+            push!(ratD, maximum(maximum(abs, Float64.(zsC[k+1]) .- Float64.(zsG[k+1])) / orb.bnd[k+1] for k in 1:N))   # max_k |e_k|_inf / bnd_k at cc = 64
+            push!(bndn, orb.bnd[N+1])
+            for k in 2:K
+                grc = Float64(bc.ref.G[N][k - 1]); grg = Float64(bg.ref.G[N][k - 1]); Dk = orb.Dk[k-1]
+                gp = Float64(abs(rows[:cpu].f.gali[k - 1] - rows[:gpu].f.gali[k - 1]))
+                Bc = ga_BG(epsT, k, bc.lam[k], grc, bc.psi); Bg = ga_BG(epsT, k, bg.lam[k], grg, bg.psi)
+                r = gp / (Bc + Bg + grc * expm1(Dk))
+                if k == d    # the log form (G_d = exp(-L) up to the constant): its own gate, D^(d)
+                    gl = Float64(abs(rows[:cpu].f.L - rows[:gpu].f.L))
+                    rl = gl / (ga_BL(epsT, bc.psi, amx[:cpu]) + ga_BL(epsT, bg.psi, amx[:gpu]) + Dk)
+                    if orb.bnd[N+1] <= 1e-4 && Dk <= 0.1
+                        push!(gL109, rl); push!(gL109gap, gl / Dk)
+                    else
+                        push!(gL109non, rl)
+                    end
+                end
+                if orb.bnd[N+1] <= 1e-4 && Dk <= 0.1
+                    gD[k].ent[] += 1
+                    push!(gD[k].Dv, Dk)
+                    push!(gD[k].gapD, gp / grc / Dk)
+                    (grc >= 10 * ga_meas(T, k) && grg >= 10 * ga_meas(T, k)) && push!(gD[k].gate, r)
+                else
+                    gD[k].non[] += 1
+                    (grc >= 10 * ga_meas(T, k) && grg >= 10 * ga_meas(T, k)) && push!(gD[k].nongate, r)
+                end
+            end
+        end
+    end
+    if d109
+        mdn(v) = isempty(v) ? NaN : sort(v)[max(end ÷ 2, 1)]
+        for k in 2:K
+            g = gD[k]
+            row("AC21", lab * ": D109a order k = $k: orbits entering (bnd_n <= 1e-4, D_orb^($k) <= 0.1) / not entering (reported) of $nref (D_orb^($k) median $(fmt(mdn(g.Dv))), max $(fmt(isempty(g.Dv) ? NaN : maximum(g.Dv))))", "$(g.ent[]) / $(g.non[])", "reported", "INFO")
+            row("AC21", lab * ": D109a order k = $k: entering and resolved ($(length(g.gate))): max |G_cpu - G_gpu| / (B_cpu + B_gpu + G_ref (exp(D_orb^($k)) - 1)); not entering and resolved ($(length(g.nongate))) max " * fmt(isempty(g.nongate) ? NaN : maximum(g.nongate)),
+                isempty(g.gate) ? NaN : maximum(g.gate), "<= 1", pf(!isempty(g.gate) && maximum(g.gate) <= 1))
+            row("AC21", lab * ": D109a order k = $k: realised gap over D_orb, |G_cpu - G_gpu| / G_ref / D_orb^($k), median / max over entering orbits", "$(fmt(mdn(g.gapD))) / $(fmt(isempty(g.gapD) ? NaN : maximum(g.gapD)))", "reported (how loose the term is)", "INFO")
+        end
+        if K == d
+            row("AC21", lab * ": D109a log form: entering $(length(gL109)) / not entering $(length(gL109non)); max |L_cpu - L_gpu| / (B_L,cpu + B_L,gpu + D_orb^($d)) over entering (not entering max $(fmt(isempty(gL109non) ? NaN : maximum(gL109non))))", isempty(gL109) ? NaN : maximum(gL109), "<= 1", pf(!isempty(gL109) && maximum(gL109) <= 1))
+            row("AC21", lab * ": D109a log form: realised gap over D_orb, |L_cpu - L_gpu| / D_orb^($d), median / max over entering orbits", "$(fmt(mdn(gL109gap))) / $(fmt(isempty(gL109gap) ? NaN : maximum(gL109gap)))", "reported (how loose the term is)", "INFO")
+        end
+        r64 = maximum(ratD)
+        row("AC21", lab * ": D109a device check: max over the $nref orbits and k = 1..n of |z_k^cpu - z_k^gpu|_inf / bnd_k, bnd_k = c eps M_k Gamma_k, at c = 16; 32; 64 (max bnd_n $(fmt(maximum(bndn))); orbits above 1 at c = 16 / 32 / 64: $(count(>(0.25), ratD)) / $(count(>(0.5), ratD)) / $(count(>(1), ratD)))",
+            "$(fmt(4 * r64)); $(fmt(2 * r64)); $(fmt(r64))", "c = 64: <= 1", pf(r64 <= 1))
     end
     for nm in (:cpu, :gpu)
         row("AC21", lab * ": backend $nm: max |G_k - G_ref| / B_G^k over resolved orders, first $nref orbits (floor-control violations: $(fl[nm]))", wG[nm], "<= 1", pf(wG[nm] <= 1 && fl[nm] == 0))
@@ -2421,6 +2553,8 @@ function gali_try(label, f)
 end
 
 want("gali") && let
+    dv16, dv64 = gali_d2_selfcheck(10.0, 8, 6)
+    row("AC21", "gali: D109a self-check at d = 2 (standard map K = 10, n = 8, 6 orbits, K = d = 2): max relative deviation of the gali D_orb^(2) (Lip = sqrt 2 |K|, c = 16) from the sali d68_orb D; same for c = 64 against 4 D (D is linear in c)", "$(fmt(dv16)); $(fmt(dv64))", "<= 1e-10", pf(dv16 <= 1e-10 && dv64 <= 1e-10))
     rng = StableRNG(GSEED)
     for (nm, c, Nreg, nref) in (("Y3 (0.5, 0.1, 1e-3)", GA_Y3A, 40_000, 8), ("Y4 N=2 (K=-1, eps=0.3)", ga_y4(2, -1.0, 0.3), 40_000, 8), ("Y4 N=5 (K=-1, eps=0.2)", ga_y4(5, -1.0, 0.2), 10_000, 4))
         d = ga_d(c)

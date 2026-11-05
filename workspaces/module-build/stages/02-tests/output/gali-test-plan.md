@@ -137,3 +137,15 @@ Test-side changes (D108k):
 | D108g | AC14: pass rate 0.5 at every size (was 0.7 at the full size) |
 
 Package-size result after the rework: gali suite 2724 of 2724 (2704 before plus the 20 of `ga_d108.jl`), 0 fail. At the package sizes none of the changes alters a verdict (the failures D108 corrects appear at the full sizes of `verify/gali.jl`).
+
+## Rework D109 b to d (2026-11-05)
+
+Review findings 2 to 4 (LOW), spec Amendment D109 b, c, d. Tests first. New file `test/gali/ga_d109.jl` (included last from `runtests.jl`), three testsets, 103 assertions:
+
+| Testset | Content |
+|---|---|
+| D109b | `gali_values`, `gali_value`, `check_frame` on a 2 by 3 matrix (Float64, Double64, BigFloat; `Matrix` and `SMatrix`) throw `ArgumentError`; one column still rejected, d = K still accepted; the `SMatrix` message is constant (contains no size) |
+| D109c | Float64, Double64, BigFloat, d in {4, 8, 200} (BigFloat: 30 instead of 200, same loops), K in {2, 4}: `@inferred gali_values(Matrix)` and `@inferred check_frame`, element type `T`, values bitwise equal to the `SMatrix` path (`===`; `==` for BigFloat), `gali_value(M, k)` equal to the order `k` value |
+| D109d | Integer matrices (exact 0/1 entries, general `Int`, `Int32`, `Rational`) give `float(T)` values equal to the Float64 evaluation, on the `Matrix` and `SMatrix` paths; `check_frame` returns a `Float64`, rejects dependent integer columns with `NumericalHealthError` |
+
+RED (against the D108 code, standalone with the helpers, `scratchpad/ga05/red109.out`): 6 pass, 18 fail, 5 error, 29 counted. A testset stops at its first error, so D109c (error at its first `@inferred`) and part of D109d (`effective_eps(Int)` in `check_frame`) are counted short. GREEN: 103 of 103; whole gali suite 2827 of 2827 (2724 + 103).

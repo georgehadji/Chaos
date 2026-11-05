@@ -94,3 +94,15 @@ Realised ratios from the gali run (printed by the tests, indicative): AC1 worst 
 - Spec B9 and the API table give `gali_floor(T, k) = 2 k effective_eps(T)`; the code returns `2 * k * effective_eps(T)` (same value, same operation order as the test constant).
 - Test plan "API" says `reducer_final` is `(n, gali, L, sum, comp, floor)`; implemented as written. The plan notes that `check_frame` is not called by `propagate`; the code follows that, spec Algorithm item 1 still reads as if the run rejects the frame.
 - `src/Indicators/CONTEXT.md` listed GALI_k as deferred to M5 (D70); updated. `_config/catalogs` still says I3 is planned (stage 05).
+
+## Rework D109 b to d (2026-11-05)
+
+Only `src/Indicators/gali.jl` changed (193 to 217 lines; longest function unchanged in order of 20 lines). Tests first, see the test plan.
+
+- D109b: `gali_values(::SMatrix)` throws `ArgumentError("GALI needs d >= k")` (constant text) before any work; the `AbstractMatrix` method and `gali_value` (which checks `size(W, 1) >= size(W, 2)` itself) interpolate the sizes; `check_frame` gets it through `gali_values`.
+- D109c: the loops moved into `_gram_core!(Q, D, K, G)` and `_norm_col(M, j, D::Int)` with runtime sizes; the `Val` methods call them (same code, same operation order, so the reducer hot path and the zero-allocation result are unchanged). `G` is an `SVector` (`Base.setindex`) on the static path and a `Vector` (in place) on the host path (`_put`). `gali_values(::AbstractMatrix)` uses a heap `Matrix` buffer and returns a `Vector{T}` (was an `SVector` from a dynamic-size `SMatrix`); inferred concretely, bitwise equal to the `SMatrix` path.
+- D109d: `float(T) === T || return gali_values(float.(W))` in both methods; `check_frame` uses `gali_floor(float(T), K)` (so `effective_eps(float(T))`). `reducer_init(GALI(), Int, Val(3), Val(2))` does not throw today and still does not (the state is built with `zeros(SVector{K, Int})`; the reducer is only reached through `propagate`, whose element type is a float); not changed.
+
+First call at d = 200, K = 4 (fresh process, `t1.jl` in scratch, includes compile): Float64 0.518 s before, 0.123 s after; Double64 0.968 s before, 0.118 s after; `check_frame` first call 0.012 s before, 0.006 s after (after the `gali_values` call has compiled). Later calls: Float64 4 us, Double64 47 to 49 us (unchanged within noise from the 30 us to 0.9 ms of the review; BigFloat not re-timed).
+
+Result: gali suite 2827 of 2827 (see the test plan); whole suite `Pkg.test()` with 4 threads: 1 408 380 pass, 0 fail, 0 error, 1 existing broken, 32 min 22 s in the testset (Aqua, JET, layering pass); log `scratchpad/ga05/full-d109.out`. Coverage of `gali.jl` not measured in this rework.

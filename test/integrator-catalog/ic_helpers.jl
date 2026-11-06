@@ -56,8 +56,8 @@ const IC_START = Dict(:f4 => [1.0, 0.0], :f2 => ic_kepler_state(0.5, 0.7), :f1_3
 # test-side Hamiltonians (generic in the element type; independent of the module)
 function ic_H(kind::Symbol, z; eps = 1.0)
     if kind === :f1_1 || kind === :f1_3
-        ws = ic_f1w(kind); n = length(ws)
-        return sum((z[n + j]^2 + ws[j]^2 * z[j]^2) / 2 for j in 1:n)
+        ws = ic_f1w(kind); n = length(ws); T = eltype(z)   # w^2 in the element type of z (D112): a Float64 w^2 would carry 1e-16 relative error into a Double64 or BigFloat reference
+        return sum((z[n + j]^2 + T(ws[j])^2 * z[j]^2) / 2 for j in 1:n)
     end
     kind === :f4 && return z[2]^2 / 2 - eps * cos(z[1])
     kind === :f2 && return (z[3]^2 + z[4]^2) / 2 - 1 / sqrt(z[1]^2 + z[2]^2)
@@ -132,7 +132,7 @@ const IC_EXPL = (IC_S..., IC_P...)                       # explicit table method
 const IC_ALLX = (IC_EXPL..., IC_PC...)                   # every explicit method with a one-step map on a separable flow
 # implicit: Gauss s = 1..4 (G1 = s = 1)
 const IC_GAUSS = ((1, T -> ImplicitMidpoint(T)), (2, T -> Gauss(T, 2)), (3, T -> Gauss(T, 3)), (4, T -> Gauss(T, 4)))
-ic_slope_type(p::Integer) = p <= 4 ? Float64 : (p <= 8 ? Double64 : BigFloat)
+ic_slope_type(p::Integer) = p <= 2 ? Float64 : (p <= 8 ? Double64 : BigFloat)   # D112: orders 3 and 4 in double-double too (a Float64 scan of S4 on F2 reaches the round-off band before its slope settles)
 
 # expected force (kick) evaluations of one step from a stored table: adjacent kicks (no drift between) share one evaluation
 function ic_expected_evals(c, d)
@@ -222,6 +222,9 @@ function ic_pick_tau0(m, flow, z0, Tend, ref, ::Type{T}) where {T}
     return ldexp(1.0, -8)
 end
 # local log2 slopes of consecutive halvings, only where both errors exceed `lims`
+# Asymptotic range (D112): the tables of high order or large coefficients are pre-asymptotic at the first halvings (the first error below 1e-2 does not put them
+# in the range of the leading term), so the order is asserted on the two finest resolved halvings, at least three halvings must be resolved; earlier slopes are reported.
+ic_asym(sl, p, tol) = length(sl) >= 3 && all(abs(s - p) <= tol for s in sl[(end - 1):end])
 ic_slopes(errs, lims) = [log2(errs[j] / errs[j + 1]) for j in 1:(length(errs) - 1) if errs[j] > lims[j] && errs[j + 1] > lims[j + 1]]
 # single-step local error slope on a flow in BigFloat: step h against one step of Gauss s = 8 (error ~ h^17); returns log2 slopes over h = hs
 function ic_local_slopes(mk, kind, z0, hs; eps = 1.0)

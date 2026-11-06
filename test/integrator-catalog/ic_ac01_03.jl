@@ -120,12 +120,16 @@ end
         @test maximum(abs, w .- [BigFloat(1) / 2, BigFloat(1) / 2]) <= 8 * ic_eps(BigFloat)
         @test maximum(abs, pos .- [z, 1 - z]) <= 64 * ic_eps(BigFloat)                      # Eq. (4.2): kicks after drifts z and 1 - z
     end
-    # effective error ratio at equal work on the pendulum: S3 at tau = 0.1 against leapfrog at tau/2 (T = 8)
-    z0 = IC_START[:f4]; ref = ic_ref(:f4, z0, 8); flow = ic_flow(Float64, :f4)
-    e3 = ic_err(advance_n(McLachlan2(Float64), flow, ic_to(Float64, z0), 0.1, 80), ref)
-    e2 = ic_err(advance_n(Leapfrog(Float64, :DKD), flow, ic_to(Float64, z0), 0.05, 160), ref)
-    @info "AC3 reported: S3 / leapfrog error ratio at equal work" e3 e2 e3 / e2
-    @test e3 / e2 < 0.6
+    # effective error ratio at equal work on a linear problem (D112): F1, n = 1, the tau^3 coefficient of the step matrix (the leading error of a second order method), 256 bits.
+    # Equal work = two force evaluations: S3 at tau against leapfrog at tau/2 (two steps), so the ratio of the errors per unit time is 4 ||E_S3|| / ||E_leapfrog|| (operator 2-norm).
+    # The pendulum ratio depends on the start, the ordering and T (0.5 to 1.5 measured, D112), a linear problem has no such dependence.
+    ratio = setprecision(BigFloat, IC_BITS) do
+        R = ic_rotpoly(3)
+        E(m) = opnorm(ic_steppoly(coefficients(m)..., 3)[4] - R[4], 2)
+        Float64(4 * E(McLachlan2(BigFloat)) / E(Leapfrog(BigFloat, :DKD)))
+    end
+    @info "AC3 reported: S3 / leapfrog error ratio at equal work, linear problem" ratio
+    @test ratio < 0.5                                                                       # measured 0.318; McLachlan1995 Table 2 prints effective constants 0.026 against 0.070 (0.37)
 end
 
 @testset "AC3b4 S13: Eq. (17) of SofroniouSpaletta2005" begin

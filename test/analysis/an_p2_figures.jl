@@ -238,12 +238,12 @@ end
     @test any(x -> occursin("CairoMakie", x[2]), imp) && any(x -> occursin("Chaoslab", x[2]), imp)
 end
 
-@testset "D91n I29: the dependency lists are unchanged: weak dependencies CairoMakie and CUDA, the two extensions, the CairoMakie bound 0.15" begin
+@testset "D91n I29: the dependency lists: hard dependencies unchanged; weak dependencies CairoMakie, CUDA and (D112, integrator-catalog) TaylorIntegration with their three extensions; the CairoMakie bound 0.15" begin
     proj = TOML.parsefile(joinpath(@__DIR__, "..", "..", "Project.toml"))
-    @test Set(keys(proj["weakdeps"])) == Set(["CairoMakie", "CUDA"])
-    @test proj["extensions"] == Dict("ChaoslabCUDAExt" => "CUDA", "ChaoslabCairoMakieExt" => "CairoMakie")
-    @test proj["compat"]["CairoMakie"] == "0.15" && proj["compat"]["CUDA"] == "6"
-    @test !haskey(proj["deps"], "CairoMakie") && !haskey(proj["deps"], "CUDA")                               # weak, not hard
+    @test Set(keys(proj["weakdeps"])) == Set(["CairoMakie", "CUDA", "TaylorIntegration"])
+    @test proj["extensions"] == Dict("ChaoslabCUDAExt" => "CUDA", "ChaoslabCairoMakieExt" => "CairoMakie", "ChaoslabTaylorExt" => "TaylorIntegration")
+    @test proj["compat"]["CairoMakie"] == "0.15" && proj["compat"]["CUDA"] == "6" && proj["compat"]["TaylorIntegration"] == "0.18"
+    @test !any(haskey(proj["deps"], w) for w in ("CairoMakie", "CUDA", "TaylorIntegration"))                               # weak, not hard
     @test Set(keys(proj["deps"])) == Set(["Dates", "DoubleFloats", "HDF5", "JSON", "KernelAbstractions", "LinearAlgebra", "PrecompileTools", "SHA", "StableRNGs", "StaticArrays", "TOML"])
     @test isfile(joinpath(@__DIR__, "..", "..", "ext", "ChaoslabCairoMakieExt.jl"))
 end

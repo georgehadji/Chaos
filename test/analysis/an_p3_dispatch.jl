@@ -99,10 +99,10 @@ end
         occursin(r"^\s*(?:using|import)\s.*\bAnalysis\b", l) && push!(up, "$d/$(basename(f))")
     end
     @test isempty(up)
-    # no new package: the dependency lists of the project are those of the release (the same list the D91 test pins), and the test target is unchanged
+    # no new package (D112: except the weak dependency TaylorIntegration of integrator-catalog, no hard dependency): the dependency lists of the project are those of the release (the same list the D91 test pins), and the test target is unchanged
     proj = TOML.parsefile(joinpath(root, "Project.toml"))
     @test Set(keys(proj["deps"])) == Set(["Dates", "DoubleFloats", "HDF5", "JSON", "KernelAbstractions", "LinearAlgebra", "PrecompileTools", "SHA", "StableRNGs", "StaticArrays", "TOML"])
-    @test Set(keys(proj["weakdeps"])) == Set(["CairoMakie", "CUDA"]) && proj["targets"]["test"] == ["Aqua", "ForwardDiff", "JET", "Test"] && Set(keys(proj["extras"])) == Set(["Aqua", "ForwardDiff", "JET", "Test"])
+    @test Set(keys(proj["weakdeps"])) == Set(["CairoMakie", "CUDA", "TaylorIntegration"]) && proj["targets"]["test"] == ["Aqua", "ForwardDiff", "JET", "Test"] && Set(keys(proj["extras"])) == Set(["Aqua", "ForwardDiff", "JET", "Test"])
     # the module has the D93 entry points (the assertions of this testset that fail before the amendment is implemented)
     @test AN.calibrate isa Function && AN.P3_PARAM_KEYS isa Tuple && length(AN.P3_PARAM_KEYS) == 71 && AN.p3_read_params isa Function
 end

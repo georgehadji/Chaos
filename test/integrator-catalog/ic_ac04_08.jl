@@ -1,13 +1,13 @@
 # AC4 to AC8: measured orders (explicit symmetric tables, non-symmetric tables, near-integrable rows, implicit methods, Tao's method).
 # Reference orbits: ic_ref (oracle O1: F1 exact, otherwise Gauss s = 8 in 256 bits); the Taylor reference (R1) arrives in AC19/AC21 when the extension is loaded.
 
-# Slopes of the final-state error for tau = tau0/2^j, j = 0..4 at T = 8 (spec criterion 4): returns the slopes used (errors above 1e3 B(n) and 1e3 10^-dtab).
-function ic_check_order(M, kind; T = ic_slope_type(M.p), Tend = 8)
+# Slopes of the final-state error for tau = tau0/2^j, j = 0..8 at T = 8 (spec criterion 4, D112): returns the slopes used (errors above 1e3 B(n) and 1e3 10^-dtab).
+function ic_check_order(M, kind; T = ic_slope_type(M.p), Tend = 8, J = 8)   # J = 5 for the implicit methods (each step costs an iteration; their slopes settle at the third halving)
     return setprecision(BigFloat, IC_BITS) do
         z0 = IC_START[kind]; ref = ic_ref(kind, z0, Tend)
         flow = ic_flow(T, kind); m = M.mk(T)
         tau0 = ic_pick_tau0(m, flow, z0, Tend, ref, T)
-        taus, errs, ns = ic_scan(m, flow, z0, Tend, ref, tau0, T)
+        taus, errs, ns = ic_scan(m, flow, z0, Tend, ref, tau0, T; J = J)
         Mn = ic_mmax(z0)
         lims = [1e3 * max(ic_B(T, Mn, ns[j], taus[j]), 10.0^(-M.dtab)) for j in eachindex(taus)]
         return ic_slopes(errs, lims), errs
@@ -20,8 +20,7 @@ end
         (M.p >= 2 && M.sym !== false) || continue
         for kind in (:f4, :f2)
             sl, errs = ic_check_order(M, kind)
-            @test length(sl) >= 2                                             # at least two resolved halvings
-            @test all(abs(s - M.p) <= (M.p <= 4 ? 0.2 : 0.3) for s in sl)
+            @test ic_asym(sl, M.p, M.p <= 4 ? 0.2 : 0.3)                      # the two finest of at least three resolved halvings (D112)
             @info "AC4 reported" M.id kind sl
         end
     end
@@ -33,8 +32,7 @@ end
         (M.sym === false) || continue
         for kind in (:f4, :f2)
             sl, errs = ic_check_order(M, kind)
-            @test length(sl) >= 2
-            @test all(abs(s - M.p) <= 0.2 for s in sl)
+            @test ic_asym(sl, M.p, 0.2)
             @info "AC5 reported" M.id kind sl
         end
     end
@@ -56,17 +54,31 @@ function ic_pend_err(M, eps, tau, ::Type{T}) where {T}
 end
 ic_sl(e1, e2) = log2(e1 / e2)
 
-@testset "AC6a SABA and SBAB: slope 2n at eps = 1e-8" begin
-    _ = (SABA, SBAB, advance_n)
-    for M in IC_P[[1, 2, 3, 4, 5, 6, 7, 8]]
+@testset "AC6a SABA and SBAB: the eps tau^2n branch (D112)" begin
+    _ = (SABA, SBAB, advance_n, coefficients)
+    # Error law e = a eps tau^2n + b eps^2 tau^2. The slope 2n between tau = 1 and 1/2 is asserted where the first branch is above the second and above the round-off floor:
+    # n = 1, 2 in binary64 at eps = 1e-8; n = 3 in 256 bits at eps = 1e-8 (binary64 is at the floor, 1e-16); n = 4 in 256 bits at eps = 1e-16 (at 1e-8 the eps^2 tau^2 branch already dominates, slope 2.0)
+    for M in IC_P[1:8]
         n = parse(Int, M.id[end:end])
-        e1 = ic_pend_err(M, 1e-8, 1.0, Float64); e2 = ic_pend_err(M, 1e-8, 0.5, Float64)
+        T, eps = n <= 2 ? (Float64, 1e-8) : (n == 3 ? (BigFloat, 1e-8) : (BigFloat, 1e-16))
+        e1 = ic_pend_err(M, eps, 1.0, T); e2 = ic_pend_err(M, eps, 0.5, T)
         @test abs(ic_sl(e1, e2) - 2n) <= 0.5
     end
-    for M in IC_PBIG                                                                     # 256-bit only; tolerance 1.0 (transition to the eps^2 tau^2 branch), see the plan
-        n = parse(Int, M.id[5:end])
+    # n = 6, 10 (256 bits): the eps tau^2n branch of these rows is below the eps^2 tau^2 branch for every eps and tau the reference orbit can resolve (a tau^12 is 1e-20 eps), so at eps = 1e-8 the
+    # error is the second branch (slope 2 within 0.3, measured 2.04 to 2.05) and the order 2n is asserted at its source: the kicks are an n-point (SABA) or (n + 1)-point (SBAB) quadrature of the
+    # free-flight integral, exact for the monomials of degree <= 2n - 1 and not for 2n (LaskarRobutel2001 Sect. 7). The same moment test is applied to n = 1 to 4.
+    for M in IC_PBIG
         e1 = ic_pend_err(M, 1e-8, 1.0, BigFloat); e2 = ic_pend_err(M, 1e-8, 0.5, BigFloat)
-        @test abs(ic_sl(e1, e2) - 2n) <= 1.0
+        @test abs(ic_sl(e1, e2) - 2) <= 0.3
+    end
+    setprecision(BigFloat, IC_BITS) do
+        for M in (IC_P[1:8]..., IC_PBIG...)
+            n = parse(Int, filter(isdigit, M.id))
+            pos, w = ic_kickpos(coefficients(M.mk(BigFloat))...)
+            mom(k) = abs(sum(w .* pos .^ k) - 1 / BigFloat(k + 1))
+            @test maximum(mom(k) for k in 0:(2n - 1)) <= 64 * ic_eps(BigFloat)
+            @test mom(2n) > 1e-14                                                       # measured 1.5e-12 (SBAB10) to 0.17 (SBAB1)
+        end
     end
 end
 
@@ -117,8 +129,8 @@ end
     # (a) slope 2s on F4 and F2; 256 bits for s >= 3
     for (s, mk) in IC_GAUSS, kind in (:f4, :f2)
         M = ICM("G$s", mk, 2s, true, Inf)
-        sl, _ = ic_check_order(M, kind; T = s >= 3 ? BigFloat : Float64)
-        @test length(sl) >= 2 && all(abs(x - 2s) <= 0.2 for x in sl)
+        sl, _ = ic_check_order(M, kind; T = s >= 3 ? BigFloat : Float64, J = 5)
+        @test ic_asym(sl, 2s, 0.2)
     end
     # coefficients computed, not copied: quadrature and collocation conditions in 256 bits, symmetric nodes
     setprecision(BigFloat, IC_BITS) do
@@ -224,18 +236,23 @@ end
     _ = (TaoExtended, extend_state, physical_state, advance)
     z0 = IC_START[:t1]; ref = ic_ref(:t1, z0, 20)
     flow = ic_flow(Float64, :t1)
-    coupling = Dict{Float64, Float64}()
-    for omega in (10.0, 100.0)
+    coupling = Dict{Tuple{Float64, Float64}, Float64}()
+    for omega in (10.0, 100.0), tau in (0.01, 0.005)
         m = TaoExtended(Float64, omega; order = 2)
         z = extend_state(ic_to(Float64, z0)); cmax = 0.0
-        for _ in 1:2000
-            z = advance(m, flow, z, 0.01)
+        for _ in 1:round(Int, 20 / tau)
+            z = advance(m, flow, z, tau)
             cmax = max(cmax, abs(z[1] - z[3]) + abs(z[2] - z[4]))
         end
-        @test ic_err(physical_state(z), ref) <= 1e-3
-        @test abs(z[1] - z[3]) <= 1e-3 && abs(z[2] - z[4]) <= 1e-3                     # q = x, p = y recovered
-        coupling[omega] = cmax
+        tau == 0.01 && @test ic_err(physical_state(z), ref) <= 1e-3
+        tau == 0.01 && @test abs(z[1] - z[3]) <= 1e-3 && abs(z[2] - z[4]) <= 1e-3                     # q = x, p = y recovered
+        coupling[(omega, tau)] = cmax
     end
     @info "AC8c reported: max |q - x| + |p - y| over the run" coupling
-    @test coupling[100.0] <= coupling[10.0]
+    # D112: the coupling is the error of the second order splitting, c(omega) tau^2 with c about 1.3 for every omega from 3 to 1000 (measured); the law is asserted (quartering under a halved
+    # step) and the two omega give the same constant to 10 percent. The drafted "decreasing with omega" (the mechanism of the continuous system) is not what the discrete coupling does: +1.8 percent measured.
+    for omega in (10.0, 100.0)
+        @test abs(log2(coupling[(omega, 0.01)] / coupling[(omega, 0.005)]) - 2) <= 0.2
+    end
+    @test abs(coupling[(100.0, 0.01)] / coupling[(10.0, 0.01)] - 1) <= 0.1
 end

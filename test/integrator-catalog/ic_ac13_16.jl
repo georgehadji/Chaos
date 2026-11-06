@@ -8,10 +8,15 @@ function ic_energy_series(m, kind, flow, z0, tau, nsteps, nchk; eps = 1.0)
     zs = advance_to(m, flow, ic_to(typeof(tau), z0), tau, ns)
     return setprecision(BigFloat, IC_BITS) do
         H0 = ic_H(kind, ic_to(BigFloat, z0); eps = eps)
-        [Float64(abs(ic_H(kind, ic_to(BigFloat, collect(z)); eps = eps) - H0)) for z in zs]
+        [Float64(abs(ic_H(kind, ic_big.(collect(z)); eps = eps) - H0)) for z in zs]
     end
 end
 ic_lsslope(y) = (n = length(y); x = collect(1.0:n); xm = sum(x) / n; sum((x .- xm) .* (y .- sum(y) / n)) / sum((x .- xm) .^ 2))
+
+# D112: in binary64 the tables of order 6 or higher (and the generalized order (8, 6, 4) rows) are not truncation dominated at these steps: the energy error of 1e4 steps is the round-off random
+# walk of Brouwer's law (1e-14 to 6e-14, growing like the square root of the step count), which the bounded-oscillation assertions are not built for. They are run in double-double (truncation
+# 1e-17 to 1e-12, round-off 1e-29) and the others in binary64, the same assertions with eps_T of the element type used.
+ic_ac13_type(M) = (M.p >= 6 || startswith(M.id, "ABA")) ? Double64 : Float64
 
 @testset "AC13 energy bounded, no secular drift" begin
     _ = (advance_to, force_evaluations)
@@ -19,18 +24,20 @@ ic_lsslope(y) = (n = length(y); x = collect(1.0:n); xm = sum(x) / n; sum((x .- x
     cases = (("F1", :f1_3, IC_START[:f1_3], 1.0), ("F2e0.1", :f2, ic_kepler_state(0.1, 0.7), 1.0), ("F2e0.5", :f2, IC_START[:f2], 1.0), ("F4", :f4, IC_START[:f4], 1.0))
     for M in IC_S
         M.id in ("S1DK", "S1KD", "S4", "S3") && continue                                # criterion 13: S2 and S5 to S9, S11 to S13
-        tau = (startswith(M.id, "S2") || M.id == "S5" || M.id == "S8" || startswith(M.id, "S12")) ? 1 / 20 : 1 / 50   # criterion 13: S2, S5, S8, S12 at 1/20
+        T = ic_ac13_type(M)
+        tau = T(1) / ((startswith(M.id, "S2") || M.id == "S5" || M.id == "S8" || startswith(M.id, "S12")) ? 20 : 50)   # criterion 13: S2, S5, S8, S12 at 1/20
         for (name, kind, z0, eps) in cases
-            E = ic_energy_series(M.mk(Float64), kind, ic_flow(Float64, kind; eps = eps), z0, tau, nsteps, nchk; eps = eps)
+            E = ic_energy_series(M.mk(T), kind, ic_flow(T, kind; eps = eps), z0, tau, nsteps, nchk; eps = eps)
             half = nchk ÷ 2; Mn = ic_mmax(z0)
-            @test maximum(E[(half + 1):end]) <= 2 * maximum(E[1:half]) + 16 * ic_eps(Float64) * Mn
+            @test maximum(E[(half + 1):end]) <= 2 * maximum(E[1:half]) + 16 * ic_eps(T) * Mn
             @test abs(ic_lsslope(E[(half + 1):end]) * half) <= 0.1 * maximum(E)
         end
     end
     for M in IC_P                                                                       # near-integrable rows on F4 with eps = 1e-2
-        E = ic_energy_series(M.mk(Float64), :f4, ic_flow(Float64, :f4; eps = 1e-2), [1.0, 0.3], 1 / 50, nsteps, nchk; eps = 1e-2)
+        T = ic_ac13_type(M)
+        E = ic_energy_series(M.mk(T), :f4, ic_flow(T, :f4; eps = 1e-2), [1.0, 0.3], T(1) / 50, nsteps, nchk; eps = 1e-2)
         half = nchk ÷ 2
-        @test maximum(E[(half + 1):end]) <= 2 * maximum(E[1:half]) + 16 * ic_eps(Float64) * 1.0
+        @test maximum(E[(half + 1):end]) <= 2 * maximum(E[1:half]) + 16 * ic_eps(T) * 1.0
         @test abs(ic_lsslope(E[(half + 1):end]) * half) <= 0.1 * maximum(E)
     end
 end

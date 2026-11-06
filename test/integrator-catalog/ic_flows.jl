@@ -13,8 +13,8 @@ function ic_gradV(kind, q; eps = 1.0)
     kind === :f4 && return [eps * sin(q[1])]
     kind === :f2 && return q ./ sqrt(q[1]^2 + q[2]^2)^3
     kind === :t2 && return [q[1] + 2 * q[1] * q[2], q[2] + q[1]^2 - q[2]^2]
-    ws = ic_f1w(kind)
-    return [ws[j]^2 * q[j] for j in eachindex(ws)]
+    ws = ic_f1w(kind); T = eltype(q)                          # w^2 in the element type of q (D112)
+    return [T(ws[j])^2 * q[j] for j in eachindex(ws)]
 end
 function ic_kick(kind, z, t; eps = 1.0)
     h = length(z) ÷ 2

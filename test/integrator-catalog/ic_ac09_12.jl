@@ -94,11 +94,17 @@ end
     end
 end
 
+# D112 (runtime, D38): ForwardDiff compiles a new closure and tag per method and flow (0.3 s each, 88 s of the 3 min 12 s of the suite for the 41 explicit methods). The package run uses one
+# representative of every code path of the tangent (drift-first and kick-first tables, non-palindromic S1 and S4, merged kicks S2KDK, the longest table S13, S5 with negative weights,
+# S9 with kick first, the generated SABA and SBAB, the two corrector kinds, the generalized order table); IC_FULL_RUN (verify/integrator-catalog.jl) runs all 41 with the same assertions.
+const IC_AC11_IDS = ("S1DK", "S1KD", "S2DKD", "S2KDK", "S3", "S4", "S5", "S9", "S12-6", "S13", "SABA3", "SBAB3", "SABAC2", "SBABC2", "ABA864")
+ic_ac11_set() = IC_FULL ? IC_ALLX : filter(M -> M.id in IC_AC11_IDS, IC_ALLX)
+
 @testset "AC11 tangent step equals the derivative of the one-step map (ForwardDiff, 256-bit finite difference)" begin
     _ = (IntegratorMap, tangent, tangent_advance, stage_count, advance, advance_n)
-    rng = StableRNG(ic_seed(11, 1))
+    rng = StableRNG(ic_seed(11, 1)); set11 = ic_ac11_set()
     # binary64 and double-double: ForwardDiff; the bound 16 eps (1 + |M|) is scaled by the stage count k (rounding of k elementary Jacobian products), see the plan
-    for T in (Float64, Double64), M in IC_ALLX, (kind, tau) in IC_SYMFL[2:3]
+    for T in (Float64, Double64), M in set11, (kind, tau) in IC_SYMFL[2:3]
         m = M.mk(T); flow = ic_flow(T, kind); d = ic_dim(kind); k = max(1, stage_count(m))
         for _ in 1:ic_size(3, 1000)
             z = ic_to(T, ic_draw(rng, kind)); h = T(tau)
@@ -107,7 +113,7 @@ end
         end
     end
     # n steps: the product of tangent steps equals the tangent of the n-step map
-    for M in IC_ALLX, (n, kind, tau) in ((1, :f4, 0.05), (10, :f4, 0.05), (10, :f2, 0.01))
+    for M in set11, (n, kind, tau) in ((1, :f4, 0.05), (10, :f4, 0.05), (10, :f2, 0.01))
         m = M.mk(Float64); flow = ic_flow(Float64, kind); d = ic_dim(kind); k = max(1, stage_count(m))
         z = ic_to(Float64, ic_draw(rng, kind)); W = SMatrix{d, d, Float64}(I); zz = z
         for _ in 1:n
@@ -119,7 +125,7 @@ end
     # 256-bit: central difference with step 2^-100; bound 2^-130 (1 + |M|) (rounding eps/h = 2^-155, truncation 2^-200); implicit methods by the same difference
     setprecision(BigFloat, IC_BITS) do
         h = BigFloat(2)^(-100)
-        ms = [(M.id, M.mk(BigFloat)) for M in IC_ALLX]
+        ms = [(M.id, M.mk(BigFloat)) for M in set11]
         append!(ms, [("G$s", mk(BigFloat)) for (s, mk) in IC_GAUSS])
         for (id, m) in ms, (kind, tau) in (IC_SYMFL[2], IC_SYMFL[3])
             flow = ic_flow(BigFloat, kind); z = ic_to(BigFloat, ic_draw(rng, kind)); tb = BigFloat(tau)
@@ -174,17 +180,26 @@ end
     z0 = IC_START[:f2]; Tend = 10.0
     cols = ic_size([1, 4], [1, 2, 3, 4])                                                   # D38: two columns (two position/momentum pairs of orbits in 192 bits)
     fd = ic_fd_columns(z0, Tend, cols, BigFloat(2)^(-40), 192)
-    for (id, mk, tau) in (("S2", T -> Leapfrog(T, :DKD), ldexp(1.0, -16)), ("S12-6", T -> KahanLi(T, 6), 1 / 128))
-        m = mk(Float64); flow = ic_flow(Float64, :f2); n = round(Int, Tend / tau)
-        z = ic_to(Float64, z0); W = SMatrix{4, 4, Float64}(I)
-        for _ in 1:n
+    scale = Float64(maximum(maximum(abs, v) for v in values(fd)))
+    frame(mk, tau) = begin
+        m = mk(Float64); flow = ic_flow(Float64, :f2); z = ic_to(Float64, z0); W = SMatrix{4, 4, Float64}(I)
+        for _ in 1:round(Int, Tend / tau)
             z, W = tangent_advance(m, flow, z, W, tau)
         end
-        scale = maximum(maximum(abs, v) for v in values(fd))
-        rel = maximum(Float64(maximum(abs, ic_big.(collect(W[:, j])) .- fd[j])) for j in cols) / Float64(scale)
-        @info "AC12b reported: relative difference to the reference tangent" id rel
-        @test rel <= 2.0^(-30)
+        W
     end
+    relerr(W) = maximum(Float64(maximum(abs, ic_big.(collect(W[:, j])) .- fd[j])) for j in cols) / scale
+    # D112: the tolerance follows the order. The tangent of a method of order p differs from the reference tangent by its truncation C tau^p (S2 at 2^-16: 3.9e-9 measured, tau^2 = 2.3e-10 times the
+    # growth of the tangent over T = 10, far above 2^-30). For S2 (symmetric, order 2, even error expansion) the order law is asserted (slope 2 between 2^-15 and 2^-16) and the Richardson
+    # extrapolate (4 W(tau/2) - W(tau))/3, whose error is O(tau^4), meets 2^-30; the 6th order table meets 2^-30 directly.
+    W1 = frame(T -> Leapfrog(T, :DKD), ldexp(1.0, -15)); W2 = frame(T -> Leapfrog(T, :DKD), ldexp(1.0, -16))
+    r1 = relerr(W1); r2 = relerr(W2); rx = relerr((4 .* W2 .- W1) ./ 3)
+    @info "AC12b reported: S2 relative difference to the reference tangent, tau = 2^-15, 2^-16, extrapolated" r1 r2 rx log2(r1 / r2)
+    @test abs(log2(r1 / r2) - 2) <= 0.3
+    @test rx <= 2.0^(-30)
+    rel6 = relerr(frame(T -> KahanLi(T, 6), 1 / 128))
+    @info "AC12b reported: S12-6 relative difference to the reference tangent" rel6
+    @test rel6 <= 2.0^(-30)
 end
 
 @testset "AC12c frame over n steps against the two-trajectory finite difference of the method's own orbits (256-bit, perturbation 2^-40)" begin

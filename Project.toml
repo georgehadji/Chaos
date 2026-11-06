@@ -19,10 +19,12 @@ TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 [weakdeps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+TaylorIntegration = "92b13dbe-c966-51a2-8445-caca9f8a7d42"
 
 [extensions]
 ChaoslabCUDAExt = "CUDA"
 ChaoslabCairoMakieExt = "CairoMakie"
+ChaoslabTaylorExt = "TaylorIntegration"
 
 [compat]
 Aqua = "0.8"
@@ -41,6 +43,7 @@ SHA = "0.7, 1"
 StableRNGs = "1"
 StaticArrays = "1.9"
 TOML = "1"
+TaylorIntegration = "0.18"
 Test = "1"
 julia = "1.13"
 

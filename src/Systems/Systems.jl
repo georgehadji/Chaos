@@ -2,7 +2,8 @@
     Systems
 
 Maps with analytic tangents: standard map, linear symplectic maps (standard-map), the product of a map with itself (rli),
-the Froeschle 4D map and the chain of coupled standard maps (coupled-maps).
+the Froeschle 4D map and the chain of coupled standard maps (coupled-maps), and the Hamiltonian flows of the integrator catalog
+(harmonic oscillator, pendulum, Kepler, Henon-Heiles, the nonseparable Tao test flow).
 """
 module Systems
 
@@ -16,6 +17,10 @@ export PairMap, PairTangent
 export FroeschleMap, WrappedFroeschleMap, StandardMapChain, WrappedStandardMapChain, ChainTangent
 export forward!, inverse!, tangent!, inverse_tangent!, tangent_action!, inverse_tangent_action!
 export wrap, symplectic_form, det_residual, symplectic_residual
+export AbstractFlow, AbstractSeparableFlow, HarmonicOscillator, Pendulum, Kepler, HenonHeilesFlow, TaoNonseparable, CountingFlow
+export hamiltonian, force, force_jacobian, hamiltonian_gradient, hamiltonian_hessian, vector_field, vector_field_jacobian
+export drift, kick, drift_increment, kick_increment, drift_jacobian, kick_jacobian, exact_flow, exact_flow_matrix
+export angular_momentum, runge_lenz, perturbation_scale, corrector_force, corrector_hessian, kick_count, reset_counts!
 
 "Supertype of the maps of this module; subtypes define `forward`, `inverse`, `tangent`, `inverse_tangent`, `dimension`."
 abstract type AbstractMap end
@@ -90,5 +95,7 @@ include("standard_map_chain.jl")
 include("chain_tangent.jl")
 include("wrapped_standard_map_chain.jl")
 include("residuals.jl")
+include("flow_core.jl")
+include("flow_models.jl")
 
 end

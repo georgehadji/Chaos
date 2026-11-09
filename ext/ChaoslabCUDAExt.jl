@@ -9,6 +9,7 @@ module ChaoslabCUDAExt
 using Chaoslab, CUDA, TOML, StaticArrays
 using Chaoslab.Foundation: Foundation, precision_label
 using Chaoslab.Tangent: Tangent, _orbit_kernel!
+using Chaoslab.Integrators: Integrators
 using Chaoslab.Systems: StandardMap
 using KernelAbstractions: KernelAbstractions
 
@@ -25,6 +26,7 @@ function __init__()
 end
 
 Tangent.device_backend(::CUDADevice) = CUDABackend()
+Integrators.ensemble_backend(::CUDADevice) = CUDABackend()      # D113: the device hook of `advance_ensemble(...; backend = :gpu)`
 Tangent.workgroup(::CUDABackend) = 256
 Foundation.free_memory(::CUDADevice) = CUDA.free_memory()
 Foundation.is_oom(::CUDA.OutOfGPUMemoryError) = true

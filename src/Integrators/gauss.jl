@@ -71,6 +71,7 @@ ImplicitMidpoint(::Type{T}) where {T} = Gauss(T, 1)
 ImplicitMidpoint() = ImplicitMidpoint(Float64)
 Gauss(s::Integer; kw...) = Gauss(Float64, s; kw...)
 
+_coeff_type(::Gauss{T}) where {T} = T
 nominal_order(::Gauss{T, S}) where {T, S} = 2S
 is_palindromic(::Gauss) = true
 adjoint_method(m::Gauss) = m
@@ -82,18 +83,43 @@ table_digits(::Gauss) = Inf
 @inline _inf_norm(v) = maximum(abs, v)
 @inline _nan_state(::SVector{D, T}) where {D, T} = SVector{D, T}(ntuple(_ -> T(NaN), Val(D)))
 
+# Error-free transformations (decision D113): the stage sums and the update sum of the Hairer2008 implementation are evaluated with a compensated dot product, so that
+# `sum_j (hi_j + lo_j) F_j` is rounded once, as if the products and the additions were done in twice the working precision. The plain sums round every product and every
+# partial sum; the rounding errors of the update sum are not independent of those of the stage sums, and over 3 x 10^6 steps they leave a bias in the energy (finding F1
+# of the stage 04 report). BigFloat (remainder 0, high precision) and the negative control `standard = true` keep the plain sums.
+@inline _prod_err(w, x::SVector) = (p = w * x; (p, fma.(w, x, -p)))
+@inline function _dot_comp(wh::SVector{S}, wl::SVector{S}, F::NTuple{S}) where {S}
+    s = zero(F[1]); c = zero(F[1])
+    for j in 1:S
+        for w in (wh[j], wl[j])
+            p, pe = _prod_err(w, F[j])
+            s, se = _twosum(s, p)
+            c = c + (se + pe)
+        end
+    end
+    return s + c
+end
+@inline _compensated(m::Gauss{T}) where {T} = !m.standard && T !== BigFloat
+
 # sum_j (Ahi_ij + Alo_ij) F_j for every stage i, h included
-@inline _stage_sum(m::Gauss{T, S}, F, h, i) where {T, S} = h * sum(ntuple(j -> m.Ahi[i, j] * F[j], Val(S))) + h * sum(ntuple(j -> m.Alo[i, j] * F[j], Val(S)))
-@inline _update_sum(m::Gauss{T, S}, F, h) where {T, S} = h * sum(ntuple(j -> m.bhi[j] * F[j], Val(S))) + h * sum(ntuple(j -> m.blo[j] * F[j], Val(S)))
+@inline function _stage_sum(m::Gauss{T, S}, F, h, i) where {T, S}
+    _compensated(m) && return h * _dot_comp(m.Ahi[i, :], m.Alo[i, :], F)
+    return h * sum(ntuple(j -> m.Ahi[i, j] * F[j], Val(S))) + h * sum(ntuple(j -> m.Alo[i, j] * F[j], Val(S)))
+end
+@inline function _update_sum(m::Gauss{T, S}, F, h) where {T, S}
+    _compensated(m) && return h * _dot_comp(m.bhi, m.blo, F)
+    return h * sum(ntuple(j -> m.bhi[j] * F[j], Val(S))) + h * sum(ntuple(j -> m.blo[j] * F[j], Val(S)))
+end
 
 # Helpers take the stage tuples as arguments: a closure over a variable that the iteration reassigns would box it (an allocation per step, and not compilable for a kernel).
+# The stages are y + Z_i with y = z + e the state carried as value and correction (compensated summation): the correction enters the stage values, not only the update.
 @inline _stage_f(flow, Y::NTuple) = map(y -> vector_field(flow, y), Y)
-@inline _stage_y(m::Gauss{T, S}, z, h, F) where {T, S} = ntuple(i -> z + _stage_sum(m, F, h, i), Val(S))
+@inline _stage_y(m::Gauss{T, S}, z, e, h, F) where {T, S} = ntuple(i -> z + (e + _stage_sum(m, F, h, i)), Val(S))
 @inline _max_diff(A::NTuple{S}, B::NTuple{S}) where {S} = maximum(ntuple(i -> _inf_norm(A[i] - B[i]), Val(S)))
 @inline _max_norm(Y::NTuple{S}) where {S} = maximum(ntuple(i -> _inf_norm(Y[i]), Val(S)))
 
 # Fixed-point iteration; returns the update increment, the status and the final stages.
-function _gauss_core(m::Gauss{T, S}, flow, z::SVector{D, ET}, h) where {T, S, D, ET}
+function _gauss_core(m::Gauss{T, S}, flow, z::SVector{D, ET}, h, e::SVector{D, ET} = zero(z)) where {T, S, D, ET}
     f0 = vector_field(flow, z)
     Y = ntuple(i -> z + (h * sum(ntuple(j -> m.Ahi[i, j], Val(S)))) * f0, Val(S))
     F = ntuple(i -> f0, Val(S))
@@ -101,7 +127,7 @@ function _gauss_core(m::Gauss{T, S}, flow, z::SVector{D, ET}, h) where {T, S, D,
     while k < m.maxiter && !stopped
         k += 1
         F = _stage_f(flow, Y)
-        Yn = _stage_y(m, z, h, F)
+        Yn = _stage_y(m, z, e, h, F)
         delta = _max_diff(Yn, Y)
         Y = Yn
         isfinite(delta) || break
@@ -115,14 +141,16 @@ function _gauss_core(m::Gauss{T, S}, flow, z::SVector{D, ET}, h) where {T, S, D,
 end
 
 function advance_checked(m::Gauss, flow, z::SVector, tau)
+    _check_types(m, z, tau)
     inc, st = _gauss_core(m, flow, z, tau)
     return st.ok ? z + inc : _nan_state(z), st
 end
 
 function advance_n(m::Gauss, flow, z::SVector, tau, n::Integer; compensated::Bool = false)
+    _check_types(m, z, tau)
     e = zero(z)
     for _ in 1:n
-        inc, st = _gauss_core(m, flow, z, tau)
+        inc, st = _gauss_core(m, flow, z, tau, e)
         st.ok || return _nan_state(z)
         z, e = compensated ? _kahan(z, e, inc) : (z + inc, e)
     end
@@ -130,11 +158,12 @@ function advance_n(m::Gauss, flow, z::SVector, tau, n::Integer; compensated::Boo
 end
 
 function advance_to(m::Gauss, flow, z::SVector, tau, ns; compensated::Bool = false)
+    _check_types(m, z, tau)
     out = Vector{typeof(z)}(undef, length(ns)); e = zero(z); done = 0
     for (j, nj) in enumerate(ns)
         nj >= done || throw(ArgumentError("the step counts must be increasing"))
         for _ in 1:(nj - done)
-            inc, st = _gauss_core(m, flow, z, tau)
+            inc, st = _gauss_core(m, flow, z, tau, e)
             st.ok || (z = _nan_state(z); break)
             z, e = compensated ? _kahan(z, e, inc) : (z + inc, e)
         end
@@ -145,6 +174,7 @@ end
 
 # Tangent: differentiate the converged stage equations, dY_i = W + h sum_j a_ij J_j dY_j, then dy' = W + h sum_i b_i J_i dY_i.
 function tangent_advance(m::Gauss{T, S}, flow, z::SVector{D, ET}, W::SMatrix{D, K}, tau) where {T, S, D, ET, K}
+    _check_types(m, z, tau)
     inc, st = _gauss_core(m, flow, z, tau)
     st.ok || return _nan_state(z), W * ET(NaN)
     Js = ntuple(i -> Matrix(vector_field_jacobian(flow, st.stages[i])), Val(S))

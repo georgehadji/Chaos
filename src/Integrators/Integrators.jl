@@ -18,7 +18,7 @@ using KernelAbstractions
 
 export AbstractIntegrator, SplittingMethod, CorrectedMethod, Gauss, ImplicitMidpoint, TaoExtended, IntegratorMap
 export advance, advance_n, advance_to, advance_checked, tangent_advance, advance_ensemble
-export coefficients, stage_count, nominal_order, is_palindromic, table_digits, force_evaluations, method_name, method_source, adjoint_method
+export coefficients, stage_count, nominal_order, is_palindromic, table_digits, force_evaluations, isolated_force_evaluations, method_name, method_source, adjoint_method
 export SymplecticEuler, Leapfrog, McLachlan2, Ruth3, ForestRuth, triple_jump, suzuki_jump, PEFRL, CalvoSanzSerna4, Yoshida, KahanLi, SofroniouSpaletta10
 export SABA, SBAB, SABAC, SBABC, ABA864, ABAH864, gauss_coefficients, extend_state, physical_state, taylor_reference
 

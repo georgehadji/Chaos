@@ -29,6 +29,7 @@ _ka_backend(b::Symbol) = b === :cpu ? CPU() : b === :gpu ? ensemble_backend(DEVI
 does not depend on `chunk`.
 """
 function advance_ensemble(m::AbstractIntegrator, flow, x0::AbstractVector{S}, tau, n::Integer; backend = :cpu, chunk::Union{Nothing, Integer} = nothing) where {S <: SVector}
+    _check_types(m, eltype(S), tau)
     be = _ka_backend(backend); N = length(x0)
     csz = chunk === nothing ? max(N, 1) : max(Int(chunk), 1)
     states = Vector{S}(undef, N); ok = Vector{Bool}(undef, N)

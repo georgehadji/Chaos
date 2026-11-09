@@ -82,7 +82,7 @@ end
 """
     CountingFlow(flow)
 
-A separable flow that counts its force evaluations (`kick_count`), for the cost tests of the integrators; forwards everything else.
+A separable flow that counts its force evaluations (`kick_count`; a corrector gradient of the SABAC and SBABC methods counts as one, D113), for the cost tests of the integrators; forwards everything else.
 Not isbits (a counter), so it is for single orbits only.
 """
 struct CountingFlow{F <: AbstractSeparableFlow} <: AbstractSeparableFlow
@@ -100,5 +100,5 @@ hamiltonian(c::CountingFlow, z) = hamiltonian(c.flow, z)
 perturbation_scale(c::CountingFlow) = perturbation_scale(c.flow)
 force(c::CountingFlow, q) = (c.n[] += 1; force(c.flow, q))
 force_jacobian(c::CountingFlow, q) = force_jacobian(c.flow, q)
-corrector_force(c::CountingFlow, z) = corrector_force(c.flow, z)
+corrector_force(c::CountingFlow, z) = (c.n[] += 1; corrector_force(c.flow, z))
 corrector_hessian(c::CountingFlow, z) = corrector_hessian(c.flow, z)

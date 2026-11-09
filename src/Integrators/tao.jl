@@ -26,6 +26,7 @@ function TaoExtended(::Type{T}, omega; order::Integer = 2) where {T}
 end
 TaoExtended(omega::Real; order::Integer = 2) = TaoExtended(Float64, omega; order = order)
 
+_coeff_type(::TaoExtended{T}) where {T} = T
 nominal_order(m::TaoExtended) = m.order
 is_palindromic(::TaoExtended) = true
 adjoint_method(m::TaoExtended) = m
@@ -68,6 +69,7 @@ end
 end
 
 function advance_n(m::TaoExtended{T, M}, flow, z::SVector, tau, n::Integer; compensated::Bool = false) where {T, M}
+    _check_types(m, z, tau)
     compensated && throw(ArgumentError("compensated summation is available for the table methods only"))
     for _ in 1:n, j in 1:M
         z = _tao_strang(m, flow, z, m.w[j] * tau)
@@ -75,7 +77,7 @@ function advance_n(m::TaoExtended{T, M}, flow, z::SVector, tau, n::Integer; comp
     return z
 end
 advance_to(m::TaoExtended, flow, z::SVector, tau, ns; compensated::Bool = false) =
-    (out = Vector{typeof(z)}(undef, length(ns)); done = 0; for (j, nj) in enumerate(ns); z = advance_n(m, flow, z, tau, nj - done); done = nj; out[j] = z; end; out)
+    (_check_types(m, z, tau); out = Vector{typeof(z)}(undef, length(ns)); done = 0; for (j, nj) in enumerate(ns); z = advance_n(m, flow, z, tau, nj - done); done = nj; out[j] = z; end; out)
 
 # Elementary Jacobians of the three partial flows (blocks of size n)
 function _tao_AB_jacobian(flow, z::SVector{D, T}, d, which::Symbol) where {D, T}
@@ -92,6 +94,7 @@ function _tao_C_jacobian(omega, ::SVector{D, T}, d) where {D, T}
 end
 
 function tangent_advance(m::TaoExtended{T, M}, flow, z::SVector, W::SMatrix, tau) where {T, M}
+    _check_types(m, z, tau)
     for j in 1:M
         d = m.w[j] * tau
         W = _tao_AB_jacobian(flow, z, d / 2, :A) * W; z = _tao_A(flow, z, d / 2)

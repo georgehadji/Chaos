@@ -185,6 +185,72 @@ end
     @test ic_upward(["using ..Foundation, ..Systems", "import ..Tangent: propagate", "using ..Lyapunov"]) == ["Tangent", "Lyapunov"]
 end
 
+# D113 (F4 of the stage 04 report): the device hook of the ensemble kernel; the fake devices IcFakeDevice and IcUnhookedDevice are defined in ic_helpers.jl.
+
+@testset "D113 F4: backend = :gpu goes through the device hook ensemble_backend" begin
+    _ = (advance_ensemble, advance_n)
+    D = Chaoslab.Foundation.DEVICE
+    m = Leapfrog(Float64, :DKD); fl = ic_flow(Float64, :f4); rng = StableRNG(ic_seed(18, 2))
+    x0 = [ic_to(Float64, ic_draw(rng, :f4)) for _ in 1:50]
+    ref, _ = advance_ensemble(m, fl, x0, 0.05, 7; backend = :cpu)
+    old = D[]
+    try
+        D[] = IcFakeDevice()
+        s, ok = advance_ensemble(m, fl, x0, 0.05, 7; backend = :gpu)
+        @test all(ok) && s == ref
+        D[] = IcUnhookedDevice()                                  # a device without a hook: a MethodError today is the symptom of F4 for the CUDA device
+        @test hasmethod(Chaoslab.Integrators.ensemble_backend, Tuple{IcFakeDevice})
+        @test !hasmethod(Chaoslab.Integrators.ensemble_backend, Tuple{IcUnhookedDevice})
+    finally
+        D[] = old
+    end
+    @test hasmethod(Chaoslab.Integrators.ensemble_backend, Tuple{Chaoslab.Foundation.NoDevice})
+end
+
+@testset "D113 R2: the element type of the method and of the step size must agree with the state" begin
+    _ = (advance, advance_n, advance_to, advance_checked, tangent_advance, advance_ensemble, Gauss, TaoExtended, Yoshida, SABAC, extend_state)
+    zf = ic_to(Float64, IC_START[:f4]); fd = ic_flow(Float64, :f4)
+    zq = ic_to(Double64, IC_START[:f4]); fq = ic_flow(Double64, :f4)
+    Wf = SMatrix{2, 2, Float64}(I); Wq = SMatrix{2, 2, Double64}(I)
+    methods64 = (Yoshida(Float64, 6), SABAC(Float64, 3), Gauss(Float64, 2), TaoExtended(Float64, 10.0))
+    # a binary64 method on a double-double state, and the reverse, is rejected at every public entry point
+    for m in (Yoshida(Float64, 6), SABAC(Float64, 3), Gauss(Float64, 2))
+        @test_throws ArgumentError advance(m, fq, zq, Double64(0.05))
+        @test_throws ArgumentError advance_n(m, fq, zq, Double64(0.05), 3)
+        m isa CorrectedMethod || @test_throws ArgumentError advance_to(m, fq, zq, Double64(0.05), [1, 2])      # advance_to exists for the table methods, Gauss and Tao
+        @test_throws ArgumentError tangent_advance(m, fq, zq, Wq, Double64(0.05))
+        @test_throws ArgumentError advance_ensemble(m, fq, [zq], Double64(0.05), 2)
+    end
+    @test_throws ArgumentError advance_checked(Gauss(Float64, 2), fq, zq, Double64(0.05))
+    @test_throws ArgumentError advance_n(Yoshida(Double64, 6), fd, zf, 0.05, 3)
+    @test_throws ArgumentError advance_n(Gauss(Double64, 2), fd, zf, 0.05, 3)
+    # a step size of another floating type than the state is rejected; an integer step size and matching types are accepted
+    for m in (Yoshida(Float64, 6), SABAC(Float64, 3), Gauss(Float64, 2))
+        @test_throws ArgumentError advance_n(m, fd, zf, Float32(0.05), 3)
+        @test_throws ArgumentError advance_n(m, fq, zq, 0.05, 3)                            # Float64 step on a double-double state (method double-double)
+    end
+    for m in (Yoshida(Double64, 6), Gauss(Double64, 2))
+        @test_throws ArgumentError advance_n(m, fq, zq, 0.05, 3)
+        @test advance_n(m, fq, zq, Double64(0.05), 3) isa SVector{2, Double64}
+    end
+    @test advance_n(Leapfrog(Float64), fd, zf, 1, 1) isa SVector{2, Float64}
+    # 128-bit BigFloat state with a binary64 method (the silent case of the review)
+    setprecision(BigFloat, 128) do
+        zb = ic_to(BigFloat, IC_START[:f4]); fb = ic_flow(BigFloat, :f4)
+        @test_throws ArgumentError advance_n(Yoshida(Float64, 6), fb, zb, BigFloat(0.05), 3)
+        @test_throws ArgumentError advance_n(Yoshida(BigFloat, 6), fb, zb, 0.05, 3)
+        @test advance_n(Yoshida(BigFloat, 6), fb, zb, BigFloat(0.05), 3) isa SVector{2, BigFloat}
+    end
+    # Tao on the extended state
+    ft = ic_flow(Float64, :t1); zt = extend_state(ic_to(Float64, IC_START[:t1]))
+    @test_throws ArgumentError advance_n(TaoExtended(Double64, 10.0), ft, zt, 0.05, 2)
+    @test advance_n(TaoExtended(Float64, 10.0), ft, zt, 0.05, 2) isa SVector{4, Float64}
+    # matching types: unchanged results and still no allocation (the check is resolved at compile time)
+    m = Yoshida(Float64, 6)
+    @test advance(m, fd, zf, 0.05) == advance_n(m, fd, zf, 0.05, 1)
+    @test ic_alloc(advance, m, fd, zf, 0.05) == 0
+end
+
 @testset "API: hand values of the first-order and second-order maps, IntegratorMap, Tangent consumption" begin
     _ = (SymplecticEuler, Leapfrog, IntegratorMap, advance, forward, inverse, dimension, nominal_order, method_name, propagate)
     flow = HarmonicOscillator([1.0]); z = SVector(1.0, 0.0)

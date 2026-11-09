@@ -4,6 +4,17 @@
 @inline _qv(z::SVector{D}) where {D} = SVector{D ÷ 2}(ntuple(i -> z[i], Val(D ÷ 2)))
 @inline _pv(z::SVector{D}) where {D} = SVector{D ÷ 2}(ntuple(i -> z[D ÷ 2 + i], Val(D ÷ 2)))
 
+# D113 (R2): the coefficient type of the method and a floating point step size must be the element type of the state. Resolved at compile time for matching types.
+_coeff_type(::SplittingMethod{T}) where {T} = T
+@noinline _type_mismatch(what, T, ET) = throw(ArgumentError("$what of type $T does not match the element type $ET of the state: construct the method and the step size in $ET"))
+@inline function _check_types(m::AbstractIntegrator, ::Type{ET}, tau) where {ET}
+    ET <: AbstractFloat || return nothing                      # automatic-differentiation numbers: not judged
+    _coeff_type(m) === ET || _type_mismatch("the coefficients of the method", _coeff_type(m), ET)
+    (tau isa AbstractFloat && !(tau isa ET)) && _type_mismatch("the step size", typeof(tau), ET)
+    return nothing
+end
+@inline _check_types(m::AbstractIntegrator, z::SVector, tau) = _check_types(m, eltype(z), tau)
+
 """
     advance(m, flow, z, tau)
 
@@ -19,6 +30,7 @@ leapfrog costs `n + 1` force evaluations. `compensated = true` carries the posit
 (Hairer2008 Sect. 2); the corrected methods reject it.
 """
 function advance_n(m::SplittingMethod{T, K}, flow, z::SVector, tau, n::Integer; compensated::Bool = false) where {T, K}
+    _check_types(m, z, tau)
     compensated && return first(_steps_comp(m, flow, z, zero(z), tau, n))
     pend = zero(T)
     for _ in 1:n
@@ -70,6 +82,7 @@ end
 The states after the step counts `ns` (increasing), from one run.
 """
 function advance_to(m::SplittingMethod, flow, z::SVector, tau, ns; compensated::Bool = false)
+    _check_types(m, z, tau)
     out = Vector{typeof(z)}(undef, length(ns)); e = zero(z); done = 0
     for (j, nj) in enumerate(ns)
         nj >= done || throw(ArgumentError("the step counts must be increasing"))
@@ -102,6 +115,7 @@ the one-step map (spec item 17). No renormalization.
 @noinline _tangent_kick(flow, z, W, t) = (kick(flow, z, t), kick_jacobian(flow, z, t) * W)
 
 function tangent_advance(m::SplittingMethod{T, K}, flow, z::SVector, W::SMatrix, tau) where {T, K}
+    _check_types(m, z, tau)
     for i in 1:K
         iszero(m.c[i]) || ((z, W) = _tangent_drift(flow, z, W, m.c[i] * tau))
         iszero(m.d[i]) || ((z, W) = _tangent_kick(flow, z, W, m.d[i] * tau))
@@ -126,6 +140,7 @@ end
 end
 
 function advance_n(m::CorrectedMethod, flow, z::SVector, tau, n::Integer; compensated::Bool = false)
+    _check_types(m, z, tau)
     compensated && throw(ArgumentError("compensated summation is available for the table methods only"))
     kappa = _corrector_kappa(m, flow, tau)
     for _ in 1:n
@@ -137,6 +152,7 @@ function advance_n(m::CorrectedMethod, flow, z::SVector, tau, n::Integer; compen
 end
 
 function tangent_advance(m::CorrectedMethod, flow, z::SVector, W::SMatrix, tau)
+    _check_types(m, z, tau)
     kappa = _corrector_kappa(m, flow, tau)
     W = _corrector_jacobian(flow, z, kappa) * W; z = _corrector_kick(flow, z, kappa)
     z, W = tangent_advance(m.base, flow, z, W, tau)
@@ -144,11 +160,12 @@ function tangent_advance(m::CorrectedMethod, flow, z::SVector, W::SMatrix, tau)
     return z, W
 end
 
+_coeff_type(m::CorrectedMethod) = _coeff_type(m.base)
 nominal_order(m::CorrectedMethod) = m.order
 is_palindromic(::CorrectedMethod) = true
 adjoint_method(m::CorrectedMethod) = m
 stage_count(m::CorrectedMethod) = stage_count(m.base)
-force_evaluations(m::CorrectedMethod) = force_evaluations(m.base)
+force_evaluations(m::CorrectedMethod) = isolated_force_evaluations(m.base) + 2       # two corrector gradients per step, no merging across them
 method_name(m::CorrectedMethod) = string(method_name(m.base)[1:4], "C", method_name(m.base)[5:end])
 method_source(m::CorrectedMethod) = method_source(m.base)
 table_digits(m::CorrectedMethod) = table_digits(m.base)

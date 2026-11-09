@@ -101,7 +101,7 @@ const IC_AC11_IDS = ("S1DK", "S1KD", "S2DKD", "S2KDK", "S3", "S4", "S5", "S9", "
 ic_ac11_set() = IC_FULL ? IC_ALLX : filter(M -> M.id in IC_AC11_IDS, IC_ALLX)
 
 @testset "AC11 tangent step equals the derivative of the one-step map (ForwardDiff, 256-bit finite difference)" begin
-    _ = (IntegratorMap, tangent, tangent_advance, stage_count, advance, advance_n)
+    _ = (IntegratorMap, tangent, tangent_advance, stage_count, advance, advance_n, advance_checked)
     rng = StableRNG(ic_seed(11, 1)); set11 = ic_ac11_set()
     # binary64 and double-double: ForwardDiff; the bound 16 eps (1 + |M|) is scaled by the stage count k (rounding of k elementary Jacobian products), see the plan
     for T in (Float64, Double64), M in set11, (kind, tau) in IC_SYMFL[2:3]
@@ -127,11 +127,29 @@ ic_ac11_set() = IC_FULL ? IC_ALLX : filter(M -> M.id in IC_AC11_IDS, IC_ALLX)
         h = BigFloat(2)^(-100)
         ms = [(M.id, M.mk(BigFloat)) for M in set11]
         append!(ms, [("G$s", mk(BigFloat)) for (s, mk) in IC_GAUSS])
+        # D113 (F2 of the stage 04 report): a random F2 draw near the pericentre can make an implicit step fail by design (criterion 7: failure status, NaN state, no value);
+        # such a point has no derivative to compare. The point is skipped when `advance_checked` reports ok = false (the failing state is asserted to be all NaN),
+        # the skips are counted and at most 10 percent of the points of the block may be skipped, so a solver that fails on ordinary points is still caught.
+        nskip = 0; npts = 0
         for (id, m) in ms, (kind, tau) in (IC_SYMFL[2], IC_SYMFL[3])
-            flow = ic_flow(BigFloat, kind); z = ic_to(BigFloat, ic_draw(rng, kind)); tb = BigFloat(tau)
+            flow = ic_flow(BigFloat, kind); z = ic_to(BigFloat, ic_draw(rng, kind)); tb = BigFloat(tau); npts += 1
+            zn, st = advance_checked(m, flow, z, tb)
+            if !st.ok
+                nskip += 1
+                @test !any(isfinite, zn) && !(m isa SplittingMethod)
+                continue
+            end
             A = Matrix(tangent(ic_imap(m, flow, tb), z)); B = ic_fdjac(w -> advance(m, flow, w, tb), z, h)
             @test Float64(maximum(abs, A .- B)) <= 2.0^(-130) * (1 + Float64(maximum(abs, A)))
         end
+        # the stiff draw of the full-size run of stage 04 (F2, e near 0.9, speed 4.36, tau = 0.01): Gauss s = 3 reports ok = false, tau = 0.001 converges; the rule above skips the first
+        let flow = ic_flow(BigFloat, :f2), m = Gauss(BigFloat, 3), z = ic_to(BigFloat, [0.09996, -0.00379, 0.0869, 4.357])
+            zn, st = advance_checked(m, flow, z, BigFloat(0.01))
+            @test !st.ok && !any(isfinite, zn)
+            @test advance_checked(m, flow, z, BigFloat(0.001))[2].ok
+        end
+        @info "AC11 256-bit block: points skipped because the implicit step reports ok = false" nskip npts
+        @test nskip <= max(1, div(npts, 10))
     end
 end
 

@@ -146,6 +146,17 @@ function ic_expected_evals(c, d)
     return cnt
 end
 
+# D113: force evaluations per step in a long run, from the stored table: maximal runs of kicks in the cyclic sequence (drift c_i, then kick d_i, stage by stage)
+function ic_expected_cyclic(c, d)
+    ev = Symbol[]
+    for i in eachindex(d)
+        iszero(c[i]) || push!(ev, :D)
+        iszero(d[i]) || push!(ev, :K)
+    end
+    :D in ev || return :K in ev ? 1 : 0
+    return count(i -> ev[i] === :K && ev[mod1(i - 1, length(ev))] !== :K, eachindex(ev))
+end
+
 # ------------------------------------------------------------------ polynomial step matrices (F1, n = 1, omega = 1: q' = p, p' = -q), 256 bits
 # M(tau) = prod_i K_i D_i as a matrix polynomial truncated at degree deg; D_i = I + c_i tau E12, K_i = I - d_i tau E21 (drift then kick, first stage rightmost)
 function ic_steppoly(c, d, deg)
@@ -250,3 +261,9 @@ function ic_alloc(f, args...)
     f(args...); f(args...)
     return @allocated f(args...)
 end
+
+# D113 (F4 of the stage 04 report): the device hook of the ensemble kernel. A fake device installed in `Foundation.DEVICE` stands for the CUDA device of
+# ext/ChaoslabCUDAExt.jl (the extension defines `Integrators.ensemble_backend(::CUDADevice)`; its presence is checked in verify/integrator-catalog.jl, where CUDA loads).
+struct IcFakeDevice <: Chaoslab.Foundation.AbstractDevice end
+Chaoslab.Integrators.ensemble_backend(::IcFakeDevice) = Chaoslab.Integrators.ensemble_backend(Chaoslab.Foundation.NoDevice())
+struct IcUnhookedDevice <: Chaoslab.Foundation.AbstractDevice end

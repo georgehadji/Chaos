@@ -64,9 +64,29 @@ method_source(::SplittingMethod{T, K, N, S}) where {T, K, N, S} = String(S)
 """
     force_evaluations(m) -> Int
 
-Force (kick) evaluations of one step of `m`: the number of maximal runs of kicks with no drift between them (adjacent kicks share one evaluation).
+Force evaluations per step in a long run (decision D113): the number of maximal runs of kicks with no drift between them, counted cyclically, because
+`advance_n` also merges the last kick of a step with the first kick of the next. The first step of a run costs [`isolated_force_evaluations`](@ref)
+(at most one more), so `n` steps cost `isolated + (n - 1) force_evaluations`. A corrected method reports the isolated cost of its base plus the two
+corrector gradients (each counts as one evaluation; the corrector kicks do not merge with the base kicks).
 """
 function force_evaluations(m::SplittingMethod{T, K}) where {T, K}
+    iso = isolated_force_evaluations(m)
+    first_kick = false; last_kick = false; any_drift = false
+    for i in 1:K
+        iszero(m.c[i]) || (any_drift = true)
+    end
+    # the table starts with a kick when stage 1 has no drift and a kick, ends with a kick when the last stage with a weight is a kick
+    (iszero(m.c[1]) && !iszero(m.d[1])) && (first_kick = true)
+    for i in K:-1:1
+        if !iszero(m.d[i]) || !iszero(m.c[i])
+            last_kick = !iszero(m.d[i]); break
+        end
+    end
+    return (first_kick && last_kick && any_drift) ? iso - 1 : iso
+end
+
+"`isolated_force_evaluations(m)`: force evaluations of one step taken alone (kicks of consecutive stages with no drift between them share one evaluation)."
+function isolated_force_evaluations(m::SplittingMethod{T, K}) where {T, K}
     n = 0; open = false
     for i in 1:K
         iszero(m.c[i]) || (open = false)

@@ -15,7 +15,7 @@ Turn a topic into an approved search plan.
 
 1. Ask for the topic slug and the question it answers.
 2. Read the covered sections of the bibliography for this topic.
-3. Draft the search plan: sub-questions, inclusion and exclusion rules, sources (Crossref, arXiv, ADS, INSPIRE), query strings, stop rule.
+3. Draft the search plan: sub-questions, inclusion and exclusion rules, sources (Crossref, arXiv, ADS, INSPIRE, Unpaywall [https://unpaywall.org/products/api](https://unpaywall.org/products/api) for open-access copies by DOI), query strings, stop rule.
 4. **[Checkpoint]** Present the plan.
 5. Run the audit, revise, write the output.
 

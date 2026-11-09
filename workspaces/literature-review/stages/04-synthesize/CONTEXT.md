@@ -14,7 +14,7 @@ Read the verified papers and extract claims and located benchmark values. Option
 
 ## Process
 
-1. Fetch open-access full texts into `data/literature/[topic]/`; list paywalled papers for the human to add. Then read each paper (one Sonnet subagent per paper): claims, method, benchmark values with page, equation or table number, relevance to catalog rows.
+1. Fetch open-access full texts into `data/literature/[topic]/`, located by DOI through the Unpaywall API (`https://api.unpaywall.org/v2/<doi>?email=`, address from `UNPAYWALL_EMAIL`, never a default); list paywalled papers for the human to add. Then read each paper (one Sonnet subagent per paper): claims, method, benchmark values with page, equation or table number, relevance to catalog rows.
 2. Merge into one notes file; list open questions and conflicts between papers.
 3. **[Checkpoint]** Present the notes.
 4. Run the audit, write the output.

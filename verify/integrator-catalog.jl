@@ -440,13 +440,15 @@ section("AC15D") do
         results[label] = Eg
         emit("15(d)", string(label, ": starts used / failed, steps up to ", ns[end], " (", @sprintf("%.0f", time() - t0), " s)"), string(length(good), " / ", nst - length(good)), "-", "INFO")
         emit("15(d)", string(label, ": rms of E(n) at n = ", join(ns, ", ")), join((fmt(x) for x in rms), ", "), "-", "INFO")
-        emit("15(d)", string(label, ": log-log slope of the rms over n in [1e4, ", ns[end], "]"), slope, comp ? "0.5 within 0.1" : "reported (negative control)", comp ? pf(abs(slope - 0.5) <= 0.1) : "INFO")
+        emit("15(d)", string(label, ": log-log slope of the rms over n in [1e4, ", ns[end], "] (reported since D114)"), slope, "reported", "INFO")
         emit("15(d)", string(label, ": slope over the whole range from n = 1000"), slope_all, "-", "INFO")
         # D113: the rule of criterion 15(a) for the start of the fit, the first n whose rms is at least 1.3 times the evaluation floor (the rms at n = 1000); reported next to the [1e4, 3e6] slope
         fl = findall(i -> ns[i] >= 10000 && rms[i] >= 1.3 * rms[1], eachindex(ns))
         slope_fl = length(fl) >= 2 ? (log(rms[end]) - log(rms[fl[1]])) / (log(ns[end]) - log(ns[fl[1]])) : NaN
-        emit("15(d)", string(label, ": slope from the first n with rms >= 1.3 x floor (n = ", isempty(fl) ? "none" : string(ns[fl[1]]), ")"), slope_fl, "reported", "INFO")
+        emit("15(d)", string(label, ": log-log slope of the rms from the first n with rms >= 1.3 x floor (n = ", isempty(fl) ? "none" : string(ns[fl[1]]), ") to ", ns[end], " (D114)"), slope_fl, comp ? "0.5 within 0.1" : "reported (negative control)", comp ? pf(abs(slope_fl - 0.5) <= 0.1) : "INFO")
         mu = vec(sum(Eg, dims = 2)) ./ length(good); se = [sqrt(sum(abs2, Eg[i, :] .- mu[i]) / (length(good) - 1)) / sqrt(length(good)) for i in axes(Eg, 1)]
+        zlast = mu[end] / se[end]
+        emit("15(d)", string(label, ": mean of E(n) over the starts in standard errors at n = ", ns[end], " (D114)"), zlast, comp ? "|z| <= 3" : "reported (negative control)", comp ? pf(abs(zlast) <= 3) : "INFO")
         emit("15(d)", string(label, ": mean of E(n) over the starts in standard errors at n = ", join(ns, ", ")), join((fmt(mu[i] / se[i]) for i in eachindex(mu)), ", "), "-", "INFO")
         emit("15(d)", string(label, ": local slopes of the rms between consecutive n"), join((fmt((log(rms[i + 1]) - log(rms[i])) / (log(ns[i + 1]) - log(ns[i]))) for i in 1:(length(ns) - 1)), ", "), "-", "INFO")
     end
@@ -491,7 +493,7 @@ section("AC18T") do
         same = k == "GAUSS" ? (isequal(a[1], b[1]) && isequal(a[2], b[2])) : isequal(a, b)
         emit("18", string("orbit results bitwise identical with ", Threads.nthreads(), " and 1 CPU threads: ", k, k == "GAUSS" ? " (10^4 orbits, states and statuses)" : " (10^5 orbits)"), same, "bitwise", pf(same))
     end
-    emit("18", "GPU against CPU (10^5 orbits, double-double kernel compile), G1 and G2 10^4 orbits CPU against GPU", "not run", "-", "NOT RUN: needs verify/gpu.jl (writes data/gpu-benchmark.toml) and a device hook ensemble_backend(::CUDADevice) that ext/ChaoslabCUDAExt.jl does not define")
+    emit("18", "GPU against CPU (10^5 orbits, double-double kernel compile), G1 and G2 10^4 orbits CPU against GPU", "not run", "-", "NOT RUN: needs verify/gpu.jl (writes data/gpu-benchmark.toml); the device hook ensemble_backend(::CUDADevice) exists since D113 (checked by IC_ONLY=GPUHOOK)")
 end
 
 # ------------------------------------------------------------------------------------------------ MARGINS: worst measured ratio (measured / bound) of the criteria whose package tests only pass or fail

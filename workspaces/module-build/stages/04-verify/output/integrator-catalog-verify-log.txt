@@ -1,0 +1,523 @@
+######## group AC01-03 (own process, log-AC01-03.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+# Info AC3 reported: S3 / leapfrog error ratio at equal work, linear problem | ratio = 0.31819993004540287
+# Info AC3b4 reported: single-step slope | sl = 11.001743540989594; errs = [8.613954193740417e-13, 4.2220365898826673e-16, 2.0533644144332931e-19, 9.991671029214945e-23]
+AC01-03 | file total (2862 pass, 0 fail, 0 error, 0 broken, 28.1 s) | 2862 | 0 fail, 0 error | PASS
+AC01-03 | testset FL1 dimension, element type and Hamiltonian (0 fail or error, 0 broken, 1.3 s) | 0 | 0 | PASS
+AC01-03 | testset FL2 partial flows are exact: drift and kick (0 fail or error, 0 broken, 1.0 s) | 0 | 0 | PASS
+AC01-03 | testset FL3 elementary Jacobians equal the derivative of the partial flows (0 fail or error, 0 broken, 4.4 s) | 0 | 0 | PASS
+AC01-03 | testset FL4 gradient and vector field of H, including the nonseparable T1 (0 fail or error, 0 broken, 1.4 s) | 0 | 0 | PASS
+AC01-03 | testset FL5 F1 exact solution and its matrix (0 fail or error, 0 broken, 0.8 s) | 0 | 0 | PASS
+AC01-03 | testset FL6 F2 invariants, perturbation scale, corrector force, force counter (0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+AC01-03 | testset FL7 T1 and T2 values (0 fail or error, 0 broken, 0.0 s) | 0 | 0 | PASS
+AC01-03 | testset AC1 sum conditions, palindromic symmetry, digits, sources (0 fail or error, 0 broken, 9.7 s) | 0 | 0 | PASS
+AC01-03 | testset AC2 linear order of every explicit table (0 fail or error, 0 broken, 3.0 s) | 0 | 0 | PASS
+AC01-03 | testset AC3a triple jump and Suzuki builders reproduce the closed forms (0 fail or error, 0 broken, 1.5 s) | 0 | 0 | PASS
+AC01-03 | testset AC3b Yoshida solution A against Kahan-Li s7odr6, stage counts (0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+AC01-03 | testset AC3b3 S3: z of the printed formula, weights, error ratio against leapfrog (0 fail or error, 0 broken, 2.3 s) | 0 | 0 | PASS
+AC01-03 | testset AC3b4 S13: Eq. (17) of SofroniouSpaletta2005 (0 fail or error, 0 broken, 0.7 s) | 0 | 0 | PASS
+AC01-03 | testset AC3b5 S9: Calvo-Sanz-Serna table, RKN form against the splitting form (0 fail or error, 0 broken, 0.6 s) | 0 | 0 | PASS
+# section AC01-03 took 28.2 s
+######## group AC04-08 (own process, log-AC04-08.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+# Info AC4 reported | M.id = "S2DKD"; kind = :f4; sl = [2.0005755259795763, 2.0001444667552666, 2.0000361534769144, 2.0000090405687745, 2.0000022592048907, 2.0000005610661096]
+# Info AC4 reported | M.id = "S2DKD"; kind = :f2; sl = [1.9941778039530218, 1.9985477823866957, 1.9996371535350064, 1.9999093004137993, 1.9999773162483974, 1.9999942713935488]
+# Info AC4 reported | M.id = "S2KDK"; kind = :f4; sl = [2.002613761509461, 2.000653274370127, 2.000163308270845, 2.000040826453592, 2.000010207058862, 2.0000025540641713]
+# Info AC4 reported | M.id = "S2KDK"; kind = :f2; sl = [1.998653297664863, 1.9996642196507957, 1.999916113961873, 1.9999790262670287, 1.9999947541573724]
+# Info AC4 reported | M.id = "S3"; kind = :f4; sl = [2.0029558291965595, 2.0007420978221617, 2.000185712418523, 2.0000464400462636, 2.000011609790606, 2.0000029066854665, 2.000000692973686]
+# Info AC4 reported | M.id = "S3"; kind = :f2; sl = [1.9982612119325656, 1.9995661221507877, 1.9998915806625723, 1.9999728899712337, 1.9999932685902904]
+# Info AC4 reported | M.id = "S5"; kind = :f4; sl = [3.827404160880903, 3.960497342539815, 3.9903404667295153, 3.997598460413729, 3.9994004465920314, 3.9998501635773565, 3.99996254413932, 3.999990636237632]
+# Info AC4 reported | M.id = "S5"; kind = :f2; sl = [3.9413902027016685, 3.9853012287667124, 3.9963227665614487, 3.999080538871768, 3.9997701252659654, 3.999942530727252, 3.999985632645009, 3.9999964081589523]
+# Info AC4 reported | M.id = "S6-4"; kind = :f4; sl = [3.827404160880903, 3.960497342539815, 3.9903404667295153, 3.997598460413729, 3.9994004465920314, 3.9998501635773565, 3.99996254413932, 3.999990636237632]
+# Info AC4 reported | M.id = "S6-4"; kind = :f2; sl = [3.9413902027016685, 3.9853012287667124, 3.9963227665614487, 3.999080538871768, 3.9997701252659654, 3.999942530727252, 3.999985632645009, 3.9999964081589523]
+# Info AC4 reported | M.id = "S6-6"; kind = :f4; sl = [6.0424142577425775, 6.01186594003363, 6.003011200171378, 6.000754983528177, 6.0001888724059365, 6.0000472258522635, 6.00001180694503, 6.000002951766386]
+# Info AC4 reported | M.id = "S6-6"; kind = :f2; sl = [5.482563972107848, 5.86121426556846, 5.964622675995953, 5.991111197298594, 5.997774987222072, 5.999443570527853, 5.999860881606422, 5.9999652197121645]
+# Info AC4 reported | M.id = "S6-8"; kind = :f4; sl = [7.806706756157956, 7.976823526129056, 7.997966313538143, 7.999743499857031, 7.999951919251606, 7.999988987405295, 7.9999973102897775]
+# Info AC4 reported | M.id = "S6-8"; kind = :f2; sl = [7.082978449190785, 7.747771675839584, 7.935354339854525, 7.983737381704242, 7.995927994957844, 7.998981601463644, 7.999745375855161]
+# Info AC4 reported | M.id = "S7-4"; kind = :f4; sl = [4.109703291241918, 4.009030651660186, 4.002238609295552, 4.000554389591422, 4.000138234630411, 4.000034535515212, 4.000008632425275, 4.000002158015363]
+# Info AC4 reported | M.id = "S7-4"; kind = :f2; sl = [3.8544715280273127, 3.9407888924812036, 3.985561557871249, 3.9964150774167635, 3.9991053221683925, 3.999776427694798, 3.999944112997147, 3.999986028628898]
+# Info AC4 reported | M.id = "S7-6"; kind = :f4; sl = [5.883122338253857, 6.19479438536499, 6.046726618383802, 6.011598520780099, 6.002894787804186, 6.000723399443108, 6.00018083134544, 6.000045206746251]
+# Info AC4 reported | M.id = "S7-6"; kind = :f2; sl = [3.4970658062283, 6.174944604512064, 6.000745629898271, 6.037653472827567, 6.0117307071198365, 6.00302296676838, 6.000760801489202, 6.000190508020942]
+# Info AC4 reported | M.id = "S7-8"; kind = :f4; sl = [7.573538856937577, 8.172300925354168, 8.037460074894431, 8.009151907754418, 8.002275480760535]
+# Info AC4 reported | M.id = "S7-8"; kind = :f2; sl = [7.026109838794255, 5.8542031416493865, 10.103696777889699, 7.885130074732291, 7.9885638377505055, 7.997922248436598, 7.999525396055326]
+# Info AC4 reported | M.id = "S8"; kind = :f4; sl = [3.8880298464123566, 3.963981153142133, 3.9927286404929334, 3.998274857019339, 3.9995743149059866, 3.999893925910692, 3.999973503227228, 3.9999933775456804]
+# Info AC4 reported | M.id = "S8"; kind = :f2; sl = [3.9460032651102948, 3.97314775602207, 3.9936008841626425, 3.998420859574966, 3.999606509228205, 3.9999017082442365, 3.99997543212593, 3.9999938583711656]
+# Info AC4 reported | M.id = "S9"; kind = :f4; sl = [3.941214476675118, 3.999316048919145, 3.9961230697064782, 3.99705646746761, 3.9982693327764123, 3.9990695302152144, 3.99952050359276, 3.999789762848314]
+# Info AC4 reported | M.id = "S9"; kind = :f2; sl = [3.922253633496966, 3.9798046264519344, 3.9925772969002105, 3.9969152654908315, 3.998610779369767, 3.9993432397570157, 3.999680410073324, 3.9998324049070733]
+# Info AC4 reported | M.id = "S11-6A"; kind = :f4; sl = [4.459289457194534, 5.759066679081664, 5.941718049235843, 5.985549922236667, 5.996395604138464]
+# Info AC4 reported | M.id = "S11-6A"; kind = :f2; sl = [5.46646876826466, 5.851016546466821, 5.961264093904814, 5.990216749849464, 5.99754847823176]
+# Info AC4 reported | M.id = "S11-8D"; kind = :f4; sl = [6.335977785034573, 7.794774109577722, 7.958594174083329]
+# Info AC4 reported | M.id = "S11-8D"; kind = :f2; sl = [6.516096590345315, 7.550221262197357, 7.8803509851331395, 7.969624783424162]
+# Info AC4 reported | M.id = "S11-8A"; kind = :f4; sl = [7.61469249125143, 7.892520568251636, 7.972314271405117]
+# Info AC4 reported | M.id = "S11-8A"; kind = :f2; sl = [7.892730253076431, 8.030235666845066, 8.013039336515616]
+# Info AC4 reported | M.id = "S12-6"; kind = :f4; sl = [5.672819920947801, 5.952592521571834, 5.987497781075968, 5.996842730075579, 5.99920879390475, 5.999802081800049, 5.999950512925943]
+# Info AC4 reported | M.id = "S12-6"; kind = :f2; sl = [5.797101456942571, 5.965037517724267, 5.991089895507761, 5.99775809971371, 5.9994385842577875, 5.999859586598529, 5.999964892121566]
+# Info AC4 reported | M.id = "S12-8"; kind = :f4; sl = [8.858385472660961, 7.955094685842115, 7.993951388604023, 7.99833503559342]
+# Info AC4 reported | M.id = "S12-8"; kind = :f2; sl = [7.240257607676139, 8.146208314737489, 8.009149764614158, 8.001246880457378, 8.000157507764325]
+# Info AC4 reported | M.id = "S12-s7odr6"; kind = :f4; sl = [4.459289457181714, 5.759066678898986, 5.941718046422511, 5.985549873676933, 5.996394557789072, 5.999075960141595, 5.998288837119377, 5.907893320507099]
+# Info AC4 reported | M.id = "S12-s7odr6"; kind = :f2; sl = [5.46646876825538, 5.85101654631851, 5.961264091539696, 5.99021671249595, 5.997547911779161, 5.999389233992958, 6.000017021441419, 6.010909655620572]
+# Info AC4 reported | M.id = "S13"; kind = :f4; sl = [11.084236520434478, 10.27521532062285, 10.05047968039295, 10.012135952038832, 10.003005167043955, 10.000733447974644]
+# Info AC4 reported | M.id = "S13"; kind = :f2; sl = [6.588068536845744, 8.757880188742602, 13.04911008574902, 10.897197912193088, 10.212691960012037, 10.053248725335092, 10.01338476172836, 10.0032896074406]
+# Info AC5 reported | M.id = "S1DK"; kind = :f4; sl = [0.9959681214570745, 0.9979770473310119, 0.9989867778935693, 0.9994929534558803, 0.9997463679315083, 0.9998731569815941, 0.9999365715918286, 0.9999682852706505]
+# Info AC5 reported | M.id = "S1DK"; kind = :f2; sl = [0.9930586715264864, 0.9967899339169627, 0.9984583753899949, 0.9992448301059079, 0.9996262995318611, 0.9998141175565879, 0.9999073006923797, 0.9999537074855935]
+# Info AC5 reported | M.id = "S1KD"; kind = :f4; sl = [1.0040875026177996, 1.002036858479707, 1.0010166985461382, 1.0005079156532468, 1.0002538493457656, 1.000126897337719, 1.0000634419886196, 1.000031718124511]
+# Info AC5 reported | M.id = "S1KD"; kind = :f2; sl = [1.0049624289860015, 1.002715878796123, 1.0014181113604572, 1.0007242936203053, 1.0003659813215966, 1.0001839522940554, 1.0000922161100307, 1.00004617394458]
+# Info AC5 reported | M.id = "S4"; kind = :f4; sl = [2.3361613322777903, 2.75922426669079, 2.893503030993953, 2.9495787410077745, 2.9754314657923997, 2.9878689480298397, 2.9939719077094216, 2.996995206089805]
+# Info AC5 reported | M.id = "S4"; kind = :f2; sl = [4.05596278716986, 4.3905192587668145, 5.006327022298473, 2.9964109911517123, 2.124485447172254, 2.704696575302682, 2.872410165759535, 2.9402299086928996]
+# Info AC6 reported: ABA slopes | M.id = "ABA864"; ic_sl(e[1], e[2]) = 3.9983291898000535; ic_sl(e[2], e[3]) = 3.999582610261222
+# Info AC6 reported: ABA slopes | M.id = "ABAH864"; ic_sl(e[1], e[2]) = 3.999848708923346; ic_sl(e[2], e[3]) = 3.9999621820712368
+# Info AC7 reported: iterations at h L rowsum = 0.1 | s = 1; extrema(its) = (15, 17)
+# Info AC7 reported: iterations at h L rowsum = 0.1 | s = 2; extrema(its) = (11, 13)
+# Info AC7 reported: iterations at h L rowsum = 0.1 | s = 3; extrema(its) = (10, 11)
+# Info AC7 reported: iterations at h L rowsum = 0.1 | s = 4; extrema(its) = (9, 11)
+# Info AC7 reported: steps with final increment exactly 0 | zero_inc / nst = 0.9924
+# Info AC8a reported: slopes | ic_sl(e2[1], e2[2]) = 1.9985672250192563; ic_sl(e2[2], e2[3]) = 1.9996526395560659; ic_sl(e4[1], e4[2]) = 3.937766322179374; ic_sl(e4[2], e4[3]) = 3.9847857942556995
+# Info AC8a control: slope with the exponent as printed | ic_sl(ep[1], ep[2]) = 1.992725288207888
+# Info AC8c reported: max |q - x| + |p - y| over the run | coupling = Dict((10.0, 0.01) => 0.0001271895283046498, (100.0, 0.01) => 0.00012949909268439308, (100.0, 0.005) => 3.2340552754910046e-5, (10.0, 0.005) => 3.180162578782231e-5)
+AC04-08 | file total (1962 pass, 0 fail, 0 error, 0 broken, 52.5 s) | 1962 | 0 fail, 0 error | PASS
+AC04-08 | testset AC4 measured order of the explicit symmetric tables (F4 and F2) (0 fail or error, 0 broken, 21.6 s) | 0 | 0 | PASS
+AC04-08 | testset AC5 non-symmetric tables: S1 first order, S4 third order, local order on nonlinear flows (0 fail or error, 0 broken, 3.8 s) | 0 | 0 | PASS
+AC04-08 | testset AC6a SABA and SBAB: the eps tau^2n branch (D112) (0 fail or error, 0 broken, 3.3 s) | 0 | 0 | PASS
+AC04-08 | testset AC6b SABA and SBAB: eps^2 tau^2 branch at eps = 1e-2 (0 fail or error, 0 broken, 2.4 s) | 0 | 0 | PASS
+AC04-08 | testset AC6c SABA_n against leapfrog at the same tau and eps = 1e-3 (0 fail or error, 0 broken, 0.0 s) | 0 | 0 | PASS
+AC04-08 | testset AC6 ABA864 and ABAH864: generalized order (8, 6, 4), eps^3 tau^4 regime (0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+AC04-08 | testset AC6d corrected SABAC_n and SBABC_n (P2) (0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+AC04-08 | testset AC7 Gauss methods: order 2s, stage equations, iteration counts, failure status, stopping rule (0 fail or error, 0 broken, 14.8 s) | 0 | 0 | PASS
+AC04-08 | testset AC8a Tao's method: Strang order 2, triple jump order 4 with the corrected exponent (0 fail or error, 0 broken, 4.6 s) | 0 | 0 | PASS
+AC04-08 | testset AC8b,c Tao's method: physical error, recovery of the original system, coupling (0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+# section AC04-08 took 52.6 s
+######## group AC09-12 (own process, log-AC09-12.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+# Info AC11 256-bit block: points skipped because the implicit step reports ok = false | nskip = 1; npts = 88
+# Info AC12b reported: S2 relative difference to the reference tangent, tau = 2^-15, 2^-16, extrapolated | r1 = 1.564528885947352e-8; r2 = 3.9086717026839025e-9; rx = 5.0731554228637575e-12; log2(r1 / r2) = 2.0009779754232824
+# Info AC12b reported: S12-6 relative difference to the reference tangent | rel6 = 1.1728731414900006e-12
+AC09-12 | file total (209398 pass, 0 fail, 0 error, 0 broken, 247.8 s) | 209398 | 0 fail, 0 error | PASS
+AC09-12 | testset AC9 symplecticity of the one-step Jacobian (0 fail or error, 0 broken, 51.8 s) | 0 | 0 | PASS
+AC09-12 | testset AC10 reversibility, adjoint property (0 fail or error, 0 broken, 9.6 s) | 0 | 0 | PASS
+AC09-12 | testset AC11 tangent step equals the derivative of the one-step map (ForwardDiff, 256-bit finite difference) (0 fail or error, 0 broken, 155.4 s) | 0 | 0 | PASS
+AC09-12 | testset AC12a tangent against the exact matrix exponential of the linearized flow (F1) (0 fail or error, 0 broken, 1.8 s) | 0 | 0 | PASS
+AC09-12 | testset AC12b tangent of S2 and of a 6th order table against finite differences of reference orbits (F2, e = 0.5, T = 10) (0 fail or error, 0 broken, 27.6 s) | 0 | 0 | PASS
+AC09-12 | testset AC12c frame over n steps against the two-trajectory finite difference of the method's own orbits (256-bit, perturbation 2^-40) (0 fail or error, 0 broken, 0.6 s) | 0 | 0 | PASS
+# section AC09-12 took 248.0 s
+######## group AC13-16 (own process, log-AC13-16.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+# Info AC14 reported: Runge-Lenz drift (linear growth, not scored) | M.id = "S2DKD"; maximum(abs, collect(runge_lenz(flow, z)) .- collect(runge_lenz(flow, ic_to(Float64, z0)))) = 0.2411720155172502
+# Info AC14 reported: Runge-Lenz drift (linear growth, not scored) | M.id = "S5"; maximum(abs, collect(runge_lenz(flow, z)) .- collect(runge_lenz(flow, ic_to(Float64, z0)))) = 0.0011611831911620962
+# Info AC14 reported: Runge-Lenz drift (linear growth, not scored) | M.id = "S12-8"; maximum(abs, collect(runge_lenz(flow, z)) .- collect(runge_lenz(flow, ic_to(Float64, z0)))) = 4.649058915617843e-13
+# Info AC15 reported: rms of the energy error with and without compensated summation | ns = [1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]; rc = [1.2382366674832315e-17, 9.10190240307544e-18, 1.248308420807811e-17, 2.1036206945482042e-17, 3.3495737240443166e-17, 5.262455116037602e-17, 9.652768674981857e-17, 1.810610746939915e-16]; ru = [1.0058856309693362e-15, 1.8403004201610584e-15, 3.3790791313575612e-15, 5.131740609735996e-15, 1.0481312210938418e-14, 1.847421164709045e-14, 3.214568850669113e-14, 5.4249910273172276e-14]
+# Info AC15d reported: rms and mean over the starts in standard errors | ns = [10000, 30000, 100000]; rms = [9.649097136026094e-18, 1.2275208206107927e-17, 1.9815480947109717e-17]; mean_se = [-0.722798537346306, 0.8856752064423122, 1.8055513838476995]
+# Info AC15d reported: worst relative error of the update sum and of a stage sum | worst_u = 2.037818782445592e-16; worst_s = 1.981642667153588e-16
+AC13-16 | file total (860 pass, 0 fail, 0 error, 0 broken, 537.8 s) | 860 | 0 fail, 0 error | PASS
+AC13-16 | testset AC13 energy bounded, no secular drift (0 fail or error, 0 broken, 29.0 s) | 0 | 0 | PASS
+AC13-16 | testset AC14 angular momentum of F2 is preserved by every explicit method (0 fail or error, 0 broken, 4.8 s) | 0 | 0 | PASS
+AC13-16 | testset AC15 Brouwer's law on Henon-Heiles (T2), order 8 on the Stormer-Verlet base, package size (0 fail or error, 0 broken, 470.4 s) | 0 | 0 | PASS
+AC13-16 | testset AC15d Gauss s = 4 with compensated summation: no systematic energy drift (package size) (0 fail or error, 0 broken, 5.8 s) | 0 | 0 | PASS
+AC13-16 | testset AC16 no allocation after warm-up, force-evaluation counts (0 fail or error, 0 broken, 26.7 s) | 0 | 0 | PASS
+# section AC13-16 took 538.0 s
+######## group AC17-23 (own process, log-AC17-23.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+AC17-23 | file total (33159 pass, 0 fail, 0 error, 0 broken, 614.9 s) | 33159 | 0 fail, 0 error | PASS
+AC17-23 | testset AC17 element-type agreement: binary64 and double-double against 256 bits (0 fail or error, 0 broken, 451.4 s) | 0 | 0 | PASS
+AC17-23 | testset AC18 CPU kernel against a plain loop, orbit results independent of the chunking (0 fail or error, 0 broken, 65.5 s) | 0 | 0 | PASS
+AC17-23 | testset AC19 R1: Taylor reference declared in Integrators, methods from the extension (0 fail or error, 0 broken, 75.3 s) | 0 | 0 | PASS
+AC17-23 | testset AC21 methods against R1 (two oracles agree on the error), extension only (0 fail or error, 0 broken, 17.1 s) | 0 | 0 | PASS
+AC17-23 | testset AC22 failures are visible (0 fail or error, 0 broken, 3.7 s) | 0 | 0 | PASS
+AC17-23 | testset AC23 layering of the Integrators sources (0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+AC17-23 | testset D113 F4: backend = :gpu goes through the device hook ensemble_backend (0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+AC17-23 | testset D113 R2: the element type of the method and of the step size must agree with the state (0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+AC17-23 | testset API: hand values of the first-order and second-order maps, IntegratorMap, Tangent consumption (0 fail or error, 0 broken, 0.8 s) | 0 | 0 | PASS
+# section AC17-23 took 615.0 s
+######## group O6 (own process, log-O6.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+3(c) | O6 table Ruth3 (BigFloat tableau) vs S4: max |coefficient difference| as is / roles exchanged (6 vs 6 operations) | NaN / 0 | 1.0e-13 | PASS (roles exchanged)
+3(c) | O6 table CandyRoz4 (BigFloat tableau) vs S5: max |coefficient difference| as is / roles exchanged (7 vs 7 operations) | NaN / 8.636e-78 | 1.0e-13 | PASS (roles exchanged)
+3(c) | O6 table CalvoSanz4 (BigFloat tableau) vs S9: max |coefficient difference| as is / roles exchanged (9 vs 9 operations) | NaN / 4.563e-15 | 1.0e-14 | PASS (roles exchanged)
+3(c) | O6 table Yoshida6 (BigFloat tableau) vs S11-6A: max |coefficient difference| as is / roles exchanged (15 vs 15 operations) | 3.007e-14 / NaN | 1.0e-13 | PASS
+3(c) | O6 table Yoshida6 (BigFloat tableau) vs S12 s7odr6 (20 digits): max |coefficient difference| as is / roles exchanged (15 vs 15 operations) | 2.907e-14 / NaN | 1.0e-13 | PASS
+3(c) | O6 table KahanLi6 (BigFloat tableau) vs S12-6: max |coefficient difference| as is / roles exchanged (19 vs 19 operations) | 1.49e-21 / NaN | 1.0e-13 | PASS
+3(c) | O6 table KahanLi8 (BigFloat tableau) vs S12-8: max |coefficient difference| as is / roles exchanged (35 vs 35 operations) | 3.979e-21 / NaN | 1.0e-13 | PASS
+3(c) | O6 table SofSpa10 (BigFloat tableau) vs S13: max |coefficient difference| as is / roles exchanged (71 vs 71 operations) | 4.359e-27 / NaN | 1.0e-26 | PASS
+3(c) | O6 SymplecticEuler vs S1 DK (as is), F1 n=3, 1000 points, max |difference| | 0 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SymplecticEuler vs S1 DK (roles exchanged), F1 n=3, 1000 points, max |difference| | 0.02 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SymplecticEuler vs S1 KD (as is), F1 n=3, 1000 points, max |difference| | 0.02 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SymplecticEuler vs S1 KD (roles exchanged), F1 n=3, 1000 points, max |difference| | 0 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SymplecticEuler best match S1 DK (as is), F1, max |difference| | 0 | max(16 eps, 1e-13, 8 dc), dc = 0 | PASS
+3(c) | O6 SymplecticEuler vs S1 DK (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 4.441e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SymplecticEuler vs S1 DK (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 1.256 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SymplecticEuler vs S1 KD (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 1.256 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SymplecticEuler vs S1 KD (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 4.441e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SymplecticEuler best match S1 DK (as is), F2, max |difference| | 4.441e-16 | max(16 eps, 1e-13, 8 dc), dc = 0 | PASS
+3(c) | O6 VelocityVerlet vs S2 KDK (as is), F1 n=3, 1000 points, max |difference| | 4.441e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VelocityVerlet vs S2 KDK (roles exchanged), F1 n=3, 1000 points, max |difference| | 0.0004999 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VelocityVerlet vs S2 DKD (as is), F1 n=3, 1000 points, max |difference| | 0.0004999 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VelocityVerlet vs S2 DKD (roles exchanged), F1 n=3, 1000 points, max |difference| | 4.441e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VelocityVerlet best match S2 KDK (as is), F1, max |difference| | 4.441e-16 | max(16 eps, 1e-13, 8 dc), dc = 0 | PASS
+3(c) | O6 VelocityVerlet vs S2 KDK (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 8.882e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VelocityVerlet vs S2 KDK (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.2285 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VelocityVerlet vs S2 DKD (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.2285 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VelocityVerlet vs S2 DKD (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 8.882e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VelocityVerlet best match S2 KDK (as is), F2, max |difference| | 8.882e-16 | max(16 eps, 1e-13, 8 dc), dc = 0 | PASS
+3(c) | O6 VerletLeapfrog vs S2 KDK (as is), F1 n=3, 1000 points, max |difference| | 0 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VerletLeapfrog vs S2 KDK (roles exchanged), F1 n=3, 1000 points, max |difference| | 0.0004999 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VerletLeapfrog vs S2 DKD (as is), F1 n=3, 1000 points, max |difference| | 0.0004999 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VerletLeapfrog vs S2 DKD (roles exchanged), F1 n=3, 1000 points, max |difference| | 0 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VerletLeapfrog best match S2 KDK (as is), F1, max |difference| | 0 | max(16 eps, 1e-13, 8 dc), dc = 0 | PASS
+3(c) | O6 VerletLeapfrog vs S2 KDK (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 8.882e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VerletLeapfrog vs S2 KDK (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.2285 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VerletLeapfrog vs S2 DKD (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.2285 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VerletLeapfrog vs S2 DKD (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 8.882e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 VerletLeapfrog best match S2 KDK (as is), F2, max |difference| | 8.882e-16 | max(16 eps, 1e-13, 8 dc), dc = 0 | PASS
+3(c) | O6 LeapfrogDriftKickDrift vs S2 DKD (as is), F1 n=3, 1000 points, max |difference| | 0 | max(16 eps, 1e-13) | INFO
+3(c) | O6 LeapfrogDriftKickDrift vs S2 DKD (roles exchanged), F1 n=3, 1000 points, max |difference| | 0.0004999 | max(16 eps, 1e-13) | INFO
+3(c) | O6 LeapfrogDriftKickDrift vs S2 KDK (as is), F1 n=3, 1000 points, max |difference| | 0.0004999 | max(16 eps, 1e-13) | INFO
+3(c) | O6 LeapfrogDriftKickDrift vs S2 KDK (roles exchanged), F1 n=3, 1000 points, max |difference| | 0 | max(16 eps, 1e-13) | INFO
+3(c) | O6 LeapfrogDriftKickDrift best match S2 DKD (as is), F1, max |difference| | 0 | max(16 eps, 1e-13, 8 dc), dc = 0 | PASS
+3(c) | O6 LeapfrogDriftKickDrift vs S2 DKD (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 8.882e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 LeapfrogDriftKickDrift vs S2 DKD (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.2285 | max(16 eps, 1e-13) | INFO
+3(c) | O6 LeapfrogDriftKickDrift vs S2 KDK (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.2285 | max(16 eps, 1e-13) | INFO
+3(c) | O6 LeapfrogDriftKickDrift vs S2 KDK (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 8.882e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 LeapfrogDriftKickDrift best match S2 DKD (as is), F2, max |difference| | 8.882e-16 | max(16 eps, 1e-13, 8 dc), dc = 0 | PASS
+3(c) | O6 McAte2 vs S3 McLachlan1995 (as is), F1 n=3, 1000 points, max |difference| | 2.423e-05 | max(16 eps, 1e-13) | INFO
+3(c) | O6 McAte2 vs S3 McLachlan1995 (roles exchanged), F1 n=3, 1000 points, max |difference| | 2.106e-05 | max(16 eps, 1e-13) | INFO
+3(c) | O6 McAte2 best match S3 McLachlan1995 (roles exchanged), F1, max |difference| | 2.106e-05 | max(16 eps, 1e-13, 8 dc), dc = 0 | INFO (different method from S3, Inconsistencies (f))
+3(c) | O6 McAte2 vs S3 McLachlan1995 (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.03562 | max(16 eps, 1e-13) | INFO
+3(c) | O6 McAte2 vs S3 McLachlan1995 (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.03739 | max(16 eps, 1e-13) | INFO
+3(c) | O6 McAte2 best match S3 McLachlan1995 (as is), F2, max |difference| | 0.03562 | max(16 eps, 1e-13, 8 dc), dc = 0 | INFO (different method from S3, Inconsistencies (f))
+3(c) | O6 Ruth3 vs S4 (as is), F1 n=3, 1000 points, max |difference| | 1.119e-05 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Ruth3 vs S4 (roles exchanged), F1 n=3, 1000 points, max |difference| | 0 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Ruth3 best match S4 (roles exchanged), F1, max |difference| | 0 | max(16 eps, 1e-13, 8 dc), dc = 0 | PASS (roles of drift and kick exchanged)
+3(c) | O6 Ruth3 vs S4 (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.03058 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Ruth3 vs S4 (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 8.882e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Ruth3 best match S4 (roles exchanged), F2, max |difference| | 8.882e-16 | max(16 eps, 1e-13, 8 dc), dc = 0 | PASS (roles of drift and kick exchanged)
+3(c) | O6 CandyRoz4 vs S5 Forest-Ruth (as is), F1 n=3, 1000 points, max |difference| | 1.53e-06 | max(16 eps, 1e-13) | INFO
+3(c) | O6 CandyRoz4 vs S5 Forest-Ruth (roles exchanged), F1 n=3, 1000 points, max |difference| | 4.441e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 CandyRoz4 best match S5 Forest-Ruth (roles exchanged), F1, max |difference| | 4.441e-16 | max(16 eps, 1e-13, 8 dc), dc = 8.636e-78 | PASS (roles of drift and kick exchanged)
+3(c) | O6 CandyRoz4 vs S5 Forest-Ruth (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.111 | max(16 eps, 1e-13) | INFO
+3(c) | O6 CandyRoz4 vs S5 Forest-Ruth (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 8.882e-16 | max(16 eps, 1e-13) | INFO
+3(c) | O6 CandyRoz4 best match S5 Forest-Ruth (roles exchanged), F2, max |difference| | 8.882e-16 | max(16 eps, 1e-13, 8 dc), dc = 8.636e-78 | PASS (roles of drift and kick exchanged)
+3(c) | O6 CalvoSanz4 vs S9 (as is), F1 n=3, 1000 points, max |difference| | 1.356e-08 | max(16 eps, 1e-13) | INFO
+3(c) | O6 CalvoSanz4 vs S9 (roles exchanged), F1 n=3, 1000 points, max |difference| | 1.776e-15 | max(16 eps, 1e-13) | INFO
+3(c) | O6 CalvoSanz4 best match S9 (roles exchanged), F1, max |difference| | 1.776e-15 | max(16 eps, 1e-13, 8 dc), dc = 4.563e-15 | PASS (roles of drift and kick exchanged)
+3(c) | O6 CalvoSanz4 vs S9 (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.01133 | max(16 eps, 1e-13) | INFO
+3(c) | O6 CalvoSanz4 vs S9 (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 3.775e-15 | max(16 eps, 1e-13) | INFO
+3(c) | O6 CalvoSanz4 best match S9 (roles exchanged), F2, max |difference| | 3.775e-15 | max(16 eps, 1e-13, 8 dc), dc = 4.563e-15 | PASS (roles of drift and kick exchanged)
+3(c) | O6 Yoshida6 vs S11-6A (as is), F1 n=3, 1000 points, max |difference| | 1.31e-14 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Yoshida6 vs S11-6A (roles exchanged), F1 n=3, 1000 points, max |difference| | 7.926e-10 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Yoshida6 vs S12 s7odr6 (as is), F1 n=3, 1000 points, max |difference| | 1.31e-14 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Yoshida6 vs S12 s7odr6 (roles exchanged), F1 n=3, 1000 points, max |difference| | 7.926e-10 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Yoshida6 best match S11-6A (as is), F1, max |difference| | 1.31e-14 | max(16 eps, 1e-13, 8 dc), dc = 3.007e-14 | PASS
+3(c) | O6 Yoshida6 vs S11-6A (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 1.044e-13 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Yoshida6 vs S11-6A (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.01514 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Yoshida6 vs S12 s7odr6 (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 1.03e-13 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Yoshida6 vs S12 s7odr6 (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.01514 | max(16 eps, 1e-13) | INFO
+3(c) | O6 Yoshida6 best match S12 s7odr6 (as is), F2, max |difference| | 1.03e-13 | max(16 eps, 1e-13, 8 dc), dc = 2.907e-14 | PASS
+3(c) | O6 KahanLi6 vs S12-6 s9odr6a (as is), F1 n=3, 1000 points, max |difference| | 0 | max(16 eps, 1e-13) | INFO
+3(c) | O6 KahanLi6 vs S12-6 s9odr6a (roles exchanged), F1 n=3, 1000 points, max |difference| | 9.435e-11 | max(16 eps, 1e-13) | INFO
+3(c) | O6 KahanLi6 best match S12-6 s9odr6a (as is), F1, max |difference| | 0 | max(16 eps, 1e-13, 8 dc), dc = 1.49e-21 | PASS
+3(c) | O6 KahanLi6 vs S12-6 s9odr6a (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 1.665e-15 | max(16 eps, 1e-13) | INFO
+3(c) | O6 KahanLi6 vs S12-6 s9odr6a (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 0.003062 | max(16 eps, 1e-13) | INFO
+3(c) | O6 KahanLi6 best match S12-6 s9odr6a (as is), F2, max |difference| | 1.665e-15 | max(16 eps, 1e-13, 8 dc), dc = 1.49e-21 | PASS
+3(c) | O6 KahanLi8 vs S12-8 s17odr8a (as is), F1 n=3, 1000 points, max |difference| | 0 | max(16 eps, 1e-13) | INFO
+3(c) | O6 KahanLi8 vs S12-8 s17odr8a (roles exchanged), F1 n=3, 1000 points, max |difference| | 3.553e-15 | max(16 eps, 1e-13) | INFO
+3(c) | O6 KahanLi8 best match S12-8 s17odr8a (as is), F1, max |difference| | 0 | max(16 eps, 1e-13, 8 dc), dc = 3.979e-21 | PASS
+3(c) | O6 KahanLi8 vs S12-8 s17odr8a (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 2.665e-15 | max(16 eps, 1e-13) | INFO
+3(c) | O6 KahanLi8 vs S12-8 s17odr8a (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 1.78e-05 | max(16 eps, 1e-13) | INFO
+3(c) | O6 KahanLi8 best match S12-8 s17odr8a (as is), F2, max |difference| | 2.665e-15 | max(16 eps, 1e-13, 8 dc), dc = 3.979e-21 | PASS
+3(c) | O6 SofSpa10 vs S13 (as is), F1 n=3, 1000 points, max |difference| | 0 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SofSpa10 vs S13 (roles exchanged), F1 n=3, 1000 points, max |difference| | 2.665e-15 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SofSpa10 best match S13 (as is), F1, max |difference| | 0 | max(16 eps, 1e-13, 8 dc), dc = 4.359e-27 | PASS
+3(c) | O6 SofSpa10 vs S13 (as is), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 2.22e-15 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SofSpa10 vs S13 (roles exchanged), F2 e in {0.1,0.5,0.9}, 1000 points, max |difference| | 1.193e-07 | max(16 eps, 1e-13) | INFO
+3(c) | O6 SofSpa10 best match S13 (as is), F2, max |difference| | 2.22e-15 | max(16 eps, 1e-13, 8 dc), dc = 4.359e-27 | PASS
+3(c) | O6 McAte3, McAte4, McAte5, McAte8 (McLachlan-type, not catalog rows) | not compared | - | INFO
+# section O6 took 41.9 s
+######## group O7 (own process, log-O7.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+O7 | extension ChaoslabTaylorExt loaded | true | true | PASS
+O7 | R1 orbit of f4 T = 8 (3.5 s): max difference to Gauss s = 8 at tau = 1/64 and 1/128 | 5.671e-43 / 8.653e-48 | 1e-30 at 1/128 | PASS
+O7 | R1 orbit of f4 T = 8: |H(T) - H(0)| | 4.613e-63 | 2^-180 = 6.5e-55 | PASS
+O7 | R1 orbit of f2 T = 8 (9.7 s): max difference to Gauss s = 8 at tau = 1/64 and 1/128 | 2.754e-32 / 4.205e-37 | 1e-30 at 1/128 | PASS
+O7 | R1 orbit of f2 T = 8: |H(T) - H(0)| | 2.083e-63 | 2^-180 = 6.5e-55 | PASS
+O7 | R1 orbit of f2 T = 8: |L(T) - L(0)| | 2.881e-63 | 2^-180 | PASS
+O7 | R1 orbit of t1 T = 8 (5.3 s): max difference to Gauss s = 8 at tau = 1/64 and 1/128 | 3.384e-39 / 5.165e-44 | 1e-30 at 1/128 | PASS
+O7 | R1 orbit of t1 T = 8: |H(T) - H(0)| | 1.153e-63 | 2^-180 = 6.5e-55 | PASS
+O7 | R1 tangent (central difference of orbits, 2^-60) of f2 T = 8 vs tangent of S12-8 (Float64, tau = 1/32), relative max difference | 4.082e-13 | 2^-30 = 9.3e-10 | PASS
+O7 | R1 tangent (central difference of orbits, 2^-60) of f4 T = 8 vs tangent of S12-8 (Float64, tau = 1/32), relative max difference | 5.765e-15 | 2^-30 = 9.3e-10 | PASS
+O7 | R1 tangent of t1: no tangent step for the nonseparable T1 outside the extended space of G3 (open point P11) | not compared | - | INFO
+# section O7 took 122.0 s
+######## group O8 (own process, log-O8.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256919e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+# O8 REBOUND files read (not executed): integrator_saba.c 18104 bytes, integrator_leapfrog.c 10739 bytes; raw.githubusercontent.com/hannorein/rebound/main/src (HEAD fd484cd6f6ed3d538b8e9606cdc2ddf251e646e9, latest tag 5.2.2 c34134716cd484ed9cdb9f7d54ef8d859bdf547d, fetched 2026-11-06)
+3(d) | REBOUND arrays parsed: rows of reb_saba_c / reb_saba_d | 10 / 10 | 10 / 10 | PASS
+3(d) | REBOUND SABA1 drifts and kicks (first halves) vs SABA1 (BigFloat), max |difference| | 0 | 1e-30 | PASS
+3(d) | REBOUND SABA2 drifts and kicks (first halves) vs SABA2 (BigFloat), max |difference| | 1.751e-42 | 1e-30 | PASS
+3(d) | REBOUND SABA3 drifts and kicks (first halves) vs SABA3 (BigFloat), max |difference| | 4.444e-41 | 1e-30 | PASS
+3(d) | REBOUND SABA4 drifts and kicks (first halves) vs SABA4 (BigFloat), max |difference| | 2.565e-41 | 1e-30 | PASS
+3(d) | REBOUND ABA(8,6,4) a_1..a_4 vs ours ABA864 (BigFloat), max |difference| | 0 | 1e-30 | PASS
+3(d) | REBOUND ABA(8,6,4) b_1..b_4 vs ours ABA864 (BigFloat, b4 recomputed), max |difference| | 4.979e-31 | 1e-30 | PASS
+3(d) |   of which the b4 difference (ours recomputed minus REBOUND print) | 4.979e-31 | - | INFO
+3(d) | REBOUND ABAH(8,6,4) a_1..a_5 and b_1..b_4 vs ours ABAH864, max |difference| | 0 | 1e-30 | PASS
+3(d) | REBOUND ABA(8,6,4) printed digits: sum of drifts - 1 / sum of kicks - 1 | -1.2e-39 / -4.979e-31 | - | INFO
+3(d) | REBOUND ABAH(8,6,4) printed digits: sum of drifts - 1 / sum of kicks - 1 | -6.2e-41 / -2e-40 | - | INFO
+3(d) | ABA864 b_1..b_4 solved from the printed a_i and the quadrature moments k = 0, 2, 4, 6 (eps tau^8 conditions): max |solved - printed| | 4.979e-31 | - | INFO
+3(d) | ABA864 b1: solved - printed (the print of REBOUND = the print of Blanes2013 Table 3 / 4) | 5.667e-40 | - | INFO
+3(d) | ABA864 b2: solved - printed (the print of REBOUND = the print of Blanes2013 Table 3 / 4) | 4.182e-40 | - | INFO
+3(d) | ABA864 b3: solved - printed (the print of REBOUND = the print of Blanes2013 Table 3 / 4) | 1.307e-40 | - | INFO
+3(d) | ABA864 b4: solved - printed (the print of REBOUND = the print of Blanes2013 Table 3 / 4) | 4.979e-31 | - | INFO
+3(d) | ABA864 b4: recomputed 1 - 2(b1+b2+b3) minus solved (stage 03 choice) | 2.231e-39 | <= 1e-36 confirms | PASS
+3(d) | ABA864 b4: printed minus solved | -4.979e-31 | - | INFO
+3(d) | ABA864 first-order conditions (moments k = 0..7 about the midpoint): max residual with the printed b | 4.979e-31 | - | INFO
+3(d) | ABA864 first-order conditions: max residual with b4 recomputed (stage 03) | 2.67e-40 | - | INFO
+3(d) | ABA864 first-order conditions: max residual with the solved b | 3.924e-41 | - | INFO
+3(d) | ABAH864 b_1..b_4 solved from the printed a_i and the quadrature moments k = 0, 2, 4, 6 (eps tau^8 conditions): max |solved - printed| | 1.796e-40 | - | INFO
+3(d) | ABAH864 b1: solved - printed (the print of REBOUND = the print of Blanes2013 Table 3 / 4) | 2.745e-42 | - | INFO
+3(d) | ABAH864 b2: solved - printed (the print of REBOUND = the print of Blanes2013 Table 3 / 4) | 1.247e-40 | - | INFO
+3(d) | ABAH864 b3: solved - printed (the print of REBOUND = the print of Blanes2013 Table 3 / 4) | -1.796e-40 | - | INFO
+3(d) | ABAH864 b4: solved - printed (the print of REBOUND = the print of Blanes2013 Table 3 / 4) | 1.522e-40 | - | INFO
+3(d) | REBOUND SABAC1 corrector coefficient vs ours (Laskar-Robutel Table II), |difference| | 3.333e-42 | 1e-30 (print has 34 to 43 digits) | PASS
+3(d) | REBOUND SABAC2 corrector coefficient vs ours (Laskar-Robutel Table II), |difference| | 3.114e-42 | 1e-30 (print has 34 to 43 digits) | PASS
+3(d) | REBOUND SABAC3 corrector coefficient vs ours (Laskar-Robutel Table II), |difference| | 2.441e-43 | 1e-30 (print has 34 to 43 digits) | PASS
+3(d) | REBOUND SABAC4 corrector coefficient vs ours (Laskar-Robutel Table II), |difference| | 0 | 1e-30 (print has 34 to 43 digits) | PASS
+3(d) | REBOUND leapfrog order 4 (lf4_a, 30 digits) vs ours Forest-Ruth drift c1, |difference| | 7.304e-31 | 1e-30 | PASS
+3(d) | REBOUND leapfrog order 4: derived entries (1/2 - a, 2a, 1 - 4a of the C code) vs ours, max |difference| (the print rounds a at 5e-31, 1 - 4a carries 4 times that) | 2.922e-30 | 5e-30 | PASS
+3(d) | REBOUND lf4_a minus theta/2, theta = 1/(2 - 2^(1/3)) (Yoshida1990 Eq. (2.11)) | -7.304e-31 | 1e-30 | PASS
+3(d) | REBOUND leapfrog orders 6 and 8 (Blanes and Casas 2016 arrays, not catalog rows): not compared | - | - | INFO
+# section O8 took 0.6 s
+######## group O9 (own process, log-O9.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+O9 | ImplicitMidpoint vs G1, f1_3, h = 0.1, 100 steps, solver tolerance 1e-14: max over steps |difference| | 2.776e-17 | 1e-12 | PASS
+O9 |   end state against the 256-bit implicit midpoint: ours / OrdinaryDiffEq | 5.002e-16 / 5.002e-16 | - | INFO
+O9 | ImplicitMidpoint vs G1, f4, h = 0.1, 100 steps, solver tolerance 1e-14: max over steps |difference| | 1.11e-15 | 1e-12 | PASS
+O9 |   end state against the 256-bit implicit midpoint: ours / OrdinaryDiffEq | 5.216e-16 / 7.712e-16 | - | INFO
+O9 | ImplicitMidpoint vs G1, f4, h = 0.05, 200 steps, solver tolerance 1e-14: max over steps |difference| | 8.285e-15 | 1e-12 | PASS
+O9 |   end state against the 256-bit implicit midpoint: ours / OrdinaryDiffEq | 8.051e-15 / 1.945e-15 | - | INFO
+# section O9 took 12.6 s
+######## group AC15D (own process, log-AC15D.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): starts used / failed, steps up to 3000000 (92 s) | 200 / 0 | - | INFO
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): rms of E(n) at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | 8.421e-18, 7.762e-18, 1.026e-17, 1.279e-17, 2.058e-17, 3.466e-17, 6.209e-17, 1.024e-16 | - | INFO
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): log-log slope of the rms over n in [1e4, 3000000] | 0.4034 | 0.5 within 0.1 | PASS
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): slope over the whole range from n = 1000 | 0.3121 | - | INFO
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): slope from the first n with rms >= 1.3 x floor (n = 30000) | 0.4518 | reported | INFO
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): mean of E(n) over the starts in standard errors at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | 0.6983, 0.4205, 0.03694, 0.1941, -0.6583, 0.9612, 0.6384, 0.6049 | - | INFO
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): local slopes of the rms between consecutive n | -0.07418, 0.2316, 0.2008, 0.3952, 0.4744, 0.4842, 0.4556 | - | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): starts used / failed, steps up to 3000000 (46 s) | 200 / 0 | - | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): rms of E(n) at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | 2.586e-16, 4.677e-16, 8.246e-16, 1.39e-15, 2.46e-15, 4.265e-15, 7.709e-15, 1.292e-14 | - | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): log-log slope of the rms over n in [1e4, 3000000] | 0.4825 | reported (negative control) | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): slope over the whole range from n = 1000 | 0.4886 | - | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): slope from the first n with rms >= 1.3 x floor (n = 10000) | 0.4825 | reported | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): mean of E(n) over the starts in standard errors at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | -0.07554, 0.9364, 0.1773, 0.4406, -0.8697, -0.6062, 0.3739, -1.19 | - | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): local slopes of the rms between consecutive n | 0.5395, 0.471, 0.4751, 0.4742, 0.501, 0.4917, 0.4702 | - | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: starts used / failed, steps up to 3000000 (107 s) | 200 / 0 | - | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: rms of E(n) at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | 2.584e-16, 4.532e-16, 7.844e-16, 1.287e-15, 2.119e-15, 3.845e-15, 7.47e-15, 1.293e-14 | - | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: log-log slope of the rms over n in [1e4, 3000000] | 0.4914 | reported (negative control) | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: slope over the whole range from n = 1000 | 0.4888 | - | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: slope from the first n with rms >= 1.3 x floor (n = 10000) | 0.4914 | reported | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: mean of E(n) over the starts in standard errors at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | -0.3136, -0.2627, -0.01569, -0.2955, -0.2159, 1.351, 0.4984, -0.03798 | - | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: local slopes of the rms between consecutive n | 0.5115, 0.4556, 0.4505, 0.4145, 0.5423, 0.5516, 0.4997 | - | INFO
+# section AC15D took 245.0 s
+######## group AC18T (own process, log-AC18T.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+18 | orbit results bitwise identical with 4 and 1 CPU threads: GAUSS (10^4 orbits, states and statuses) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S12_6_f2 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S12_6_f4 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S2_f2 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S2_f4 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S5_f2 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S5_f4 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S8_f2 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S8_f4 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: SABA3_f2 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: SABA3_f4 (10^5 orbits) | true | bitwise | PASS
+18 | GPU against CPU (10^5 orbits, double-double kernel compile), G1 and G2 10^4 orbits CPU against GPU | not run | - | NOT RUN: needs verify/gpu.jl (writes data/gpu-benchmark.toml) and a device hook ensemble_backend(::CUDADevice) that ext/ChaoslabCUDAExt.jl does not define
+# section AC18T took 66.5 s
+######## group MARGINS (own process, log-MARGINS.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256605e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+1 | sum conditions, worst |sum - 1| / (4 k eps_tab) over 32 explicit tables in 256 bits (worst: ABA864) | 0.375 | <= 1 | PASS
+9 | symplecticity, worst residual / (8 d eps ||M||^2), Float64, 40 methods x 3 flows x 200 points (worst: S7-8 f4) | 0.5311 | <= 1 | PASS
+9 | symplecticity, worst residual / (8 d eps ||M||^2), Double64, 40 methods x 3 flows x 200 points (worst: S7-8 f4) | 0.02267 | <= 1 | PASS
+10 | reversibility, worst |S(-tau)^n S(tau)^n y - y| / (16 B(n) x 4), Float64 (worst: S7-8 f2 n = 1000) | 0.01332 | <= 1 | PASS
+11 | tangent step against ForwardDiff, worst error / (16 eps (1 + |M|) k), Float64 (worst: S1KD f2) | 0.08214 | <= 1 | PASS
+13 | energy: max over the second half / (2 x max over the first half + 16 eps M), S2, S5, S12-6 on F4, F2, F1 at tau = 1/20, 1e5 steps | 0.5005 | <= 1 | PASS
+13 | energy: |least-squares slope x run length| / (0.1 max), same cases | 0.1 | <= 1 | PASS
+14 | angular momentum of F2, worst |L(n) - L(0)| / B(n), n = 1e5, 40 methods x e in {0.1, 0.5} (worst: S13 e = 0.1) | 2.674e-07 | <= 1 | PASS
+17 | element-type agreement Float64 against 256 bits, worst error / B(n), n = n_H (worst: S13 f4) | 0.06872 | <= 1 | PASS
+17 | element-type agreement Double64 against 256 bits, worst error / B(n), n = n_H (worst: S11-8A f2) | 0.0009511 | <= 1 | PASS
+17 | effective epsilon of double-double | 7.889e-31 | <= 2^-100 = 7.9e-31 | PASS
+16 | bytes allocated by advance and tangent_advance after warm-up: calls with nonzero allocation / calls (all explicit methods, F1 n = 1, 3, F4, Float64 and Double64) | 0 / 480 | 0 | PASS
+# section MARGINS took 115.0 s
+######## group GPUHOOK (own process, log-GPUHOOK.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794256631e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+18 | extension ChaoslabCUDAExt loaded (CUDA imported, no device code run) | true | true | PASS
+18 | Integrators.ensemble_backend(::CUDADevice) is defined (a MethodError of advance_ensemble(...; backend = :gpu) otherwise) | true | true | PASS
+18 | the hook returns the CUDA backend | true | true | PASS
+18 | CUDA.functional() on this machine (informational; the GPU runs themselves are in verify/gpu.jl, not run here) | true | - | INFO
+# section GPUHOOK took 0.0 s
+######## group FIG (own process, log-FIG.txt)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794257273e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+FIG | S1 DK (Float64) tau0 = 0.015625 slopes 0.996, 0.998, 0.999, 0.9995, 0.9997, 0.9999, 0.9999, 1
+FIG | S2 leapfrog (Float64) tau0 = 0.125 slopes 2.001, 2, 2, 2, 2, 2, 2, 2
+FIG | S4 Ruth (Double64) tau0 = 0.5 slopes 2.336, 2.759, 2.894, 2.95, 2.975, 2.988, 2.994, 2.997
+FIG | S5 Forest-Ruth (Double64) tau0 = 0.5 slopes 3.827, 3.96, 3.99, 3.998, 3.999, 4, 4, 4
+FIG | S8 PEFRL (Double64) tau0 = 1.0 slopes 3.888, 3.964, 3.993, 3.998, 4, 4, 4, 4
+FIG | S9 CSS (Double64) tau0 = 1.0 slopes 3.941, 3.999, 3.996, 3.997, 3.998, 3.999, 4, 4
+FIG | S11 Yoshida 6A (Double64) tau0 = 1.0 slopes 4.459, 5.759, 5.942, 5.986, 5.996
+FIG | S12 KL 6 (Double64) tau0 = 1.0 slopes 5.673, 5.953, 5.987, 5.997, 5.999, 6, 6
+FIG | S12 KL 8 (Double64) tau0 = 1.0 slopes 8.858, 7.955, 7.994, 7.998
+FIG | S13 SS 10 (BigFloat) tau0 = 1.0 slopes 11.08, 10.28, 10.05, 10.01, 10, 10
+FIG | wrote integrator-catalog-order.png, integrator-catalog-brouwer.png
+# section FIG took 22.4 s
+
+# ============================================================ Rerun after D114 (2026-11-09; IC_ONLY=AC15D and IC_ONLY=AC18T, 200 starts, 3e6 steps, 4 threads)
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794257581e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): starts used / failed, steps up to 3000000 (82 s) | 200 / 0 | - | INFO
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): rms of E(n) at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | 8.421e-18, 7.762e-18, 1.026e-17, 1.279e-17, 2.058e-17, 3.466e-17, 6.209e-17, 1.024e-16 | - | INFO
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): log-log slope of the rms over n in [1e4, 3000000] (reported since D114) | 0.4034 | reported | INFO
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): slope over the whole range from n = 1000 | 0.3121 | - | INFO
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): log-log slope of the rms from the first n with rms >= 1.3 x floor (n = 30000) to 3000000 (D114) | 0.4518 | 0.5 within 0.1 | PASS
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): mean of E(n) over the starts in standard errors at n = 3000000 (D114) | 0.6049 | |z| <= 3 | PASS
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): mean of E(n) over the starts in standard errors at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | 0.6983, 0.4205, 0.03694, 0.1941, -0.6583, 0.9612, 0.6384, 0.6049 | - | INFO
+15(d) | Hairer2008 implementation (iteration to convergence, split coefficients, compensated): local slopes of the rms between consecutive n | -0.07418, 0.2316, 0.2008, 0.3952, 0.4744, 0.4842, 0.4556 | - | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): starts used / failed, steps up to 3000000 (49 s) | 200 / 0 | - | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): rms of E(n) at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | 2.586e-16, 4.677e-16, 8.246e-16, 1.39e-15, 2.46e-15, 4.265e-15, 7.709e-15, 1.292e-14 | - | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): log-log slope of the rms over n in [1e4, 3000000] (reported since D114) | 0.4825 | reported | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): slope over the whole range from n = 1000 | 0.4886 | - | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): log-log slope of the rms from the first n with rms >= 1.3 x floor (n = 10000) to 3000000 (D114) | 0.4825 | reported (negative control) | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): mean of E(n) over the starts in standard errors at n = 3000000 (D114) | -1.19 | reported (negative control) | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): mean of E(n) over the starts in standard errors at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | -0.07554, 0.9364, 0.1773, 0.4406, -0.8697, -0.6062, 0.3739, -1.19 | - | INFO
+15(d) | standard implementation (fixed threshold, rounded coefficients): local slopes of the rms between consecutive n | 0.5395, 0.471, 0.4751, 0.4742, 0.501, 0.4917, 0.4702 | - | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: starts used / failed, steps up to 3000000 (81 s) | 200 / 0 | - | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: rms of E(n) at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | 2.584e-16, 4.532e-16, 7.844e-16, 1.287e-15, 2.119e-15, 3.845e-15, 7.47e-15, 1.293e-14 | - | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: log-log slope of the rms over n in [1e4, 3000000] (reported since D114) | 0.4914 | reported | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: slope over the whole range from n = 1000 | 0.4888 | - | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: log-log slope of the rms from the first n with rms >= 1.3 x floor (n = 10000) to 3000000 (D114) | 0.4914 | reported (negative control) | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: mean of E(n) over the starts in standard errors at n = 3000000 (D114) | -0.03798 | reported (negative control) | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: mean of E(n) over the starts in standard errors at n = 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000 | -0.3136, -0.2627, -0.01569, -0.2955, -0.2159, 1.351, 0.4984, -0.03798 | - | INFO
+15(d) | diagnostic: Hairer2008 iteration and coefficients, plain summation: local slopes of the rms between consecutive n | 0.5115, 0.4556, 0.4505, 0.4145, 0.5423, 0.5516, 0.4997 | - | INFO
+# section AC15D took 211.8 s
+# integrator-catalog verification, julia 1.13.2, threads 4, base seed 20261012 + 41000, IC_FULL_RUN = true, time 1.794257806e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# package OrdinaryDiffEqSymplecticRK 2.2.3
+# package OrdinaryDiffEqCore 4.18.1
+# package OrdinaryDiffEqSDIRK 2.9.8
+# package TaylorIntegration 0.18.19
+# extension ChaoslabTaylorExt loaded: true
+# IC_FULL = true
+18 | orbit results bitwise identical with 4 and 1 CPU threads: GAUSS (10^4 orbits, states and statuses) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S12_6_f2 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S12_6_f4 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S2_f2 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S2_f4 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S5_f2 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S5_f4 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S8_f2 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: S8_f4 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: SABA3_f2 (10^5 orbits) | true | bitwise | PASS
+18 | orbit results bitwise identical with 4 and 1 CPU threads: SABA3_f4 (10^5 orbits) | true | bitwise | PASS
+18 | GPU against CPU (10^5 orbits, double-double kernel compile), G1 and G2 10^4 orbits CPU against GPU | not run | - | NOT RUN: needs verify/gpu.jl (writes data/gpu-benchmark.toml); the device hook ensemble_backend(::CUDADevice) exists since D113 (checked by IC_ONLY=GPUHOOK)
+# section AC18T took 44.7 s

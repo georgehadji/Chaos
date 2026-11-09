@@ -152,3 +152,17 @@ Spec: `integrator-catalog-spec.md`, criteria 3(c), 7, 11, 15(d), 16, 18, Scope (
 | 6 | R2, new testset D113 R2 (`ic_ac17_23.jl`) | binary64 method on double-double state, double-double method on binary64 state, Float32 or Float64 step on another type, 128-bit BigFloat with a binary64 method: `ArgumentError` from `advance`, `advance_n`, `advance_to`, `advance_checked`, `tangent_advance`, `advance_ensemble` for the table, corrected and Gauss methods and Tao; matching types, an integer step and unchanged results; `advance` allocates 0 bytes | a binary64 table on a BigFloat state ran silently | RED: 29 failures in the old code (one of them a MethodError of `advance_to` for a corrected method, which does not exist: the test skips that call); GREEN all pass |
 
 Weakening, stated: (2) a point where an implicit step fails is not compared (1 of 88, at most 10 percent); (1) the package check of 15(d) detects a bias of a few standard errors at 1e5 steps, the full slope and the controls are in `verify/`; the margin of the slope at full size is 0.003 (0.403 against the limit 0.4), see the spec. Not tested: the BigFloat precision of a table against the precision at use; `advance_to` for corrected methods (missing, not in scope).
+
+## Amendment D114 (stage 04, 2026-11-09)
+
+Spec: `integrator-catalog-spec.md`, criterion 15(d) (the changed sentence carries the mark D114). Owner decision "Amend 15(d)" after the stage 04 rerun following D113 and the independent review finding D1. `src/` and the package tests are unchanged; the only code touched is `verify/integrator-catalog.jl` (sections AC15D and AC18T).
+
+| # | Item | Change | Why | Before / after |
+|---|------|--------|-----|----------------|
+| 1 | 15(d) slope | fit from the first n at which the rms is at least 1.3 times the evaluation floor (rule and floor of 15(a): the rms at n = 1e3) to 3e6; band 0.5 within 0.1 unchanged; the slope over [1e4, 3e6] stays printed as information | the rms at n = 1e4 is 1.22 times the floor, so a fit from 1e4 is pulled down by the evaluation floor, and the pass margin was 0.0034 | slope 0.4034 (margin 0.0034) to 0.4518 from n = 3e4 (margin 0.052) |
+| 2 | 15(d) mean | added: the mean of E(n) over the starts at n = 3e6 within 3 standard errors of 0 (as 15(b)) | detects the bias that failed in the first stage 04 run (-99 SE); the package AC15d tests it at 3e4 and 1e5 only | +0.60 SE, PASS |
+| 3 | `verify/` AC18T | the printed NOT RUN line no longer says the hook is missing; it says the hook exists since D113 (GPUHOOK) and the device runs are in `verify/gpu.jl` | stale text since D113 | text only |
+
+Rerun at full size (`IC_ONLY=AC15D`, 200 starts, 3e6 steps, 4 threads, 212 s; same seeds, numbers identical to the first run): Hairer2008 implementation slope 0.4518 from n = 3e4 PASS, mean +0.60 SE PASS; controls (reported only): standard implementation 0.4825, mean -1.19 SE; plain summation 0.4914, mean -0.04 SE. AC18T: 11 of 11 bitwise lines PASS, GPU line NOT RUN (text corrected).
+
+Package test AC15d needs no change: it checks the mean at 3e4 and 1e5 and the accuracy of the sums, and states no fit range. Weakening, stated: the fit range of (d) now starts at 3e4 instead of 1e4 (the first 1e4 steps carry no law in the energy error of this scheme: the local slopes there are -0.07 to 0.4); the added mean check compensates in part.

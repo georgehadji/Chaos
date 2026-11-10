@@ -12,3 +12,6 @@ include(joinpath(@__DIR__, "tc_d34.jl"))
 
 # Amendment D44 (step-chunked relaunch; _LAUNCH_STEPS, _before_launch, _budget_steps, launch provenance, ninth reason): output/tangent-core-d44-test-plan.md
 include(joinpath(@__DIR__, "tc_d44.jl"))
+
+# Amendment D115 (frame product with explicit fma, Foundation.fused_product): output/tangent-core-d115-test-plan.md
+include(joinpath(@__DIR__, "tc_d115.jl"))

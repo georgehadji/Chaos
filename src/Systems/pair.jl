@@ -35,7 +35,7 @@ _rows(W::SMatrix{D, k}, r0, ::Val{d}) where {D, k, d} = SMatrix{d, k}(ntuple(l -
 
 function Base.:*(M::PairTangent{T, d}, W::SMatrix{D, k}) where {T, d, D, k}
     D == 2d || throw(DimensionMismatch("tangent of size $(2d) times a matrix with $D rows"))
-    RA, RB = M.A * _rows(W, 0, Val(d)), M.B * _rows(W, d, Val(d))
+    RA, RB = fused_product(M.A, _rows(W, 0, Val(d))), fused_product(M.B, _rows(W, d, Val(d)))   # D115
     return SMatrix{D, k}(ntuple(l -> (i = (l - 1) % D + 1; j = (l - 1) ÷ D + 1; i <= d ? RA[i, j] : RB[i - d, j]), Val(D * k)))
 end
 

@@ -8,6 +8,7 @@ the Froeschle 4D map and the chain of coupled standard maps (coupled-maps), and 
 module Systems
 
 using StaticArrays
+using ..Foundation: fused_product   # block products of PairTangent (D115)
 using LinearAlgebra
 
 export AbstractMap, StandardMap, LinearSymplecticMap, WrappedStandardMap, torus_state, lift

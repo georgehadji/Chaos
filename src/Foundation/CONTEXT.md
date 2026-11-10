@@ -10,6 +10,7 @@ Specs: `workspaces/module-build/stages/01-spec/output/tangent-core-spec.md` (T-)
 |------|-------|
 | `Foundation.jl` | the module: error type, sums, device hooks, `resolve_backend`, precision functions |
 | `norm.jl` | `safe_norm`, the one norm of every estimator and indicator (moved from Lyapunov, D69) |
+| `product.jl` | `fused_product`, the frame product with explicit `fma` for Float32 and Float64 `SMatrix` factors (D115) |
 
 ## Exports
 
@@ -24,7 +25,7 @@ Specs: `workspaces/module-build/stages/01-spec/output/tangent-core-spec.md` (T-)
 | `Double64` | re-export of the extended type (D20) |
 | `safe_norm(v)` | scaled Euclidean norm; no overflow or underflow, zero for a zero vector, NaN and Inf propagate |
 
-Not exported, for extensions and tests: `AbstractDevice`, `NoDevice`, `DEVICE`, `probe`, `free_memory`, `is_oom`, `is_compile_error`, `is_device_lost`, `gpu_step_ns`. `ext/CONTEXT.md` says which of them the CUDA extension fills.
+Not exported: `fused_product` (Tangent stepping body, `PairTangent`; D115). For extensions and tests: `AbstractDevice`, `NoDevice`, `DEVICE`, `probe`, `free_memory`, `is_oom`, `is_compile_error`, `is_device_lost`, `gpu_step_ns`. `ext/CONTEXT.md` says which of them the CUDA extension fills.
 
 ## Invariants a caller can rely on
 
@@ -38,6 +39,7 @@ Not exported, for extensions and tests: `AbstractDevice`, `NoDevice`, `DEVICE`, 
 | `exact` and the Float64-to-`T`-to-Float64 trip lose nothing; no step goes through Float64 | P Invariant 1, P-AC1, P-AC2 |
 | Results of `add` and `exact` stay in `T`; both allocate nothing after warm-up for isbits `T` | P Invariant 2, P-AC12 |
 | A fallback changes the backend, never the requested precision | P Invariant 4, P-AC7 |
+| `fused_product` of Float32 or Float64 `SMatrix` factors rounds the same on every CPU and call site, column by column | T Amendment D115, D115a, D115b |
 | Float32 has no method (`precision_label(Float32)` is a `MethodError`) | D24 |
 
 ## Tests and verification

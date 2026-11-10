@@ -47,7 +47,7 @@ end
     n = n0
     for _ in 1:(steps ÷ tau)
         for _ in 1:tau
-            W = tangent(sys, x) * W
+            W = fused_product(tangent(sys, x), W)   # explicit fma for Float32 and Float64 SMatrix tangents, else `*` (D115)
             x = forward(sys, x)
         end
         n += tau

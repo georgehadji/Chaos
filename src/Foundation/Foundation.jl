@@ -156,5 +156,6 @@ exact(::Type{T}, x::Rational) where {T} = exact(T, numerator(x)) / exact(T, deno
 exact(::Type{T}, s::String) where {T} = parse(T, s)
 
 include("norm.jl")
+include("product.jl")   # fused_product (D115), not exported
 
 end

@@ -10,7 +10,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/tangent-core-spec.md` (T-; 
 |------|-------|
 | `Tangent.jl` | module, exports, the reducer protocol (`reducer_init`, `reducer_update`, `reducer_final`, `reducer_step`, `reducer_failed`, `reducer_error`, and the workspace surface below) |
 | `initial.jl` | `initial_deviations`: seeded Haar frames keyed by (seed, orbit) |
-| `orbit.jl` | `_orbit_body` (the one per-step loop), `propagate_orbit`, health status codes |
+| `orbit.jl` | `_orbit_body` (the one per-step loop; frame update by `fused_product`, explicit `fma`, D115), `propagate_orbit`, health status codes |
 | `propagate.jl` | `propagate`, chunking, device fallback, launch budget, provenance, `chunk_size`, `bytes_per_orbit` |
 
 ## Exports

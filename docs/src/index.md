@@ -41,11 +41,12 @@ res.finals[1][1].lambda
 | Layer | Holds |
 |-------|-------|
 | `Foundation` | health errors, compensated sums, backend resolution, precision |
-| `Systems` | maps, tangent maps, symplectic residuals |
+| `Systems` | maps, tangent maps, symplectic residuals, Hamiltonian flows |
+| `Integrators` | symplectic splitting, composition, implicit and extended phase-space integrators for flows |
 | `Tangent` | the propagation kernel and the reducer protocol |
 | `Diagnostics` | reducers that check a run |
 | `Lyapunov` | the exponent estimators |
-| `Indicators` | chaos indicators as reducers (SALI) |
+| `Indicators` | chaos indicators as reducers |
 | `Experiments` | preregistered campaigns and the HDF5 run store |
 | `Analysis` | analysis of a finished study run |
 

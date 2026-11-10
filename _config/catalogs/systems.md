@@ -16,10 +16,10 @@ Layer 3, canonical. `Status` is `planned` or `verified`; only module-build/05 wr
 
 | ID | System | DOF | Role | Known-answer tests | Source | Phase | Status |
 |----|--------|-----|------|--------------------|--------|-------|--------|
-| F1 | Harmonic oscillator | 1..N | exact solution, integrator order tests | energy, exact phase | none needed | M5 | planned |
-| F2 | Kepler problem | 2 | integrable, nonlinear, order tests | energy, angular momentum, Runge-Lenz | HairerLubichWanner2006 | M5 | planned |
+| F1 | Harmonic oscillator | 1..N | exact solution, integrator order tests | energy, exact phase | none needed | M5 | verified (integrator-catalog: `HarmonicOscillator`) |
+| F2 | Kepler problem | 2 | integrable, nonlinear, order tests | energy, angular momentum, Runge-Lenz | HairerLubichWanner2006 | M5 | verified (integrator-catalog: `Kepler`, Hamiltonian and first integrals; the exact solution by Kepler's equation deferred, HairerLubichWanner2006 not read) |
 | F3 | Henon-Heiles | 2 | mixed phase space; escape above E = 1/6 | energy; E = 1/12, 1/8, 1/6 portraits | HenonHeiles1964 | M5 | planned |
-| F4 | Pendulum | 1 | separatrix, near-separatrix FTLE | energy | none needed | M5 | planned |
+| F4 | Pendulum | 1 | separatrix, near-separatrix FTLE | energy | none needed | M5 | verified (integrator-catalog: `Pendulum`, also the near-integrable form p^2/2 - eps cos q; near-separatrix FTLE not built) |
 | F5 | FPU-beta lattice / disordered Klein-Gordon chain | N | high-dimensional tangent dynamics, integrator efficiency | energy, pairing | Senyange2018, Danieli2019 | M5 (optional) | planned |
 | F6 | Circular restricted three-body problem (planar) | 2 | astro bridge, Jacobi constant; first R2 transfer target | Jacobi constant | MurrayDermott1999 | M8 | planned |
 | F7 | Forced pendulum, autonomous form H = p^2/2 - cos q + omega I + eps cos q cos phi | 2 | R2 workhorse: known separatrix, tunable stochastic layer, cheap | H conserved (autonomous form); eps = 0 integrable | Chirikov1979, LichtenbergLieberman1992 | M7 | planned |

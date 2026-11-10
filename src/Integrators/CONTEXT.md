@@ -32,4 +32,4 @@ Spec: `workspaces/module-build/stages/01-spec/output/integrator-catalog-spec.md`
 
 ## Limits
 
-Fixed step only. Tao's tangent frame lives in the extended space (open point P11). The Gauss tangent builds a dense `s * 2n` system (heap, not for kernels). `advance_ensemble` takes a KernelAbstractions backend (`ensemble_backend` hook, defined for the CUDA device in `ext/ChaoslabCUDAExt.jl`, D113); the GPU runs are stage 04. Static arrays only: the full tangent frame is measured up to n = 50 degrees of freedom, a `Vector` path is open (risk K22).
+Fixed step only. Tao's tangent frame lives in the extended space (open point P11). The Gauss tangent builds a dense `s * 2n` system (heap, not for kernels). `advance_ensemble` takes a KernelAbstractions backend (`ensemble_backend` hook, defined for the CUDA device in `ext/ChaoslabCUDAExt.jl`, D113); the GPU device runs (`verify/gpu.jl`) were not run at stage 04. Static arrays only: the full tangent frame is measured up to n = 50 degrees of freedom, a `Vector` path is open (risk K22).

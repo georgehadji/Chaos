@@ -10,6 +10,7 @@ One page per layer, in layer order:
 
 - [Foundation](api/foundation.md)
 - [Systems](api/systems.md)
+- [Integrators](api/integrators.md)
 - [Tangent](api/tangent.md)
 - [Diagnostics](api/diagnostics.md)
 - [Lyapunov](api/lyapunov.md)

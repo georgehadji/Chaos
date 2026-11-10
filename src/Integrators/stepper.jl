@@ -104,16 +104,16 @@ One step and its health: `status.ok`, `.iterations` (0 for the explicit methods)
 advance_checked(m::AbstractIntegrator, flow, z::SVector, tau) =
     (advance(m, flow, z, tau), (ok = true, iterations = 0, increment = zero(eltype(z)), stages = ()))
 
+# The elementary tangent operations are not inlined into the stepper (compiled once per flow and element type, not once per table length).
+@noinline _tangent_drift(flow, z, W, t) = (drift(flow, z, t), drift_jacobian(flow, z, t) * W)
+@noinline _tangent_kick(flow, z, W, t) = (kick(flow, z, t), kick_jacobian(flow, z, t) * W)
+
 """
     tangent_advance(m, flow, z, W, tau) -> (znew, Wnew)
 
 The deviation frame `W` (`2n x k`, an `SMatrix` or a `Matrix`) advanced through the elementary Jacobians in stage order, with the state: the exact derivative of
 the one-step map (spec item 17). No renormalization.
 """
-# The elementary tangent operations are not inlined into the stepper (compiled once per flow and element type, not once per table length).
-@noinline _tangent_drift(flow, z, W, t) = (drift(flow, z, t), drift_jacobian(flow, z, t) * W)
-@noinline _tangent_kick(flow, z, W, t) = (kick(flow, z, t), kick_jacobian(flow, z, t) * W)
-
 function tangent_advance(m::SplittingMethod{T, K}, flow, z::SVector, W::SMatrix, tau) where {T, K}
     _check_types(m, z, tau)
     for i in 1:K

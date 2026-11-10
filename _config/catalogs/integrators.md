@@ -8,28 +8,28 @@ Implementation rule (see architecture): every explicit splitting/composition met
 
 | ID | Method | Order | Notes | Source | Phase | Status |
 |----|--------|-------|-------|--------|-------|--------|
-| S1 | Symplectic Euler (A then B, and B then A) | 1 | baseline, composes to leapfrog | HairerLubichWanner2006 | M5 | planned |
-| S2 | Stormer-Verlet / leapfrog (DKD and KDK) | 2 | time-reversible; reference for all order tests | HairerLubichWanner2006 | M5 | planned |
-| S3 | Optimized 2-stage second-order (McLachlan) | 2 | smaller error constant than leapfrog | McLachlan1995 | M5 | planned |
-| S4 | Ruth third-order | 3 | historical | Ruth1983 | M5 | planned |
-| S5 | Forest-Ruth / Candy-Rozmus fourth-order | 4 | same as Yoshida triple jump of leapfrog | ForestRuth1990, CandyRozmus1991 | M5 | planned |
-| S6 | Yoshida triple-jump composition (4 from 2, 6 from 4, 8 from 6) | 4, 6, 8 | generic composition builder; negative steps | Yoshida1990 | M5 | planned |
-| S7 | Suzuki fractal (5-stage) composition | 4+ | smaller negative steps | Suzuki1990 | M5 | planned |
-| S8 | PEFRL (position-extended Forest-Ruth-like) | 4 | much smaller error constant than S5 | Omelyan2002 | M5 | planned |
-| S9 | Calvo-Sanz-Serna fourth-order | 4 | optimized coefficients | CalvoSanzSerna1993a? / CalvoSanzSerna1993b? (which one: decide at 01-spec), SanzSernaCalvo1994 | M5 | planned |
+| S1 | Symplectic Euler (A then B, and B then A) | 1 | baseline, composes to leapfrog | Yoshida1990, Ruth1983 (HairerLubichWanner2006 not read) | M5 | verified |
+| S2 | Stormer-Verlet / leapfrog (DKD and KDK) | 2 | time-reversible; reference for all order tests | Yoshida1990, Ruth1983 (HairerLubichWanner2006 not read) | M5 | verified (GPU runs of criterion 18 not run) |
+| S3 | Optimized 2-stage second-order (McLachlan) | 2 | smaller error constant than leapfrog | McLachlan1995 | M5 | verified |
+| S4 | Ruth third-order | 3 | historical | Ruth1983 | M5 | verified |
+| S5 | Forest-Ruth / Candy-Rozmus fourth-order | 4 | same as Yoshida triple jump of leapfrog | ForestRuth1990, Yoshida1990, Omelyan2002 (CandyRozmus1991 not read) | M5 | verified (independent read of ForestRuth1990 Eqs. (4.3), (4.4) not run; GPU runs of criterion 18 not run) |
+| S6 | Yoshida triple-jump composition (4 from 2, 6 from 4, 8 from 6) | 4, 6, 8 | generic composition builder; negative steps | Yoshida1990 | M5 | verified |
+| S7 | Suzuki fractal (5-stage) composition | 4+ | smaller negative steps; orders 4, 6, 8 (5, 25, 125 leapfrog pieces) | KahanLi1997, McLachlan1995 (Suzuki1990 not read; KahanLi1997 credits Suzuki's 1991 and 1992 papers, not in the bibliography) | M5 | verified |
+| S8 | PEFRL (position-extended Forest-Ruth-like) | 4 | much smaller error constant than S5 | Omelyan2002 | M5 | verified (GPU runs of criterion 18 not run) |
+| S9 | Calvo-Sanz-Serna fourth-order | 4 | optimized coefficients | CalvoSanzSerna1993a (Eq. (2.8)) | M5 | verified |
 | S10 | Blanes-Moan SRKN (optimized RKN splitting) | 4, 6 | very efficient for separable H with T quadratic | BlanesMoan2002 | M5 | planned |
-| S11 | Yoshida sixth/eighth order (solution A / D families) | 6, 8 | many stages | Yoshida1990 | M5 | planned |
-| S12 | Kahan-Li optimal compositions | 6, 8 | KahanLi6, KahanLi8 | KahanLi1997 | M5 | planned |
-| S13 | Sofroniou-Spaletta composition | 10 | high precision reference; many stages | SofroniouSpaletta2005 | M5 | planned |
+| S11 | Yoshida sixth/eighth order (solution A / D families) | 6, 8 | many stages; 6th order solution A, 8th order solutions A and D | Yoshida1990 | M5 | verified (criterion 3(b2), McLachlan1995 Table 2 against Yoshida1990 Table 1, not run) |
+| S12 | Kahan-Li optimal compositions | 6, 8 | s9odr6a, s17odr8a | KahanLi1997 | M5 | verified (GPU runs of criterion 18 not run) |
+| S13 | Sofroniou-Spaletta composition | 10 | high precision reference; many stages | SofroniouSpaletta2005 | M5 | verified |
 | S14 | Processed (corrector) methods | var. | kernel + processor | Blanes1999 | catalog only | planned |
 
 ## B. Near-integrable H = A + eps B
 
 | ID | Method | Order | Notes | Source | Phase | Status |
 |----|--------|-------|-------|--------|-------|--------|
-| P1 | SABA_n / SBAB_n | (2n, 2) in (tau, eps) | needs exact flow of A | LaskarRobutel2001 | M5 | planned |
-| P2 | SABAC_n (with corrector) | higher in eps | | LaskarRobutel2001 | M5 | planned |
-| P3 | Blanes et al. families, e.g. ABA864, ABAH864 | (8,6,4) | modified-potential variants | Blanes2013 | M5 | planned |
+| P1 | SABA_n / SBAB_n | (2n, 2) in (tau, eps) | needs exact flow of A; n = 1 to 10 | LaskarRobutel2001 | M5 | verified (GPU runs of criterion 18 not run for SABA3) |
+| P2 | SABAC_n (with corrector) | higher in eps | also SBABC_n | LaskarRobutel2001 | M5 | verified |
+| P3 | Blanes et al. families, e.g. ABA864, ABAH864 | (8,6,4) | modified-potential variants; ABA864 and ABAH864 built, ABA104, ABA1064, ABAH844, ABAH1064 not | Blanes2013 | M5 | verified |
 
 ## C. N-body (via REBOUND, adapter only, no re-implementation)
 
@@ -52,16 +52,16 @@ REBOUND usage rules (from rebound.hanno-rein.de quickstart, checked 2026-10-12):
 
 | ID | Method | Order | Notes | Source | Phase | Status |
 |----|--------|-------|-------|--------|-------|--------|
-| G1 | Implicit midpoint | 2 | symplectic for any H | HairerLubichWanner2006 | M5 | planned |
-| G2 | Gauss-Legendre collocation, s stages | 2s | symplectic for any H; fixed-point or Newton | HairerLubichWanner2006 | M5 | planned |
-| G3 | Tao extended phase-space explicit method | 2 (composable) | nonseparable H, explicit | Tao2016 | M5 | planned |
+| G1 | Implicit midpoint | 2 | symplectic for any H; Gauss s = 1 | Hairer2008 (HairerLubichWanner2006 not read) | M5 | verified (GPU runs of criterion 18 not run) |
+| G2 | Gauss-Legendre collocation, s stages | 2s | symplectic for any H; fixed-point solve with compensated sums (D113) | Hairer2008 (HairerLubichWanner2006 not read) | M5 | verified (Newton option, closed-form coefficients and quadratic invariants deferred; GPU runs of criterion 18 not run) |
+| G3 | Tao extended phase-space explicit method | 2 (composable) | nonseparable H, explicit; exponent 1/(l - 1) of Yoshida1990, not the printed 1/(l + 1) | Tao2016 | M5 | verified (tangent in the extended space not scored, open point P11) |
 | G4 | Pihajoki extended phase space | 2 | leapfrog for nonseparable H | Pihajoki2015 | catalog only | planned |
 
 ## E. Non-symplectic references (truth generators for tests)
 
 | ID | Method | Use | Source | Phase | Status |
 |----|--------|-----|--------|-------|--------|
-| R1 | Taylor series method, high order, arbitrary precision, jet transport for variational equations | reference orbits and tangents | JorbaZou2005 | M5 (TaylorIntegration.jl, BigFloat) | planned |
+| R1 | Taylor series method, high order, arbitrary precision, jet transport for variational equations | reference orbits; reference tangents by finite differences (jet transport deferred) | JorbaZou2005 | M5 (TaylorIntegration.jl, BigFloat; package extension) | verified |
 | R2 | High-order explicit RK (OrdinaryDiffEq DP8 / Vern9) | quick non-symplectic comparison | HairerNorsettWanner1993 | M5 | planned |
 | R3 | Bulirsch-Stoer | catalog | HairerNorsettWanner1993 | catalog only | planned |
 

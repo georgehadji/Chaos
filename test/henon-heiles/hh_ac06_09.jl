@@ -89,7 +89,7 @@ end
                 Jref = hh_ref_jacobian(E0, zp[2], zp[4])                                      # leg from the previous section point, reference return map
                 @test maximum(abs.(J .- Jref) ./ max.(1, abs.(Jref))) <= 1.0e-6
                 nsteps = round(Int, (rec.t[i] - rec.t[i - 1]) / tau) + 1
-                M = max(1.0, maximum(abs, tangent(im, zp)))
+                M = max(1.0, maximum(abs, tangent(im, zp)), maximum(abs, J))                  # Amendment D117: M_max includes the leg's own product (|J| up to about 23 at E = 1/6)
                 @test abs(det(J) - 1) <= dtol * et * (1 + M) * nsteps + 4 * et
             end
         end

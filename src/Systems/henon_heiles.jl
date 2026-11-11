@@ -55,15 +55,15 @@ section_interval(flow::HenonHeilesFlow, E::Real) = section_interval(flow, float(
 """
     energy_start(flow::HenonHeilesFlow, E, q2, p2) -> (z, status)
 
-The start `z = (0, q2, p1, p2)` on the energy surface `H = E` with `p1 = sqrt(2 (E - p2^2/2 - u(q2))) >= 0` (Equation 8), `status = :ok`. `(nothing, :outside)` if
-`p2^2/2 + u(q2) > E` or `abs(q2) > 1` (the start must lie in the origin component for `E <= 1/6` and inside `r <= 1` above it); `(nothing, :nonfinite)` for a non-finite
+The start `z = (0, q2, p1, p2)` on the energy surface `H = E` with `p1 = sqrt(2 (E - p2^2/2 - u(q2))) > 0` (Equation 8), `status = :ok`. `(nothing, :outside)` if
+`p2^2/2 + u(q2) >= E` (the boundary `p1 = 0` included, Amendment D117) or `abs(q2) > 1` (the start must lie in the origin component for `E <= 1/6` and inside `r <= 1` above it); `(nothing, :nonfinite)` for a non-finite
 argument. Never a NaN state.
 """
 function energy_start(::HenonHeilesFlow, E, q2, p2)
     T = float(promote_type(typeof(E), typeof(q2), typeof(p2)))
     (isfinite(E) && isfinite(q2) && isfinite(p2)) || return (nothing, :nonfinite)
     r = 2 * (T(E) - T(p2)^2 / 2 - _hh_u(T(q2)))
-    (r >= 0 && abs(q2) <= 1) || return (nothing, :outside)
+    (r > 0 && abs(q2) <= 1) || return (nothing, :outside)                 # D117 (L1): p1 = 0 is not an upward crossing
     return (SVector{4, T}(0, T(q2), sqrt(r), T(p2)), :ok)
 end
 

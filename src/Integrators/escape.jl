@@ -9,12 +9,12 @@
     escape_sector(flow::HenonHeilesFlow, q) -> Int
 
 The exit `0`, `1` or `2` whose centre angle (`pi/2`, `7 pi/6`, `11 pi/6`) is nearest to the polar angle of `q` (Equation 14). The rotation by `2 pi/3` maps `k` to `k + 1` (mod 3), the
-reflection `q1 -> -q1` swaps 1 and 2. Allocation free.
+reflection `q1 -> -q1` swaps 1 and 2 (also at `q1 = +-0`: a 1-2 tie goes to 1 when the sign bit of `q1` is set, Amendment D117). Allocation free.
 """
 function escape_sector(::HenonHeilesFlow, q)
     T = float(eltype(q)); h = T(1) / 2; s = sqrt(T(3)) / 2
     d0 = q[2]; d1 = -s * q[1] - h * q[2]; d2 = s * q[1] - h * q[2]      # q . u_k for the unit exit vectors u_k: the nearest centre angle is the largest dot product
-    return (d0 >= d1 && d0 >= d2) ? 0 : (d1 >= d2 ? 1 : 2)
+    return (d0 >= d1 && d0 >= d2) ? 0 : ((d1 > d2 || (d1 == d2 && signbit(q[1]))) ? 1 : 2)    # D117 (L2): a 1-2 tie (q1 = +-0) by the sign bit, so the reflection swaps it
 end
 
 """

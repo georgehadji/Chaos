@@ -129,3 +129,13 @@ Verified keys and the locations used (read in this draft or recorded as read in 
 - P8. Energy tolerance key. Proposed: no key (criterion 6 bounds only). Alternative: define `energy_error_tol` as a multiple of the integrator's local energy error constant.
 - P9. Default integrator and step for this system: proposed order-8 table at tau = 1/20 and the order-4 table as the comparison; both to be calibrated by a drafting run. Alternative: the Hairer step 2/240 for the order-8 composition (integrator-catalog criterion 15).
 - P10. Use of the symmetry: proposed as a test only (criterion 3), no folding of the portrait; alternative: fold by time reversal and reflection (the p2 symmetry used in the "fast PSS scanning" of AntonopoulosManosSkokos2010), which reduces the work to a quarter, with the folding error to be measured against criterion 10.
+
+## Amendment D117 (2026-11-11)
+
+Decision D117 (owner: "Amend + fix L1,L2,L4"). Found at stage 04 (`../../04-verify/output/henon-heiles-verification.md`): the code agrees with the 256-bit Taylor references, but two bounds are not attainable as written.
+
+1. Criterion 8, determinant. M_max in the cumulative bound is the largest of 1, the entries of the one-step tangent at the previous section point, and the entries of the leg Jacobian J itself. The determinant defect of a leg is about eps_T |J|^2 (measured max |J| = 23.4 at E = 1/6, defect 1024 eps_T, 1.004 times the bound with the one-step norm alone). The bound holds for the order-8 table at tau = 1/20 only: the projection with the exact vector field leaves a truncation defect O(tau^p) (review M1; 8.3e-7 for the order-4 table), reported, not scored.
+2. Criterion 12(b). The escape time is scored for escapes before t = 50 (bound 1e-6 unchanged); escapes in [50, 100) are reported. Past t = 50 the chaotic amplification of round-off exceeds 1e-6 at any step (tau/8 is no closer to the reference), the reading of U1 for crossings.
+3. Code (stage 03 fixes, review findings L1, L2, L4): the energy-surface start rejects the boundary p1 = 0 (status outside), as criterion 4 requires p1 > 0; the exit label breaks a tie between labels 1 and 2 (q1 = +-0) by the sign bit of q1, so the reflection of criterion 12(c) swaps it; the grazing test uses the same unit as the crossing tolerance (`effective_eps`, which differs from `eps` for double-double).
+
+Not changed: criteria 1 to 7, 9 to 11, 12(a), (c), (d), 13 to 17; review findings M2 and L3, L5 to L10 stay open (LOW or within the order-8 tolerance).

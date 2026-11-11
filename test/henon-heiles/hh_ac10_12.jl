@@ -76,8 +76,8 @@ end
         while done < nref * k
             z0, _ = random_energy_start(flow, E, (-1.0, 1.0), (-1.0, 1.0), rng)
             res = escape_orbit(m, flow, z0, tau, n; R_esc = R)
-            (res.status === :escaped && res.t < 100) || continue
-            ref = hh_ref_escape(z0, R, 100.0)
+            (res.status === :escaped && res.t < 50) || continue                                 # Amendment D117: scored before t = 50 (round-off amplified past it, as U1)
+            ref = hh_ref_escape(z0, R, 51.0)
             ref === nothing ? (nmis += 1) : (worst = max(worst, abs(res.t - ref)))
             done += 1
         end
@@ -127,4 +127,12 @@ end
     @test section_map(m, flow, SVector(-1.0e100, 1.0, 0.0, 0.0), tau, 100).status === :nonfinite
     z, st = random_energy_start(flow, NaN, (-1.0, 1.0), (-1.0, 1.0), StableRNG(hh_seed(12, 30)))
     @test z === nothing && st !== :ok
+end
+
+@testset "D117 boundary start and the 1-2 label tie" begin
+    flow = HenonHeilesFlow()
+    @test energy_start(flow, 1 / 8, 0.0, 0.5) == (nothing, :outside)                              # 0.5^2/2 == 1/8 exactly: p1 would be 0 (AC4 needs p1 > 0)
+    @test energy_start(flow, 1 / 8, 0.0, 0.25)[2] === :ok && energy_start(flow, 1 / 8, 0.0, 0.25)[1][3] > 0
+    @test escape_sector(flow, SVector(0.0, -1.0)) == 2 && escape_sector(flow, SVector(-0.0, -1.0)) == 1  # reflection swaps the tie (AC12c)
+    @test escape_sector(flow, SVector(0.0, 1.0)) == 0 && escape_sector(flow, SVector(-0.0, 1.0)) == 0
 end

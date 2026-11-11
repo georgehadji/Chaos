@@ -1,0 +1,50 @@
+# Amendment D117 rerun, 2026-11-11 (groups FULL2, FULL3, O3b, O3c; code and tests after D117)
+# henon-heiles verification, julia 1.13.2, threads 4, base seed 20261012 + 42000, HH_FULL_RUN = true, groups FULL2, time 1.794397253e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC6 reported: max |H - H0| by step size (scaling with tau^p) | name = "order-8"; worst = Dict(0.0125 => 3.1807889655510735e-14, 0.05 => 1.484923295436147e-14, 0.025 => 2.4397150966137815e-14)
+# Info AC6 reported: max |H - H0| by step size (scaling with tau^p) | name = "order-4"; worst = Dict(0.0125 => 9.743499895797925e-10, 0.05 => 2.499263714872413e-7, 0.025 => 1.5595654184741292e-8)
+# Info AC9 reported: slope of the cumulative determinant defect, signed and absolute sums; mean |det J - 1| | s_signed = 0.797586894825487; s_abs = 1.010312383909645; hh_mean(abs.(d)) = 4.0234482412415675e-15
+ACFULL2 | file total (888 pass, 0 fail, 0 error, 0 broken, 80.3 s) | 888 | 0 fail, 0 error | PASS
+ACFULL2 | testset AC6 energy conservation of the order-8 and order-4 tables (0 pass, 0 fail or error, 0 broken, 75.6 s) | 0 | 0 | PASS
+ACFULL2 | testset AC7a crossings of the plane q1 = 0: invariants, count and location against the reference (0 pass, 0 fail or error, 0 broken, 2.5 s) | 0 | 0 | PASS
+ACFULL2 | testset AC7b grazing is flagged, not recorded; one crossing solve (0 pass, 0 fail or error, 0 broken, 0.0 s) | 0 | 0 | PASS
+ACFULL2 | testset AC8 section Jacobian: reference finite differences, determinant (0 pass, 0 fail or error, 0 broken, 1.0 s) | 0 | 0 | PASS
+ACFULL2 | testset AC9 symplecticity of the section map with the sub-step: growth of the determinant defect (0 pass, 0 fail or error, 0 broken, 0.6 s) | 0 | 0 | PASS
+# section FULL2 took 80.4 s
+# henon-heiles verification, julia 1.13.2, threads 4, base seed 20261012 + 42000, HH_FULL_RUN = true, groups FULL3, time 1.794397253e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC10 reported: chaotic fraction, sticky orbit S (printed: turns chaotic after about 5000 steps) | fraction = 0.5460257928674825; S2000 = 0.6925658149506939; S10000 = 0.0
+# Info AC11 reported: fractions at E = 1/12, 1/8, 1/6 | f8 = [0.005693581780538302, 0.5455143383320179, 0.9654078985298357]; f4 = [0.005434782608695652, 0.5459089713233359, 0.9661285673104641]
+ACFULL3 | file total (26 pass, 0 fail, 0 error, 0 broken, 560.3 s) | 26 | 0 fail, 0 error | PASS
+ACFULL3 | testset AC10 portrait reproduction at E = 1/8 (AntonopoulosManosSkokos2010 Sect. 3.1, O5) (0 pass, 0 fail or error, 0 broken, 301.5 s) | 0 | 0 | PASS
+ACFULL3 | testset AC11 chaotic fractions across the three energies and the integrator effect (0 pass, 0 fail or error, 0 broken, 255.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12a escape: declared at r >= R_esc, no return, sector by the polar angle (0 pass, 0 fail or error, 0 broken, 0.6 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12b escape time against the reference (0 pass, 0 fail or error, 0 broken, 1.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12c exit label equivariance: reflection bitwise, rotation shifts the label (0 pass, 0 fail or error, 0 broken, 1.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12d non-finite and overflowing starts end with a status, never an exception (0 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset D117 boundary start and the 1-2 label tie (0 pass, 0 fail or error, 0 broken, 0.0 s) | 0 | 0 | PASS
+# section FULL3 took 560.4 s
+# henon-heiles verification, julia 1.13.2, threads 4, base seed 20261012 + 42000, HH_FULL_RUN = true, groups O3b, time 1.794397261e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# O3b: reference Jacobian = central difference (step 2^-100) of the Taylor return map (order 40, abstol 2^-200, 256 bits), legs 2 to 4 of 10 starts per energy
+AC8 | O3b: E = 0.0833333, 30 legs: max relative |J - Taylor finite-difference Jacobian| / max(1, |entry|) | 1.64e-13 | <= 1e-6 | PASS
+AC8 | O3b: E = 0.0833333: worst |det J - 1| / (det_residual_tol eps (1 + M) n_steps + 4 eps) | 0.02239 | <= 1 | PASS
+AC8 | O3b: E = 0.125, 30 legs: max relative |J - Taylor finite-difference Jacobian| / max(1, |entry|) | 1.731e-13 | <= 1e-6 | PASS
+AC8 | O3b: E = 0.125: worst |det J - 1| / (det_residual_tol eps (1 + M) n_steps + 4 eps) | 0.04215 | <= 1 | PASS
+AC8 | O3b: E = 0.166667, 30 legs: max relative |J - Taylor finite-difference Jacobian| / max(1, |entry|) | 8.317e-13 | <= 1e-6 | PASS
+AC8 | O3b: E = 0.166667: worst |det J - 1| / (det_residual_tol eps (1 + M) n_steps + 4 eps) | 0.1182 | <= 1 | PASS
+# section O3b took 354.1 s
+# henon-heiles verification, julia 1.13.2, threads 4, base seed 20261012 + 42000, HH_FULL_RUN = true, groups O3c, time 1.794397261e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# O3c: reference first passage r = R_esc = 10 by the dense Taylor polynomials (order 40, abstol 2^-200, 256 bits), horizon = module time + 0.05; 100 escapes before t = 100 per energy (starts as AC12b of the package suite)
+AC12 | O3c: E = 0.20, 100 escapes before t = 100 (of 111 starts, latest escape t = 93.8): reference found / max |t_escape - reference| for t < 50 (D117; t >= 50 reported below) | 100/100 ; 3.017e-09 | all found; <= 1e-6 | PASS
+AC12 | O3c: E = 0.20: escapes with |t - reference| > 1e-6 at tau = 1/20 / the same count at tau/8 / max difference at tau/8 | 6 ; 8 ; 4.588e-05 | info | INFO
+AC12 | O3c: E = 0.20: escapes with t in [0, 25): count, max |t - reference| at tau, at tau/8 | 50 ; 7.574e-12 ; 1.107e-11 | info | INFO
+AC12 | O3c: E = 0.20: escapes with t in [25, 50): count, max |t - reference| at tau, at tau/8 | 28 ; 3.017e-09 ; 2.291e-08 | info | INFO
+AC12 | O3c: E = 0.20: escapes with t in [50, 100): count, max |t - reference| at tau, at tau/8 | 22 ; 8.547e-05 ; 4.588e-05 | info | INFO
+AC12 | O3c: E = 0.25, 100 escapes before t = 100 (of 100 starts, latest escape t = 71.2): reference found / max |t_escape - reference| for t < 50 (D117; t >= 50 reported below) | 100/100 ; 4.929e-08 | all found; <= 1e-6 | PASS
+AC12 | O3c: E = 0.25: escapes with |t - reference| > 1e-6 at tau = 1/20 / the same count at tau/8 / max difference at tau/8 | 1 ; 1 ; 0.003218 | info | INFO
+AC12 | O3c: E = 0.25: escapes with t in [0, 25): count, max |t - reference| at tau, at tau/8 | 89 ; 1.857e-11 ; 3.104e-11 | info | INFO
+AC12 | O3c: E = 0.25: escapes with t in [25, 50): count, max |t - reference| at tau, at tau/8 | 10 ; 4.929e-08 ; 2.558e-08 | info | INFO
+AC12 | O3c: E = 0.25: escapes with t in [50, 100): count, max |t - reference| at tau, at tau/8 | 1 ; 0.0006427 ; 0.003218 | info | INFO
+# section O3c took 534.0 s

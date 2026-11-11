@@ -47,7 +47,7 @@ end
 
 The upward crossings of the plane `q1 = 0` (`p1 > 0`) of the orbit of `z0` over `n` steps of `tau`. Returns a `NamedTuple` `(t, z, J, grazing, status)`: crossing times, full crossing
 states (`q1` about 0), the Jacobians of the legs in `(q2, p2)` (only with `jacobian`; `J[i]` is the leg from section point `i - 1` to `i`, `J[1]` the identity when the start is on
-the section and a placeholder identity otherwise), `grazing` the count of bracketed crossings with `abs(p1) < 8 eps` (flagged, not recorded), and `status` in `:ok`, `:nonfinite`,
+the section and a placeholder identity otherwise), `grazing` the count of bracketed crossings with `abs(p1) < 8 effective_eps(T)` (flagged, not recorded), and `status` in `:ok`, `:nonfinite`,
 `:buffer_full`. A start with `q1 = 0`, `p1 > 0` is the first point at `t = 0`. Never throws on non-finite values.
 """
 function section_map(m, flow, z0::SVector{4, T}, tau, n::Integer; jacobian::Bool = false, max_crossings::Integer = typemax(Int)) where {T}
@@ -64,7 +64,7 @@ function section_map(m, flow, z0::SVector{4, T}, tau, n::Integer; jacobian::Bool
         Phin = _frame_step(m, flow, z, Phi, tau, jv)
         if z[1] < 0 <= zn[1] && zn[3] > 0
             zc, s = locate_crossing(m, flow, z, tau)
-            if abs(zc[3]) < 8 * eps(T)
+            if abs(zc[3]) < 8 * effective_eps(T)                              # D117 (L4): the unit of the crossing tolerance
                 graz += 1
             else
                 jacobian && push!(Js, isempty(zs) ? one(SMatrix{2, 2, T, 4}) : _leg_jacobian(flow, _frame_step(m, flow, z, Phi, s, jv), zs[end], zc))

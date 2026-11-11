@@ -98,3 +98,7 @@ henon-heiles    |   32     26     58  3.7s
 30 testsets: 4 pass (AC1a, AC2, AC3b, AC3d: 32 tests), 26 error, 0 fail, 0 broken. Every error is an `UndefVarError` for a proposed name, raised by the first line of the testset (the tuple naming the new symbols): `random_energy_start` 12 testsets, `energy_start` 5, `energy_grid` 3, `critical_points` 2 (AC1b, AC14), `d3_elements` 1, `section_interval` 1, `section_map` 1, `escape_orbit` 1. No parse error, no error in a helper, no failure of an existing-code test.
 
 Check of the test logic (not RED): the same suite against a throwaway implementation of the proposed API (scratch only, not delivered, bisection crossings, 1 thread) gives 6898 pass, 2 fail, 0 error in 61 s; the 2 failures are the allocation of the scratch `escape_sector` (it builds a vector), a defect of the scratch code. The Jacobian convention of AC8 and the section-map tests agree with the Double64 reference on that implementation.
+
+## Amendment D117 (2026-11-11)
+
+Spec section "Amendment D117". Test changes: `hh_ac06_09.jl` AC8, M includes `maximum(abs, J)` (item 1); `hh_ac10_12.jl` AC12b, escapes before t = 50 scored, reference horizon 51 (item 2); new testset "D117 boundary start and the 1-2 label tie" in `hh_ac10_12.jl` (item 3: `energy_start` at p1 = 0 is `:outside`; `escape_sector` at q1 = +0 and -0 gives 2 and 1). `verify/henon-heiles.jl` O3b and O3c follow items 1 and 2.

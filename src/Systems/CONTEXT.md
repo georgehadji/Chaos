@@ -19,7 +19,8 @@ Spec: `workspaces/module-build/stages/01-spec/output/standard-map-spec.md` (SM-;
 | `wrapped_standard_map_chain.jl` | `WrappedStandardMapChain` (state length `4N`), `torus_state`, `lift`, `SVector`-state forms (D105) |
 | `residuals.jl` | `symplectic_form`, `det_residual`, `symplectic_residual` |
 | `flow_core.jl` | `AbstractFlow`, `AbstractSeparableFlow`; the exact partial flows `drift`, `kick` (and increments, Jacobians), `hamiltonian_gradient`, `vector_field`, `CountingFlow` (integrator-catalog, D111) |
-| `flow_models.jl` | `HarmonicOscillator` (F1), `Pendulum` (F4), `Kepler` (F2), `HenonHeilesFlow` (T2), `TaoNonseparable` (T1) with Hamiltonian, force, Hessians and the SABAC corrector pair |
+| `flow_models.jl` | `HarmonicOscillator` (F1), `Pendulum` (F4), `Kepler` (F2), `HenonHeilesFlow` (F3), `TaoNonseparable` (T1) with Hamiltonian, force, Hessians and the SABAC corrector pair |
+| `henon_heiles.jl` | F3 system parts and starts (henon-heiles, D116; spec `henon-heiles-spec.md`, tests `test/henon-heiles/`, notes `henon-heiles-impl-notes.md`); section and escape tools are in Integrators |
 
 ## Exports
 
@@ -39,6 +40,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/standard-map-spec.md` (SM-;
 | `forward!`, `inverse!`, `tangent!`, `inverse_tangent!`, `tangent_action!`, `inverse_tangent_action!` | chain only: in-place forms (0 bytes after warm-up), dense `2N x 2N` tangent, `M W` and `M^-1 W` for a frame in cost linear in `N` |
 | `torus_state(sys, z)`, `lift(sys, s)` | two-argument forms for the wrapped Y3 and chain (state length does not identify the system) |
 | `HarmonicOscillator(w)`, `Pendulum(eps)`, `Kepler()`, `HenonHeilesFlow()`, `TaoNonseparable()` | Hamiltonian flows, states `(q, p)`: `hamiltonian`, `force`, `force_jacobian`, `drift`, `kick` and their Jacobians, `vector_field`, `exact_flow` (F1), `angular_momentum`, `runge_lenz` (F2), `perturbation_scale`, `corrector_force`, `corrector_hessian`; `CountingFlow` counts force evaluations |
+| `critical_points`, `escape_energy`, `d3_elements`, `section_interval`, `energy_start`, `random_energy_start`, `energy_grid` | F3: the four critical points, 1/6, the six D3 matrices (any `T`); roots of `u = E`; starts on `q1 = 0` as `(z, status)` (`:ok`, `:outside`, `:nonfinite`, never a NaN state), seeded draw, cell-centre grid |
 | `symplectic_form(T, d)`, `det_residual(M)`, `symplectic_residual(M)` | `Omega`, `abs(det M - 1)`, max entry of `M' Omega M - Omega` (also for a dense `Matrix`) |
 
 ## Invariants a caller can rely on

@@ -20,6 +20,7 @@ export AbstractIntegrator, SplittingMethod, CorrectedMethod, Gauss, ImplicitMidp
 export advance, advance_n, advance_to, advance_checked, tangent_advance, advance_ensemble
 export coefficients, stage_count, nominal_order, is_palindromic, table_digits, force_evaluations, isolated_force_evaluations, method_name, method_source, adjoint_method
 export SymplecticEuler, Leapfrog, McLachlan2, Ruth3, ForestRuth, triple_jump, suzuki_jump, PEFRL, CalvoSanzSerna4, Yoshida, KahanLi, SofroniouSpaletta10
+export locate_crossing, section_map, escape_sector, locate_escape, escape_orbit
 export SABA, SBAB, SABAC, SBABC, ABA864, ABAH864, gauss_coefficients, extend_state, physical_state, taylor_reference
 
 include("splitting.jl")
@@ -30,6 +31,8 @@ include("gauss.jl")
 include("tao.jl")
 include("integrator_map.jl")
 include("ensemble.jl")
+include("section.jl")
+include("escape.jl")
 
 """
     taylor_reference(flow, z, t)

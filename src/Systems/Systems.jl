@@ -21,6 +21,7 @@ export wrap, symplectic_form, det_residual, symplectic_residual
 export AbstractFlow, AbstractSeparableFlow, HarmonicOscillator, Pendulum, Kepler, HenonHeilesFlow, TaoNonseparable, CountingFlow
 export hamiltonian, force, force_jacobian, hamiltonian_gradient, hamiltonian_hessian, vector_field, vector_field_jacobian
 export drift, kick, drift_increment, kick_increment, drift_jacobian, kick_jacobian, exact_flow, exact_flow_matrix
+export critical_points, escape_energy, d3_elements, section_interval, energy_start, random_energy_start, energy_grid
 export angular_momentum, runge_lenz, perturbation_scale, corrector_force, corrector_hessian, kick_count, reset_counts!
 
 "Supertype of the maps of this module; subtypes define `forward`, `inverse`, `tangent`, `inverse_tangent`, `dimension`."
@@ -98,5 +99,6 @@ include("wrapped_standard_map_chain.jl")
 include("residuals.jl")
 include("flow_core.jl")
 include("flow_models.jl")
+include("henon_heiles.jl")
 
 end

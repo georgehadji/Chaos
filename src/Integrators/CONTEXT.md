@@ -2,7 +2,7 @@
 
 Symplectic and reference integrators for Hamiltonian flows (catalog `_config/catalogs/integrators.md`, rows S1 to S9, S11 to S13, P1 to P3, G1 to G3, R1, tangent dynamics by the same splitting). Imports Foundation and Systems only (layering test). Built by the integrator-catalog run (M5).
 
-Spec: `workspaces/module-build/stages/01-spec/output/integrator-catalog-spec.md` (D111). Tests `test/integrator-catalog/`, plan `stages/02-tests/output/integrator-catalog-test-plan.md`, notes `stages/03-implement/output/integrator-catalog-impl-notes.md`.
+Spec: `workspaces/module-build/stages/01-spec/output/integrator-catalog-spec.md` (D111); section and escape tools: `henon-heiles-spec.md` (D116), tests `test/henon-heiles/`. Tests `test/integrator-catalog/`, plan `stages/02-tests/output/integrator-catalog-test-plan.md`, notes `stages/03-implement/output/integrator-catalog-impl-notes.md`.
 
 ## Files
 
@@ -17,6 +17,8 @@ Spec: `workspaces/module-build/stages/01-spec/output/integrator-catalog-spec.md`
 | `tao.jl` | `TaoExtended`, `extend_state`, `physical_state`: Tao2016 extended phase space, Strang and triple jump |
 | `integrator_map.jl` | `IntegratorMap`: the one-step map as a Systems `AbstractMap` |
 | `ensemble.jl` | `advance_ensemble`: one KernelAbstractions kernel over orbits |
+| `section.jl` | `locate_crossing` (sub-step root solver of the method's own step), `section_map` (upward crossings of `q1 = 0`, optional Jacobian of the leg in `(q2, p2)`) (henon-heiles, D116) |
+| `escape.jl` | `escape_sector`, `locate_escape`, `escape_orbit` (first passage of `r = R_esc`, exit label) |
 
 ## Rules a caller can rely on
 

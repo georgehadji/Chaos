@@ -1,5 +1,5 @@
 # The Hamiltonian flows of the integrator-catalog tests (catalog systems.md, section B): F1 harmonic oscillator, F4 pendulum, F2 planar Kepler,
-# T2 Henon-Heiles (test-only here, Hairer2008 Sect. 2) and the nonseparable T1 (Tao2016 Sec. II A). Parameters are built in the state's element type.
+# F3 Henon-Heiles (Hairer2008 Sect. 2; its section and escape tools: henon_heiles.jl and Integrators) and the nonseparable T1 (Tao2016 Sec. II A). Parameters are built in the state's element type.
 
 @inline _sq(x) = x * x
 
@@ -21,7 +21,12 @@ end
 "F2: planar Kepler problem `H = |p|^2/2 - 1/|q|` (GM = 1), state (q1, q2, p1, p2)."
 struct Kepler <: AbstractSeparableFlow end
 
-"T2: Henon-Heiles `H = |p|^2/2 + |q|^2/2 + q1^2 q2 - q2^3/3`, state (q1, q2, p1, p2)."
+"""
+    HenonHeilesFlow()
+
+F3: Henon-Heiles `H = |p|^2/2 + |q|^2/2 + q1^2 q2 - q2^3/3`, state `(q1, q2, p1, p2)`; three saddles at `V = 1/6` (escape energy), D3 symmetry. System parts and energy-surface
+starts: [`critical_points`](@ref), [`d3_elements`](@ref), [`energy_start`](@ref), [`energy_grid`](@ref); section map and escape tools are in Integrators.
+"""
 struct HenonHeilesFlow <: AbstractSeparableFlow end
 
 "T1: the nonseparable `H = (Q^2 + 1)(P^2 + 1)/2` of Tao2016 Sec. II A, state (Q, P)."
@@ -92,7 +97,7 @@ function runge_lenz(f::Kepler, z::SVector)
     return SVector(z[4] * L - z[1] / r, -z[3] * L - z[2] / r)
 end
 
-# ---- T2
+# ---- F3
 hamiltonian(::HenonHeilesFlow, z::SVector) = (_sq(z[3]) + _sq(z[4])) / 2 + (_sq(z[1]) + _sq(z[2])) / 2 + _sq(z[1]) * z[2] - z[2]^3 / 3
 force(::HenonHeilesFlow, q::SVector) = SVector(q[1] + 2 * q[1] * q[2], q[2] + _sq(q[1]) - _sq(q[2]))
 force_jacobian(::HenonHeilesFlow, q::SVector{2, T}) where {T} = SMatrix{2, 2, T}(1 + 2 * q[2], 2 * q[1], 2 * q[1], 1 - 2 * q[2])

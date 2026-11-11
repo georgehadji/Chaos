@@ -10,10 +10,12 @@ using ..Foundation
 using ..Systems
 using ..Tangent
 using StaticArrays
+using LinearAlgebra: dot
 
 import ..Tangent: reducer_init, reducer_update, reducer_final, reducer_step, reducer_failed, reducer_error, reducer_provenance, reducer_workspace
 
 export GALI, gali_values, gali_value, gali_floor, SALI, alignment_indices, sali_pair, sali_from_log, sali_floor, check_frame, FLI, fli_unlogged, MEGNO, RLI, pair_start, pair_distance
+export OFLI, ofli_initial
 export StretchingNumbers, spectral_distance, spectrum_cell, spectrum_density, stretching_range, check_run
 export window_weights, window_frequency, WindowFrequency, frequency_map, FrequencyMap, check_frequency_map, circle_distance, frequency_distance, frequency_index
 export birkhoff_weight, birkhoff_weights, phase_increments, weighted_phase_frequency, WeightedPhaseAdvance, PlanarObservable, LiftedAngleObservable
@@ -23,6 +25,7 @@ include("sali.jl")
 include("alignment.jl")
 include("gali.jl")
 include("fli.jl")
+include("ofli.jl")
 include("megno.jl")
 include("rli.jl")
 include("stretching.jl")

@@ -52,3 +52,35 @@ ACFULL2 | testset AC10b identities: instantaneous value, sin theta at the maximi
 # Info AC11c reported (A1 prediction 2^p) | table = 2; angle_h = 0.0003259172121174938; angle_half = 8.030183074658833e-5; ratio = 4.058652325698572; predicted = 4
 # Info AC11c reported (A1 prediction 2^p) | table = 4; angle_h = 3.7623311659825143e-7; angle_half = 2.3486328656493274e-8; ratio = 16.01923919659679; predicted = 16
 # Info AC11c reported (A1 prediction 2^p) | table = 8; angle_h = 1.289451874196401e-14; angle_half = 1.9290184956889115e-14; ratio = 0.6684497204553231; predicted = 256
+# Info AC12 reported (R3) | max_error_over_bound = 0.1393180161987809; median_ratio = 0.0004435004636694959; rows = 17136; maximiser_differs = 0
+# Info AC13 reported: OFLI_1 - OFLI_tau at n = 1000 | orbit = :R; diffs = [-1.7763568394002505e-15, 0.0003720076956406082, 0.007652280221507102]
+# Info AC13 reported: OFLI_1 - OFLI_tau at n = 1000 | orbit = :C; diffs = [5.329070518200751e-15, 1.7763568394002505e-15, 8.881784197001252e-16]
+# Info AC15a reported (R3) | bigfloat_error_over_bound = 0.0010494240642598053
+# Info AC15b reported | G = 3789.370664795094; error_over_bound = 0.0007328203020220134
+ACFULL3 | file total (380 pass, 0 fail, 0 error, 0 broken, 1351.8 s) | 380 | 0 fail, 0 error | PASS
+ACFULL3 | testset AC11a direction candidates: the rigorous bound |OFLI_A - OFLI_B| <= sin(angle) ||w|| (0 pass, 0 fail or error, 0 broken, 3.3 s) | 0 | 0 | PASS
+ACFULL3 | testset AC11c direction candidates: the angle at fixed t for the order-4 and order-8 tables (reported) (0 pass, 0 fail or error, 0 broken, 0.8 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12 same-orbit reference: |G - G_ref| <= B_G for both forms, Float64 and Double64 (0 pass, 0 fail or error, 0 broken, 1022.7 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12 negative control: a single-precision projection exceeds B_G at n = 1e3 (test-side double) (0 pass, 0 fail or error, 0 broken, 2.0 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13 schedule: OFLI_tau(n) <= OFLI_1(n) + 2 B_G (0 pass, 0 fail or error, 0 broken, 1.8 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14a vector field: an equilibrium start is a health error at the first handoff, with orbit id and step (0 pass, 0 fail or error, 0 broken, 1.6 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14b deviation matrix: a zero tangent is a health error naming the column and the step (0 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14c frames: a supplied single vector parallel to the flow is refused before any work, the basis is accepted (0 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14d chains: the orbit is bitwise unchanged, a non-replacing OFLI changes nothing for the others (0 pass, 0 fail or error, 0 broken, 1.6 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14e run record and dimension guard (0 pass, 0 fail or error, 0 broken, 1.4 s) | 0 | 0 | PASS
+ACFULL3 | testset D119 field health of ofli_initial, the combined series, the flow record (0 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL3 | testset AC15a precision ladder: Float64, Double64 and BigFloat(256) agree, BigFloat against its own reference (0 pass, 0 fail or error, 0 broken, 175.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC15b representation: OFLI_B above 709.78 is finite, not clipped, and the display conversion reports the overflow (0 pass, 0 fail or error, 0 broken, 139.9 s) | 0 | 0 | PASS
+# section FULL3 took 1352.0 s
+# ofli verification, julia 1.13.2, threads 8, base seed 20261012 + 43000, OF_FULL_RUN = true, groups FULL4, time 1.795005764e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC16 reported | threads = 8; starts = 4096
+# Info AC17 reported: order-4 table, error at t = 10, 30, 60 | orbit = :R; errors = [1.2767121343681964e-5, 1.4559918731338328e-5, 1.7031697509661825e-5]
+# Info AC17 reported: order-4 table, error at t = 10, 30, 60 | orbit = :C; errors = [5.1870686541555244e-6, 7.154939280606953e-6, 0.0005802727944388408]
+# Info AC18 reported | orbits_in_agreement = 235
+ACFULL4 | file total (22 pass, 0 fail, 0 error, 0 broken, 8937.7 s) | 22 | 0 fail, 0 error | PASS
+ACFULL4 | testset AC16a execution invariance: chunk sizes and the serial body give bitwise identical series (0 pass, 0 fail or error, 0 broken, 442.8 s) | 0 | 0 | PASS
+ACFULL4 | testset AC16b the hot loop allocates nothing after warm-up (0 pass, 0 fail or error, 0 broken, 2.9 s) | 0 | 0 | PASS
+ACFULL4 | testset AC17 external reference, package stand-in: order-8 table at h = 1/20 against the Double64 order-10 reference (the Taylor form is stage 04) (0 pass, 0 fail or error, 0 broken, 1.4 s) | 0 | 0 | PASS
+ACFULL4 | testset AC18 CPU part: each backend against its own reference, the gap rule, the fallback (0 pass, 0 fail or error, 0 broken, 8490.2 s) | 0 | 0 | PASS
+# section FULL4 took 8938.2 s

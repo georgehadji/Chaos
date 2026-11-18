@@ -1,6 +1,6 @@
 # Verification report: ofli (catalog row I6; spec D118)
 
-Stage 04 of `workspaces/module-build`, 2026-11-11 (Amendment D119 added 2026-11-18). Script `verify/ofli.jl` (environment `verify/`, groups FULL1 to FULL4, Oa, Ob, Oc, PLATEAUp, PLATEAUf, Od, R, AC16T, AC18r, FIG), raw output `ofli-verify-log.txt`, figures `ofli-plateau.png` (OFLI_B against t on the pendulum and the period-1 orbit, order 4 and 8, h and h/2, with t*) and `ofli-classes.png` (OFLI_B against t for orbits R, C and the period-1 orbit). Code at commit 7eaf9d4. Status: awaiting the stage 04 checkpoint.
+Stage 04 of `workspaces/module-build`, 2026-11-11 (Amendment D119 added 2026-11-18). Script `verify/ofli.jl` (environment `verify/`, groups FULL1 to FULL4, Oa, Ob, Oc, PLATEAUp, PLATEAUf, Od, R, AC16T, AC18r, FIG), raw output `ofli-verify-log.txt`, figures `ofli-plateau.png` (OFLI_B against t on the pendulum and the period-1 orbit, order 4 and 8, h and h/2, with t*) and `ofli-classes.png` (OFLI_B against t for orbits R, C and the period-1 orbit). Code at commit 7eaf9d4. Status: accepted at the stage 04 checkpoint after Amendment D119, 2026-11-18 (owner: "Accept").
 
 ## Evidence per criterion
 

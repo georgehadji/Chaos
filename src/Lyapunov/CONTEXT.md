@@ -1,6 +1,6 @@
 # Lyapunov
 
-Exponent estimators as reducers of the tangent stream, plus the two-trajectory estimator that runs its own loop. Imports Foundation, Systems and Tangent. Built by the lyap-benettin (catalog L1), lyap-gram-schmidt (L3 CGS, L4 MGS, L4b RGS), lyap-householder-qr (L5 Householder, L6 Givens, L5b augmented), lyap-svd-stabilized (L9) and lyap-two-trajectory (L2) runs.
+Exponent estimators as reducers of the tangent stream, plus the two-trajectory and continuous QR estimators, which run their own loops. Imports Foundation, Systems, Integrators (method names only) and Tangent. Built by the lyap-benettin (catalog L1), lyap-gram-schmidt (L3 CGS, L4 MGS, L4b RGS), lyap-householder-qr (L5 Householder, L6 Givens, L5b augmented), lyap-svd-stabilized (L9) and lyap-two-trajectory (L2) and continuous-qr (L8) runs.
 
 Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the five slugs above (amendments D35 for all five bounds, D41 svd-stabilized, D42 two-trajectory; owner answers D30; API contract D34). Reports: `stages/04-verify/output/<slug>-verification.md`, same five slugs.
 
@@ -16,6 +16,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 | `lapack_qr.jl` | `LapackQR`, the LAPACK library path (non-isbits state with a preallocated workspace) |
 | `svd_spectrum.jl` | `SVDSpectrum` reducer, `log_singular_values` |
 | `separation.jl` | `separation` and `displaced` hooks, with `WrappedStandardMap` methods (minimal image) |
+| `continuous_qr.jl` | `ContinuousQR`, the penalty form `cqr_rhs`, growth rates `cqr_growth`, per-orbit loop, series and ensemble drivers (CPU only) |
 | `two_trajectory.jl` | `propagate_shadow`, `propagate_shadow_orbit`, the per-orbit body, kernel, chunking and device fallback |
 
 ## Exports
@@ -34,6 +35,8 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 | `log_singular_values(S, c)` | log singular values of the triangular product from the QR totals and the ratio `c` |
 | `propagate_shadow(sys, x0, N; d0, tau, seed, backend, chunk, U0)` | two-trajectory estimate X2 for every orbit; returns a `PropagationResult` |
 | `propagate_shadow_orbit` | the same body for one orbit, serial; throws `NumericalHealthError` |
+| `ContinuousQR(map, flow; order, penalty_factor, orthogonality_tol, form)` | continuous QR estimator: Q follows an ODE (Heun or RK4 on the orbit grid), exponents are compensated integrals of `(Q'AQ)_ii`; guard `E_max` default `CQ_EMAX = 1e-2` |
+| `propagate_cqr_orbit`, `propagate_cqr_series`, `propagate_cqr` | one orbit (no allocation), one orbit with a series, many orbits (`PropagationResult`); `cqr_rhs`, `cqr_growth`, `cqr_bytes` are the pure pieces |
 | `separation(sys, ref, shadow)`, `displaced(sys, ref, delta)` | separation vector and shadow placement; plain difference by default, minimal image for `WrappedStandardMap` |
 
 ## Invariants a caller can rely on
@@ -57,7 +60,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 
 ## Tests and verification
 
-- Package: `test/lyap-benettin/`, `test/lyap-gram-schmidt/`, `test/lyap-householder-qr/`, `test/lyap-svd-stabilized/`, `test/lyap-two-trajectory/`.
+- Package: `test/lyap-benettin/`, `test/lyap-gram-schmidt/`, `test/lyap-householder-qr/`, `test/lyap-svd-stabilized/`, `test/lyap-two-trajectory/`, `test/continuous-qr/`.
 - Oracle runs: `verify/<slug>.jl` for each of the five slugs, `verify/threads.jl` (thread identity), `verify/gpu.jl` (GPU lines).
 - Bounds, tolerances and measured ratios live in the specs and verification reports; this file points to them.
 
@@ -69,3 +72,4 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 | General-`d` singular-value exponents | held for M3, D32 |
 | lyap-two-trajectory criterion 13 (external two-trajectory oracle): re-specified in wrapped mode, verified | D43, D46 |
 | Float32 | D24 |
+| continuous-qr: GPU path, ChaosTools comparison, Taylor-form reference, full sizes | stage 04 (`CQ_FULL_RUN`) |

@@ -1,12 +1,14 @@
 """
     Lyapunov
 
-Lyapunov-exponent estimators as reducers of the tangent stream: Benettin (lyap-benettin), the Gram-Schmidt QR spectrum (lyap-gram-schmidt) and their shared helpers.
+Lyapunov-exponent estimators as reducers of the tangent stream: Benettin (lyap-benettin), the Gram-Schmidt QR spectrum (lyap-gram-schmidt) and their shared helpers, and the continuous QR method (continuous-qr).
 """
 module Lyapunov
 
 using ..Foundation
 using ..Systems
+using ..Integrators: method_name, nominal_order
+using ..Tangent: initial_deviations, PropagationResult
 using ..Tangent
 using StaticArrays
 using LinearAlgebra
@@ -15,7 +17,8 @@ import ..Tangent: reducer_init, reducer_update, reducer_final, reducer_step, red
 
 export Benettin, Orthonormalizer, CGS, MGS, RGS, orthonormalize, QR_OK, QR_PIVOT, QR_PASSES,
        window_Gw, window_G, orthogonality_threshold, QRSpectrum, HouseholderQR, AugmentedQR, GivensQR, LapackQR, SVDSpectrum, log_singular_values,
-       propagate_shadow, propagate_shadow_orbit, separation, displaced
+       propagate_shadow, propagate_shadow_orbit, separation, displaced,
+       ContinuousQR, cqr_rhs, cqr_growth, propagate_cqr_orbit, propagate_cqr_series, propagate_cqr, cqr_bytes, CQ_EMAX
 
 include("benettin.jl")
 include("orthonormalize.jl")
@@ -25,5 +28,6 @@ include("householder.jl")
 include("svd_spectrum.jl")
 include("separation.jl")
 include("two_trajectory.jl")
+include("continuous_qr.jl")
 
 end

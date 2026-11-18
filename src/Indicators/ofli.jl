@@ -123,19 +123,29 @@ function reducer_final(::OFLI, st::OFLIState{T, k}) where {T, k}
             stepB = st.stepB, colB = Int(st.colB), step1 = st.step1, sinB = st.sinB, sin1 = st.sin1, sinmin = st.sinmin, nminf = st.nminf)
 end
 
-reducer_provenance(r::OFLI) = (indicator = "ofli", ofli_flow = string(nameof(typeof(r.flow))), ofli_replace = r.replace)
+reducer_provenance(r::OFLI) = (indicator = "ofli", ofli_flow = sprint(show, r.flow), ofli_replace = r.replace)   # D119 (M3): type and parameters
 
 """
-    ofli_initial(flow, x0, W0) -> SVector{k}
+    ofli_initial(flow, x0, W0; orbit = 0) -> SVector{k}
 
 The `s = 0` terms `log(||P w_i||)` of the columns of `W0` (`P` the projection orthogonal to `vector_field(flow, x0)`), minus infinity for a
-zero component (spec O2, Algorithm 1). The OFLI series is the running maximum of these and of the reducer's handoff terms.
+zero component (spec O2, Algorithm 1). The OFLI series is the running maximum of these and of the reducer's handoff terms ([`ofli_total`](@ref)).
+A field at `x0` that is zero or not finite throws `NumericalHealthError("vector field", ...)` at step 0 (Amendment D119).
 """
-function ofli_initial(flow, x0::SVector, W0::SMatrix{d, k, T}) where {d, k, T}
+function ofli_initial(flow, x0::SVector, W0::SMatrix{d, k, T}; orbit::Integer = 0) where {d, k, T}
     f = vector_field(flow, x0)
-    u = f / safe_norm(f)
+    fn = safe_norm(f)
+    (isfinite(fn) && fn > floatmin(T)) || throw(NumericalHealthError("vector field", Float64(fn), Float64(floatmin(T)), 0, orbit, :cpu, 0))
+    u = f / fn
     return SVector{k, T}(ntuple(i -> (b = ofli_column(u, W0[:, i])[2]; b > 0 ? log(b) : T(-Inf)), Val(k)))
 end
+
+"""
+    ofli_total(final, g0) -> (ofli, ofli1)
+
+The OFLI series with the `s = 0` term (spec Algorithm 1): `final` a `reducer_final` record of [`OFLI`](@ref), `g0` from [`ofli_initial`](@ref).
+"""
+ofli_total(final, g0::AbstractVector) = (ofli = max(maximum(g0), final.ofli), ofli1 = max(first(g0), final.ofli1))
 
 """
     check_frame(OFLI(flow), W0, x0; orbit = 0) -> defect

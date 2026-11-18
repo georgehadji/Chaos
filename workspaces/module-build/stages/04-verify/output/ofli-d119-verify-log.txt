@@ -1,0 +1,54 @@
+# ofli verification, julia 1.13.2, threads 8, base seed 20261012 + 43000, OF_FULL_RUN = true, groups FULL1,FULL2,FULL3, time 1.794430633e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC3b reported | table = 2; form = :err1; error_h01 = 0.0021123751296148185; error_h005 = 0.0005031089704294472; max_to_t1000 = 0.001045890068928662
+# Info AC3b reported | table = 2; form = :errB; error_h01 = 0.0021123751296148185; error_h005 = 0.0005031089704294472; max_to_t1000 = 0.001045890068928662
+# Info AC3b reported | table = 4; form = :err1; error_h01 = 1.3246030125493857e-5; error_h005 = 8.387117012287337e-7; max_to_t1000 = 3.685879709869333e-5
+# Info AC3b reported | table = 4; form = :errB; error_h01 = 1.3246030125493857e-5; error_h005 = 8.387117012287337e-7; max_to_t1000 = 3.685879709869333e-5
+# Info AC4c reported (R1) | amplitude = 2.0; tstar_h_1_4 = 5737.0; tstar_h_1_8 = Inf; tstar_h_1_20 = Inf
+# Info AC4c reported (R1) | amplitude = 3.0; tstar_h_1_4 = 2411.0; tstar_h_1_8 = Inf; tstar_h_1_20 = Inf
+# Info AC5 reported | period = 6.075615784322902; trace = -0.9035017068164999; Tprime = -1.3465966585961553
+# Info AC5c reported (R1) | dG = 0.0018952709775938992; dFLI = 2.152820560045935
+# Info AC5c reported (R1) | dG = 0.0005358767022936028; dFLI = 1.8833932763959216
+ACFULL1 | file total (78 pass, 0 fail, 0 error, 0 broken, 18.2 s) | 78 | 0 fail, 0 error | PASS
+ACFULL1 | testset AC1 algebra on the free particle, d = 4 (exact step, closed form) (0 pass, 0 fail or error, 0 broken, 3.0 s) | 0 | 0 | PASS
+ACFULL1 | testset AC1 negative controls (test-side doubles, no module name) (0 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL1 | testset AC2 free particle d = 2 (0 pass, 0 fail or error, 0 broken, 1.1 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3a oscillator: the exact-flow identity (the oracle itself, 256 bits) (0 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3b oscillator: order of the discretization error of the OFLI (order-2 and order-4 tables) (0 pass, 0 fail or error, 0 broken, 2.4 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3c controls: doubles with one defect fail the closed form (no module name) (0 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+ACFULL1 | testset AC4a pendulum: the exact-flow identity on the reference (Double64 order-10 stand-in; the 1e-30 Taylor form is stage 04) (0 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL1 | testset AC4b pendulum: the exact OFLI_1 is periodic (continuous minimum), the exact FLI_1 grows as ln t (0 pass, 0 fail or error, 0 broken, 6.8 s) | 0 | 0 | PASS
+ACFULL1 | testset AC4c pendulum: the numerical OFLI against the exact one, order-4 table at h = 1/20 (0 pass, 0 fail or error, 0 broken, 0.9 s) | 0 | 0 | PASS
+ACFULL1 | testset AC5 periodic orbit of F3: bounded OFLI against linearly growing FLI (0 pass, 0 fail or error, 0 broken, 1.1 s) | 0 | 0 | PASS
+# section FULL1 took 18.3 s
+# Info AC6 reported | slope_R = 1.0021627013622858; slopes_regular = [1.003254039942283, 1.0038348828389942, 1.0196724074835017, 0.5634559923630367, 1.0010635238174617, 1.0036543489982193, 1.0896106881308247, 1.0025533988015136, 0.9941062123467567, 1.0074085952673066, 1.0025537759065817, 1.00260638957417, 1.002093350299824, 1.0147955084547209, 1.0036027572588047, 1.0030416369862722, 0.9370324358042535, 1.0046251139268245, 1.0133672761533072, 1.0024095332037652]; sali_regular = [0.4609587151206816, 0.6006533657803165, 0.15825986053053187, 0.047871817758743634, 0.8537262066355918, 1.2219471956802888, 0.4965788734135897, 0.9088481418984182, 0.5202352635358831, 0.6902290321449842, 1.0084360199611266, 0.24165095191124095, 1.4065000427722083, 0.07928363056909501, 0.8300365400001378, 1.0074181798706185, 0.08039621253199701, 0.31123769416243097, 0.24766274276575476, 0.39066397653319523]
+# Info AC7 reported (R2) | median_FLI_minus_OFLI = 0.17031246455704974; mean_slope = 0.049252630507920434; mean_lambda = 0.04976161260638519
+# Info AC8 reported | orbit = :R; t = 1000.0; spread = 0.3513244155706001; bound = 0.6931471805599453
+# Info AC8 reported | orbit = :R; t = 10000.0; spread = 0.3539931130043419; bound = 0.6931471805599453
+# Info AC8 reported | orbit = :C; t = 1000.0; spread = 0.29231313225644584; bound = 0.6931471805599453
+# Info AC8 reported | orbit = :C; t = 10000.0; spread = 0.29231313225830036; bound = 0.6931471805599453
+# Info AC9 reported: (F* - OFLI_B) / ln sqrt(4) at the last step | quantiles = (0.001234138011125811, 0.3907089593631914, 0.7308064606432111)
+ACFULL2 | file total (841 pass, 0 fail, 0 error, 0 broken, 611.0 s) | 841 | 0 fail, 0 error | PASS
+ACFULL2 | testset AC6 quasi-periodic orbit R and the regular class: log OFLI_B grows like ln t (0 pass, 0 fail or error, 0 broken, 51.8 s) | 0 | 0 | PASS
+ACFULL2 | testset AC7 chaotic class: the slope of OFLI_B against t equals the mean finite-time exponent (0 pass, 0 fail or error, 0 broken, 15.7 s) | 0 | 0 | PASS
+ACFULL2 | testset AC8 initial-basis independence: any two orthonormal frames agree within ln sqrt(4) (0 pass, 0 fail or error, 0 broken, 2.7 s) | 0 | 0 | PASS
+ACFULL2 | testset AC9 basis-free sandwich: F* - ln sqrt(4) <= OFLI_B <= F* (0 pass, 0 fail or error, 0 broken, 531.4 s) | 0 | 0 | PASS
+ACFULL2 | testset AC10a chains: the sums are bitwise those of FLI and SALI, the companions are the delivered FLI (0 pass, 0 fail or error, 0 broken, 4.5 s) | 0 | 0 | PASS
+ACFULL2 | testset AC10b identities: instantaneous value, sin theta at the maximiser, OFLI <= FLI, the s = 0 floor (0 pass, 0 fail or error, 0 broken, 4.8 s) | 0 | 0 | PASS
+# section FULL2 took 611.1 s
+# Info AC11b reported (R1) | system = :oscillator; first_time_angle_above_0_1 = Inf; ratio_candB_over_candA_at_end = 1.0000000474711213; angle_end = 9.944839052833009e-7
+# Info AC11b reported (R1) | system = :pendulum; first_time_angle_above_0_1 = Inf; ratio_candB_over_candA_at_end = 0.9999998016712929; angle_end = 6.089052805816557e-8
+# Info AC11b reported (R1) | system = :R; first_time_angle_above_0_1 = Inf; ratio_candB_over_candA_at_end = 0.9999999999997868; angle_end = 1.0960250931897892e-12
+# Info AC11b reported (R1) | system = :C; first_time_angle_above_0_1 = 831.0; ratio_candB_over_candA_at_end = 4.493126067183774e-5; angle_end = 0.4433828738300815
+# Info AC11c reported (A1 prediction 2^p) | table = 2; angle_h = 0.0003259172121174938; angle_half = 8.030183074658833e-5; ratio = 4.058652325698572; predicted = 4
+# Info AC11c reported (A1 prediction 2^p) | table = 4; angle_h = 3.7623311659825143e-7; angle_half = 2.3486328656493274e-8; ratio = 16.01923919659679; predicted = 16
+# Info AC11c reported (A1 prediction 2^p) | table = 8; angle_h = 1.289451874196401e-14; angle_half = 1.9290184956889115e-14; ratio = 0.6684497204553231; predicted = 256
+# ofli verification, julia 1.13.2, threads 8, base seed 20261012 + 43000, OF_FULL_RUN = true, groups FULL3, time 1.795005764e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC11b reported (R1) | system = :oscillator; first_time_angle_above_0_1 = Inf; ratio_candB_over_candA_at_end = 1.0000000474711213; angle_end = 9.944839052833009e-7
+# Info AC11b reported (R1) | system = :pendulum; first_time_angle_above_0_1 = Inf; ratio_candB_over_candA_at_end = 0.9999998016712929; angle_end = 6.089052805816557e-8
+# Info AC11b reported (R1) | system = :R; first_time_angle_above_0_1 = Inf; ratio_candB_over_candA_at_end = 0.9999999999997868; angle_end = 1.0960250931897892e-12
+# Info AC11b reported (R1) | system = :C; first_time_angle_above_0_1 = 831.0; ratio_candB_over_candA_at_end = 4.493126067183774e-5; angle_end = 0.4433828738300815
+# Info AC11c reported (A1 prediction 2^p) | table = 2; angle_h = 0.0003259172121174938; angle_half = 8.030183074658833e-5; ratio = 4.058652325698572; predicted = 4
+# Info AC11c reported (A1 prediction 2^p) | table = 4; angle_h = 3.7623311659825143e-7; angle_half = 2.3486328656493274e-8; ratio = 16.01923919659679; predicted = 16
+# Info AC11c reported (A1 prediction 2^p) | table = 8; angle_h = 1.289451874196401e-14; angle_half = 1.9290184956889115e-14; ratio = 0.6684497204553231; predicted = 256

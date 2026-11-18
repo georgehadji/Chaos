@@ -114,3 +114,7 @@ Run: `test/ofli/` only (files `of_ac01_05.jl` to `of_ac16_18.jl` after `of_helpe
 ## Stage 04 note
 
 `verify/ofli.jl` sets `OF_FULL_RUN = true` before including `test/ofli/runtests.jl`, adds the Taylor reference for criteria 3a, 4a, 17, the D_orb chaotic-class gap and device runs for 18, and the thread-count rerun (U11).
+
+## Amendment D119 (2026-11-11)
+
+Spec section "Amendment D119" (owner: "Amend + fix M1-M3"). Test changes: `of_ac1_ratio` bound 32 eps (AC1, AC2); AC4c start q = 0, p = 2 sin(A/2), delta 1e-4; AC10b bound plus 8 eps / sin theta at the maximising column; AC18 regular-class gap plus the 1e-9 gate; AC14e expects `sprint(show, flow)` as the flow record; new testset "D119 field health of ofli_initial, the combined series, the flow record" in `of_ac11_15.jl`. `verify/ofli.jl` Oa and PLATEAUp use the same bounds.

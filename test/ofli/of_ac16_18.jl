@@ -94,7 +94,7 @@ end
                                  max(ofli_initial(flow, cs[Float64][j].x0, cs[Float64][j].W0)[1], Float64(fin[Float64].finals[j][1].ofli1))
                 gb = form == 1 ? max(maximum(ofli_initial(flow, cs[Double64][j].x0, cs[Double64][j].W0)), Float64(fin[Double64].finals[j][1].ofli)) :
                                  max(ofli_initial(flow, cs[Double64][j].x0, cs[Double64][j].W0)[1], Float64(fin[Double64].finals[j][1].ofli1))
-                abs(ga - gb) <= ra.bound + rb.bound || (ngap += 1)
+                abs(ga - gb) <= ra.bound + rb.bound + 1.0e-9 || (ngap += 1)          # Amendment D119: plus the state gate
             end
         end
     end

@@ -177,13 +177,25 @@ end
     p = res.provenance
     res0 = propagate(im, [z0], 40; k = 2, tau = 20, seed = 1)
     @test p.tau == 20 && p.k == 2 && p.precision == res0.provenance.precision
-    @test p.indicator == "ofli" && p.ofli_flow == "HenonHeilesFlow" && p.ofli_replace === true
+    @test p.indicator == "ofli" && p.ofli_flow == sprint(show, flow) && p.ofli_replace === true
     @test reducer_provenance(OFLI(flow; replace = false)).ofli_replace === false
     # h and the flow of the map are held by the map (im.tau, im.flow): the record of the experiment layer compares them with the reducer's identifier (P10)
-    @test im.tau == OF_H && string(nameof(typeof(im.flow))) == p.ofli_flow
+    @test im.tau == OF_H && sprint(show, im.flow) == p.ofli_flow
     # the reducer refuses a state dimension different from the flow's (P11, extended phase space) and a mismatching flow
     @test_throws ArgumentError Chaoslab.reducer_init(OFLI(flow), Float64, Val(6), Val(2))
     @test_throws ArgumentError propagate(im, [z0], 40; k = 2, tau = 20, seed = 1, reducers = (OFLI(HarmonicOscillator(SVector(1.0))),))
+end
+
+@testset "D119 field health of ofli_initial, the combined series, the flow record" begin
+    _ = (OFLI, ofli_initial, ofli_total, reducer_provenance)
+    flow = HenonHeilesFlow(); W = SMatrix{4, 4, Float64}(I)
+    e = of_health_error(() -> ofli_initial(flow, zero(SVector{4, Float64}), W; orbit = 3))
+    @test e isa NumericalHealthError && e.what == "vector field" && e.orbit == 3 && e.step == 0
+    @test of_health_error(() -> ofli_initial(flow, SVector(NaN, 0.0, 0.0, 0.0), W)) isa NumericalHealthError
+    c = of_case(:R, Float64, :o8, 200); g0 = ofli_initial(flow, c.x0, c.W0)
+    fin = last(of_snaps(OFLI(flow), c.im, c.x0, c.W0, 200, 20)); t = ofli_total(fin, g0)
+    @test t.ofli == max(maximum(g0), fin.ofli) && t.ofli1 == max(g0[1], fin.ofli1)
+    @test reducer_provenance(OFLI(HarmonicOscillator(SVector(1.0)))).ofli_flow != reducer_provenance(OFLI(HarmonicOscillator(SVector(1.3)))).ofli_flow
 end
 
 # ------------------------------------------------------------------ AC15: precision ladder

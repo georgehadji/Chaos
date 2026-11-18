@@ -12,7 +12,7 @@ Chaos indicators as reducers of the tangent stream and the pure functions behind
 | `Indicators.jl` | module, exports, include order |
 | `sali.jl`, `alignment.jl` | `SALI` reducer and its isbits state `SALIState` (`k = 2`); `alignment_indices`, `sali_pair`, `sali_from_log`, `sali_floor`, `check_frame` (SALI method) |
 | `gali.jl` | `GALI` reducer and its isbits state `GALIState` (`2 <= k <= d`), `gali_values`, `gali_value`, `gali_floor`, `check_frame` (GALI method); loops over `MMatrix` stack buffers (d = 200 compiles in 0.1 s) |
-| `fli.jl`, `ofli.jl` | `FLI` reducer and its isbits state `FLIState` (`k = 2`), `check_frame` (FLI method), `fli_unlogged`; `OFLI(flow)` reducer and its isbits state `OFLIState` (`1 <= k <= d`), `ofli_initial`, `check_frame` (OFLI method) |
+| `fli.jl`, `ofli.jl` | `FLI` reducer and its isbits state `FLIState` (`k = 2`), `check_frame` (FLI method), `fli_unlogged`; `OFLI(flow)` reducer and its isbits state `OFLIState` (`1 <= k <= d`), `ofli_initial`, `ofli_total`, `check_frame` (OFLI method) |
 | `megno.jl` | `MEGNO` reducer and its isbits state `MEGNOState` (`k = 2`, five compensated sums per column), `check_frame` (MEGNO method) |
 | `rli.jl` | `RLI` reducer and its isbits state `RLIState` (`k = 2`, pair frame), `check_frame` (RLI method), `pair_start`, `pair_distance` |
 | `naff_fft.jl`, `naff.jl`, `naff_map.jl` | series path (E1): radix-2 FFT for the coarse search; `window_weights`, `window_frequency` (`WindowFrequency`); `frequency_map` (`FrequencyMap`), `check_frequency_map`, `circle_distance`, `frequency_distance`, `frequency_index` |

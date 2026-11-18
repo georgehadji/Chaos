@@ -1,0 +1,317 @@
+# ofli stage 04 verify log: concatenation of the per-group logs of verify/ofli.jl (one process per group, OF_ONLY, OF_LOG), run 2026-11-11; order: FULL1 to FULL4, Oa, Ob1 to Ob3, Oc, PLATEAUp, PLATEAUf, Od, R2, R4, R5, AC16T, AC18r, then diagnostic notes
+# ===== group FULL1 =====
+# ofli verification, julia 1.13.2, threads 4, base seed 20261012 + 43000, OF_FULL_RUN = true, groups FULL1, time 1.794420012e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC3b reported | table = 2; form = :err1; error_h01 = 0.0021123751296148185; error_h005 = 0.0005031089704294472; max_to_t1000 = 0.001045890068928662
+# Info AC3b reported | table = 2; form = :errB; error_h01 = 0.0021123751296148185; error_h005 = 0.0005031089704294472; max_to_t1000 = 0.001045890068928662
+# Info AC3b reported | table = 4; form = :err1; error_h01 = 1.3246030125493857e-5; error_h005 = 8.387117012287337e-7; max_to_t1000 = 3.685879709869333e-5
+# Info AC3b reported | table = 4; form = :errB; error_h01 = 1.3246030125493857e-5; error_h005 = 8.387117012287337e-7; max_to_t1000 = 3.685879709869333e-5
+# Info AC4c reported (R1) | amplitude = 2.0; tstar_h_1_4 = 5727.0; tstar_h_1_8 = Inf; tstar_h_1_20 = Inf
+# Info AC4c reported (R1) | amplitude = 3.0; tstar_h_1_4 = 2364.0; tstar_h_1_8 = Inf; tstar_h_1_20 = Inf
+# Info AC5 reported | period = 6.075615784322902; trace = -0.9035017068164999; Tprime = -1.3465966585961553
+# Info AC5c reported (R1) | dG = 0.0018952709775938992; dFLI = 2.152820560045935
+# Info AC5c reported (R1) | dG = 0.0005358767022936028; dFLI = 1.8833932763959216
+ACFULL1 | file total (78 pass, 0 fail, 0 error, 0 broken, 11.6 s) | 78 | 0 fail, 0 error | PASS
+ACFULL1 | testset AC1 algebra on the free particle, d = 4 (exact step, closed form) (0 pass, 0 fail or error, 0 broken, 1.6 s) | 0 | 0 | PASS
+ACFULL1 | testset AC1 negative controls (test-side doubles, no module name) (0 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL1 | testset AC2 free particle d = 2 (0 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3a oscillator: the exact-flow identity (the oracle itself, 256 bits) (0 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3b oscillator: order of the discretization error of the OFLI (order-2 and order-4 tables) (0 pass, 0 fail or error, 0 broken, 1.1 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3c controls: doubles with one defect fail the closed form (no module name) (0 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL1 | testset AC4a pendulum: the exact-flow identity on the reference (Double64 order-10 stand-in; the 1e-30 Taylor form is stage 04) (0 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL1 | testset AC4b pendulum: the exact OFLI_1 is periodic (continuous minimum), the exact FLI_1 grows as ln t (0 pass, 0 fail or error, 0 broken, 4.9 s) | 0 | 0 | PASS
+ACFULL1 | testset AC4c pendulum: the numerical OFLI against the exact one, order-4 table at h = 1/20 (0 pass, 0 fail or error, 0 broken, 0.6 s) | 0 | 0 | PASS
+ACFULL1 | testset AC5 periodic orbit of F3: bounded OFLI against linearly growing FLI (0 pass, 0 fail or error, 0 broken, 0.8 s) | 0 | 0 | PASS
+# section FULL1 took 11.7 s
+# ===== group FULL2 =====
+# ofli verification, julia 1.13.2, threads 4, base seed 20261012 + 43000, OF_FULL_RUN = true, groups FULL2, time 1.794420052e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC6 reported | slope_R = 1.0021627013622858; slopes_regular = [1.003254039942283, 1.0038348828389942, 1.0196724074835017, 0.5634559923630367, 1.0010635238174617, 1.0036543489982193, 1.0896106881308247, 1.0025533988015136, 0.9941062123467567, 1.0074085952673066, 1.0025537759065817, 1.00260638957417, 1.002093350299824, 1.0147955084547209, 1.0036027572588047, 1.0030416369862722, 0.9370324358042535, 1.0046251139268245, 1.0133672761533072, 1.0024095332037652]; sali_regular = [0.4609587151206816, 0.6006533657803165, 0.15825986053053187, 0.047871817758743634, 0.8537262066355918, 1.2219471956802888, 0.4965788734135897, 0.9088481418984182, 0.5202352635358831, 0.6902290321449842, 1.0084360199611266, 0.24165095191124095, 1.4065000427722083, 0.07928363056909501, 0.8300365400001378, 1.0074181798706185, 0.08039621253199701, 0.31123769416243097, 0.24766274276575476, 0.39066397653319523]
+# Info AC7 reported (R2) | median_FLI_minus_OFLI = 0.17031246455704974; mean_slope = 0.049252630507920434; mean_lambda = 0.04976161260638519
+# Info AC8 reported | orbit = :R; t = 1000.0; spread = 0.3513244155706001; bound = 0.6931471805599453
+# Info AC8 reported | orbit = :R; t = 10000.0; spread = 0.3539931130043419; bound = 0.6931471805599453
+# Info AC8 reported | orbit = :C; t = 1000.0; spread = 0.29231313225644584; bound = 0.6931471805599453
+# Info AC8 reported | orbit = :C; t = 10000.0; spread = 0.29231313225830036; bound = 0.6931471805599453
+# Info AC9 reported: (F* - OFLI_B) / ln sqrt(4) at the last step | quantiles = (0.001234138011125811, 0.3907089593631914, 0.7308064606432111)
+ACFULL2 | file total (839 pass, 2 fail, 0 error, 0 broken, 555.5 s) | 839 | 0 fail, 0 error | FAIL
+ACFULL2 | testset AC6 quasi-periodic orbit R and the regular class: log OFLI_B grows like ln t (0 pass, 0 fail or error, 0 broken, 55.7 s) | 0 | 0 | PASS
+ACFULL2 | testset AC7 chaotic class: the slope of OFLI_B against t equals the mean finite-time exponent (0 pass, 0 fail or error, 0 broken, 16.1 s) | 0 | 0 | PASS
+ACFULL2 | testset AC8 initial-basis independence: any two orthonormal frames agree within ln sqrt(4) (0 pass, 0 fail or error, 0 broken, 3.0 s) | 0 | 0 | PASS
+ACFULL2 | testset AC9 basis-free sandwich: F* - ln sqrt(4) <= OFLI_B <= F* (0 pass, 0 fail or error, 0 broken, 472.9 s) | 0 | 0 | PASS
+ACFULL2 | testset AC10a chains: the sums are bitwise those of FLI and SALI, the companions are the delivered FLI (0 pass, 0 fail or error, 0 broken, 4.1 s) | 0 | 0 | PASS
+ACFULL2 | testset AC10b identities: instantaneous value, sin theta at the maximiser, OFLI <= FLI, the s = 0 floor (0 pass, 2 fail or error, 0 broken, 3.3 s) | 2 | 0 | FAIL
+FULL2 | ERROR | Some tests did not pass: 839 passed, 2 failed, 0 errored, 0 broken. | - | FAIL
+# section FULL2 took 556.0 s
+# ===== group FULL3 =====
+# ofli verification, julia 1.13.2, threads 4, base seed 20261012 + 43000, OF_FULL_RUN = true, groups FULL3, time 1.794420052e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC11b reported (R1) | system = :oscillator; first_time_angle_above_0_1 = Inf; ratio_candB_over_candA_at_end = 1.0000000474711213; angle_end = 9.944839052833009e-7
+# Info AC11b reported (R1) | system = :pendulum; first_time_angle_above_0_1 = Inf; ratio_candB_over_candA_at_end = 0.9999998016712929; angle_end = 6.089052805816557e-8
+# Info AC11b reported (R1) | system = :R; first_time_angle_above_0_1 = Inf; ratio_candB_over_candA_at_end = 0.9999999999997868; angle_end = 1.0960250931897892e-12
+# Info AC11b reported (R1) | system = :C; first_time_angle_above_0_1 = 831.0; ratio_candB_over_candA_at_end = 4.493126067183774e-5; angle_end = 0.4433828738300815
+# Info AC11c reported (A1 prediction 2^p) | table = 2; angle_h = 0.0003259172121174938; angle_half = 8.030183074658833e-5; ratio = 4.058652325698572; predicted = 4
+# Info AC11c reported (A1 prediction 2^p) | table = 4; angle_h = 3.7623311659825143e-7; angle_half = 2.3486328656493274e-8; ratio = 16.01923919659679; predicted = 16
+# Info AC11c reported (A1 prediction 2^p) | table = 8; angle_h = 1.289451874196401e-14; angle_half = 1.9290184956889115e-14; ratio = 0.6684497204553231; predicted = 256
+# Info AC12 reported (R3) | max_error_over_bound = 0.1393180161987809; median_ratio = 0.0004435004636694959; rows = 17136; maximiser_differs = 0
+# Info AC13 reported: OFLI_1 - OFLI_tau at n = 1000 | orbit = :R; diffs = [-1.7763568394002505e-15, 0.0003720076956406082, 0.007652280221507102]
+# Info AC13 reported: OFLI_1 - OFLI_tau at n = 1000 | orbit = :C; diffs = [5.329070518200751e-15, 1.7763568394002505e-15, 8.881784197001252e-16]
+# Info AC15a reported (R3) | bigfloat_error_over_bound = 0.0010494240642598053
+# Info AC15b reported | G = 3789.370664795094; error_over_bound = 0.0007328203020220134
+ACFULL3 | file total (376 pass, 0 fail, 0 error, 0 broken, 886.0 s) | 376 | 0 fail, 0 error | PASS
+ACFULL3 | testset AC11a direction candidates: the rigorous bound |OFLI_A - OFLI_B| <= sin(angle) ||w|| (0 pass, 0 fail or error, 0 broken, 1.6 s) | 0 | 0 | PASS
+ACFULL3 | testset AC11c direction candidates: the angle at fixed t for the order-4 and order-8 tables (reported) (0 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12 same-orbit reference: |G - G_ref| <= B_G for both forms, Float64 and Double64 (0 pass, 0 fail or error, 0 broken, 718.9 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12 negative control: a single-precision projection exceeds B_G at n = 1e3 (test-side double) (0 pass, 0 fail or error, 0 broken, 1.3 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13 schedule: OFLI_tau(n) <= OFLI_1(n) + 2 B_G (0 pass, 0 fail or error, 0 broken, 1.0 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14a vector field: an equilibrium start is a health error at the first handoff, with orbit id and step (0 pass, 0 fail or error, 0 broken, 1.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14b deviation matrix: a zero tangent is a health error naming the column and the step (0 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14c frames: a supplied single vector parallel to the flow is refused before any work, the basis is accepted (0 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14d chains: the orbit is bitwise unchanged, a non-replacing OFLI changes nothing for the others (0 pass, 0 fail or error, 0 broken, 1.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14e run record and dimension guard (0 pass, 0 fail or error, 0 broken, 0.8 s) | 0 | 0 | PASS
+ACFULL3 | testset AC15a precision ladder: Float64, Double64 and BigFloat(256) agree, BigFloat against its own reference (0 pass, 0 fail or error, 0 broken, 88.7 s) | 0 | 0 | PASS
+ACFULL3 | testset AC15b representation: OFLI_B above 709.78 is finite, not clipped, and the display conversion reports the overflow (0 pass, 0 fail or error, 0 broken, 70.4 s) | 0 | 0 | PASS
+# section FULL3 took 886.2 s
+# ===== group FULL4 =====
+# ofli verification, julia 1.13.2, threads 4, base seed 20261012 + 43000, OF_FULL_RUN = true, groups FULL4, time 1.794420052e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC16 reported | threads = 4; starts = 4096
+# Info AC17 reported: order-4 table, error at t = 10, 30, 60 | orbit = :R; errors = [1.2767121343681964e-5, 1.4559918731338328e-5, 1.7031697509661825e-5]
+# Info AC17 reported: order-4 table, error at t = 10, 30, 60 | orbit = :C; errors = [5.1870686541555244e-6, 7.154939280606953e-6, 0.0005802727944388408]
+# Info AC18 reported | orbits_in_agreement = 235
+ACFULL4 | file total (21 pass, 1 fail, 0 error, 0 broken, 3459.8 s) | 21 | 0 fail, 0 error | FAIL
+ACFULL4 | testset AC16a execution invariance: chunk sizes and the serial body give bitwise identical series (0 pass, 0 fail or error, 0 broken, 288.8 s) | 0 | 0 | PASS
+ACFULL4 | testset AC16b the hot loop allocates nothing after warm-up (0 pass, 0 fail or error, 0 broken, 2.0 s) | 0 | 0 | PASS
+ACFULL4 | testset AC17 external reference, package stand-in: order-8 table at h = 1/20 against the Double64 order-10 reference (the Taylor form is stage 04) (0 pass, 0 fail or error, 0 broken, 0.8 s) | 0 | 0 | PASS
+ACFULL4 | testset AC18 CPU part: each backend against its own reference, the gap rule, the fallback (0 pass, 1 fail or error, 0 broken, 3167.9 s) | 1 | 0 | FAIL
+FULL4 | ERROR | Some tests did not pass: 21 passed, 1 failed, 0 errored, 0 broken. | - | FAIL
+# section FULL4 took 3460.2 s
+# ===== group Oa =====
+# ofli verification, julia 1.13.2, threads 2, base seed 20261012 + 43000, OF_FULL_RUN = true, groups Oa, time 1.794420393e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Oa: free particle in BigFloat(256), h = 1/16, N = 10000 steps, p0 = (0.6, 0.8) for d = 4 and 0.5 for d = 2, canonical frame, one single-column run per column (OFLI_1 of each column)
+# Oa:   d = 4 tau = 1 column 1 n = 100: |error| / eps = 0
+# Oa:   d = 4 tau = 1 column 1 n = 1000: |error| / eps = 0
+# Oa:   d = 4 tau = 1 column 1 n = 10000: |error| / eps = 0
+# Oa:   d = 4 tau = 1 column 2 n = 100: |error| / eps = 1
+# Oa:   d = 4 tau = 1 column 2 n = 1000: |error| / eps = 1
+# Oa:   d = 4 tau = 1 column 2 n = 10000: |error| / eps = 1
+# Oa:   d = 4 tau = 1 column 3 n = 100: |error| / eps = 2
+# Oa:   d = 4 tau = 1 column 3 n = 1000: |error| / eps = 8
+# Oa:   d = 4 tau = 1 column 3 n = 10000: |error| / eps = 4
+# Oa:   d = 4 tau = 1 column 4 n = 100: |error| / eps = 1
+# Oa:   d = 4 tau = 1 column 4 n = 1000: |error| / eps = 6
+# Oa:   d = 4 tau = 1 column 4 n = 10000: |error| / eps = 4
+AC1 | Oa: free particle d = 4, BigFloat(256), tau = 1, N = 10000: worst error / (16 eps max(1, |g|)) over 4 single columns (2 constant, 2 growing like ln t; minus-infinity column agrees with the closed form) | 0.356 | <= 1 | PASS
+# Oa:   d = 4 tau = 10 column 1 n = 100: |error| / eps = 0
+# Oa:   d = 4 tau = 10 column 1 n = 1000: |error| / eps = 0
+# Oa:   d = 4 tau = 10 column 1 n = 10000: |error| / eps = 0
+# Oa:   d = 4 tau = 10 column 2 n = 100: |error| / eps = 1
+# Oa:   d = 4 tau = 10 column 2 n = 1000: |error| / eps = 1
+# Oa:   d = 4 tau = 10 column 2 n = 10000: |error| / eps = 1
+# Oa:   d = 4 tau = 10 column 3 n = 100: |error| / eps = 1
+# Oa:   d = 4 tau = 10 column 3 n = 1000: |error| / eps = 24
+# Oa:   d = 4 tau = 10 column 3 n = 10000: |error| / eps = 28
+# Oa:   d = 4 tau = 10 column 4 n = 100: |error| / eps = 0
+# Oa:   d = 4 tau = 10 column 4 n = 1000: |error| / eps = 26
+# Oa:   d = 4 tau = 10 column 4 n = 10000: |error| / eps = 28
+AC1 | Oa: free particle d = 4, BigFloat(256), tau = 10, N = 10000: worst error / (16 eps max(1, |g|)) over 4 single columns (2 constant, 2 growing like ln t; minus-infinity column agrees with the closed form) | 0.8897 | <= 1 | PASS
+# Oa:   d = 2 tau = 1 column 2 n = 100: |error| / eps = 4
+# Oa:   d = 2 tau = 1 column 2 n = 1000: |error| / eps = 10
+# Oa:   d = 2 tau = 1 column 2 n = 10000: |error| / eps = 20
+AC1 | Oa: free particle d = 2, BigFloat(256), tau = 1, N = 10000: worst error / (16 eps max(1, |g|)) over 2 single columns (2 constant, 0 growing like ln t; minus-infinity column agrees with the closed form) | 1.25 | <= 1 | FAIL
+# Oa:   d = 2 tau = 10 column 2 n = 100: |error| / eps = 1
+# Oa:   d = 2 tau = 10 column 2 n = 1000: |error| / eps = 8
+# Oa:   d = 2 tau = 10 column 2 n = 10000: |error| / eps = 8
+AC1 | Oa: free particle d = 2, BigFloat(256), tau = 10, N = 10000: worst error / (16 eps max(1, |g|)) over 2 single columns (2 constant, 0 growing like ln t; minus-infinity column agrees with the closed form) | 0.5 | <= 1 | PASS
+AC3 | Oa: oscillator F1 omega = 1.3, (q, p) = (1, 0.3), Taylor order 40, abstol 2^-200, 256 bits, 100 sample times in [0.37, 99]: max relative |norm(P w) - |gradH0.w0| / norm(f)| | 1.655e-62 | <= 1e-30 | PASS
+AC4 | Oa: pendulum F4 amplitude 2 (turning point start), Taylor order 40, abstol 2^-200, 256 bits, 100 sample times in [0.37, 99]: max relative |norm(P w) - |gradH0.w0| / norm(f)| | 1.237e-61 | <= 1e-30 | PASS
+AC4 | Oa: pendulum F4 amplitude 2 from q = 0 (not a turning point), Taylor order 40, abstol 2^-200, 256 bits, 100 sample times in [0.37, 99]: max relative |norm(P w) - |gradH0.w0| / norm(f)| | 6.833e-62 | <= 1e-30 | PASS
+AC4 | Oa: pendulum F4 amplitude 3 (turning point start), Taylor order 40, abstol 2^-200, 256 bits, 100 sample times in [0.37, 99]: max relative |norm(P w) - |gradH0.w0| / norm(f)| | 3.126e-61 | <= 1e-30 | PASS
+AC4 | Oa: pendulum F4 amplitude 3 from q = 0 (not a turning point), Taylor order 40, abstol 2^-200, 256 bits, 100 sample times in [0.37, 99]: max relative |norm(P w) - |gradH0.w0| / norm(f)| | 6.928e-62 | <= 1e-30 | PASS
+# Oa: Newton iteration 1: closure |R(x) - x| = 4.68e-15
+# Oa: Newton iteration 2: closure |R(x) - x| = 9.21e-31
+# Oa: Newton iteration 3: closure |R(x) - x| = 3.52e-61
+# Oa: Newton iteration 4: closure |R(x) - x| = 1.57e-77
+AC5 | Oa: period-1 orbit of F3 at E = 1/8, 256 bits: closure |R(x) - x| after Newton | 1.567e-77 | <= 1e-30 | PASS
+AC5 | Oa: period T (section time of the orbit), 256 bits | 6.076 | report | INFO
+AC5 | Oa: reduced monodromy A: trace, det - 1 (A2: |tr A| < 2) | -0.9035 ; -7.726e-48 | |tr A| < 2, |det - 1| < 1e-6 | PASS
+AC5 | Oa: T'(E) at E = 1/8 (central difference, dE = 2^-30, fixed point re-solved at 256 bits) | -1.347 | not zero (O6 e); package AC5: -1.347 | PASS
+# Oa: exact series, canonical frame, 8199 Taylor steps, 565.1 s
+AC5a | Oa: exact (Taylor 256 bits) series on the period-1 orbit, canonical frame, OFLI_B(100 T) - OFLI_B(10 T) with 10 T -> 61, 100 T -> 608 | 0.001896 | <= 0.1 | PASS
+AC5a | Oa: exact series, canonical frame, FLI_B(100 T) - FLI_B(10 T) | 2.153 | >= 1.5 (ln 10 = 2.30 expected) | PASS
+# Oa: exact series, seeded (of_frame) frame, 8183 Taylor steps, 480.6 s
+AC5a | Oa: exact (Taylor 256 bits) series on the period-1 orbit, seeded (of_frame) frame, OFLI_B(100 T) - OFLI_B(10 T) with 10 T -> 61, 100 T -> 608 | 0.0009218 | <= 0.1 | PASS
+AC5a | Oa: exact series, seeded (of_frame) frame, FLI_B(100 T) - FLI_B(10 T) | 2.223 | >= 1.5 (ln 10 = 2.30 expected) | PASS
+# section Oa took 1354.6 s
+# ===== group Ob1 =====
+# ofli verification, julia 1.13.2, threads 2, base seed 20261012 + 43000, OF_FULL_RUN = true, groups Ob1, time 1.794420487e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Ob1 REDUCTION: orbits R and C at N = 10000 steps (t = 500) with checkpoints every 100 steps (spec criterion 9 horizon list reaches 1e4 steps; the BigFloat product at N = 1e4 is the cost)
+# Ob R, C: 2 orbits x 2 frames, N = 10000 steps, tau = 10, checkpoints every 100 steps, 34.2 s
+AC9 | Ob R, C: sandwich F* - ln 2 - B_G <= OFLI_B <= F* + B_G, F* from the BigFloat(256) singular values of P Y (Jacobi, independent): violations over 800 rows | 0 | 0 | PASS
+AC9 | Ob R, C: the same sandwich on the BigFloat reference series itself (slack 1e-12): violations | 0 | 0 | PASS
+AC9 | Ob R, C: (F* - OFLI_B) / ln 2 at the last step: min, median, max (must lie in [0, 1]) | 0.154 ; 0.4986 ; 0.6265 | [0, 1] | PASS
+AC12 | Ob R, C: Float64, order-8, same-orbit BigFloat reference, both forms, 800 rows: max error / B_G (R3) | 0.04164 | <= 1 | PASS
+AC12 | Ob R, C: rows whose maximiser differs between computed and reference series | 0 | report | INFO
+# section Ob1 took 34.2 s
+# ===== group Ob2 =====
+# ofli verification, julia 1.13.2, threads 2, base seed 20261012 + 43000, OF_FULL_RUN = true, groups Ob2, time 1.794420487e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Ob2 REDUCTION: 20 regular-class starts at N = 2000 steps (t = 100), tau = 10 (spec: 20 starts per class; horizon reduced from 1e4 steps for the cost of the BigFloat products)
+# Ob regular class: 20 orbits x 2 frames, N = 2000 steps, tau = 10, checkpoints every 100 steps, 80.5 s
+AC9 | Ob regular class: sandwich F* - ln 2 - B_G <= OFLI_B <= F* + B_G, F* from the BigFloat(256) singular values of P Y (Jacobi, independent): violations over 1600 rows | 0 | 0 | PASS
+AC9 | Ob regular class: the same sandwich on the BigFloat reference series itself (slack 1e-12): violations | 0 | 0 | PASS
+AC9 | Ob regular class: (F* - OFLI_B) / ln 2 at the last step: min, median, max (must lie in [0, 1]) | 0.007814 ; 0.3941 ; 0.6702 | [0, 1] | PASS
+AC12 | Ob regular class: Float64, order-8, same-orbit BigFloat reference, both forms, 1600 rows: max error / B_G (R3) | 0.1035 | <= 1 | PASS
+AC12 | Ob regular class: rows whose maximiser differs between computed and reference series | 0 | report | INFO
+# section Ob2 took 80.5 s
+# ===== group Ob3 =====
+# ofli verification, julia 1.13.2, threads 2, base seed 20261012 + 43000, OF_FULL_RUN = true, groups Ob3, time 1.794420487e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Ob3 REDUCTION: 20 chaotic-class starts at N = 2000 steps (t = 100), tau = 10 (spec: 20 starts per class; horizon reduced from 1e4 steps for the cost of the BigFloat products)
+# Ob chaotic class: 20 orbits x 2 frames, N = 2000 steps, tau = 10, checkpoints every 100 steps, 80.3 s
+AC9 | Ob chaotic class: sandwich F* - ln 2 - B_G <= OFLI_B <= F* + B_G, F* from the BigFloat(256) singular values of P Y (Jacobi, independent): violations over 1600 rows | 0 | 0 | PASS
+AC9 | Ob chaotic class: the same sandwich on the BigFloat reference series itself (slack 1e-12): violations | 0 | 0 | PASS
+AC9 | Ob chaotic class: (F* - OFLI_B) / ln 2 at the last step: min, median, max (must lie in [0, 1]) | 0.001177 ; 0.3677 ; 0.7311 | [0, 1] | PASS
+AC12 | Ob chaotic class: Float64, order-8, same-orbit BigFloat reference, both forms, 1600 rows: max error / B_G (R3) | 0.04645 | <= 1 | PASS
+AC12 | Ob chaotic class: rows whose maximiser differs between computed and reference series | 0 | report | INFO
+# section Ob3 took 80.3 s
+# ===== group Oc =====
+# ofli verification, julia 1.13.2, threads 2, base seed 20261012 + 43000, OF_FULL_RUN = true, groups Oc, time 1.794420489e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Oc: reference = Taylor order 40, abstol 2^-200, 256 bits, state + 4 variational columns (hand-written field), OFLI_B from O1 with the exact field at the reference points at integer times; frame = seeded of_frame; numerics: order-8 (KahanLi) and order-4 (ForestRuth) tables, h = 1/20, tau = 20
+# Oc: orbit R, reference to t = 1000: 13895 Taylor steps, 1026.9 s
+AC17 | Oc: orbit R, t = 10, order-8 table h = 1/20: |OFLI_B,num - OFLI_B,Taylor| (OFLI_B,Taylor = 1.074) | 8.66e-15 | <= delta_8 = 1e-6 | PASS
+AC17 | Oc: orbit R, t = 10, order-4 table h = 1/20: error (reported), ratio to the order-8 error | 6.79e-06 ; 7.841e+08 | report | INFO
+AC17 | Oc: orbit R, t = 30, order-8 table h = 1/20: |OFLI_B,num - OFLI_B,Taylor| (OFLI_B,Taylor = 1.782) | 1.155e-14 | <= delta_8 = 1e-6 | PASS
+AC17 | Oc: orbit R, t = 30, order-4 table h = 1/20: error (reported), ratio to the order-8 error | 1.332e-05 ; 1.154e+09 | report | INFO
+AC17 | Oc: orbit R, t = 60, order-8 table h = 1/20: |OFLI_B,num - OFLI_B,Taylor| (OFLI_B,Taylor = 2.812) | 9.326e-15 | <= delta_8 = 1e-6 | PASS
+AC17 | Oc: orbit R, t = 60, order-4 table h = 1/20: error (reported), ratio to the order-8 error | 1.909e-05 ; 2.047e+09 | report | INFO
+AC17 | Oc: orbit R, t = 100: order-8 error ; order-4 error (reported) | 1.732e-14 ; 1.175e-05 | report | INFO
+AC17 | Oc: orbit R, t = 300: order-8 error ; order-4 error (reported) | 5.16e-13 ; 5.162e-07 | report | INFO
+AC17 | Oc: orbit R, t = 1000: order-8 error ; order-4 error (reported) | 6.741e-13 ; 5.424e-05 | report | INFO
+AC17 | Oc: orbit R to t = 1000: max over integer t of the order-8 error | 9.539e-13 | report | INFO
+# Oc: orbit C, reference to t = 60: 795 Taylor steps, 45.8 s
+AC17 | Oc: orbit C, t = 10, order-8 table h = 1/20: |OFLI_B,num - OFLI_B,Taylor| (OFLI_B,Taylor = 1.082) | 5.329e-15 | <= delta_8 = 1e-6 | PASS
+AC17 | Oc: orbit C, t = 10, order-4 table h = 1/20: error (reported), ratio to the order-8 error | 4.719e-06 ; 8.855e+08 | report | INFO
+AC17 | Oc: orbit C, t = 30, order-8 table h = 1/20: |OFLI_B,num - OFLI_B,Taylor| (OFLI_B,Taylor = 3.017) | 3.819e-14 | <= delta_8 = 1e-6 | PASS
+AC17 | Oc: orbit C, t = 30, order-4 table h = 1/20: error (reported), ratio to the order-8 error | 5.227e-06 ; 1.369e+08 | report | INFO
+AC17 | Oc: orbit C, t = 60, order-8 table h = 1/20: |OFLI_B,num - OFLI_B,Taylor| (OFLI_B,Taylor = 4.346) | 6.564e-13 | <= delta_8 = 1e-6 | PASS
+AC17 | Oc: orbit C, t = 60, order-4 table h = 1/20: error (reported), ratio to the order-8 error | 0.0005503 ; 8.385e+08 | report | INFO
+# section Oc took 1073.3 s
+# ===== group PLATEAUp =====
+# ofli verification, julia 1.13.2, threads 2, base seed 20261012 + 43000, OF_FULL_RUN = true, groups PLATEAUp, time 1.794420616e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# PLATEAUp REDUCTION: reference horizon Tmax = 1000000 time units, 10^6/(2 pi) periods or more (a t* above Tmax is reported as > Tmax); reference = Double64 order-10 table at h = 1/20 (state only), exact OFLI_1 from O5: G(t) = ln |gradH0.w0| - running min ln ||f(z(t))||
+# PLATEAUp: amplitude 2, start q = 0, p = 1.682942, period P = 8.349753, reference 150.0 s
+AC4c | PLATEAUp: pendulum amplitude 2, start q = 0, order-4 table, h = 1/2: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 83; departure at Tmax | 368 ; 0.008162 ; 7.075 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, start q = 0, order-4 table, h = 1/4: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 83; departure at Tmax | 5737 ; 0.0004508 ; 4.248 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, start q = 0, order-4 table, h = 1/8: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 83; departure at Tmax | 9.085e+04 ; 2.872e-05 ; 1.594 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, start q = 0, order-4 table, h = 1/16: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 83; departure at Tmax | > 1000000 ; 1.807e-06 ; 0.01937 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, start q = 0, order-4 table, h = 1/20: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 83; departure at Tmax | > 1000000 ; 7.41e-07 ; 0.003092 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, order-4 table h = 1/20, start q = 0: max |OFLI_num - OFLI_exact| for t <= 10 P (= 83) | 7.41e-07 | <= delta = 1e-5 (stage 02 calibration) | PASS
+AC4c | PLATEAUp: pendulum amplitude 2, order-4: t*(h/2) / t*(h = 1/2) against 2^4 = 16 (R1, prediction O11 ii: t* ~ h^-p) | 15.59 (t* 368, 5737) | report, within a factor 2 of 2^p | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, order-4: t*(h/2) / t*(h = 1/4) against 2^4 = 16 (R1, prediction O11 ii: t* ~ h^-p) | 15.84 (t* 5737, 9.085e+04) | report, within a factor 2 of 2^p | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, order-4: t*(h/2) / t*(h = 1/8) against 2^4 = 16 (R1, prediction O11 ii: t* ~ h^-p) | not both below Tmax (9.085e+04, Inf) | report, within a factor 2 of 2^p | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, start q = 0, order-8 table, h = 1/1: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 83; departure at Tmax | 624 ; 0.001339 ; 4.989 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, start q = 0, order-8 table, h = 1/2: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 83; departure at Tmax | > 1000000 ; 2.521e-07 ; 0.006608 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, start q = 0, order-8 table, h = 1/4: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 83; departure at Tmax | > 1000000 ; 7.207e-10 ; 1.473e-09 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, start q = 0, order-8 table, h = 1/20: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 83; departure at Tmax | > 1000000 ; 7.772e-15 ; 1.2e-06 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, order-8: t*(h/2) / t*(h = 1/1) against 2^8 = 256 (R1, prediction O11 ii: t* ~ h^-p) | not both below Tmax (624, Inf) | report, within a factor 2 of 2^p | INFO
+AC4c | PLATEAUp: pendulum amplitude 2, order-8: t*(h/2) / t*(h = 1/2) against 2^8 = 256 (R1, prediction O11 ii: t* ~ h^-p) | not both below Tmax (Inf, Inf) | report, within a factor 2 of 2^p | INFO
+# PLATEAUp: amplitude 3, start q = 0, p = 1.994990, period P = 16.155539, reference 122.7 s
+AC4c | PLATEAUp: pendulum amplitude 3, start q = 0, order-4 table, h = 1/2: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 161; departure at Tmax | 4 ; 0.3266 ; 8.639 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, start q = 0, order-4 table, h = 1/4: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 161; departure at Tmax | 2411 ; 0.009098 ; 6.024 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, start q = 0, order-4 table, h = 1/8: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 161; departure at Tmax | 3.774e+04 ; 0.001273 ; 3.256 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, start q = 0, order-4 table, h = 1/16: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 161; departure at Tmax | 6.014e+05 ; 8.602e-05 ; 0.5269 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, start q = 0, order-4 table, h = 1/20: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 161; departure at Tmax | > 1000000 ; 3.509e-05 ; 0.003101 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, order-4 table h = 1/20, start q = 0: max |OFLI_num - OFLI_exact| for t <= 10 P (= 161) | 3.509e-05 | <= delta = 1e-5 (stage 02 calibration) | FAIL
+AC4c | PLATEAUp: pendulum amplitude 3, order-4: t*(h/2) / t*(h = 1/2) against 2^4 = 16 (R1, prediction O11 ii: t* ~ h^-p) | 602.8 (t* 4, 2411) | report, within a factor 2 of 2^p | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, order-4: t*(h/2) / t*(h = 1/4) against 2^4 = 16 (R1, prediction O11 ii: t* ~ h^-p) | 15.65 (t* 2411, 3.774e+04) | report, within a factor 2 of 2^p | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, order-4: t*(h/2) / t*(h = 1/8) against 2^4 = 16 (R1, prediction O11 ii: t* ~ h^-p) | 15.93 (t* 3.774e+04, 6.014e+05) | report, within a factor 2 of 2^p | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, start q = 0, order-8 table, h = 1/1: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 161; departure at Tmax | 12 ; 0.9015 ; 9.709 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, start q = 0, order-8 table, h = 1/2: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 161; departure at Tmax | 1.413e+04 ; 0.0001385 ; 1.722 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, start q = 0, order-8 table, h = 1/4: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 161; departure at Tmax | > 1000000 ; 7.616e-08 ; 3.542e-08 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, start q = 0, order-8 table, h = 1/20: t* (first t with |OFLI_1,num - OFLI_1,exact| > 0.05); max departure for t <= 10 P = 161; departure at Tmax | > 1000000 ; 6.511e-12 ; 2.016e-05 | report (R1) | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, order-8: t*(h/2) / t*(h = 1/1) against 2^8 = 256 (R1, prediction O11 ii: t* ~ h^-p) | 1178 (t* 12, 1.413e+04) | report, within a factor 2 of 2^p | INFO
+AC4c | PLATEAUp: pendulum amplitude 3, order-8: t*(h/2) / t*(h = 1/2) against 2^8 = 256 (R1, prediction O11 ii: t* ~ h^-p) | not both below Tmax (1.413e+04, Inf) | report, within a factor 2 of 2^p | INFO
+# section PLATEAUp took 358.6 s
+# ===== group PLATEAUf =====
+# ofli verification, julia 1.13.2, threads 2, base seed 20261012 + 43000, OF_FULL_RUN = true, groups PLATEAUf, time 1.794420616e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# PLATEAUf REDUCTION: reference horizon Tmax = 200000 time units = 32918 periods (the spec checks 100 T; t* above Tmax is reported as > Tmax); reference = Double64 order-10 table at h = 1/20 with tangent, seeded frame, k = 4; closure of the Float64 start 3.664e-15
+# PLATEAUf: reference done, 158.3 s; reference OFLI_B(10 T) = 1.212991, OFLI_B(100 T) = 1.213896, OFLI_B(Tmax) = 1.214232
+AC5c | PLATEAUf: F3 period-1 orbit, order-4 table, h = 1/4: t* (departure of OFLI_B from the reference above 0.05); max departure for t <= 100 T; OFLI_B(100 T) - OFLI_B(10 T) numerical; FLI_B(100 T) - FLI_B(10 T) numerical | 2816 ; 0.006741 ; 0.01308 ; 2.234 | report (R1); dG <= 0.1, dFLI >= 1.5 for order 8 | INFO
+AC5c | PLATEAUf: F3 period-1 orbit, order-4 table, h = 1/8: t* (departure of OFLI_B from the reference above 0.05); max departure for t <= 100 T; OFLI_B(100 T) - OFLI_B(10 T) numerical; FLI_B(100 T) - FLI_B(10 T) numerical | 4.134e+04 ; 0.0005501 ; 0.001778 ; 2.171 | report (R1); dG <= 0.1, dFLI >= 1.5 for order 8 | INFO
+AC5c | PLATEAUf: F3 period-1 orbit, order-4 table, h = 1/16: t* (departure of OFLI_B from the reference above 0.05); max departure for t <= 100 T; OFLI_B(100 T) - OFLI_B(10 T) numerical; FLI_B(100 T) - FLI_B(10 T) numerical | > 200000 ; 2.275e-05 ; 0.0009091 ; 2.17 | report (R1); dG <= 0.1, dFLI >= 1.5 for order 8 | INFO
+AC5c | PLATEAUf: F3 period-1 orbit, order-4 table, h = 1/20: t* (departure of OFLI_B from the reference above 0.05); max departure for t <= 100 T; OFLI_B(100 T) - OFLI_B(10 T) numerical; FLI_B(100 T) - FLI_B(10 T) numerical | > 200000 ; 9.315e-06 ; 0.0009068 ; 2.17 | report (R1); dG <= 0.1, dFLI >= 1.5 for order 8 | INFO
+AC5c | PLATEAUf: order-4: t*(h/2) / t*(h = 1/4) against 2^4 = 16 (R1) | 14.68 (t* 2816, 4.134e+04) | report, within a factor 2 of 2^p | INFO
+AC5c | PLATEAUf: order-4: t*(h/2) / t*(h = 1/8) against 2^4 = 16 (R1) | not both below Tmax (4.134e+04, Inf) | report, within a factor 2 of 2^p | INFO
+AC5c | PLATEAUf: F3 period-1 orbit, order-8 table, h = 1/2: t* (departure of OFLI_B from the reference above 0.05); max departure for t <= 100 T; OFLI_B(100 T) - OFLI_B(10 T) numerical; FLI_B(100 T) - FLI_B(10 T) numerical | > 200000 ; 4.867e-07 ; 0.0009043 ; 2.17 | report (R1); dG <= 0.1, dFLI >= 1.5 for order 8 | INFO
+AC5c | PLATEAUf: F3 period-1 orbit, order-8 table, h = 1/4: t* (departure of OFLI_B from the reference above 0.05); max departure for t <= 100 T; OFLI_B(100 T) - OFLI_B(10 T) numerical; FLI_B(100 T) - FLI_B(10 T) numerical | > 200000 ; 1.938e-09 ; 0.0009045 ; 2.17 | report (R1); dG <= 0.1, dFLI >= 1.5 for order 8 | INFO
+AC5c | PLATEAUf: F3 period-1 orbit, order-8 table, h = 1/20: t* (departure of OFLI_B from the reference above 0.05); max departure for t <= 100 T; OFLI_B(100 T) - OFLI_B(10 T) numerical; FLI_B(100 T) - FLI_B(10 T) numerical | > 200000 ; 9.681e-14 ; 0.0009045 ; 2.17 | report (R1); dG <= 0.1, dFLI >= 1.5 for order 8 | INFO
+AC5b | PLATEAUf: order-8 table h = 1/20 seeded frame: OFLI_B(100 T) - OFLI_B(10 T) | 0.0009045 | <= 0.1 | PASS
+AC5b | PLATEAUf: order-8 table h = 1/20 seeded frame: FLI_B(100 T) - FLI_B(10 T) | 2.17 | >= 1.5 | PASS
+AC5c | PLATEAUf: order-8: t*(h/2) / t*(h = 1/2) against 2^8 = 256 (R1) | not both below Tmax (Inf, Inf) | report, within a factor 2 of 2^p | INFO
+# section PLATEAUf took 171.0 s
+# ===== group Od =====
+# ofli verification, julia 1.13.2, threads 4, base seed 20261012 + 43000, OF_FULL_RUN = true, groups Od, time 1.794420655e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Od: ChaosTools 3.5.4, CoupledODEs Tsit5 abstol = reltol = 1e-14, hand-coded Jacobian, one renormalization per time unit (stop_at_Δt); loose sanity only (the ChaosTools spectrum is Gram-Schmidt, the OFLI sum is one unnormalized column), T = 100
+AC7 | Od: orbit R, T = 100: ChaosTools lambda_1 (Gram-Schmidt); OFLI-reducer column sum S_1 / T (identity frame, one column); max_i S_i / T; OFLI_B / T | 0.001501 ; 0.001501 ; 0.03238 ; 0.03254 | info (loose: window length 100, O(1 / T) end terms) | INFO
+AC7 | Od: orbit C, T = 100: ChaosTools lambda_1 (Gram-Schmidt); OFLI-reducer column sum S_1 / T (identity frame, one column); max_i S_i / T; OFLI_B / T | -0.0005524 ; -0.0005524 ; 0.03131 ; 0.04514 | info (loose: window length 100, O(1 / T) end terms) | INFO
+# section Od took 4.8 s
+# ===== group R2 =====
+# ofli verification, julia 1.13.2, threads 4, base seed 20261012 + 43000, OF_FULL_RUN = true, groups R2, time 1.794420639e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# R2: the 200 starts per class of the package (random_energy_start, E = 1/8, classed by SALI at 2000 below 1e-8), k = 4, seeded frames; FLI_B - OFLI_B with the s = 0 term in OFLI_B; quantiles reported as min ; q25 ; median ; q75 ; max
+ACR2 | regular class (200 starts), t = 1000: FLI_B - OFLI_B quantiles; negative count (must be 0 up to rounding) | 0.0001569 ; 0.08798 ; 0.4092 ; 1.162 ; 2.774 ; neg 0 | no threshold | INFO
+ACR2 | regular class, t = 1000: OFLI_B quantiles ; FLI_B quantiles | 1.524 ; 4.802 ; 5.323 ; 5.698 ; 13.26 || 3.917 ; 5.471 ; 5.841 ; 6.273 ; 13.72 | no threshold | INFO
+ACR2 | regular class (200 starts), t = 10000: FLI_B - OFLI_B quantiles; negative count (must be 0 up to rounding) | 1.648e-05 ; 0.1072 ; 0.4163 ; 1.251 ; 3.914 ; neg 0 | no threshold | INFO
+ACR2 | regular class, t = 10000: OFLI_B quantiles ; FLI_B quantiles | 3.484 ; 7.11 ; 7.65 ; 8.012 ; 443.2 || 6.244 ; 7.797 ; 8.182 ; 8.653 ; 443.5 | no threshold | INFO
+ACR2 | chaotic class (200 starts), t = 1000: FLI_B - OFLI_B quantiles; negative count (must be 0 up to rounding) | 6.502e-07 ; 0.07597 ; 0.1789 ; 0.3574 ; 1.102 ; neg 0 | no threshold | INFO
+ACR2 | chaotic class, t = 1000: OFLI_B quantiles ; FLI_B quantiles | 9.624 ; 40.63 ; 55.07 ; 65.87 ; 83.17 || 10.73 ; 41.13 ; 55.32 ; 66.01 ; 83.35 | no threshold | INFO
+ACR2 | chaotic class (200 starts), t = 10000: FLI_B - OFLI_B quantiles; negative count (must be 0 up to rounding) | 8.385e-07 ; 0.04987 ; 0.1592 ; 0.3224 ; 0.8795 ; neg 0 | no threshold | INFO
+ACR2 | chaotic class, t = 10000: OFLI_B quantiles ; FLI_B quantiles | 83.23 ; 398.2 ; 477.9 ; 537.6 ; 612.1 || 84.07 ; 398.4 ; 478.2 ; 537.7 ; 612.1 | no threshold | INFO
+ACR2 | loose sanity, orbit C, t = 1000: OFLI_B / t ; L1 finite-time exponent of the identical orbit ; FLI_B - OFLI_B | 0.03131 ; 0.03171 ; 0.4389 | no threshold | INFO
+# section R2 took 54.4 s
+# ===== group R4 =====
+# ofli verification, julia 1.13.2, threads 4, base seed 20261012 + 43000, OF_FULL_RUN = true, groups R4, time 1.794420638e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+ACR4 | periodic orbit of F3, order-8 table, canonical frame, t in [10 T, 100 T] = [61, 608]: running supremum OFLI_B at 10 T, 100 T, and increase | 1.265 ; 1.267 ; 0.001896 | report (F2) | INFO
+ACR4 | same: instantaneous value max_i g_i(n): min ; max ; max - min over the window, handoffs where the supremum rose, handoffs with inst < sup - 0.01 (oscillates below a converging supremum if the last two are large and small) | -0.04361 ; 1.267 ; 1.31 ; 1 ; 516 of 547 | report (F2) | INFO
+ACR4 | periodic orbit of F3, order-4 table, canonical frame, t in [10 T, 100 T] = [61, 608]: running supremum OFLI_B at 10 T, 100 T, and increase | 1.265 ; 1.267 ; 0.001895 | report (F2) | INFO
+ACR4 | same: instantaneous value max_i g_i(n): min ; max ; max - min over the window, handoffs where the supremum rose, handoffs with inst < sup - 0.01 (oscillates below a converging supremum if the last two are large and small) | -0.04367 ; 1.267 ; 1.31 ; 1 ; 516 of 547 | report (F2) | INFO
+# section R4 took 1.4 s
+# ===== group R5 =====
+# ofli verification, julia 1.13.2, threads 8, base seed 20261012 + 43000, OF_FULL_RUN = true, groups R5, time 1.794420757e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# R5: 200 chaotic-class starts, seeded frames, horizon t = 10000 (the sticky starts that do not reach ln 1e20 = 46.05 by then are counted); first handoff with OFLI_B >= ln 1e20
+ACR5 | chaotic class: starts reaching OFLI_B = ln 1e20 = 46.05 within t = 10000: count of 200; time quantiles min ; q25 ; median ; q75 ; max | 200 ; 400 ; 694.5 ; 810.5 ; 1158 ; 4502 | no threshold | INFO
+# section R5 took 27.8 s
+# ===== group AC16T =====
+# ofli verification, julia 1.13.2, threads 8, base seed 20261012 + 43000, OF_FULL_RUN = true, groups AC16T, time 1.794420755e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# AC16T: 4096 starts of F3 at E = 1/6 (random_energy_start, as AC16a), t = 1e3 (20000 steps), tau in {1, 20}: 8 threads 27.2 s, 1 thread (child) 199.6 s; compared: the final OFLI record (all fields: maxima, sums, compensation terms, maximisers, diagnostics), final state, final frame
+AC16 | AC16T: tau = 1: OFLI final records bitwise identical, 8 against 1 CPU threads (4096 starts) | true | bitwise | PASS
+AC16 | AC16T: tau = 1: final states and frames bitwise identical | true | bitwise | PASS
+AC16 | AC16T: tau = 20: OFLI final records bitwise identical, 8 against 1 CPU threads (4096 starts) | true | bitwise | PASS
+AC16 | AC16T: tau = 20: final states and frames bitwise identical | true | bitwise | PASS
+AC16 | AC16T: GPU against CPU | not run | - | NOT RUN: needs verify/gpu.jl (writes data/); owner decision
+# section AC16T took 227.1 s
+# ===== group AC18r =====
+# ofli verification, julia 1.13.2, threads 2, base seed 20261012 + 43000, OF_FULL_RUN = true, groups AC18r, time 1.794421012e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# AC18r REDUCTION: 24 starts per class (spec: 1024), t = 400 (order-8 table), CPU backends Float64 and Double64 against their own BigFloat(256) references; patched copy of the AC18 testset in the scratch folder
+# Info AC18 reported | orbits_in_agreement = 28
+ACAC18r | file total (6 pass, 0 fail, 0 error, 0 broken, 398.0 s) | 6 | 0 fail, 0 error | PASS
+ACAC18r | testset AC18 CPU part: each backend against its own reference, the gap rule, the fallback (0 pass, 0 fail or error, 0 broken, 397.7 s) | 0 | 0 | PASS
+# section AC18r took 398.1 s
+# ===== group FIG =====
+# ofli verification, julia 1.13.2, threads 2, base seed 20261012 + 43000, OF_FULL_RUN = true, groups FIG, time 1.794421014e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# FIG: wrote ofli-plateau.png and ofli-classes.png in the stage 04 output folder
+# section FIG took 15.7 s
+# ===== diagnostic notes (scratch scripts, not part of verify/ofli.jl; outputs in the scratch folder) =====
+# FULL2 AC10b (2 failures, assertion worst <= 1 at test/ofli/of_ac06_10.jl:153): diagnosed by a scratch rerun of the AC10b loop: only start (:reg, 7), both frames (seeded 2.22, canonical 1.85), at handoff 990 to 991 with minimum sin theta 0.024 and inst 1.13 to 1.35. The test bound 4 eps max(1, |inst|) has no 1/sin theta cancellation term (O12 has 8 eps / sin theta); ratio 2 at sin theta 0.024 is far inside 8 eps / sin theta. Cause: test tolerance, not the reducer. Nothing changed.
+# FULL4 AC18 (1 failure, nbad == 0 && ngap == 0 at test/ofli/of_ac16_18.jl:101): diagnosed by 8 scratch processes over the same 200 + 200 starts: 0 rows with error > B_G for either backend (nbad = 0); ngap = 2: regular start 120 only, both forms, |OFLI_Float64 - OFLI_Double64| = 4.83e-10 (form 1) and 5.19e-10 (form 2) against B_G,Float64 = 3.54e-10 and 3.34e-10 (B_G,Double64 about 1e-24). The final states of the two backends agree within the 1e-9 gate but the orbits have separated by up to 1e-9 over t = 400, which the B_G gap rule does not include (the D68 orbit-divergence term); the gate 1e-9 admits an orbit pair whose divergence term is of the order of the gap. Cause: gap rule of criterion 18(b) as tested, not the reducer. Nothing changed.

@@ -35,7 +35,7 @@ function of_ac1_ratio(mk, init, ::Type{T}, p0, cols, N, tau; ndof = 2, h = 1 / 1
                 if isinf(gf)
                     worst = max(worst, gc == gf ? 0.0 : Inf)
                 else
-                    worst = max(worst, Float64(abs(of_big(gc) - gf)) / (16 * of_eps(T) * max(1.0, abs(Float64(gf)))))
+                    worst = max(worst, Float64(abs(of_big(gc) - gf)) / (32 * of_eps(T) * max(1.0, abs(Float64(gf)))))   # Amendment D119: 32 eps to n = 1e4
                 end
             end
         end
@@ -209,9 +209,10 @@ function of_pend_period(A)
 end
 # Reference run: Double64 order-10 table at h/40 = 1/40, the cumulative tangent of the unit start w0, handoffs every `per` steps. Returns the reference states,
 # columns and ||f|| at every step (for the continuous minimum) and at every handoff.
-function of_pend_ref(A::Float64, w0, T::Float64; per = 40)
+function of_pend_ref(A::Float64, w0, T::Float64; per = 40, qzero = false)
     D = Double64; m = SofroniouSpaletta10(D); flow = Pendulum(D(1)); h = D(1) / per
-    z = SVector{2, D}(D(A), D(0)); W = SMatrix{2, 1, D}(D(w0[1]), D(w0[2]))
+    z = qzero ? SVector{2, D}(D(0), 2 * sin(D(A) / 2)) : SVector{2, D}(D(A), D(0))      # H = p^2/2 - cos q: q = 0 with p = 2 sin(A/2) (D119)
+    W = SMatrix{2, 1, D}(D(w0[1]), D(w0[2]))
     N = round(Int, T * per); zs = Vector{typeof(z)}(undef, N + 1); Ws = Vector{typeof(W)}(undef, N + 1); zs[1] = z; Ws[1] = W
     for n in 1:N
         z, W = tangent_advance(m, flow, z, W, h); zs[n + 1] = z; Ws[n + 1] = W
@@ -269,15 +270,15 @@ end
     _ = (OFLI, ofli_initial)
     for A in (2.0, 3.0)
         P = of_pend_period(A); w0 = (0.6, 0.8); W = SMatrix{2, 1, Float64}(w0); tmax = 10P
-        R = of_pend_ref(A, w0, tmax + 1)
-        flow = Pendulum(1.0); h = 1 / 20; sys = IntegratorMap(ForestRuth(Float64), flow, h); x0 = SVector(A, 0.0)
+        R = of_pend_ref(A, w0, tmax + 1; qzero = true)                               # Amendment D119: start q = 0 (a turning point makes the s = 0 term the maximum)
+        flow = Pendulum(1.0); h = 1 / 20; sys = IntegratorMap(ForestRuth(Float64), flow, h); x0 = SVector(0.0, Float64(R.zs[1][2]))
         M = floor(Int, tmax); snaps = of_snaps(OFLI(flow), sys, x0, W, 20M, 20); g0 = ofli_initial(flow, x0, W)[1]
         # exact discrete series (handoffs every unit time): G(m) = max over m' <= m of ln ||P w(m')|| from the reference columns
         gex = [(z = R.zs[1 + R.per * m]; w = SVector(R.Ws[1 + R.per * m][1], R.Ws[1 + R.per * m][2]); f = vector_field(R.flow, z);
                 Float64(log(norm(w - (dot(f, w) / dot(f, f)) * f)))) for m in 0:M]
         Gex = accumulate(max, gex)
         err = [abs(max(g0, snaps[m].ofli1) - Gex[m + 1]) for m in 1:M]
-        @test maximum(err) <= 1.0e-5                                                 # delta: calibrated at stage 02 (spec: order 1e-6)
+        @test maximum(err) <= 1.0e-4                                                 # delta: Amendment D119 (stage 04: 3.5e-5 at amplitude 3)
         # R1: the plateau-loss time t* (first handoff where the computed OFLI exceeds the plateau by 0.05), at h and h/2, order-4 table: reported, not scored
         tstar(hh) = (s = IntegratorMap(ForestRuth(Float64), flow, hh); tau = round(Int, 1 / hh); n = of_size(5000, 20000);
                      sn = of_snaps(OFLI(flow), s, x0, W, n * tau, tau); pl = max(g0, sn[M].ofli1);

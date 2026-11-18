@@ -163,3 +163,16 @@ Recorded lines (no threshold): R1 the plateau-loss times t* and the direction an
 - P10. Flow consistency. The reducer holds a flow; the map holds another. A mismatch gives wrong numbers silently. Recommended: the run record carries a flow identifier from each (criterion 14g) and the experiment layer compares them, at its stage, not here. Alternative: construct the reducer from the map.
 - P11. Extended phase space integrators. Recommended: refuse (state dimension different from the flow's) with a clear error; no definition of the flow direction is attempted.
 - P12. Study use. Thresholds (the source threshold t, the cap 1e20) are not applied by the module; a study pre-registers its own (`_config/numerics-policy.md`). The OFLI is delivered as a series; classification belongs to the study or analysis modules.
+
+## Amendment D119 (2026-11-11)
+
+Owner: "Amend + fix M1-M3", from the stage 04 report (`stages/04-verify/output/ofli-verification.md`). Criteria restated (all other text unchanged):
+- Criterion 1: the closed-form bound is 32 eps max(1, abs g) for n up to 1e4 (stage 04: 20 eps at d = 2, tau = 1, n = 1e4, growing about as n^0.3 from 4 eps at n = 100: rounding of the 1e4 renormalisations; 16 eps was a borrowed constant).
+- Criterion 4(c): scored on the pendulum start q = 0 (not a turning point; the turning-point start makes the s = 0 term the maximum and the error 0) with delta = 1e-4 (stage 04: 7.4e-7 at amplitude 2, 3.5e-5 at amplitude 3).
+- Criterion 10(b): the bound is 4 eps max(1, abs S_i) + 8 eps / sin theta_i at the maximising column, the cancellation term of O12 (stage 04: 2.2 times 4 eps at sin theta 0.024 on one start).
+- Criterion 18(b), regular class: the gap rule is abs(G_a - G_b) <= B_a + B_b + 1e-9, the last term the agreement gate on the final states (first-order effect of an orbit separation up to the gate; stage 04: 5.2e-10 against 3.5e-10 on one regular orbit whose states agree within 1e-9).
+Code fixes:
+- M1: `ofli_initial` checks the field as the reducer does (norm finite and above floatmin(T)), else `NumericalHealthError("vector field", ...)` at step 0 (Algorithm item 2, criterion 14a).
+- M2: `ofli_total(final, g0)` returns the series with the s = 0 term, `(ofli = max(max_i g0_i, final.ofli), ofli1 = max(g0_1, final.ofli1))` (Algorithm item 1); the reducer's `ofli`, `ofli1` stay over the handoffs only (U1).
+- M3: the run record names the flow by `sprint(show, flow)` (type and parameters), so two flows of one type with different parameters are distinguished (P10).
+Open: review L1 to L4 (LOW).

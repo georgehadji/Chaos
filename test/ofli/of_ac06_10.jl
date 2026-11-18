@@ -146,7 +146,8 @@ end
             sinth(n, i) = (f = vector_field(flow, tr.xs[n]); w = tr.Ws[n][:, i]; norm(w - (dot(f, w) / dot(f, f)) * f) / norm(w))
             for (n, s) in enumerate(snaps)
                 gs = [Sold[i] + log(sinth(n, i) * norm(tr.Ws[n][:, i])) for i in 1:4]
-                worst = max(worst, abs(s.inst - maximum(gs)) / (4 * eT * max(1.0, abs(s.inst))))     # (b) g_i = S_i(old) + ln ||P w_arr||
+                im_ = argmax(gs)                                                                       # (b) g_i = S_i(old) + ln ||P w_arr||; D119: plus 8 eps / sin theta (O12)
+                worst = max(worst, abs(s.inst - maximum(gs)) / (4 * eT * max(1.0, abs(s.inst)) + 8 * eT / sinth(n, im_)))
                 Sold = [s.sum[i] + s.comp[i] for i in 1:4]
                 (s.ofli <= s.fli + 4 * eT * max(1.0, abs(s.fli)) && s.ofli1 <= s.fli1 + 4 * eT * max(1.0, abs(s.fli1))) || (nbad_le += 1)   # (c)
             end

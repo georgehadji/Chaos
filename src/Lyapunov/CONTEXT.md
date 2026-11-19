@@ -72,4 +72,4 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 | General-`d` singular-value exponents | held for M3, D32 |
 | lyap-two-trajectory criterion 13 (external two-trajectory oracle): re-specified in wrapped mode, verified | D43, D46 |
 | Float32 | D24 |
-| continuous-qr: GPU path, ChaosTools comparison, Taylor-form reference, full sizes | stage 04 (`CQ_FULL_RUN`) |
+| continuous-qr: device kernel (none, CPU only); ChaosTools comparison, Taylor references, full sizes | D121; `verify/continuous-qr.jl` (`CQ_FULL_RUN`) |

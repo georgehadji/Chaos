@@ -1,6 +1,6 @@
 # Lyapunov
 
-Exponent estimators as reducers of the tangent stream, plus the two-trajectory, continuous QR and CLV estimators, which run their own loops. Imports Foundation, Systems, Integrators (method names only) and Tangent. Built by the lyap-benettin (catalog L1), lyap-gram-schmidt (L3 CGS, L4 MGS, L4b RGS), lyap-householder-qr (L5 Householder, L6 Givens, L5b augmented), lyap-svd-stabilized (L9) and lyap-two-trajectory (L2) continuous-qr (L8) and clv-ginelli (L12) runs.
+Exponent estimators as reducers of the tangent stream, plus the two-trajectory, continuous QR and CLV estimators, which run their own loops. Imports Foundation, Systems, Integrators (method names only) and Tangent. Built by the lyap-benettin (catalog L1), lyap-gram-schmidt (L3 CGS, L4 MGS, L4b RGS), lyap-householder-qr (L5 Householder, L6 Givens, L5b augmented), lyap-svd-stabilized (L9), lyap-two-trajectory (L2), continuous-qr (L8) and clv-ginelli (L12) runs.
 
 Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the five slugs above (amendments D35 for all five bounds, D41 svd-stabilized, D42 two-trajectory; owner answers D30; API contract D34). Reports: `stages/04-verify/output/<slug>-verification.md`, same five slugs.
 
@@ -76,3 +76,4 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 | lyap-two-trajectory criterion 13 (external two-trajectory oracle): re-specified in wrapped mode, verified | D43, D46 |
 | Float32 | D24 |
 | continuous-qr: device kernel (none, CPU only); ChaosTools comparison, Taylor references, full sizes | D121; `verify/continuous-qr.jl` (`CQ_FULL_RUN`) |
+| clv-ginelli: device kernel (none, CPU only); L12b, adjoint CLVs; static-algorithm cross-check, full sizes | D122, D124; `verify/clv-ginelli.jl` (`CLV_FULL_RUN`) |

@@ -105,3 +105,17 @@ StableRNGs. `cq_seed(ac, sub) = 20261012 + 44000 + 50 ac + sub` (`CQ_BASE = CQ_S
 ## Stage 04 note
 
 Criterion 21 (ChaosTools), the device part of 22 (GPU, `verify/gpu.jl`), the thread-count comparison of 17, the Taylor-form external reference of 20 and the full spec sizes (`CQ_FULL_RUN`) run at stage 04. The T = 1000 allowance of AC9 must be calibrated there. Stage 03 must not loosen a bound in this file without an amendment.
+
+## Amendment D121 (2026-11-18)
+
+Spec section "Amendment D121" (owner: "Amend + fix M1-M4"). Test changes, nothing else:
+- AC4: the ratio assertion applies to the pairs whose coarse step has Delta ||A||_F <= 0.35 (Delta = q h / 2; 1e-9 relative slack); the fitted slope is reported next to the ratios.
+- AC6b: scored at t = 60 (B_col 5e-3); at the full size t = 100 is also run and reported (`worst` per horizon).
+- AC8: `CQ_B8 = 0.4` replaces 3e-2 in the bound B_8 + 8 eps / c, scored for t <= 60 only; beyond t = 60 the worst error and the number of samples above the bound are reported (the record stops where c falls below 1e3 eps, as before).
+- AC9: `CQ_CD4 = 20`, `CQ_CD2 = 10` replace c_d = 10 and 2 at T = 60; the realized c_d per q is reported; the long horizon (200 at package size, 1000 at the full size) is computed and reported (lambda-form c_d and l-form constant), no longer scored; the ratio check on orbit C at T = 60 is kept.
+- AC11: `ndisc >= 0.95 n` replaces `ndisc == n`; the maximum ratio to the allowance is reported.
+- `cq_G` (test-side scheme, `cq_helpers.jl`): the growth rate is divided by the squared column length, as `cqr_growth` (needed so that AC14, the same-orbit rounding against the BigFloat scheme, compares the same scheme).
+- New testset "D121 dimension guard, normalised rates, orbit-named errors" in `cq_ac16_22.jl` (11 assertions): M1 (a 3-vector state on the 4D flow, a 3 x 3 frame, a 4 x 2 frame for k = 4, one frame for two orbits, a 4-vector on the 2D pendulum all throw `ArgumentError`); M2 (a frame with column-scaling defect E_ii in 2.5e-3 to 7.5e-3 gives the rates of the unit frame within 2e-6, realized 4.4e-16, while the unnormalised formula is off by up to 1.7e-2, more than 100 times larger); M4 (an ensemble of 4 orbits whose orbit j, j = 2 and 3, has a frame scaled by 1.3 throws `NumericalHealthError("orthogonality")` with `orbit == j` and `step > 0`).
+- AC4 (owner: "Keep M2, amend"): the window of the gated ratios is [2^q / 4, 2 x 2^q].
+- AC12 (owner: "Keep M2, amend"): the order assertion on the sum is removed; the ratio of the sums at h = 1/20 and 1/40 is reported per orbit and q. The sum bound stays.
+`verify/continuous-qr.jl`: Oa applies the same gate and window to criterion 4 and reports the other ratios; Oc9 reports T = 1000 (INFO, realized c_d recorded); AC11d scores 95 percent and reports the maximum ratio. Package suite: 1625 pass, 0 fail (was 1626 with the D121 testset added and one AC4 pair gated out).

@@ -35,7 +35,7 @@ Spec: `workspaces/module-build/stages/01-spec/output/<slug>-spec.md` for the fiv
 | `log_singular_values(S, c)` | log singular values of the triangular product from the QR totals and the ratio `c` |
 | `propagate_shadow(sys, x0, N; d0, tau, seed, backend, chunk, U0)` | two-trajectory estimate X2 for every orbit; returns a `PropagationResult` |
 | `propagate_shadow_orbit` | the same body for one orbit, serial; throws `NumericalHealthError` |
-| `ContinuousQR(map, flow; order, penalty_factor, orthogonality_tol, form)` | continuous QR estimator: Q follows an ODE (Heun or RK4 on the orbit grid), exponents are compensated integrals of `(Q'AQ)_ii`; guard `E_max` default `CQ_EMAX = 1e-2` |
+| `ContinuousQR(map, flow; order, penalty_factor, orthogonality_tol, form)` | continuous QR estimator: Q follows an ODE (Heun or RK4 on the orbit grid), exponents are compensated integrals of `(Q'AQ)_ii / (q_i . q_i)` (D121); guard `E_max` default `CQ_EMAX = 1e-2` |
 | `propagate_cqr_orbit`, `propagate_cqr_series`, `propagate_cqr` | one orbit (no allocation), one orbit with a series, many orbits (`PropagationResult`); `cqr_rhs`, `cqr_growth`, `cqr_bytes` are the pure pieces |
 | `separation(sys, ref, shadow)`, `displaced(sys, ref, delta)` | separation vector and shadow placement; plain difference by default, minimal image for `WrappedStandardMap` |
 

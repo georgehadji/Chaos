@@ -115,6 +115,38 @@ end
     @test cf.n[] == 0                                                                    # no Jacobian was evaluated
 end
 
+@testset "D121 dimension guard, normalised rates, orbit-named errors" begin
+    _ = (ContinuousQR, propagate_cqr_orbit, propagate_cqr, cqr_growth)
+    flow, im = cq_hh(); z0 = cq_orbit_C(); Q0 = initial_deviations(cq_seed(19, 3), 1, Val(4), Val(4), Float64); cq = cq_cqr(im, flow; order = 4)
+    # M1: the state length and the frame rows must equal the flow dimension; a supplied Q0 must be d x k, one per orbit
+    z3 = SVector(z0[1], z0[2], z0[3]); Q3 = SMatrix{3, 3, Float64}(Q0[1:3, 1:3])
+    @test_throws ArgumentError propagate_cqr(cq, [z3], 8; k = 4, seed = 1)
+    @test_throws ArgumentError propagate_cqr_orbit(cq, z3, Q3, 8)
+    @test_throws ArgumentError propagate_cqr_orbit(cq, z3, Q0, 8)
+    @test_throws ArgumentError propagate_cqr_orbit(cq, z0, Q3, 8)
+    @test_throws ArgumentError propagate_cqr(cq, [z0], 8; k = 4, seed = 1, Q0 = [SMatrix{4, 2, Float64}(Q0[:, 1:2])])
+    @test_throws ArgumentError propagate_cqr(cq, [z0, z0], 8; k = 4, seed = 1, Q0 = [Q0])
+    pend = Pendulum(1.0); cqp = cq_cqr(cq_im(pend, Float64, :o4, CQ_H), pend; order = 4)
+    @test_throws ArgumentError propagate_cqr(cqp, [z0], 8; k = 2, seed = 1)                  # a 4-vector on the 2D pendulum
+    # M2: the rate of a column is divided by its squared length: a frame with a column-scaling defect E_ii about 5e-3 gives the rates of the unit frame to O(E^2); the
+    # unnormalised formula (Q' A Q)_ii is off by E_ii u_i, first order
+    rng = StableRNG(cq_seed(19, 4)); worst_new = 0.0; worst_old = 0.0; E = 5.0e-3
+    for _ in 1:20
+        A = SMatrix{4, 4, Float64}(randn(rng, 4, 4)); Qu = cq_frame(rng, 4, 4, Float64); sc = SVector{4, Float64}(sqrt.(1 .+ E .* (0.5 .+ rand(rng, 4))))
+        Qd = Qu * Diagonal(sc); u0 = cqr_growth(Qu, A); old = diag(Qd' * A * Qd)
+        worst_new = max(worst_new, maximum(abs, cqr_growth(Qd, A) - u0)); worst_old = max(worst_old, maximum(abs, old - u0))
+    end
+    @test worst_new <= 2.0e-6                                                                 # bound: E^2 = 2.5e-5 at the largest defect; realized see @info (rounding level)
+    @test worst_old > 100 * worst_new                                                          # the old formula's first-order bias is what the fix removes
+    @info "D121 M2 reported: worst rate error with the normalised and with the unnormalised formula (E_ii in 2.5e-3 .. 7.5e-3)" worst_new worst_old
+    # M4: an ensemble whose orbit j fails (a frame far from orthonormal, E about 0.7 against the guard) throws a NumericalHealthError naming orbit j and the step, and aborts the call
+    for j in (2, 3)
+        Qs = [initial_deviations(cq_seed(19, 5), i, Val(4), Val(4), Float64) for i in 1:4]; Qs[j] = Qs[j] * 1.3
+        e = cq_health_error(() -> propagate_cqr(cq, fill(z0, 4), 40; k = 4, seed = 1, Q0 = Qs))
+        @test e isa NumericalHealthError && e.what == "orthogonality" && e.orbit == j && e.step > 0
+    end
+end
+
 @testset "AC19e the run record carries h, the integrator and its order, q, the form, c_nu, E_max, the element type, k, the seed, backend, device, fallback reason and the flow" begin
     _ = (ContinuousQR, propagate_cqr)
     flow, im = cq_hh(); z0 = cq_orbit_C()

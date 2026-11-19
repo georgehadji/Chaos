@@ -1,0 +1,527 @@
+# continuous-qr stage 04 raw log: one section per process, concatenated in this order; verify/continuous-qr.jl (CQ_ONLY groups); wall-clock timings are from a loaded machine
+# ======== group FULL1 ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL1, time 1.795036721e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC3 reported (R3): worst error / B_lin | worst = 0.017029572275970715
+# Info AC3 control: largest l_2 - l_1 over 20 seeded frames, frames where the sorted double fails | best = 0.48747871027181233; bound = 0.02822922821840994; nmiss = 5
+# Info AC4 reported: absolute errors and ratios | ratios = Dict{Any, Any}(("b", 2) => ([0.002008868674232999, 0.0006243483708785462, 0.000170738960600491, 4.4360728913338985e-5], [3.217544511898441, 3.656742249587941, 3.848876354895758]), ("b", 4) => ([0.000918905850220023, 8.819079013976302e-5, 6.071438775056303e-6, 3.902001837077996e-7], [10.419521684336416, 14.52551749382422, 15.559805014348441]), ("a", 4) => ([2.1883224014075849e-7, 1.2280761109056035e-8, 7.273397783104853e-10, 4.4245308432797836e-11], [17.819110574456822, 16.88448985642258, 16.438800046228817]), ("a", 2) => ([0.0004506192806271844, 8.914698186813754e-5, 1.937186857826591e-5, 4.4807467883930665e-6], [5.054790091421395, 4.601878311736803, 4.323357130656619]))
+# Info AC5 reported (R3): worst error / bound | worst = 0.07449889849044103
+ACFULL1 | file total (681 pass, 0 fail, 0 error, 0 broken, 10.0 s) | 681 | 0 fail, 0 error | PASS
+ACFULL1 | testset ALG right-hand side: on the manifold both forms agree, the penalty and the defect equation of C13, one column (C11) (55 pass, 0 fail or error, 0 broken, 1.7 s) | 0 | 0 | PASS
+ACFULL1 | testset AC1 fixed point Q = I for upper triangular A: bitwise Q, rounding-only growth (48 pass, 0 fail or error, 0 broken, 3.1 s) | 0 | 0 | PASS
+ACFULL1 | testset AC1 negative controls (test-side doubles, no new name) (10 pass, 0 fail or error, 0 broken, 0.8 s) | 0 | 0 | PASS
+ACFULL1 | testset AC2 skew A (oscillator, all omega = 1): l_i = 0 to rounding, Q(t) = exp(A t) Q0 (72 pass, 0 fail or error, 0 broken, 0.9 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3 hyperbolic closed forms: l_i against the 256-bit Gram-determinant reference, individually for the degenerate pair (216 pass, 0 fail or error, 0 broken, 2.2 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3 control: the individual values of the degenerate case depend on the frame; a double that sorts the exponents misses them (no new name) (21 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3 oracle: the 256-bit exponential and Gram determinants reproduce the closed forms of C19 (no new name) (3 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL1 | testset AC4 order of the Q-scheme: error ratios of consecutive h lie in [2^q / 2, 2 x 2^q] above the rounding floor (12 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL1 | testset AC5 rotated frame, A = diag(0.8, -0.8): l_1, the sum and Q(t) against the closed form (240 pass, 0 fail or error, 0 broken, 0.0 s) | 0 | 0 | PASS
+ACFULL1 | testset AC5 negative control: S of the wrong sign fails l_1 and Q (the sum is blind to it, U3; test-side double, no new name) (4 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+# section FULL1 took 10.1 s
+# ======== group FULL2 ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL2, time 1.795036721e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC6a reported (R3): worst error / bound, worst absolute error per scheme | worst = 0.38889368671247254; wabs = Dict(2 => 0.019483573704294876, 4 => 0.00016147798246030076)
+# Info AC6b reported: largest |l_i(k) - l_i(4)| | worst = 0.028794935219405904
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 2; t = 10; ratio = 4.0345681544024155
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 2; t = 30; ratio = 4.002430336425078
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 2; t = 60; ratio = 3.8509168855450797
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 4; t = 10; ratio = 16.751595616849425
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 4; t = 30; ratio = 17.07252941126003
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 4; t = 60; ratio = 17.282622161297795
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=3"; q = 4; t = 10; ratio = 17.29486585259592
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=3"; q = 4; t = 30; ratio = 19.097858240446133
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=3"; q = 4; t = 60; ratio = 20.261467386410246
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 2; t = 10; ratio = 6.736043147501761
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 2; t = 30; ratio = 4.359741339412882
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 2; t = 60; ratio = 3.8225552003583223
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 4; t = 10; ratio = 12.552602160104351
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 4; t = 30; ratio = 15.401998437576982
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 4; t = 60; ratio = 9.097942186946932
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 2; t = 10; ratio = 4.274231417141749
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 2; t = 30; ratio = 4.5340616930934035
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 2; t = 60; ratio = 4.659833349029744
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 4; t = 10; ratio = 17.09138623430585
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 4; t = 30; ratio = 8.66492734193497
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 4; t = 60; ratio = 17.391609490891913
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 2; t = 10; ratio = 2.9389928028628955
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 2; t = 30; ratio = 4.961189723446031
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 2; t = 60; ratio = 4.668941323307026
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 4; t = 10; ratio = 0.17317226731774626
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 4; t = 30; ratio = 3.226436241745978
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 4; t = 60; ratio = 33.70712297461392
+# Info AC8 reported | worst_err = 14.132654600389772; orbits = 83; median_Tvalid = 300.0; min_Tvalid = 300.0
+# Info AC9 reported (R3, R6): worst lambda error / allowance at T = 60 (q = 4 and 2), worst l error / h^4 at the long horizon, spread among the discrete variants, ratio on orbit C | worst = 2.3155358513573394; worstl = 274237.3710709482; spread = 6.050715484207103e-15; ratio_C = 19.300434005156188
+# Info AC10a reported | slope = -0.9290619941159268; final_lambda1 = 0.0005685631396952858
+# Info AC10b reported | bound = 0.005105170185988092; maxes = [0.0007378845636346847, 0.0007226935274505155, 0.0010099161137626725, 0.0019074481205667909, 0.0009919357142948518, 0.0009474455964625932, 0.0011776110938319126, 0.0008352887952279646, 0.001046328438207376, 0.0007413444258151232, 0.0010015277850951689, 0.0009494226400550668, 0.0012654693668855967, 0.001195827560667696, 0.0009088607893089439, 0.0013161470940950537, 0.000895633699296606, 0.0009629885731035257, 0.0010258143138429322, 0.0012707727649018334, 0.0005624537894646606, 0.0010877974681348349, 0.0005772210421920604, 0.0013794388539490649, 0.0014078429652375484, 0.0013316842045986088, 0.0013959917718462738, 0.0010345385008827665, 0.0008497852746385665, 0.0014571742592409864, 0.0005760739154491731, 0.0009201971528638415, 0.0009661461172954411, 0.0010143960953019925, 0.000764243657938418, 0.000888552441695304, 0.0013544373841429926, 0.0011266632881418433, 0.0008117570452985049, 0.00094; sali = [1.2482504723153336, 0.377005257811582, 1.204743171044067, 0.30451730471621413, 0.26085526270513876, 1.0315287915678104, 0.027585322469979644, 1.3054601038541136, 0.3543323891228141, 1.2426010566605377, 1.2277810402796399, 0.8334878191994853, 0.0876101672752979, 0.07837264682934422, 1.2517200606425376, 0.16897427530059592, 0.33503841422833824, 0.26543051253814215, 1.294313462870859, 0.12704496898555231, 0.6498560030084249, 0.3837178682973861, 0.8124357723119153, 0.1641099523291205, 1.1731956301951803, 0.06904464006017878, 0.3565952361868018, 1.3617674016428276, 0.9154236743754358, 0.4559314522120672, 0.5063226186086583, 0.45779251460061626, 1.082077958972239, 0.4535052193743291, 1.1554949614917038, 0.5993805782408667, 0.13602264119960797, 0.13723874828411917, 0.363823018646189, 1.239398216423114, 0.12125903722856843, 1.07072673938646, 0.08464341765022886, 0.942413751792515, 0.54600046167
+ACFULL2 | file total (84 pass, 4 fail, 0 error, 0 broken, 48.8 s) | 84 | 0 fail, 0 error | FAIL
+ACFULL2 | testset AC6a one column: l_1 = ln ||Y(t) q(0)|| on F1, the inverted oscillator and the pendulum (12 pass, 0 fail or error, 0 broken, 2.7 s) | 0 | 0 | PASS
+ACFULL2 | testset AC6b column independence on Henon-Heiles: the k = 1, 2, 4 runs agree for i <= k within B_col = 5e-3 (calibrated, U7) (10 pass, 2 fail or error, 0 broken, 17.5 s) | 2 | 0 | FAIL
+ACFULL2 | testset AC7 equilibrium start is refused by the direction frame (test-side, no new name; spec point U1) (2 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL2 | testset AC7 flow-direction identity: l_1(t) = ln(||f(z(t))|| / ||f(z_0)||) for the frame whose first column is f(z_0) / ||f(z_0)|| (54 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL2 | testset AC8 energy covector identity: l_1(t) = ln|gradH(z_0).q_1(0)| - ln|gradH(z(t)).q_1(t)| up to T_valid (1 pass, 1 fail or error, 0 broken, 1.2 s) | 1 | 0 | FAIL
+ACFULL2 | testset AC9 same-orbit agreement with the discrete QR spectrum (Householder, repeated Gram-Schmidt) and Benettin (1 pass, 1 fail or error, 0 broken, 5.8 s) | 1 | 0 | FAIL
+ACFULL2 | testset AC10a pendulum libration: lambda_1(t) decays like 1/t and l_1 + l_2 = 0 (2 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+ACFULL2 | testset AC10b F3 regular orbits: |lambda_i(T)| <= 5 (1 + ln T) / T for at least 80 percent of the starts, orbit R included (2 pass, 0 fail or error, 0 broken, 20.2 s) | 0 | 0 | PASS
+# section FULL2 took 49.2 s
+# ======== group FULL2h ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL2h, time 1.795036721e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# FULL2h REDUCTION: DIAGNOSTIC, not a reduction: AC6b at t = 60 (calibration horizon, spec 100) and AC8 at Tmax = 100 (calibration horizon, spec 300); every other size stays full (patched copy in the scratch folder)
+# Info AC6a reported (R3): worst error / bound, worst absolute error per scheme | worst = 0.38889368671247254; wabs = Dict(2 => 0.019483573704294876, 4 => 0.00016147798246030076)
+# Info AC6b reported: largest |l_i(k) - l_i(4)| | worst = 0.0013173407785718183
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 2; t = 10; ratio = 4.0345681544024155
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 2; t = 30; ratio = 4.002430336425078
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 2; t = 60; ratio = 3.8509168855450797
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 4; t = 10; ratio = 16.751595616849425
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 4; t = 30; ratio = 17.07252941126003
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 4; t = 60; ratio = 17.282622161297795
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=3"; q = 4; t = 10; ratio = 17.29486585259592
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=3"; q = 4; t = 30; ratio = 19.097858240446133
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=3"; q = 4; t = 60; ratio = 20.261467386410246
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 2; t = 10; ratio = 6.736043147501761
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 2; t = 30; ratio = 4.359741339412882
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 2; t = 60; ratio = 3.8225552003583223
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 4; t = 10; ratio = 12.552602160104351
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 4; t = 30; ratio = 15.401998437576982
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 4; t = 60; ratio = 9.097942186946932
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 2; t = 10; ratio = 4.274231417141749
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 2; t = 30; ratio = 4.5340616930934035
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 2; t = 60; ratio = 4.659833349029744
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 4; t = 10; ratio = 17.09138623430585
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 4; t = 30; ratio = 8.66492734193497
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 4; t = 60; ratio = 17.391609490891913
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 2; t = 10; ratio = 2.9389928028628955
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 2; t = 30; ratio = 4.961189723446031
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 2; t = 60; ratio = 4.668941323307026
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 4; t = 10; ratio = 0.17317226731774626
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 4; t = 30; ratio = 3.226436241745978
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 4; t = 60; ratio = 33.70712297461392
+# Info AC8 reported | worst_err = 1.46529669036188; orbits = 83; median_Tvalid = 100.0; min_Tvalid = 100.0
+# Info AC9 reported (R3, R6): worst lambda error / allowance at T = 60 (q = 4 and 2), worst l error / h^4 at the long horizon, spread among the discrete variants, ratio on orbit C | worst = 2.3155358513573394; worstl = 274237.3710709482; spread = 6.050715484207103e-15; ratio_C = 19.300434005156188
+# Info AC10a reported | slope = -0.9290619941159268; final_lambda1 = 0.0005685631396952858
+# Info AC10b reported | bound = 0.005105170185988092; maxes = [0.0007378845636346847, 0.0007226935274505155, 0.0010099161137626725, 0.0019074481205667909, 0.0009919357142948518, 0.0009474455964625932, 0.0011776110938319126, 0.0008352887952279646, 0.001046328438207376, 0.0007413444258151232, 0.0010015277850951689, 0.0009494226400550668, 0.0012654693668855967, 0.001195827560667696, 0.0009088607893089439, 0.0013161470940950537, 0.000895633699296606, 0.0009629885731035257, 0.0010258143138429322, 0.0012707727649018334, 0.0005624537894646606, 0.0010877974681348349, 0.0005772210421920604, 0.0013794388539490649, 0.0014078429652375484, 0.0013316842045986088, 0.0013959917718462738, 0.0010345385008827665, 0.0008497852746385665, 0.0014571742592409864, 0.0005760739154491731, 0.0009201971528638415, 0.0009661461172954411, 0.0010143960953019925, 0.000764243657938418, 0.000888552441695304, 0.0013544373841429926, 0.0011266632881418433, 0.0008117570452985049, 0.00094; sali = [1.2482504723153336, 0.377005257811582, 1.204743171044067, 0.30451730471621413, 0.26085526270513876, 1.0315287915678104, 0.027585322469979644, 1.3054601038541136, 0.3543323891228141, 1.2426010566605377, 1.2277810402796399, 0.8334878191994853, 0.0876101672752979, 0.07837264682934422, 1.2517200606425376, 0.16897427530059592, 0.33503841422833824, 0.26543051253814215, 1.294313462870859, 0.12704496898555231, 0.6498560030084249, 0.3837178682973861, 0.8124357723119153, 0.1641099523291205, 1.1731956301951803, 0.06904464006017878, 0.3565952361868018, 1.3617674016428276, 0.9154236743754358, 0.4559314522120672, 0.5063226186086583, 0.45779251460061626, 1.082077958972239, 0.4535052193743291, 1.1554949614917038, 0.5993805782408667, 0.13602264119960797, 0.13723874828411917, 0.363823018646189, 1.239398216423114, 0.12125903722856843, 1.07072673938646, 0.08464341765022886, 0.942413751792515, 0.54600046167
+ACFULL2h | file total (86 pass, 2 fail, 0 error, 0 broken, 48.4 s) | 86 | 0 fail, 0 error | FAIL
+ACFULL2h | testset AC6a one column: l_1 = ln ||Y(t) q(0)|| on F1, the inverted oscillator and the pendulum (12 pass, 0 fail or error, 0 broken, 2.7 s) | 0 | 0 | PASS
+ACFULL2h | testset AC6b column independence on Henon-Heiles: the k = 1, 2, 4 runs agree for i <= k within B_col = 5e-3 (calibrated, U7) (12 pass, 0 fail or error, 0 broken, 16.8 s) | 0 | 0 | PASS
+ACFULL2h | testset AC7 equilibrium start is refused by the direction frame (test-side, no new name; spec point U1) (2 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL2h | testset AC7 flow-direction identity: l_1(t) = ln(||f(z(t))|| / ||f(z_0)||) for the frame whose first column is f(z_0) / ||f(z_0)|| (54 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL2h | testset AC8 energy covector identity: l_1(t) = ln|gradH(z_0).q_1(0)| - ln|gradH(z(t)).q_1(t)| up to T_valid (1 pass, 1 fail or error, 0 broken, 1.5 s) | 1 | 0 | FAIL
+ACFULL2h | testset AC9 same-orbit agreement with the discrete QR spectrum (Householder, repeated Gram-Schmidt) and Benettin (1 pass, 1 fail or error, 0 broken, 5.7 s) | 1 | 0 | FAIL
+ACFULL2h | testset AC10a pendulum libration: lambda_1(t) decays like 1/t and l_1 + l_2 = 0 (2 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+ACFULL2h | testset AC10b F3 regular orbits: |lambda_i(T)| <= 5 (1 + ln T) / T for at least 80 percent of the starts, orbit R included (2 pass, 0 fail or error, 0 broken, 20.0 s) | 0 | 0 | PASS
+# section FULL2h took 48.7 s
+# ======== group FULL3 ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL3, time 1.795036721e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC11 reported | mean_lambda1_cqr = 0.04795594398831938; mean_lambda1_discrete_B = 0.04565640136179987; max_zero_pair = 0.006134602110538993; max_pairing = 0.003492187165338726; discrete_zero = 0.00517848591701126
+# Info AC12 reported (R3): worst |sum| / B_sum | worst = 4.5433916537631906e-5
+# Info AC12 control reported | polar_sum = -1.8382280786433114e-7; scheme_sum = -8.414676844203939e-8; bound = 0.19151598289351643
+# Info AC13a reported: worst E / bound | worst = 0.0010035298009777017
+# Info AC13b reported (R2) | rec = Any[(q = 2, E_eq = [0.00531122979571208, 0.001267067846998482], ratio = 4.191748538402019), (q = 4, E_eq = [8.648575908154488e-5, 5.146958877877417e-6], ratio = 16.803273764878266)]
+# Info AC14 reported (R3): worst error / B_C | worst = Dict{DataType, Float64}(Float64 => 0.006990655821218955, Double64 => 0.0001116218938195617)
+# Info AC14 control reported | f32_error = 2.833937941426612e-5; B = 4.6436808996096226e-8
+# Info AC15 reported | orbits_in_agreement = 51; bigfloat_error_over_bound = 0.0001556485028592045096941356377470552533743638548014337443630760631800480963984933
+ACFULL3 | file total (67539 pass, 1 fail, 0 error, 0 broken, 256.8 s) | 67539 | 0 fail, 0 error | FAIL
+ACFULL3 | testset AC11 chaotic class: positive lambda_1, agreement with the discrete value, the zero pair and the pairing, independent ensembles (2 pass, 1 fail or error, 0 broken, 54.3 s) | 1 | 0 | FAIL
+ACFULL3 | testset AC12 sum identity: |sum l_i| <= B_sum(T) and its order in Delta (12 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12 negative control: a double that restores Q to its polar factor each step passes the sum bound without any penalty (test-side, no new name; spec point U5) (1 pass, 0 fail or error, 0 broken, 0.7 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13a injected defect decays: coupled hyperbolic fixture (form 84, k = d) and two columns of orbit C (form 92, k = 2) (300 pass, 0 fail or error, 0 broken, 1.6 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13b equilibrium defect: E_max seen is below the tolerance and scales like Delta^q (6 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13c injected fault: Q scaled by 1.05 (E = 0.1) at step 500 raises the orthogonality error at the next Q-step, nothing stored (4 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13d explicit stability limits of C14: E diverges above nu Delta = 1 (order 2) and 1.39 (order 4), not at 0.9 of it (4 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14 same-orbit rounding: |l_i - l_i,ref| <= B_C(t) at every 50th Q-step, Float64 and Double64, reference in BigFloat(256) at the realized points (67200 pass, 0 fail or error, 0 broken, 194.4 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14 negative control: a double with the product Q^T A Q in single precision exceeds B_C (test-side, no new name) (1 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC15 precision ladder: Float64, Double64 and BigFloat(256) agree; BigFloat against its own 512-bit reference (9 pass, 0 fail or error, 0 broken, 4.9 s) | 0 | 0 | PASS
+# section FULL3 took 257.2 s
+# ======== group FULL4 ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL4, time 1.795037279e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC17 reported | threads = 2; starts = 4096
+# Info AC20 reported (R3, R4): worst error / delta_ext per scheme, and the error of the discrete spectrum against the same reference | worst = Dict(2 => 4.1103581108053096, 4 => 0.13802997182992272); rows = Any[(name = "F3 R", q = 2, t = 10, err = 0.0018464854853967871, discrete_err = 1.176836406102666e-14), (name = "F3 R", q = 2, t = 30, err = 0.04345147889141743, discrete_err = 1.6209256159527285e-14), (name = "F3 R", q = 2, t = 60, err = 0.16597805856670056, discrete_err = 1.887379141862766e-14), (name = "F3 R", q = 4, t = 10, err = 2.2430242359483543e-5, discrete_err = 1.176836406102666e-14), (name = "F3 R", q = 4, t = 30, err = 0.00011444631057555554, discrete_err = 1.6209256159527285e-14), (name = "F3 R", q = 4, t = 60, err = 0.00047649819365269686, discrete_err = 1.887379141862766e-14), (name = "F3 C", q = 2, t = 10, err = 0.004772076790224754, discrete_err = 2.2648549702353193e-14), (name = "F3 C", q = 2, t = 30, err = 0.031588366181041216, discrete_err = 1.1390888232654106e-13), (name = "F3 C", q = 2, t = 60, err = 0.0832050390899548, discrete_err = 1.3029577417000837e-12), (name =
+# Info AC22 reported: orbits in agreement, orbit divergence | nagree = 247; divs = [7.587333539227359e-14, 6.072919944699606e-14, 1.9137434692506616e-12, 7.371568633285364e-13, 4.829470157119431e-14, 9.24316179151674e-13, 2.9024005421263155e-13, 3.4033886819884174e-13, 3.6166208916554865e-13, 4.029138134242771e-13, 2.1105339698124226e-13, 3.6759484345338933e-13, 4.283240429003854e-13, 6.272760089132134e-13, 1.3061773884714967e-13, 1.3417045252595017e-13, 7.013001290800958e-13, 1.72029057665668e-13, 4.146752385913999e-13, 3.781003288239049e-14, 1.4982459717316488e-13, 2.3467339183014246e-13, 1.2101430968414206e-13, 2.4771851236948805e-13, 1.5343282200319663e-13, 3.197719866676607e-13, 5.163647287531603e-13, 1.254552017826427e-13, 2.488738382044886e-13, 4.013456234019941e-14, 2.7228219678931964e-13, 1.9471924073144464e-13, 3.369457490798311e-13, 1.4788170688007085e-13, 2.1405099914773018e-13, 5.345723863570129e-14, 4.848899060050371e-13, 2.9426461267689774e-13, 4.0858982
+# Info R1 reported: seconds and ratios to the repeated Gram-Schmidt and Householder spectra | tq = Dict{Any, Float64}(2 => 0.0071605, 4 => 0.0069334); discrete_rgs = 0.0217638; discrete_householder = 0.2182639; ratio_q4_rgs = 0.3185748812247861; ratio_q2_rgs = 0.3290096398606861
+# Info R2 reported | rows = Any[(k = 4, form = :f84, h = 0.05, cnu = 1.0, E = 8.536313601759105e-5, l1 = 3.022652475926186), (k = 4, form = :f84, h = 0.05, cnu = 2.0, E = 0.0010176882861281378, l1 = 3.0225645703191035), (k = 4, form = :f84, h = 0.05, cnu = 4.0, E = 0.009532106516647598, l1 = 3.02252446875442), (k = 4, form = :f84, h = 0.025, cnu = 1.0, E = 5.0799962225678286e-6, l1 = 3.022954800926208), (k = 4, form = :f84, h = 0.025, cnu = 2.0, E = 5.235116498569781e-5, l1 = 3.022947199320058), (k = 4, form = :f84, h = 0.025, cnu = 4.0, E = 0.00033153640161998066, l1 = 3.0229259596244296), (k = 2, form = :f92, h = 0.05, cnu = 1.0, E = 0.00029108585048187585, l1 = 3.0230232089850735), (k = 2, form = :f92, h = 0.05, cnu = 2.0, E = 0.0014412444250900824, l1 = 3.0230278953185024), (k = 2, form = :f92, h = 0.05, cnu = 4.0, E = 0.011017582103906576, l1 = 3.023174162234173), (k = 2, form = :f92, h = 0.025, cnu = 1.0, E =
+# Info R5 reported (if the no-penalty time is Inf, form 92 did not grow at nu = 0 and the finding goes to the owner) | tcross = Dict(2.0 => Inf, 0.0 => 173.5)
+ACFULL4 | file total (96 pass, 0 fail, 0 error, 0 broken, 1057.1 s) | 96 | 0 fail, 0 error | PASS
+ACFULL4 | testset AC16 orbit invariance: the orbit is bitwise that of the integrator alone, of the discrete spectrum and of Benettin, for every k and both schemes (9 pass, 0 fail or error, 0 broken, 1.8 s) | 0 | 0 | PASS
+ACFULL4 | testset AC17a execution invariance: chunk sizes and the serial body give bitwise identical series, sums, final Q and orbit points (6 pass, 0 fail or error, 0 broken, 260.1 s) | 0 | 0 | PASS
+ACFULL4 | testset AC17b the hot loop allocates nothing after warm-up (12 pass, 0 fail or error, 0 broken, 3.7 s) | 0 | 0 | PASS
+ACFULL4 | testset AC17c the series is a bitwise prefix of the run: the record at step n equals a fresh run to n (8 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL4 | testset AC18 cost counts: one Jacobian and one orbit step per orbit step, two right-hand sides per orbit step, memory formula of C21 (9 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL4 | testset AC19a an equilibrium start is accepted (the module does not divide by the field) (1 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL4 | testset AC19b non-finite state, Jacobian or frame: kind, orbit id and step, nothing stored (3 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL4 | testset AC19c, AC19d argument errors come before any work (9 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL4 | testset AC19e the run record carries h, the integrator and its order, q, the form, c_nu, E_max, the element type, k, the seed, backend, device, fallback reason and the flow (6 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL4 | testset AC20 external variational reference, package stand-in (Double64 order-10 table at 1/80; the Taylor form is stage 04) (24 pass, 0 fail or error, 0 broken, 2.5 s) | 0 | 0 | PASS
+ACFULL4 | testset AC22 CPU part: each backend against its own 256-bit reference, the gap where the orbits agree; the :gpu request falls back to the CPU with its reason (6 pass, 0 fail or error, 0 broken, 786.1 s) | 0 | 0 | PASS
+ACFULL4 | testset R1 cost ratio against the discrete QR, reported (the 40 of Geist1990 Table III p.886 is a reproduction target, never a pass) (1 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL4 | testset R2 equilibrium defect against h, c_nu and the form, and the exponent bias against it, reported (1 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL4 | testset R5 form 92 at nu = 0 and k = 2 on orbit C: the time at which E reaches 1e-2, with and without the penalty (the claim of Skokos2010 p.53 is tested, not assumed) (1 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+# section FULL4 took 1057.2 s
+# ======== group Oa ========
+# continuous-qr verification, julia 1.13.2, threads 8, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups Oa, time 1.795036254e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Oa: element type BigFloat (256 bits), the closed forms of C19 on constant matrices (no orbit); references: exact matrix exponential and Gram determinants in 256 bits (C16)
+AC1 | Oa: diag(0.7, -0.7), q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, -0.7), q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: diag(0.7, -0.7), q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, -0.7), q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0.06242 | <= 1 | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: direct sum d = 4, q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: direct sum d = 4, q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: direct sum d = 4, q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: direct sum d = 4, q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC2 | Oa: skew F1 omega = 1, N = 1 (d = 2), q = 2, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 0.001328 | 0.1706 | <= 1 (E_max <= 0.01) | PASS
+AC2 | Oa: skew F1 omega = 1, N = 1 (d = 2), q = 4, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 5.708e-06 | 0.002104 | <= 1 (E_max <= 0.01) | PASS
+AC2 | Oa: skew F1 omega = 1, N = 2 (d = 4), q = 2, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0.001825 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 0.001374 | 0.1688 | <= 1 (E_max <= 0.01) | PASS
+AC2 | Oa: skew F1 omega = 1, N = 2 (d = 4), q = 4, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0.001921 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 2.566e-05 | 0.001408 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: inverted oscillator lam = 0.8 (d = 2), q = 2, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.001017) | 0.04403 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: inverted oscillator lam = 0.8 (d = 2), q = 4, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 3.356e-06) | 0.0006944 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: coupled hyperbolic lam = (0.8, 0.35), d = 4, q = 2, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.004491) | 0.001591 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: coupled hyperbolic lam = (0.8, 0.35), d = 4, q = 4, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.0004892) | 0.0003232 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: degenerate lam = (0.5, 0.5), d = 4 (every l_i individually, not their sum), q = 2, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.00283) | 0.005228 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: degenerate lam = (0.5, 0.5), d = 4 (every l_i individually, not their sum), q = 4, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 3.793e-05) | 0.0008207 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: degenerate case, l_2,ref - l_1,ref over the 4 frames at t = 10 (frame dependence of the individual values; the reference is the same Gram determinant) | ["-0.294", "-1.437", "1.042", "0.7071"] | report | INFO
+AC4 | Oa: fixture a, q = 2, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 1.811e-05, 2.593e-06, 4.302e-07, 8.169e-08, 1.727e-08) | 6.983, 6.028, 5.267, 4.729 | each in [2.0, 8] | PASS
+AC4 | Oa: fixture a, q = 2: least-squares slope of ln error against ln h | 2.506 | report (expected 2) | INFO
+AC4 | Oa: fixture a, q = 4, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 4.465e-07, 2.526e-08, 1.501e-09, 9.147e-11, 5.645e-12) | 17.68, 16.82, 16.41, 16.21 | each in [8.0, 32] | PASS
+AC4 | Oa: fixture a, q = 4: least-squares slope of ln error against ln h | 4.065 | report (expected 4) | INFO
+AC4 | Oa: fixture b, q = 2, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 0.004808, 0.00102, 0.0002409, 6.095e-05, 1.534e-05) | 4.712, 4.235, 3.952, 3.972 | each in [2.0, 8] | PASS
+AC4 | Oa: fixture b, q = 2: least-squares slope of ln error against ln h | 2.065 | report (expected 2) | INFO
+AC4 | Oa: fixture b, q = 4, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 0.002487, 6.454e-05, 3.927e-06, 2.531e-07, 1.609e-08) | 38.54, 16.43, 15.52, 15.73 | each in [8.0, 32] | FAIL
+AC4 | Oa: fixture b, q = 4: same ladder without the coarsest pair h = 0.1 -> 0.05 (pre-asymptotic: Delta ||A|| = 0.6977 at h = 0.1, the frame-dependent leading error constant) | 16.43, 15.52, 15.73 | each in [8.0, 32] | PASS
+AC4 | Oa: fixture b, q = 4: least-squares slope of ln error against ln h | 4.247 | report (expected 4) | INFO
+AC5 | Oa: A = diag(0.8, -0.8), theta = 0.3, q = 2, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.01564 ; 3.514e-76 ; 0.03222 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 0.3, q = 4, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.001966 ; 2.439e-75 ; 0.005069 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.0, q = 2, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.006632 ; 5.896e-76 ; 0.0745 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.0, q = 4, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.007428 ; 5.465e-75 ; 0.01457 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.4, q = 2, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.05876 ; 1.524e-75 ; 0.0698 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.4, q = 4, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.004355 ; 5.368e-75 ; 0.007969 | <= 1 each | PASS
+# section Oa took 11.7 s
+# ======== group Oid ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups Oid, time 1.795036045e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Oid: reference = Taylor order 40, abstol 2^-200, 256 bits (integrator-catalog O7, henon-heiles O3 settings), hand-written fields; frames in 256 bits
+AC7 | Oid: F3 orbit R, t = 10, exact flow: |ln ||Y q_1|| - ln(||f(z_t)|| / ||f(z_0)||)| with q_1(0) = f(z_0)/||f(z_0)|| (256 bits) | 8.713e-65 | <= 1e-30 | PASS
+AC8 | Oid: F3 orbit R, t = 10, exact flow, seeded frame: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t).q_1(t)|)| (256 bits) | 1.804e-63 | <= 1e-30 | PASS
+AC7 | Oid: F3 orbit R, t = 30, exact flow: |ln ||Y q_1|| - ln(||f(z_t)|| / ||f(z_0)||)| with q_1(0) = f(z_0)/||f(z_0)|| (256 bits) | 2.193e-63 | <= 1e-30 | PASS
+AC8 | Oid: F3 orbit R, t = 30, exact flow, seeded frame: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t).q_1(t)|)| (256 bits) | 1.134e-63 | <= 1e-30 | PASS
+AC7 | Oid: F3 orbit R, t = 60, exact flow: |ln ||Y q_1|| - ln(||f(z_t)|| / ||f(z_0)||)| with q_1(0) = f(z_0)/||f(z_0)|| (256 bits) | 5.194e-63 | <= 1e-30 | PASS
+AC8 | Oid: F3 orbit R, t = 60, exact flow, seeded frame: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t).q_1(t)|)| (256 bits) | 9.817e-63 | <= 1e-30 | PASS
+AC7 | Oid: F3 orbit C, t = 10, exact flow: |ln ||Y q_1|| - ln(||f(z_t)|| / ||f(z_0)||)| with q_1(0) = f(z_0)/||f(z_0)|| (256 bits) | 1.533e-64 | <= 1e-30 | PASS
+AC8 | Oid: F3 orbit C, t = 10, exact flow, seeded frame: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t).q_1(t)|)| (256 bits) | 1.962e-63 | <= 1e-30 | PASS
+AC7 | Oid: F3 orbit C, t = 30, exact flow: |ln ||Y q_1|| - ln(||f(z_t)|| / ||f(z_0)||)| with q_1(0) = f(z_0)/||f(z_0)|| (256 bits) | 3.401e-63 | <= 1e-30 | PASS
+AC8 | Oid: F3 orbit C, t = 30, exact flow, seeded frame: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t).q_1(t)|)| (256 bits) | 1.052e-64 | <= 1e-30 | PASS
+AC7 | Oid: F3 orbit C, t = 60, exact flow: |ln ||Y q_1|| - ln(||f(z_t)|| / ||f(z_0)||)| with q_1(0) = f(z_0)/||f(z_0)|| (256 bits) | 1.516e-62 | <= 1e-30 | PASS
+AC8 | Oid: F3 orbit C, t = 60, exact flow, seeded frame: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t).q_1(t)|)| (256 bits) | 5.504e-64 | <= 1e-30 | PASS
+AC7 | Oid: pendulum A=2, q = 2, h = 1/20, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.007311 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 2, h = 1/20, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.06398 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 2, h = 1/20, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.2354 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 2, h = 1/40, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.001812 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 2, h = 1/40, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.01598 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 2, h = 1/40, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.06112 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 4, h = 1/20, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 5.651e-05 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 4, h = 1/20, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.000286 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 4, h = 1/20, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.0008775 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 4, h = 1/40, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 3.375e-06 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 4, h = 1/40, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 1.676e-05 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=2, q = 4, h = 1/40, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 5.08e-05 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=3, q = 4, h = 1/20, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.001696 | <= 0.1 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=3, q = 4, h = 1/20, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.009764 | <= 0.1 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=3, q = 4, h = 1/20, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.02353 | <= 0.1 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=3, q = 4, h = 1/40, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 9.818e-05 | <= 0.1 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=3, q = 4, h = 1/40, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.0005101 | <= 0.1 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=3, q = 4, h = 1/40, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.001163 | <= 0.1 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: pendulum A=3, order-2 scheme | skipped | plan U7 (realized error 3.4 at t = 60) | INFO
+AC7 | Oid: F1 w=1.3, q = 2, h = 1/20, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.0004013 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 2, h = 1/20, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.007705 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 2, h = 1/20, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.01229 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 2, h = 1/40, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 5.959e-05 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 2, h = 1/40, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.001769 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 2, h = 1/40, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.003219 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 4, h = 1/20, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 1.935e-05 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 4, h = 1/20, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 8.572e-05 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 4, h = 1/20, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 9.977e-05 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 4, h = 1/40, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 1.544e-06 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 4, h = 1/40, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 5.595e-06 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F1 w=1.3, q = 4, h = 1/40, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 9.799e-06 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 2, h = 1/20, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.003889 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 2, h = 1/20, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.01401 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 2, h = 1/20, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.2181 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 2, h = 1/40, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.0009194 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 2, h = 1/40, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.003159 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 2, h = 1/40, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.04739 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 4, h = 1/20, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 1.234e-05 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 4, h = 1/20, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 2.267e-05 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 4, h = 1/20, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.0001437 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 4, h = 1/40, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 7.72e-07 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 4, h = 1/40, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 2.881e-06 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 R, q = 4, h = 1/40, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 5.834e-06 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 2, h = 1/20, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.0007075 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 2, h = 1/20, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.0336 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 2, h = 1/20, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.3315 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 2, h = 1/40, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.0001428 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 2, h = 1/40, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.00748 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 2, h = 1/40, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.07329 | <= 1.0 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 4, h = 1/20, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 5.447e-06 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 4, h = 1/20, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 1.542e-05 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 4, h = 1/20, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 0.0001351 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 4, h = 1/40, t = 10: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 6.662e-07 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 4, h = 1/40, t = 30: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 4.241e-06 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC7 | Oid: F3 C, q = 4, h = 1/40, t = 60: |l_1 - ln(||f(z_t)|| / ||f(z_0)||)| with z_t from the Taylor reference | 1.547e-05 | <= 0.005 (plan U7; spec 1e-3 / 1e-1) | PASS
+AC8 | Oid: F3 orbit R, t = 10, q = 4, h = 1/20: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t^Taylor).q_1(t)|)| (c = 0.03274) | 0.0004092 | <= 0.03 (plan U8; spec 1e-3 + cancellation: ratio 0.4092) | PASS
+AC8 | Oid: F3 orbit R, t = 30, q = 4, h = 1/20: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t^Taylor).q_1(t)|)| (c = 0.04832) | 0.0004617 | <= 0.03 (plan U8; spec 1e-3 + cancellation: ratio 0.4617) | PASS
+AC8 | Oid: F3 orbit R, t = 60, q = 4, h = 1/20: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t^Taylor).q_1(t)|)| (c = 0.05912) | 0.000681 | <= 0.03 (plan U8; spec 1e-3 + cancellation: ratio 0.681) | PASS
+AC8 | Oid: F3 orbit C, t = 10, q = 4, h = 1/20: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t^Taylor).q_1(t)|)| (c = 0.2354) | 0.0001013 | <= 0.03 (plan U8; spec 1e-3 + cancellation: ratio 0.1013) | PASS
+AC8 | Oid: F3 orbit C, t = 30, q = 4, h = 1/20: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t^Taylor).q_1(t)|)| (c = 0.03372) | 0.0009763 | <= 0.03 (plan U8; spec 1e-3 + cancellation: ratio 0.9763) | PASS
+AC8 | Oid: F3 orbit C, t = 60, q = 4, h = 1/20: |l_1 - (ln|gradH(z_0).q_1(0)| - ln|gradH(z_t^Taylor).q_1(t)|)| (c = 0.009175) | 0.004576 | <= 0.03 (plan U8; spec 1e-3 + cancellation: ratio 4.576) | PASS
+# section Oid took 319.1 s
+# ======== group Od20 ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups Od20, time 1.795036045e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Od20: reference = Taylor order 40, abstol 2^-200, 256 bits, state + k variational columns of the seeded frame Q0 (hand-written field), l_ref from the Gram determinants of Y Q0 (C16, 256 bits); order-8 table on F3, order-4 table on the pendulum; bounds: plan AC20 (q = 4: 5e-3, pendulum A = 3: 1e-1; q = 2: 1.0, pendulum A = 3 skipped) with the spec delta_ext (1e-3, 1e-1) reported next to them
+# Od20: F3 R Taylor reference to t = 60, 50.8 s
+AC20 | Od20: F3 R, q = 2, h = 1/20, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.003304 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.03304 | PASS
+AC20 | Od20: F3 R, q = 4, h = 1/20, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 3.398e-05 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.03398 | PASS
+AC20 | Od20: F3 R, h = 1/20, t = 10: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 9.992e-15 ; 3.398e-05 ; 0.003304 | report | INFO
+AC20 | Od20: F3 R, q = 2, h = 1/20, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.02098 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.2098 | PASS
+AC20 | Od20: F3 R, q = 4, h = 1/20, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.0001116 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.1116 | PASS
+AC20 | Od20: F3 R, h = 1/20, t = 30: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 9.548e-15 ; 0.0001116 ; 0.02098 | report | INFO
+AC20 | Od20: F3 R, q = 2, h = 1/20, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.07685 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.7685 | PASS
+AC20 | Od20: F3 R, q = 4, h = 1/20, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.0004661 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.4661 | PASS
+AC20 | Od20: F3 R, h = 1/20, t = 60: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 2.22e-14 ; 0.0004661 ; 0.07685 | report | INFO
+AC20 | Od20: F3 R, q = 2, h = 1/40, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.0007816 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.007816 | PASS
+AC20 | Od20: F3 R, q = 4, h = 1/40, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 2.111e-06 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.002111 | PASS
+AC20 | Od20: F3 R, h = 1/40, t = 10: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 4.663e-15 ; 2.111e-06 ; 0.0007816 | report | INFO
+AC20 | Od20: F3 R, q = 2, h = 1/40, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.005228 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.05228 | PASS
+AC20 | Od20: F3 R, q = 4, h = 1/40, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 6.207e-06 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.006207 | PASS
+AC20 | Od20: F3 R, h = 1/40, t = 30: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 6.883e-14 ; 6.207e-06 ; 0.005228 | report | INFO
+AC20 | Od20: F3 R, q = 2, h = 1/40, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.01814 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.1814 | PASS
+AC20 | Od20: F3 R, q = 4, h = 1/40, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 2.196e-05 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.02196 | PASS
+AC20 | Od20: F3 R, h = 1/40, t = 60: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 5.373e-14 ; 2.196e-05 ; 0.01814 | report | INFO
+# Od20: F3 C Taylor reference to t = 60, 52.1 s
+AC20 | Od20: F3 C, q = 2, h = 1/20, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.006307 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.06307 | PASS
+AC20 | Od20: F3 C, q = 4, h = 1/20, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 5.463e-05 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.05463 | PASS
+AC20 | Od20: F3 C, h = 1/20, t = 10: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 1.055e-14 ; 5.463e-05 ; 0.006307 | report | INFO
+AC20 | Od20: F3 C, q = 2, h = 1/20, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.03825 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.3825 | PASS
+AC20 | Od20: F3 C, q = 4, h = 1/20, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.0001626 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.1626 | PASS
+AC20 | Od20: F3 C, h = 1/20, t = 30: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 1.07e-13 ; 0.0001626 ; 0.03825 | report | INFO
+AC20 | Od20: F3 C, q = 2, h = 1/20, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.1168 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 1.168 | PASS
+AC20 | Od20: F3 C, q = 4, h = 1/20, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.0005366 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.5366 | PASS
+AC20 | Od20: F3 C, h = 1/20, t = 60: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 1.391e-12 ; 0.0005366 ; 0.1168 | report | INFO
+AC20 | Od20: F3 C, q = 2, h = 1/40, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.001571 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.01571 | PASS
+AC20 | Od20: F3 C, q = 4, h = 1/40, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 3.714e-06 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.003714 | PASS
+AC20 | Od20: F3 C, h = 1/40, t = 10: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 1.532e-14 ; 3.714e-06 ; 0.001571 | report | INFO
+AC20 | Od20: F3 C, q = 2, h = 1/40, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.009602 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.09602 | PASS
+AC20 | Od20: F3 C, q = 4, h = 1/40, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 1.023e-05 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.01023 | PASS
+AC20 | Od20: F3 C, h = 1/40, t = 30: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 9.459e-14 ; 1.023e-05 ; 0.009602 | report | INFO
+AC20 | Od20: F3 C, q = 2, h = 1/40, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.03327 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.3327 | PASS
+AC20 | Od20: F3 C, q = 4, h = 1/40, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 2.841e-05 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.02841 | PASS
+AC20 | Od20: F3 C, h = 1/40, t = 60: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 6.888e-13 ; 2.841e-05 ; 0.03327 | report | INFO
+# Od20: pendulum A=2 Taylor reference to t = 100, 50.0 s
+AC20 | Od20: pendulum A=2, q = 2, h = 1/20, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.002587 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.02587 | PASS
+AC20 | Od20: pendulum A=2, q = 4, h = 1/20, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 1.475e-05 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.01475 | PASS
+AC20 | Od20: pendulum A=2, h = 1/20, t = 10: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 4.094e-07 ; 1.475e-05 ; 0.002587 | report | INFO
+AC20 | Od20: pendulum A=2, q = 2, h = 1/20, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.02124 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.2124 | PASS
+AC20 | Od20: pendulum A=2, q = 4, h = 1/20, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 8.17e-05 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.0817 | PASS
+AC20 | Od20: pendulum A=2, h = 1/20, t = 30: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 1.847e-06 ; 8.17e-05 ; 0.02124 | report | INFO
+AC20 | Od20: pendulum A=2, q = 2, h = 1/20, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.08274 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.8274 | PASS
+AC20 | Od20: pendulum A=2, q = 4, h = 1/20, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.0002695 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.2695 | PASS
+AC20 | Od20: pendulum A=2, h = 1/20, t = 60: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 4.728e-06 ; 0.0002695 ; 0.08274 | report | INFO
+AC20 | Od20: pendulum A=2, q = 2, h = 1/20, t = 100: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.2297 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 2.297 | PASS
+AC20 | Od20: pendulum A=2, q = 4, h = 1/20, t = 100: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.000689 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.689 | PASS
+AC20 | Od20: pendulum A=2, h = 1/20, t = 100: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 4.974e-07 ; 0.000689 ; 0.2297 | report | INFO
+AC20 | Od20: pendulum A=2, q = 2, h = 1/40, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.000651 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.00651 | PASS
+AC20 | Od20: pendulum A=2, q = 4, h = 1/40, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 8.962e-07 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.0008962 | PASS
+AC20 | Od20: pendulum A=2, h = 1/40, t = 10: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 2.568e-08 ; 8.962e-07 ; 0.000651 | report | INFO
+AC20 | Od20: pendulum A=2, q = 2, h = 1/40, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.005292 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.05292 | PASS
+AC20 | Od20: pendulum A=2, q = 4, h = 1/40, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 4.821e-06 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.004821 | PASS
+AC20 | Od20: pendulum A=2, h = 1/40, t = 30: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 1.156e-07 ; 4.821e-06 ; 0.005292 | report | INFO
+AC20 | Od20: pendulum A=2, q = 2, h = 1/40, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.02066 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.2066 | PASS
+AC20 | Od20: pendulum A=2, q = 4, h = 1/40, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 1.567e-05 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.01567 | PASS
+AC20 | Od20: pendulum A=2, h = 1/40, t = 60: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 2.958e-07 ; 1.567e-05 ; 0.02066 | report | INFO
+AC20 | Od20: pendulum A=2, q = 2, h = 1/40, t = 100: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.05839 | <= 1.0 (plan); h = 1/20 spec delta_ext 1e-1: ratio 0.5839 | PASS
+AC20 | Od20: pendulum A=2, q = 4, h = 1/40, t = 100: max_i |l_i - l_i,ref| (Taylor 256 bits) | 3.966e-05 | <= 0.005 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.03966 | PASS
+AC20 | Od20: pendulum A=2, h = 1/40, t = 100: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 3.119e-08 ; 3.966e-05 ; 0.05839 | report | INFO
+# Od20: pendulum A=3 Taylor reference to t = 100, 43.8 s
+AC20 | Od20: pendulum A=3, q = 2, h = 1/20, t = 10: max_i |l_i - l_i,ref| (skipped by plan U7) | 0.0003343 | report | INFO
+AC20 | Od20: pendulum A=3, q = 4, h = 1/20, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 5.758e-05 | <= 0.1 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.05758 | PASS
+AC20 | Od20: pendulum A=3, h = 1/20, t = 10: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 5.736e-05 ; 5.758e-05 ; 0.0003343 | report | INFO
+AC20 | Od20: pendulum A=3, q = 2, h = 1/20, t = 30: max_i |l_i - l_i,ref| (skipped by plan U7) | 0.6844 | report | INFO
+AC20 | Od20: pendulum A=3, q = 4, h = 1/20, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.001216 | <= 0.1 (plan); h = 1/20 spec delta_ext 1e-3: ratio 1.216 | PASS
+AC20 | Od20: pendulum A=3, h = 1/20, t = 30: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 8.081e-05 ; 0.001216 ; 0.6844 | report | INFO
+AC20 | Od20: pendulum A=3, q = 2, h = 1/20, t = 60: max_i |l_i - l_i,ref| (skipped by plan U7) | 1.892 | report | INFO
+AC20 | Od20: pendulum A=3, q = 4, h = 1/20, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.004504 | <= 0.1 (plan); h = 1/20 spec delta_ext 1e-3: ratio 4.504 | PASS
+AC20 | Od20: pendulum A=3, h = 1/20, t = 60: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 0.0001836 ; 0.004504 ; 1.892 | report | INFO
+AC20 | Od20: pendulum A=3, q = 2, h = 1/20, t = 100: max_i |l_i - l_i,ref| (skipped by plan U7) | 4.111 | report | INFO
+AC20 | Od20: pendulum A=3, q = 4, h = 1/20, t = 100: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.0129 | <= 0.1 (plan); h = 1/20 spec delta_ext 1e-3: ratio 12.9 | PASS
+AC20 | Od20: pendulum A=3, h = 1/20, t = 100: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 0.0003588 ; 0.0129 ; 4.111 | report | INFO
+AC20 | Od20: pendulum A=3, q = 2, h = 1/40, t = 10: max_i |l_i - l_i,ref| (skipped by plan U7) | 7.363e-05 | report | INFO
+AC20 | Od20: pendulum A=3, q = 4, h = 1/40, t = 10: max_i |l_i - l_i,ref| (Taylor 256 bits) | 3.618e-06 | <= 0.1 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.003618 | PASS
+AC20 | Od20: pendulum A=3, h = 1/40, t = 10: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 3.59e-06 ; 3.618e-06 ; 7.363e-05 | report | INFO
+AC20 | Od20: pendulum A=3, q = 2, h = 1/40, t = 30: max_i |l_i - l_i,ref| (skipped by plan U7) | 0.1908 | report | INFO
+AC20 | Od20: pendulum A=3, q = 4, h = 1/40, t = 30: max_i |l_i - l_i,ref| (Taylor 256 bits) | 4.855e-05 | <= 0.1 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.04855 | PASS
+AC20 | Od20: pendulum A=3, h = 1/40, t = 30: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 5.058e-06 ; 4.855e-05 ; 0.1908 | report | INFO
+AC20 | Od20: pendulum A=3, q = 2, h = 1/40, t = 60: max_i |l_i - l_i,ref| (skipped by plan U7) | 0.5875 | report | INFO
+AC20 | Od20: pendulum A=3, q = 4, h = 1/40, t = 60: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.00019 | <= 0.1 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.19 | PASS
+AC20 | Od20: pendulum A=3, h = 1/40, t = 60: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 1.149e-05 ; 0.00019 ; 0.5875 | report | INFO
+AC20 | Od20: pendulum A=3, q = 2, h = 1/40, t = 100: max_i |l_i - l_i,ref| (skipped by plan U7) | 1.46 | report | INFO
+AC20 | Od20: pendulum A=3, q = 4, h = 1/40, t = 100: max_i |l_i - l_i,ref| (Taylor 256 bits) | 0.0005396 | <= 0.1 (plan); h = 1/20 spec delta_ext 1e-3: ratio 0.5396 | PASS
+AC20 | Od20: pendulum A=3, h = 1/40, t = 100: discrete RGS spectrum error against the same reference ; continuous q = 4 ; q = 2 | 2.246e-05 ; 0.0005396 ; 1.46 | report | INFO
+# Od20: convergence sweep uses orthogonality_tol = 0.5 (a guard, not a bound; the default 1e-2 / 5e-2 would stop the coarse order-2 runs)
+AC20 | Od20: orbit C, t = 60, order-8 table, q = 2, h = 1/10 .. 1/320: errors 0.4536, 0.1168, 0.03327, 0.008535, 0.002141, 0.0005349; E_max seen 0.02285, 0.005299, 0.001265, 0.0003086, 7.619e-05, 1.893e-05 | ratios 3.885, 3.509, 3.899, 3.987, 4.002 | report; expected about 4 | INFO
+AC20 | Od20: orbit C, t = 60, q = 2: slope of ln error against ln h over all h ; over h = 1/20 .. 1/80 | 1.94 ; 1.887 | report (expected 2) | INFO
+AC20 | Od20: orbit C, t = 60, order-8 table, q = 4, h = 1/10 .. 1/320: errors 0.01565, 0.0005366, 2.841e-05, 1.69e-06, 1.038e-07, 6.441e-09; E_max seen 0.001577, 8.548e-05, 5.088e-06, 3.121e-07, 1.935e-08, 1.205e-09 | ratios 29.17, 18.89, 16.81, 16.28, 16.12 | report; expected about 16 | INFO
+AC20 | Od20: orbit C, t = 60, q = 4: slope of ln error against ln h over all h ; over h = 1/20 .. 1/80 | 4.204 ; 4.155 | report (expected 4) | INFO
+ACR4 | order-2 against order-4 error at h = 1/20, orbit C, t = 60: q = 2 ; q = 4 ; h at which the order-2 error reaches the order-4 error at h = 1/20 | 0.1168 ; 0.0005366 ; about h = 0.00313 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 4, form 84, h = 1/20, c_nu = 1.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 8.548e-05 ; 0.0005366 ; 6.278 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 4, form 84, h = 1/20, c_nu = 2.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 0.001015 ; 0.001566 ; 1.543 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 4, form 84, h = 1/20, c_nu = 4.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 0.009517 ; 0.01206 ; 1.267 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 4, form 84, h = 1/40, c_nu = 1.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 5.088e-06 ; 2.841e-05 ; 5.585 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 4, form 84, h = 1/40, c_nu = 2.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 5.22e-05 ; 5.447e-05 ; 1.043 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 4, form 84, h = 1/40, c_nu = 4.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 0.0003312 ; 0.0001423 ; 0.4297 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 2, form 92, h = 1/20, c_nu = 1.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 0.0002929 ; 0.0005521 ; 1.885 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 2, form 92, h = 1/20, c_nu = 2.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 0.001484 ; 0.0006589 ; 0.444 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 2, form 92, h = 1/20, c_nu = 4.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 0.01148 ; 0.003918 ; 0.3415 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 2, form 92, h = 1/40, c_nu = 1.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 1.613e-05 ; 3.809e-05 ; 2.361 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 2, form 92, h = 1/40, c_nu = 2.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 7.208e-05 ; 5.567e-05 ; 0.7724 | no threshold | INFO
+ACR2 | orbit C, t = 60, q = 4, k = 2, form 92, h = 1/40, c_nu = 4.0: E_eq (E_max seen) ; exponent error against the Taylor reference ; error / E_eq | 0.0003647 ; 8.497e-05 ; 0.233 | no threshold | INFO
+# section Od20 took 198.2 s
+# ======== group Od20R ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups Od20R, time 1.795036045e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Od20R: orbit R Taylor reference to t = 1000 (4 columns), 790.7 s
+AC20 | Od20R: orbit R, q = 4, h = 1/20, t = 60: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 0.000491 ; 5.479e-14 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 4, h = 1/20, t = 100: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 0.003776 ; 8.957e-13 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 4, h = 1/20, t = 300: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 0.008494 ; 9.335e-13 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 4, h = 1/20, t = 1000: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 0.09529 ; 1.786e-12 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 4, h = 1/40, t = 60: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 2.497e-05 ; 3.227e-13 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 4, h = 1/40, t = 100: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 6.953e-05 ; 1.612e-12 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 4, h = 1/40, t = 300: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 0.0003594 ; 1.572e-12 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 4, h = 1/40, t = 1000: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 0.003981 ; 5.353e-12 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 2, h = 1/20, t = 60: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 0.3308 ; 5.479e-14 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 2, h = 1/20, t = 100: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 0.8153 ; 8.957e-13 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 2, h = 1/20, t = 300: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 2.57 ; 9.335e-13 | report (to t = 1000) | INFO
+AC20 | Od20R: orbit R, q = 2, h = 1/20, t = 1000: max_i |l_i - l_i,ref| ; discrete RGS error (reported) | 4.2 ; 1.786e-12 | report (to t = 1000) | INFO
+# section Od20R took 791.5 s
+# ======== group Oc9 ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups Oc9, time 1.795036045e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Oc9: orbits R, C and 20 starts per class (cq_classes, SALI at 2000 below 1e-8), order-8 table, q = 4, T = 1000; lambda form |lambda^C - lambda^D| against c_d h^4 with c_d = 5 (spec) and the l form |l^C - l^D| against 5e4 h^4 (plan U9, calibrated at T = 200); discrete = repeated Gram-Schmidt k = 4 at tau = 1 divided by h
+AC9 | Oc9: C, h = 1/20, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 13.69) | 2.737 | <= 1 (spec c_d = 5; plan calibration at T = 60: c_d = 10) | FAIL
+AC9 | Oc9: C, h = 1/20, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9) | 0.2737 | <= 1 | PASS
+AC9 | Oc9: C, h = 1/20, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 2.737 ; 2.685 ; 1.277e-15 | report (R6) | INFO
+AC9 | Oc9: C, h = 1/40, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 8.64) | 1.728 | <= 1 (spec c_d = 5; plan calibration at T = 60: c_d = 10) | FAIL
+AC9 | Oc9: C, h = 1/40, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9) | 0.1728 | <= 1 | PASS
+AC9 | Oc9: C, h = 1/40, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 1.728 ; 1.728 ; 3.084e-15 | report (R6) | INFO
+AC9 | Oc9: R, h = 1/20, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 13.53) | 2.706 | <= 1 (spec c_d = 5; plan calibration at T = 60: c_d = 10) | FAIL
+AC9 | Oc9: R, h = 1/20, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9) | 0.2706 | <= 1 | PASS
+AC9 | Oc9: R, h = 1/20, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 2.706 ; 0.8722 ; 1.789e-15 | report (R6) | INFO
+AC9 | Oc9: R, h = 1/40, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 10.13) | 2.026 | <= 1 (spec c_d = 5; plan calibration at T = 60: c_d = 10) | FAIL
+AC9 | Oc9: R, h = 1/40, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9) | 0.2026 | <= 1 | PASS
+AC9 | Oc9: R, h = 1/40, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 2.026 ; 0.6372 ; 8.058e-16 | report (R6) | INFO
+AC9 | Oc9: chaotic, h = 1/20, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 298.7) | 59.74 | <= 1 (spec c_d = 5; plan calibration at T = 60: c_d = 10) | FAIL
+AC9 | Oc9: chaotic, h = 1/20, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9) | 5.974 | <= 1 | FAIL
+AC9 | Oc9: chaotic, h = 1/20, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 59.74 ; 13.64 ; 2.649e-13 | report (R6) | INFO
+AC9 | Oc9: chaotic, h = 1/40, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 240.4) | 48.08 | <= 1 (spec c_d = 5; plan calibration at T = 60: c_d = 10) | FAIL
+AC9 | Oc9: chaotic, h = 1/40, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9) | 4.808 | <= 1 | FAIL
+AC9 | Oc9: chaotic, h = 1/40, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 48.08 ; 34.03 ; 5.477e-14 | report (R6) | INFO
+AC9 | Oc9: regular, h = 1/20, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 253.9) | 50.78 | <= 1 (spec c_d = 5; plan calibration at T = 60: c_d = 10) | FAIL
+AC9 | Oc9: regular, h = 1/20, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9) | 5.078 | <= 1 | FAIL
+AC9 | Oc9: regular, h = 1/20, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 50.78 ; 6.065 ; 2.003e-14 | report (R6) | INFO
+AC9 | Oc9: regular, h = 1/40, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 256.8) | 51.36 | <= 1 (spec c_d = 5; plan calibration at T = 60: c_d = 10) | FAIL
+AC9 | Oc9: regular, h = 1/40, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9) | 5.136 | <= 1 | FAIL
+AC9 | Oc9: regular, h = 1/40, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 51.36 ; 3.771 ; 1.635e-13 | report (R6) | INFO
+# section Oc9 took 12.3 s
+# ======== group Oord ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups Oord, time 1.795036045e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Oord: error |lambda^C - lambda^D| (max over i, k = 4, RGS at tau = 1 over h) against h on orbits R and C, T = 60; allowance c h^m with m = min(p, q); tables order 8 (KahanLi) and order 4 (ForestRuth)
+AC9 | Oord: orbit R, table order 8, q = 2 (m = 2), T = 60, h = 1/10 .. 1/80: errors 0.003407, 0.0007448, 0.0001765, 4.307e-05; fitted slope 2.1 | ratios 4.575, 4.221, 4.097 | each in [1.0, 16] where above the floor 2.22e-13 (reported) | INFO
+AC9 | Oord: orbit R, table order 8, q = 4 (m = 4), T = 60, h = 1/10 .. 1/80: errors 0.0001837, 5.9e-06, 3.005e-07, 1.774e-08; fitted slope 4.431 | ratios 31.14, 19.63, 16.94 | each in [4.0, 64] where above the floor 2.22e-13 (reported) | INFO
+AC9 | Oord: orbit R, table order 4, q = 2 (m = 2), T = 60, h = 1/10 .. 1/80: errors 0.003393, 0.000744, 0.0001764, 4.307e-05; fitted slope 2.098 | ratios 4.561, 4.217, 4.096 | each in [1.0, 16] where above the floor 2.22e-13 (reported) | INFO
+AC9 | Oord: orbit R, table order 4, q = 4 (m = 4), T = 60, h = 1/10 .. 1/80: errors 0.0001713, 5.579e-06, 3e-07, 1.809e-08; fitted slope 4.384 | ratios 30.71, 18.6, 16.58 | each in [4.0, 64] where above the floor 2.22e-13 (reported) | INFO
+AC9 | Oord: orbit C, table order 8, q = 2 (m = 2), T = 60, h = 1/10 .. 1/80: errors 0.003064, 0.0007868, 0.0001975, 4.932e-05; fitted slope 1.987 | ratios 3.895, 3.984, 4.004 | each in [1.0, 16] where above the floor 2.22e-13 (reported) | INFO
+AC9 | Oord: orbit C, table order 8, q = 4 (m = 4), T = 60, h = 1/10 .. 1/80: errors 0.0002265, 8.005e-06, 4.241e-07, 2.533e-08; fitted slope 4.362 | ratios 28.3, 18.88, 16.74 | each in [4.0, 64] where above the floor 2.22e-13 (spec gate: orbit C, q = 4) | PASS
+AC9 | Oord: orbit C, table order 4, q = 2 (m = 2), T = 60, h = 1/10 .. 1/80: errors 0.003104, 0.0007887, 0.0001976, 4.933e-05; fitted slope 1.992 | ratios 3.936, 3.991, 4.006 | each in [1.0, 16] where above the floor 2.22e-13 (reported) | INFO
+AC9 | Oord: orbit C, table order 4, q = 4 (m = 4), T = 60, h = 1/10 .. 1/80: errors 0.0002322, 8.42e-06, 4.501e-07, 2.696e-08; fitted slope 4.344 | ratios 27.58, 18.71, 16.7 | each in [4.0, 64] where above the floor 2.22e-13 (reported) | INFO
+# section Oord took 1.1 s
+# ======== group AC11d ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups AC11d, time 1.795036479e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+AC11 | AC11d: 200 chaotic starts, T = 2000: starts with lambda_1 > 0 ; starts within the allowance 5e4 h^4 / T of the discrete lambda_1 | 200 ; 191 | all 200 ; all 200 | FAIL
+AC11 | AC11d: |lambda_1^C - lambda_1^D| / allowance: median ; q90 ; max ; smallest lambda_1^C | 0.07533 ; 0.4388 ; 10.7 ; 0.01144 | report | INFO
+# section AC11d took 27.8 s
+# ======== group Od21 ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups Od21, time 1.795036046e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Od21: ChaosTools 3.5.4 lyapunovspectrum (method H2 of Geist1990, hand-coded Jacobian, CoupledODEs Tsit5 abstol = reltol = 1e-12, Delta t = 1, identity frame), 100 independent chaotic-class starts (SALI at 2000 below 1e-8) on each side, t = 500.0; module: q = 4, order-8 table, h = 1/20, identity frame
+# Od21: ChaosTools side 1.9 s
+AC21 | Od21: lambda_1 ensemble means: module 0.05014 (sd 0.0188) ; ChaosTools 0.04787 (sd 0.02175): |difference| ; 4 combined SE + 4 / t | 0.002265 ; 0.0195 | <= 4 SE + 4 / t = 0.0195 (difference / SE = 0.7881) | PASS
+AC21 | Od21: lambda_2 ensemble means: module 0.006172 (sd 0.002544) ; ChaosTools 0.006355 (sd 0.002449): |difference| ; 4 combined SE + 4 / t | 0.0001824 ; 0.009412 | <= 4 SE + 4 / t = 0.009412 (difference / SE = 0.5167) | PASS
+AC21 | Od21: lambda_1 + lambda_4 and lambda_2 + lambda_3 means, module ; ChaosTools (pairing, reported) | -0.0002869, 0.0002869 ; -0.0004384, 0.0004384 | report | INFO
+# section Od21 took 16.9 s
+# ======== group AC17T ========
+# continuous-qr verification, julia 1.13.2, threads 8, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups AC17T, time 1.795036254e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# AC17T: 4096 random starts of F3 at E = 1/8, t = 1e3 (20000 steps), both schemes: 8 threads over orbits (propagate_cqr_orbit in Threads.@threads) 10.8 s; 1 thread child (propagate_cqr, chunk 64) 76.2 s; propagate_cqr itself is a serial loop over orbits (impl notes), so the threaded side is the orbit-level use
+AC17 | AC17T: q = 2: final records (l, lambda, E, Emax, counts) bitwise identical, 8 threads against 1 thread child (4096 starts) | true | bitwise | PASS
+AC17 | AC17T: q = 2: final states and final frames bitwise identical | true | bitwise | PASS
+AC17 | AC17T: q = 2: chunk 64 (child) against chunk 1000 (this process, serial): bitwise identical records, states, frames | true | bitwise | PASS
+AC17 | AC17T: q = 4: final records (l, lambda, E, Emax, counts) bitwise identical, 8 threads against 1 thread child (4096 starts) | true | bitwise | PASS
+AC17 | AC17T: q = 4: final states and final frames bitwise identical | true | bitwise | PASS
+AC17 | AC17T: q = 4: chunk 64 (child) against chunk 1000 (this process, serial): bitwise identical records, states, frames | true | bitwise | PASS
+# section AC17T took 155.0 s
+# ======== group AC17alloc ========
+# continuous-qr verification, julia 1.13.2, threads 8, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups AC17alloc, time 1.795036254e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+AC17 | AC17alloc: Float64, q = 2, k = 1, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Float64, q = 2, k = 2, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Float64, q = 2, k = 4, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Float64, q = 4, k = 1, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Float64, q = 4, k = 2, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Float64, q = 4, k = 4, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Double64, q = 2, k = 1, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Double64, q = 2, k = 2, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Double64, q = 2, k = 4, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Double64, q = 4, k = 1, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Double64, q = 4, k = 2, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+AC17 | AC17alloc: Double64, q = 4, k = 4, t = 1e3 (20000 steps): bytes allocated after warm-up | 0 | 0 | PASS
+# section AC17alloc took 8.6 s
+# ======== group AC22 ========
+# continuous-qr verification, julia 1.13.2, threads 8, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups AC22, time 1.795036254e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+AC22 | AC22: Float64, request :gpu -> backend cpu, device cpu, fallback reason: reducer is CPU-only | cpu | backend :cpu | PASS
+AC22 | AC22: Float64, request :auto -> backend cpu, device cpu, fallback reason: reducer is CPU-only | cpu | backend :cpu | PASS
+AC22 | AC22: Float64, request :cpu -> backend cpu, device cpu, fallback reason:  | cpu | backend :cpu | PASS
+AC22 | AC22: Double64, request :gpu -> backend cpu, device cpu, fallback reason: reducer is CPU-only | cpu | backend :cpu | PASS
+AC22 | AC22: Double64, request :auto -> backend cpu, device cpu, fallback reason: reducer is CPU-only | cpu | backend :cpu | PASS
+AC22 | AC22: Double64, request :cpu -> backend cpu, device cpu, fallback reason:  | cpu | backend :cpu | PASS
+AC22 | AC22: CPU against GPU, Float64: device part and 1024 + 1024 starts at t = 400 | not run | - | NOT RUN: needs verify/gpu.jl (writes data/gpu-benchmark.toml); owner decision. The module has no kernel path (impl notes): a :gpu request falls back to the CPU with the reason of a CPU-only reducer, not the Double64 kernel reason of the spec Compute section
+# section AC22 took 4.5 s
+# ======== group R1 ========
+# continuous-qr verification, julia 1.13.2, threads 1, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups R1, time 1.795037261e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# R1: orbit C, N = 20000 steps (t = 1000), h = 1/20, order-8 table, k = d = 4, tau = 1, minimum of 5 repeats, 1 thread; the machine may be loaded by other processes
+ACR1 | Float64, q = 2: continuous QR seconds ; discrete RGS ; discrete Householder ; ratios to RGS and to Householder (Geist1990 Table III p.886 reports 40 against Gram-Schmidt, a reproduction target only) | 0.007918 ; 0.02203 ; 0.02341 ; 0.3594 ; 0.3382 | no threshold | INFO
+ACR1 | Float64, q = 4: continuous QR seconds ; discrete RGS ; discrete Householder ; ratios to RGS and to Householder (Geist1990 Table III p.886 reports 40 against Gram-Schmidt, a reproduction target only) | 0.007867 ; 0.02203 ; 0.02341 ; 0.3571 ; 0.3361 | no threshold | INFO
+ACR1 | Double64, q = 2: continuous QR seconds ; discrete RGS ; discrete Householder ; ratios to RGS and to Householder (Geist1990 Table III p.886 reports 40 against Gram-Schmidt, a reproduction target only) | 0.2301 ; 0.3038 ; 0.3134 ; 0.7572 ; 0.7342 | no threshold | INFO
+ACR1 | Double64, q = 4: continuous QR seconds ; discrete RGS ; discrete Householder ; ratios to RGS and to Householder (Geist1990 Table III p.886 reports 40 against Gram-Schmidt, a reproduction target only) | 0.2089 ; 0.3038 ; 0.3134 ; 0.6877 ; 0.6668 | no threshold | INFO
+# section R1 took 10.5 s
+# ======== group FIG ========
+# continuous-qr verification, julia 1.13.2, threads 2, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FIG, time 1.795036687e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# FIG: wrote continuous-qr-convergence.png and continuous-qr-orthogonality.png in the stage 04 output folder
+# section FIG took 11.4 s

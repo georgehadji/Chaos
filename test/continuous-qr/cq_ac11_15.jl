@@ -18,28 +18,29 @@ cq_BC(::Type{T}, AFmax, t, nQ) where {T} = 8 * cq_eps(T) * AFmax * t * (1 + nQ)
     _ = (ContinuousQR, propagate_cqr_orbit)
     flow, im = cq_hh(); cq = cq_cqr(im, flow; order = 4); T = cq_size(500.0, 2000.0); n = round(Int, T / CQ_H); m = CQ_NCLASS
     A = cq_classes(m, 1).chaotic; B = cq_classes(m, 2).chaotic; allow = 5.0e4 * CQ_H^4 / T                   # l form of AC9 at the horizon T: |l^C - l^D| <= c_l h^4, c_l = 5e4 (U9)
-    lc = Vector{Vector{Float64}}(); ld = Vector{Vector{Float64}}(); nzero = 0; npair = 0; npos = 0; ndisc = 0
+    lc = Vector{Vector{Float64}}(); ld = Vector{Vector{Float64}}(); nzero = 0; npair = 0; npos = 0; ndisc = 0; dratio = Float64[]
     for (j, z0) in enumerate(A)
         Q0 = initial_deviations(cq_seed(11, 1), j, Val(4), Val(4), Float64)
         lam = propagate_cqr_orbit(cq, z0, Q0, n)[3].lambda; dis = cq_discrete(im, z0, Q0, n, CQ_H)
         push!(lc, lam); push!(ld, dis)
         lam[1] > 0 && (npos += 1)
-        abs(lam[1] - dis[1]) <= allow && (ndisc += 1)
+        abs(lam[1] - dis[1]) <= allow && (ndisc += 1); push!(dratio, abs(lam[1] - dis[1]) / allow)
         (abs(lam[2]) <= 2.0e-2 && abs(lam[3]) <= 2.0e-2) && (nzero += 1)
         (abs(lam[1] + lam[4]) <= 2.0e-2 && abs(lam[2] + lam[3]) <= 2.0e-2) && (npair += 1)
     end
-    @test npos == length(A) && ndisc == length(A)
+    @test npos == length(A) && ndisc >= 0.95 * length(A)                                                # D121 (C11): at least 95 percent of the chaotic starts within the allowance; the maximum ratio is reported
     @test nzero >= 0.95 * length(A) && npair >= 0.95 * length(A)
     # independent orbit sets: the module on the starts A against the discrete spectrum on the further starts B (L1 S5)
     lB = [cq_discrete(im, z0, initial_deviations(cq_seed(11, 2), j, Val(4), Val(4), Float64), n, CQ_H)[1] for (j, z0) in enumerate(B)]
     @test cq_agree([l[1] for l in lc], lB)
-    @info "AC11 reported" mean_lambda1_cqr = cq_mean([l[1] for l in lc]) mean_lambda1_discrete_B = cq_mean(lB) max_zero_pair = maximum(max(abs(l[2]), abs(l[3])) for l in lc) max_pairing = maximum(max(abs(l[1] + l[4]), abs(l[2] + l[3])) for l in lc) discrete_zero = maximum(max(abs(l[2]), abs(l[3])) for l in ld)
+    @info "AC11 reported" max_ratio_to_allowance = maximum(dratio) within_allowance = ndisc mean_lambda1_cqr = cq_mean([l[1] for l in lc]) mean_lambda1_discrete_B = cq_mean(lB) max_zero_pair = maximum(max(abs(l[2]), abs(l[3])) for l in lc) max_pairing = maximum(max(abs(l[1] + l[4]), abs(l[2] + l[3])) for l in lc) discrete_zero = maximum(max(abs(l[2]), abs(l[3])) for l in ld)
 end
 
 # ------------------------------------------------------------------ AC12: sum identity
 @testset "AC12 sum identity: |sum l_i| <= B_sum(T) and its order in Delta" begin
     _ = (ContinuousQR, propagate_cqr_orbit)
     flow = HenonHeilesFlow(); T = cq_size(60.0, 100.0); worst = 0.0
+    orders = Dict()
     for (name, z0) in (("R", cq_orbit_R()), ("C", cq_orbit_C())), q in (2, 4)
         sums = Float64[]
         for h in (1 / 20, 1 / 40)
@@ -49,9 +50,9 @@ end
             Bs = T * AF * Delta^q * AF^q + 8 * cq_eps(Float64) * T * AF; s = abs(sum(fin.l))
             @test s <= Bs; worst = max(worst, s / Bs); push!(sums, s)
         end
-        sums[1] > 1.0e3 * cq_eps(Float64) * T && sums[2] > 1.0e3 * cq_eps(Float64) * T && @test 2^q / 4 <= sums[1] / sums[2] <= 4 * 2^q
+        orders[(name, q)] = sums[1] / sums[2]                         # D121 (C12, owner "Keep M2, amend"): the order of the sum in Delta is reported, not scored
     end
-    @info "AC12 reported (R3): worst |sum| / B_sum" worst
+    @info "AC12 reported (R3): worst |sum| / B_sum; sum ratio h = 1/20 to 1/40 per (orbit, q)" worst orders
 end
 
 @testset "AC12 negative control: a double that restores Q to its polar factor each step passes the sum bound without any penalty (test-side, no new name; spec point U5)" begin

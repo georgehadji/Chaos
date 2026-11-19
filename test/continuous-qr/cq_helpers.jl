@@ -154,7 +154,7 @@ function cq_G(Q::SMatrix{d, k, T}, A, nu, form::Symbol, mode::Symbol = :ok) wher
     Id = one(SMatrix{k, k, T}); E = Q' * Q - Id
     pen = mode === :nuQ ? nu * Q : nu * (Q * E)
     G = form === :f84 ? Q * S - pen : AQ - Q * U + (Q * S) * (Id + E) - pen
-    u = SVector{k, T}(ntuple(i -> U[i, i], Val(k)))
+    u = SVector{k, T}(ntuple(i -> U[i, i] / (Id + E)[i, i], Val(k)))                       # D121 (M2): the rate is divided by the squared column length, as in cqr_growth
     return G, (mode === :signu ? -u : u)
 end
 # One Q-step of order q from the nodes: returns (Q+, increment of l, Emax over the stages' result).

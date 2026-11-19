@@ -41,10 +41,15 @@ function _check_cqr(cq::ContinuousQR, ::Val{d}, ::Val{k}, N::Integer) where {d, 
     return nothing
 end
 
-"`cqr_growth(Q, A)`: the growth rates `u_i = (Q' A Q)_ii` of the columns of `Q`."
-function cqr_growth(Q::SMatrix{d, k}, A) where {d, k}
+"""
+    cqr_growth(Q, A)
+
+The growth rates `u_i = (Q' A Q)_ii / (q_i . q_i)` of the columns of `Q`. The division by the squared length of the column (D121, M2) makes a frame defect
+`E` below the guard bias the rates at second order in `E`, not at first; for an orthonormal `Q` it is the diagonal of `Q' A Q`.
+"""
+function cqr_growth(Q::SMatrix{d, k}, A) where {d, k}   # D121 (M2)
     AQ = A * Q
-    return SVector{k}(ntuple(i -> dot(Q[:, i], AQ[:, i]), Val(k)))
+    return SVector{k}(ntuple(i -> dot(Q[:, i], AQ[:, i]) / dot(Q[:, i], Q[:, i]), Val(k)))
 end
 
 # S = strict lower triangle of U minus its transpose (skew generator that keeps Q upper-triangular in R).
@@ -116,6 +121,7 @@ end
 # The run: N orbit steps in Q-steps of m = order / 2 orbit steps. Returns (z, Q, final); N + 1 Jacobian calls in total.
 function _cqr_run(cq::ContinuousQR, x0::SVector, Q0::SMatrix{d, k, T}, N::Int, orbit::Int, backend::Symbol, series, every::Int) where {d, k, T}
     _check_cqr(cq, Val(d), Val(k), N)
+    length(x0) == d == dimension(cq.flow) || throw(ArgumentError("state length $(length(x0)) and frame rows $d must both equal the flow dimension $(dimension(cq.flow))"))   # D121 (M1)
     all(isfinite, x0) || throw(NumericalHealthError("state", NaN, 0.0, 0, orbit, backend))
     all(isfinite, Q0) || throw(NumericalHealthError("deviation matrix", NaN, 0.0, 0, orbit, backend))
     p = (cnu = T(_cqr_cnu(cq, Val(d), Val(k))), form = _cqr_form(cq, Val(d), Val(k)))
@@ -165,13 +171,19 @@ end
     propagate_cqr(cq, xs, N; k, seed, backend = :cpu, chunk = nothing, Q0 = nothing) -> PropagationResult
 
 Many orbits, one per element of `xs`, each from its own frame `Q0[j]` (default `initial_deviations(seed, j, Val(d), Val(k), T)`).
-`finals[j]` equals the `final` of the orbit alone; `W` holds the final frames. CPU only: a `:gpu` request falls back to the CPU with its reason
-in the provenance (the device path is stage 04). `chunk` is accepted for the common signature and does not change the result.
+`finals[j]` equals the `final` of the orbit alone; `W` holds the final frames. Throws `ArgumentError` when the state length differs from
+`dimension(flow)` or a supplied `Q0[j]` is not `d x k` (D121, M1). CPU only (D121, M3): this release has no device kernel, so `:gpu` and `:auto`
+run on the CPU and record the reason "reducer is CPU-only" (`FALLBACK_REASONS[6]`) in the provenance; the device part of criterion 22 is not
+applicable until a kernel exists. `chunk` is accepted for the common signature and does not change the result.
+Failure convention (D121, M4), the one of the tangent `propagate`: the first orbit that fails throws a `NumericalHealthError` naming that
+orbit (`orbit`, the index in `xs`) and the step, and aborts the call; no partial result is returned.
 """
 function propagate_cqr(cq::ContinuousQR, xs::AbstractVector{<:SVector{s, T}}, N::Integer; k::Integer, seed::Integer, backend::Symbol = :cpu, chunk = nothing,
                        Q0 = nothing) where {s, T}
     d = dimension(cq.flow)
     _check_cqr(cq, Val(d), Val(Int(k)), N)
+    s == d || throw(ArgumentError("state length $s differs from the flow dimension $d"))   # D121 (M1)
+    Q0 === nothing || (length(Q0) == length(xs) && all(Q -> size(Q) == (d, Int(k)), Q0)) || throw(ArgumentError("Q0 must hold one $d x $k frame per orbit"))   # D121 (M1)
     choice = resolve_backend(backend, T; cpu_only_reducer = true)
     Qs = Q0 === nothing ? [initial_deviations(seed, j, Val(d), Val(Int(k)), T) for j in eachindex(xs)] : Q0
     runs = [_cqr_run(cq, xs[j], Qs[j], Int(N), j, :cpu, nothing, 1) for j in eachindex(xs)]

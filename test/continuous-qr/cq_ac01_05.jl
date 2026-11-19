@@ -156,7 +156,7 @@ end
     end
 end
 
-@testset "AC4 order of the Q-scheme: error ratios of consecutive h lie in [2^q / 2, 2 x 2^q] above the rounding floor" begin
+@testset "AC4 order of the Q-scheme: error ratios of consecutive h lie in [2^q / 4, 2 x 2^q] above the rounding floor" begin
     _ = (ContinuousQR, propagate_cqr_orbit)
     t = 10.0; hs = (0.1, 0.05, 0.025, 0.0125); T = Float64; rng = StableRNG(cq_seed(4, 1)); ratios = Dict()
     for (name, A) in cq_hyp_fixtures()[1:2], q in (2, 4)
@@ -165,11 +165,12 @@ end
         floor_ = 1.0e3 * cq_eps(T) * t
         for j in 1:3
             (errs[j] > floor_ && errs[j + 1] > floor_) || continue
-            @test 2^q / 2 <= errs[j] / errs[j + 1] <= 2 * 2^q
+            q / 2 * hs[j] * cq_AF(A) <= 0.35 * (1 + 1.0e-9) || continue                    # D121 (C4): the ratio gate holds for pairs with Delta ||A||_F <= 0.35 (Delta = q h / 2, the coarse step of the pair); the coarsest pair is pre-asymptotic
+            @test 2^q / 4 <= errs[j] / errs[j + 1] <= 2 * 2^q                                 # D121 (C4, owner "Keep M2, amend"): lower edge 2^q / 4
         end
-        ratios[(name, q)] = (errs, errs[1:3] ./ errs[2:4])
+        ratios[(name, q)] = (errs = errs, ratios = errs[1:3] ./ errs[2:4], slope = cq_slope(log.(collect(hs)), log.(errs)))
     end
-    @info "AC4 reported: absolute errors and ratios" ratios
+    @info "AC4 reported: absolute errors, ratios and fitted slope" ratios
 end
 
 # ------------------------------------------------------------------ AC5: rotated frame (C19 (b))

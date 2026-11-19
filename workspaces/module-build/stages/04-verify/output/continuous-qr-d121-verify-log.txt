@@ -1,0 +1,295 @@
+# D121 verification re-run (groups FULL1 to FULL4, Oa, Oc9, AC11d), one process per group, each section's log concatenated; the original log is continuous-qr-verify-log.txt
+## ---- cal2-FULL1
+# continuous-qr verification, julia 1.13.2, threads 4, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL1, time 1.79503957e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC3 reported (R3): worst error / B_lin | worst = 0.013340998145486426
+# Info AC3 control: largest l_2 - l_1 over 20 seeded frames, frames where the sorted double fails | best = 0.48747871027181233; bound = 0.02822922821840994; nmiss = 5
+# Info AC4 reported: absolute errors, ratios and fitted slope | ratios = Dict{Any, Any}(("b", 2) => (errs = [0.002099493735643331, 0.0006423391054761745, 0.00020686190843940402, 5.8411445585459975e-5], ratios = [3.2685130295577265, 3.105158945511395, 3.5414618892927545], slope = 1.713760686980748), ("b", 4) => (errs = [0.0012762814498858846, 0.00011187840245651034, 7.3590347877564236e-6, 4.6467980373473446e-7], ratios = [11.40775540106594, 15.202863647641367, 15.836786381956417], slope = 3.8196537040633527), ("a", 4) => (errs = [5.486481063142914e-7, 3.0788682526721367e-8, 1.8235553410785513e-9, 1.1093596143282114e-10], ratios = [17.81979809750294, 16.883876147411705, 16.437909921417425], slope = 4.089338914388467), ("a", 2) => (errs = [0.00028857217326671046, 0.00011698967967831462, 3.458080579431565e-5, 9.290091669600695e-6], ratios = [2.466646408984062, 3.383081365256828, 3.722332031175963], slope = 1.662962451394831))
+# Info AC5 reported (R3): worst error / bound | worst = 0.07449889849044103
+ACFULL1 | file total (680 pass, 0 fail, 0 error, 0 broken, 11.2 s) | 680 | 0 fail, 0 error | PASS
+ACFULL1 | testset ALG right-hand side: on the manifold both forms agree, the penalty and the defect equation of C13, one column (C11) (55 pass, 0 fail or error, 0 broken, 1.8 s) | 0 | 0 | PASS
+ACFULL1 | testset AC1 fixed point Q = I for upper triangular A: bitwise Q, rounding-only growth (48 pass, 0 fail or error, 0 broken, 3.5 s) | 0 | 0 | PASS
+ACFULL1 | testset AC1 negative controls (test-side doubles, no new name) (10 pass, 0 fail or error, 0 broken, 0.8 s) | 0 | 0 | PASS
+ACFULL1 | testset AC2 skew A (oscillator, all omega = 1): l_i = 0 to rounding, Q(t) = exp(A t) Q0 (72 pass, 0 fail or error, 0 broken, 1.0 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3 hyperbolic closed forms: l_i against the 256-bit Gram-determinant reference, individually for the degenerate pair (216 pass, 0 fail or error, 0 broken, 2.4 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3 control: the individual values of the degenerate case depend on the frame; a double that sorts the exponents misses them (no new name) (21 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3 oracle: the 256-bit exponential and Gram determinants reproduce the closed forms of C19 (no new name) (3 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL1 | testset AC4 order of the Q-scheme: error ratios of consecutive h lie in [2^q / 2, 2 x 2^q] above the rounding floor (11 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+ACFULL1 | testset AC5 rotated frame, A = diag(0.8, -0.8): l_1, the sum and Q(t) against the closed form (240 pass, 0 fail or error, 0 broken, 0.0 s) | 0 | 0 | PASS
+ACFULL1 | testset AC5 negative control: S of the wrong sign fails l_1 and Q (the sum is blind to it, U3; test-side double, no new name) (4 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+# section FULL1 took 11.4 s
+## ---- cal2-FULL2
+# continuous-qr verification, julia 1.13.2, threads 4, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL2, time 1.795039439e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC6a reported (R3): worst error / bound, worst absolute error per scheme | worst = 0.39908047358220256; wabs = Dict(2 => 0.01999393172646835, 4 => 0.00022508968631194948)
+# Info AC6b reported: largest |l_i(k) - l_i(4)| at t = 60 (scored) and t = 100 (reported) | worst = Dict(60.0 => 0.001241603148051773, 100.0 => 0.02876036076032107)
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 2; t = 10; ratio = 4.022186482119042
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 2; t = 30; ratio = 3.9980525679646033
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 2; t = 60; ratio = 3.849430750203048
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 4; t = 10; ratio = 16.597745483705474
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 4; t = 30; ratio = 16.94583284270878
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=2"; q = 4; t = 60; ratio = 17.192245408005412
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=3"; q = 4; t = 10; ratio = 17.28988266261418
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=3"; q = 4; t = 30; ratio = 19.09142464378761
+# Info AC7 reported ratio h / (h/2) | name = "pendulum A=3"; q = 4; t = 60; ratio = 20.254989766402012
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 2; t = 10; ratio = 2.403797897362057
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 2; t = 30; ratio = 4.707526912943085
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 2; t = 60; ratio = 3.7815782154148616
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 4; t = 10; ratio = 13.247356265118174
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 4; t = 30; ratio = 14.733067346979157
+# Info AC7 reported ratio h / (h/2) | name = "F1 w=1.3"; q = 4; t = 60; ratio = 12.016661080456926
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 2; t = 10; ratio = 4.392793077625902
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 2; t = 30; ratio = 4.416192474237173
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 2; t = 60; ratio = 4.635787114225059
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 4; t = 10; ratio = 15.685505034245345
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 4; t = 30; ratio = 11.42513518780471
+# Info AC7 reported ratio h / (h/2) | name = "F3 R"; q = 4; t = 60; ratio = 0.652045469829302
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 2; t = 10; ratio = 2.36754609925849
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 2; t = 30; ratio = 4.882717931033285
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 2; t = 60; ratio = 4.650914551335931
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 4; t = 10; ratio = 5.865282382389334
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 4; t = 30; ratio = 4.510829613844173
+# Info AC7 reported ratio h / (h/2) | name = "F3 C"; q = 4; t = 60; ratio = 9.696335943718834
+# Info AC8 reported | worst_err_t60 = 0.19396712174918296; worst_err_beyond_t60 = 14.13233872646129; samples_beyond_bound = 4299; bound = 0.4; orbits = 83; median_Tvalid = 300.0; min_Tvalid = 300.0
+# Info AC9 reported (R3, R6): worst lambda error / allowance at T = 60, realized c_d at T = 60 (q = 4, 2), realized c_d and l-form constant at T = long (not scored), spread among the discrete variants, ratio on orbit C | worst = 0.4613410020610591; cdreal = Dict(2 => 4.613410020611286, 4 => 8.616335533779498); cdlong = 274.04355200797136; worstl = 274043.5520079714; Tlong = 1000.0; spread = 6.050715484207103e-15; ratio_C = 18.557541950363106
+# Info AC10a reported | slope = -0.9292075456127579; final_lambda1 = 0.000568134339842474
+# Info AC10b reported | bound = 0.005105170185988092; maxes = [0.0007369442181618416, 0.0007216868314226162, 0.0010088127650754108, 0.0019058106778100691, 0.0009911648583670351, 0.0009463246162043668, 0.0011764812252106935, 0.0008345495906651417, 0.0010453522662846135, 0.0007405391741276696, 0.0010006694849400415, 0.0009488282020538551, 0.0012634414825184554, 0.0011948627778109052, 0.0009082450771620632, 0.0013143203131120028, 0.0008945730772589284, 0.0009623841832176593, 0.001024886377009279, 0.0012688889945106276, 0.0005618965445399337, 0.0010856436500308296, 0.0005769963449170658, 0.00137770901920842, 0.0014062547042673502, 0.0013298195898568022, 0.0013944499397178904, 0.0010334108147162483, 0.0008490010837537273, 0.0014555177099743954, 0.0005753113418922874, 0.0009195770662584526, 0.0009655586569231929, 0.0010123828568258616, 0.0007629855644170602, 0.0008877528403934142, 0.0013525768680585312, 0.0011258557364518518, 0.0008112248293549205, 0.000; sali = [1.2482504723153336, 0.377005257811582, 1.204743171044067, 0.30451730471621413, 0.26085526270513876, 1.0315287915678104, 0.027585322469979644, 1.3054601038541136, 0.3543323891228141, 1.2426010566605377, 1.2277810402796399, 0.8334878191994853, 0.0876101672752979, 0.07837264682934422, 1.2517200606425376, 0.16897427530059592, 0.33503841422833824, 0.26543051253814215, 1.294313462870859, 0.12704496898555231, 0.6498560030084249, 0.3837178682973861, 0.8124357723119153, 0.1641099523291205, 1.1731956301951803, 0.06904464006017878, 0.3565952361868018, 1.3617674016428276, 0.9154236743754358, 0.4559314522120672, 0.5063226186086583, 0.45779251460061626, 1.082077958972239, 0.4535052193743291, 1.1554949614917038, 0.5993805782408667, 0.13602264119960797, 0.13723874828411917, 0.363823018646189, 1.239398216423114, 0.12125903722856843, 1.07072673938646, 0.08464341765022886, 0.942413751792515, 0.54600046167
+ACFULL2 | file total (88 pass, 0 fail, 0 error, 0 broken, 48.4 s) | 88 | 0 fail, 0 error | PASS
+ACFULL2 | testset AC6a one column: l_1 = ln ||Y(t) q(0)|| on F1, the inverted oscillator and the pendulum (12 pass, 0 fail or error, 0 broken, 2.6 s) | 0 | 0 | PASS
+ACFULL2 | testset AC6b column independence on Henon-Heiles: the k = 1, 2, 4 runs agree for i <= k within B_col = 5e-3 at t <= 60 (calibrated, U7; D121 C6), t = 100 reported (12 pass, 0 fail or error, 0 broken, 18.5 s) | 0 | 0 | PASS
+ACFULL2 | testset AC7 equilibrium start is refused by the direction frame (test-side, no new name; spec point U1) (2 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL2 | testset AC7 flow-direction identity: l_1(t) = ln(||f(z(t))|| / ||f(z_0)||) for the frame whose first column is f(z_0) / ||f(z_0)|| (54 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL2 | testset AC8 energy covector identity: l_1(t) = ln|gradH(z_0).q_1(0)| - ln|gradH(z(t)).q_1(t)| scored at t <= 60 (D121, C8), beyond reported (2 pass, 0 fail or error, 0 broken, 1.1 s) | 0 | 0 | PASS
+ACFULL2 | testset AC9 same-orbit agreement with the discrete QR spectrum (Householder, repeated Gram-Schmidt) and Benettin: T = 60 scored (D121, C9), the long horizon reported (2 pass, 0 fail or error, 0 broken, 5.7 s) | 0 | 0 | PASS
+ACFULL2 | testset AC10a pendulum libration: lambda_1(t) decays like 1/t and l_1 + l_2 = 0 (2 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+ACFULL2 | testset AC10b F3 regular orbits: |lambda_i(T)| <= 5 (1 + ln T) / T for at least 80 percent of the starts, orbit R included (2 pass, 0 fail or error, 0 broken, 19.0 s) | 0 | 0 | PASS
+# section FULL2 took 48.5 s
+## ---- cal-FULL3
+# continuous-qr verification, julia 1.13.2, threads 4, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL3, time 1.79503935e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC11 reported | max_ratio_to_allowance = 10.711361543024653; within_allowance = 191; mean_lambda1_cqr = 0.04795474805823877; mean_lambda1_discrete_B = 0.04565640136179987; max_zero_pair = 0.006133477867217908; max_pairing = 0.00349223854938891; discrete_zero = 0.00517848591701126
+# Info AC12 reported (R3): worst |sum| / B_sum | worst = 0.0002017239757292512
+# Info AC12 control reported | polar_sum = -3.0143246480873742e-5; scheme_sum = -2.1254189048747207e-6; bound = 0.19151598289351643
+# Info AC13a reported: worst E / bound | worst = 0.0010035298009777017
+# Info AC13b reported (R2) | rec = Any[(q = 2, E_eq = [0.00531122979571208, 0.001267067846998482], ratio = 4.191748538402019), (q = 4, E_eq = [8.648575908154488e-5, 5.146958877877417e-6], ratio = 16.803273764878266)]
+# Info AC14 reported (R3): worst error / B_C | worst = Dict{DataType, Float64}(Float64 => 0.006990594168233504, Double64 => 0.00011162503513904067)
+# Info AC14 control reported | f32_error = 2.8338890433410313e-5; B = 4.6436808996096226e-8
+# Info AC15 reported | orbits_in_agreement = 51; bigfloat_error_over_bound = 0.0001554306927515841228984163818984444936232203330028008199641085206763751526511473
+ACFULL3 | file total (67539 pass, 1 fail, 0 error, 0 broken, 286.4 s) | 67539 | 0 fail, 0 error | FAIL
+ACFULL3 | testset AC11 chaotic class: positive lambda_1, agreement with the discrete value, the zero pair and the pairing, independent ensembles (3 pass, 0 fail or error, 0 broken, 52.9 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12 sum identity: |sum l_i| <= B_sum(T) and its order in Delta (11 pass, 1 fail or error, 0 broken, 0.7 s) | 1 | 0 | FAIL
+ACFULL3 | testset AC12 negative control: a double that restores Q to its polar factor each step passes the sum bound without any penalty (test-side, no new name; spec point U5) (1 pass, 0 fail or error, 0 broken, 0.7 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13a injected defect decays: coupled hyperbolic fixture (form 84, k = d) and two columns of orbit C (form 92, k = 2) (300 pass, 0 fail or error, 0 broken, 1.5 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13b equilibrium defect: E_max seen is below the tolerance and scales like Delta^q (6 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13c injected fault: Q scaled by 1.05 (E = 0.1) at step 500 raises the orthogonality error at the next Q-step, nothing stored (4 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13d explicit stability limits of C14: E diverges above nu Delta = 1 (order 2) and 1.39 (order 4), not at 0.9 of it (4 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14 same-orbit rounding: |l_i - l_i,ref| <= B_C(t) at every 50th Q-step, Float64 and Double64, reference in BigFloat(256) at the realized points (67200 pass, 0 fail or error, 0 broken, 224.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14 negative control: a double with the product Q^T A Q in single precision exceeds B_C (test-side, no new name) (1 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC15 precision ladder: Float64, Double64 and BigFloat(256) agree; BigFloat against its own 512-bit reference (9 pass, 0 fail or error, 0 broken, 5.6 s) | 0 | 0 | PASS
+# section FULL3 took 286.8 s
+## ---- cal-FULL4
+# continuous-qr verification, julia 1.13.2, threads 4, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL4, time 1.79503935e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC17 reported | threads = 4; starts = 4096
+# Info D121 M2 reported: worst rate error with the normalised and with the unnormalised formula (E_ii in 2.5e-3 .. 7.5e-3) | worst_new = 4.440892098500626e-16; worst_old = 0.016628674144602673
+# Info AC20 reported (R3, R4): worst error / delta_ext per scheme, and the error of the discrete spectrum against the same reference | worst = Dict(2 => 4.112221594753789, 4 => 0.14705592310875204); rows = Any[(name = "F3 R", q = 2, t = 10, err = 0.0018011415679830556, discrete_err = 1.176836406102666e-14), (name = "F3 R", q = 2, t = 30, err = 0.044618310132338856, discrete_err = 1.6209256159527285e-14), (name = "F3 R", q = 2, t = 60, err = 0.16713453812831536, discrete_err = 1.887379141862766e-14), (name = "F3 R", q = 4, t = 10, err = 3.1849391654403814e-5, discrete_err = 1.176836406102666e-14), (name = "F3 R", q = 4, t = 30, err = 0.0001399473802530249, discrete_err = 1.6209256159527285e-14), (name = "F3 R", q = 4, t = 60, err = 0.000560262766653219, discrete_err = 1.887379141862766e-14), (name = "F3 C", q = 2, t = 10, err = 0.00443892845255222, discrete_err = 2.2648549702353193e-14), (name = "F3 C", q = 2, t = 30, err = 0.0319868090508173, discrete_err = 1.1390888232654106e-13), (name = "F3 C", q = 2, t = 60, err = 0.0863164490515067, discrete_err = 1.3029577417000837e-12), (name = "F3 
+# Info AC22 reported: orbits in agreement, orbit divergence | nagree = 247; divs = [7.587333539227359e-14, 6.072919944699606e-14, 1.9137434692506616e-12, 7.371568633285364e-13, 4.829470157119431e-14, 9.24316179151674e-13, 2.9024005421263155e-13, 3.4033886819884174e-13, 3.6166208916554865e-13, 4.029138134242771e-13, 2.1105339698124226e-13, 3.6759484345338933e-13, 4.283240429003854e-13, 6.272760089132134e-13, 1.3061773884714967e-13, 1.3417045252595017e-13, 7.013001290800958e-13, 1.72029057665668e-13, 4.146752385913999e-13, 3.781003288239049e-14, 1.4982459717316488e-13, 2.3467339183014246e-13, 1.2101430968414206e-13, 2.4771851236948805e-13, 1.5343282200319663e-13, 3.197719866676607e-13, 5.163647287531603e-13, 1.254552017826427e-13, 2.488738382044886e-13, 4.013456234019941e-14, 2.7228219678931964e-13, 1.9471924073144464e-13, 3.369457490798311e-13, 1.4788170688007085e-13, 2.1405099914773018e-13, 5.345723863570129e-14, 4.848899060050371e-13, 2.9426461267689774e-13, 4.0858982
+# Info R1 reported: seconds and ratios to the repeated Gram-Schmidt and Householder spectra | tq = Dict{Any, Float64}(2 => 0.0081945, 4 => 0.0081811); discrete_rgs = 0.0219611; discrete_householder = 0.189895; ratio_q4_rgs = 0.3725268770689993; ratio_q2_rgs = 0.373137046869237
+# Info R2 reported | rows = Any[(k = 4, form = :f84, h = 0.05, cnu = 1.0, E = 8.536313601759105e-5, l1 = 3.022616379173336), (k = 4, form = :f84, h = 0.05, cnu = 2.0, E = 0.0010176882861281378, l1 = 3.0225611300374906), (k = 4, form = :f84, h = 0.05, cnu = 4.0, E = 0.009532106516647598, l1 = 3.0227350617021775), (k = 4, form = :f84, h = 0.025, cnu = 1.0, E = 5.0799962225678286e-6, l1 = 3.0229519858158613), (k = 4, form = :f84, h = 0.025, cnu = 2.0, E = 5.235116498569781e-5, l1 = 3.022945707392223), (k = 4, form = :f84, h = 0.025, cnu = 4.0, E = 0.00033153640161998066, l1 = 3.0229266274078594), (k = 2, form = :f92, h = 0.05, cnu = 1.0, E = 0.00029108585048187585, l1 = 3.02300037297516), (k = 2, form = :f92, h = 0.05, cnu = 2.0, E = 0.0014412444250900824, l1 = 3.02302489276703), (k = 2, form = :f92, h = 0.05, cnu = 4.0, E = 0.011017582103906576, l1 = 3.023363699791184), (k = 2, form = :f92, h = 0.025, cnu = 1.0, E = 
+# Info R5 reported (if the no-penalty time is Inf, form 92 did not grow at nu = 0 and the finding goes to the owner) | tcross = Dict(2.0 => Inf, 0.0 => 173.5)
+ACFULL4 | file total (107 pass, 0 fail, 0 error, 0 broken, 1063.2 s) | 107 | 0 fail, 0 error | PASS
+ACFULL4 | testset AC16 orbit invariance: the orbit is bitwise that of the integrator alone, of the discrete spectrum and of Benettin, for every k and both schemes (9 pass, 0 fail or error, 0 broken, 2.1 s) | 0 | 0 | PASS
+ACFULL4 | testset AC17a execution invariance: chunk sizes and the serial body give bitwise identical series, sums, final Q and orbit points (6 pass, 0 fail or error, 0 broken, 273.6 s) | 0 | 0 | PASS
+ACFULL4 | testset AC17b the hot loop allocates nothing after warm-up (12 pass, 0 fail or error, 0 broken, 4.0 s) | 0 | 0 | PASS
+ACFULL4 | testset AC17c the series is a bitwise prefix of the run: the record at step n equals a fresh run to n (8 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL4 | testset AC18 cost counts: one Jacobian and one orbit step per orbit step, two right-hand sides per orbit step, memory formula of C21 (9 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL4 | testset AC19a an equilibrium start is accepted (the module does not divide by the field) (1 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL4 | testset AC19b non-finite state, Jacobian or frame: kind, orbit id and step, nothing stored (3 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL4 | testset AC19c, AC19d argument errors come before any work (9 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL4 | testset D121 dimension guard, normalised rates, orbit-named errors (11 pass, 0 fail or error, 0 broken, 0.6 s) | 0 | 0 | PASS
+ACFULL4 | testset AC19e the run record carries h, the integrator and its order, q, the form, c_nu, E_max, the element type, k, the seed, backend, device, fallback reason and the flow (6 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL4 | testset AC20 external variational reference, package stand-in (Double64 order-10 table at 1/80; the Taylor form is stage 04) (24 pass, 0 fail or error, 0 broken, 2.2 s) | 0 | 0 | PASS
+ACFULL4 | testset AC22 CPU part: each backend against its own 256-bit reference, the gap where the orbits agree; the :gpu request falls back to the CPU with its reason (6 pass, 0 fail or error, 0 broken, 777.5 s) | 0 | 0 | PASS
+ACFULL4 | testset R1 cost ratio against the discrete QR, reported (the 40 of Geist1990 Table III p.886 is a reproduction target, never a pass) (1 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL4 | testset R2 equilibrium defect against h, c_nu and the form, and the exponent bias against it, reported (1 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL4 | testset R5 form 92 at nu = 0 and k = 2 on orbit C: the time at which E reaches 1e-2, with and without the penalty (the claim of Skokos2010 p.53 is tested, not assumed) (1 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+# section FULL4 took 1063.3 s
+## ---- cal-Oa
+# continuous-qr verification, julia 1.13.2, threads 4, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups Oa, time 1.79503935e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Oa: element type BigFloat (256 bits), the closed forms of C19 on constant matrices (no orbit); references: exact matrix exponential and Gram determinants in 256 bits (C16)
+AC1 | Oa: diag(0.7, -0.7), q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, -0.7), q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: diag(0.7, -0.7), q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, -0.7), q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0.06242 | <= 1 | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: direct sum d = 4, q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: direct sum d = 4, q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: direct sum d = 4, q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: direct sum d = 4, q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC2 | Oa: skew F1 omega = 1, N = 1 (d = 2), q = 2, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 0.001328 | 0.1706 | <= 1 (E_max <= 0.01) | PASS
+AC2 | Oa: skew F1 omega = 1, N = 1 (d = 2), q = 4, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 5.708e-06 | 0.002104 | <= 1 (E_max <= 0.01) | PASS
+AC2 | Oa: skew F1 omega = 1, N = 2 (d = 4), q = 2, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0.001825 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 0.001374 | 0.1688 | <= 1 (E_max <= 0.01) | PASS
+AC2 | Oa: skew F1 omega = 1, N = 2 (d = 4), q = 4, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0.001921 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 2.566e-05 | 0.001408 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: inverted oscillator lam = 0.8 (d = 2), q = 2, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.001017) | 0.03607 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: inverted oscillator lam = 0.8 (d = 2), q = 4, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 3.356e-06) | 0.001524 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: coupled hyperbolic lam = (0.8, 0.35), d = 4, q = 2, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.004491) | 0.001237 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: coupled hyperbolic lam = (0.8, 0.35), d = 4, q = 4, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.0004892) | 0.0005086 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: degenerate lam = (0.5, 0.5), d = 4 (every l_i individually, not their sum), q = 2, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.00283) | 0.002903 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: degenerate lam = (0.5, 0.5), d = 4 (every l_i individually, not their sum), q = 4, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 3.793e-05) | 0.001682 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: degenerate case, l_2,ref - l_1,ref over the 4 frames at t = 10 (frame dependence of the individual values; the reference is the same Gram determinant) | ["-0.294", "-1.437", "1.042", "0.7071"] | report | INFO
+AC4 | Oa: fixture a, q = 2, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 8.173e-06, 1.431e-06, 7.422e-07, 2.307e-07, 6.314e-08); pairs with Delta ||A||_F <= 0.35 gated, Delta ||A||_F of the coarse steps 0.1187, 0.05936, 0.02968, 0.01484 | 5.713, 1.927, 3.217, 3.654 | gated pairs (1, 2, 3, 4) each in [2.0, 8] | FAIL
+AC4 | Oa: fixture a, q = 2: least-squares slope of ln error against ln h | 1.666 | report (expected 2) | INFO
+AC4 | Oa: fixture a, q = 4, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 1.375e-06, 7.788e-08, 4.63e-09, 2.822e-10, 1.741e-11); pairs with Delta ||A||_F <= 0.35 gated, Delta ||A||_F of the coarse steps 0.2375, 0.1187, 0.05936, 0.02968 | 17.65, 16.82, 16.41, 16.21 | gated pairs (1, 2, 3, 4) each in [8.0, 32] | PASS
+AC4 | Oa: fixture a, q = 4: least-squares slope of ln error against ln h | 4.065 | report (expected 4) | INFO
+AC4 | Oa: fixture b, q = 2, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 0.004701, 0.001024, 0.0002606, 6.599e-05, 1.662e-05); pairs with Delta ||A||_F <= 0.35 gated, Delta ||A||_F of the coarse steps 0.3488, 0.1744, 0.08721, 0.04361 | 4.592, 3.929, 3.949, 3.971 | gated pairs (1, 2, 3, 4) each in [2.0, 8] | PASS
+AC4 | Oa: fixture b, q = 2: least-squares slope of ln error against ln h | 2.024 | report (expected 2) | INFO
+AC4 | Oa: fixture b, q = 4, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 0.001956, 8.029e-05, 6.023e-06, 4.066e-07, 2.618e-08); pairs with Delta ||A||_F <= 0.35 gated, Delta ||A||_F of the coarse steps 0.6977, 0.3488, 0.1744, 0.08721 | 24.36, 13.33, 14.81, 15.53 | gated pairs (2, 3, 4) each in [8.0, 32] | PASS
+AC4 | Oa: fixture b, q = 4: ratios of the pre-asymptotic pairs (Delta ||A||_F > 0.35), reported | 24.36 | report | INFO
+AC4 | Oa: fixture b, q = 4: least-squares slope of ln error against ln h | 4 | report (expected 4) | INFO
+AC5 | Oa: A = diag(0.8, -0.8), theta = 0.3, q = 2, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.00528 ; 5.527e-76 ; 0.03222 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 0.3, q = 4, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.003257 ; 0 ; 0.005069 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.0, q = 2, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.008854 ; 9.522e-77 ; 0.0745 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.0, q = 4, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.01814 ; 1.152e-74 ; 0.01457 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.4, q = 2, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.04669 ; 6.231e-77 ; 0.0698 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.4, q = 4, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.006661 ; 1.785e-75 ; 0.007969 | <= 1 each | PASS
+# section Oa took 9.8 s
+## ---- cal-Oc9
+# continuous-qr verification, julia 1.13.2, threads 4, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups Oc9, time 1.79503935e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Oc9: orbits R, C and 20 starts per class (cq_classes, SALI at 2000 below 1e-8), order-8 table, q = 4, T = 1000; lambda form |lambda^C - lambda^D| against c_d h^4 with c_d = 5 (spec) and the l form |l^C - l^D| against 5e4 h^4 (plan U9, calibrated at T = 200); discrete = repeated Gram-Schmidt k = 4 at tau = 1 divided by h
+AC9 | Oc9: C, h = 1/20, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 13.5); D121: reported at T = 1000, scored at T = 60 (FULL2) | 2.7 | report (spec c_d = 5; D121 scores T = 60 only) | INFO
+AC9 | Oc9: C, h = 1/20, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9); D121: reported | 0.27 | report | INFO
+AC9 | Oc9: C, h = 1/20, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 2.7 ; 2.642 ; 1.277e-15 | report (R6) | INFO
+AC9 | Oc9: C, h = 1/40, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 8.389); D121: reported at T = 1000, scored at T = 60 (FULL2) | 1.678 | report (spec c_d = 5; D121 scores T = 60 only) | INFO
+AC9 | Oc9: C, h = 1/40, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9); D121: reported | 0.1678 | report | INFO
+AC9 | Oc9: C, h = 1/40, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 1.678 ; 1.678 ; 3.084e-15 | report (R6) | INFO
+AC9 | Oc9: R, h = 1/20, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 13.6); D121: reported at T = 1000, scored at T = 60 (FULL2) | 2.72 | report (spec c_d = 5; D121 scores T = 60 only) | INFO
+AC9 | Oc9: R, h = 1/20, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9); D121: reported | 0.272 | report | INFO
+AC9 | Oc9: R, h = 1/20, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 2.72 ; 0.944 ; 1.789e-15 | report (R6) | INFO
+AC9 | Oc9: R, h = 1/40, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 10.21); D121: reported at T = 1000, scored at T = 60 (FULL2) | 2.043 | report (spec c_d = 5; D121 scores T = 60 only) | INFO
+AC9 | Oc9: R, h = 1/40, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9); D121: reported | 0.2043 | report | INFO
+AC9 | Oc9: R, h = 1/40, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 2.043 ; 0.717 ; 8.058e-16 | report (R6) | INFO
+AC9 | Oc9: chaotic, h = 1/20, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 298.5); D121: reported at T = 1000, scored at T = 60 (FULL2) | 59.7 | report (spec c_d = 5; D121 scores T = 60 only) | INFO
+AC9 | Oc9: chaotic, h = 1/20, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9); D121: reported | 5.97 | report | INFO
+AC9 | Oc9: chaotic, h = 1/20, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 59.7 ; 13.59 ; 2.649e-13 | report (R6) | INFO
+AC9 | Oc9: chaotic, h = 1/40, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 240.6); D121: reported at T = 1000, scored at T = 60 (FULL2) | 48.11 | report (spec c_d = 5; D121 scores T = 60 only) | INFO
+AC9 | Oc9: chaotic, h = 1/40, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9); D121: reported | 4.811 | report | INFO
+AC9 | Oc9: chaotic, h = 1/40, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 48.11 ; 33.98 ; 5.477e-14 | report (R6) | INFO
+AC9 | Oc9: regular, h = 1/20, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 253.9); D121: reported at T = 1000, scored at T = 60 (FULL2) | 50.77 | report (spec c_d = 5; D121 scores T = 60 only) | INFO
+AC9 | Oc9: regular, h = 1/20, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9); D121: reported | 5.077 | report | INFO
+AC9 | Oc9: regular, h = 1/20, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 50.77 ; 6.03 ; 2.003e-14 | report (R6) | INFO
+AC9 | Oc9: regular, h = 1/40, T = 1000, q = 4: worst |lambda^C - lambda^D(RGS)| / (5 h^4) (lambda form of the spec; realized c_d = 256.7); D121: reported at T = 1000, scored at T = 60 (FULL2) | 51.35 | report (spec c_d = 5; D121 scores T = 60 only) | INFO
+AC9 | Oc9: regular, h = 1/40, T = 1000: worst |l^C - l^D| / (5e4 h^4) (l form of plan U9); D121: reported | 5.135 | report | INFO
+AC9 | Oc9: regular, h = 1/40, T = 1000: worst vs Householder / (5 h^4) ; vs Benettin column 1 / (5 h^4) ; R6 spread among the discrete variants max|RGS - Householder| (compare with the difference to the continuous value) | 51.35 ; 3.734 ; 1.635e-13 | report (R6) | INFO
+# section Oc9 took 12.1 s
+## ---- cal-AC11d
+# continuous-qr verification, julia 1.13.2, threads 4, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups AC11d, time 1.79503935e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+AC11 | AC11d: 200 chaotic starts, T = 2000: starts with lambda_1 > 0 ; starts within the allowance 5e4 h^4 / T of the discrete lambda_1 (D121: at least 95 percent) | 200 ; 191 | all 200 ; >= 190 | PASS
+AC11 | AC11d: |lambda_1^C - lambda_1^D| / allowance: median ; q90 ; max (reported, D121) ; smallest lambda_1^C | 0.08123 ; 0.4484 ; 10.71 ; 0.01144 | report | INFO
+# section AC11d took 28.8 s
+## ---- keepM2-Oa
+# continuous-qr verification, julia 1.13.2, threads 8, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups Oa, time 1.795043476e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Oa: element type BigFloat (256 bits), the closed forms of C19 on constant matrices (no orbit); references: exact matrix exponential and Gram determinants in 256 bits (C16)
+AC1 | Oa: diag(0.7, -0.7), q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, -0.7), q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: diag(0.7, -0.7), q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, -0.7), q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: diag(0.7, 0.3, -0.3, -0.7), q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0.06242 | <= 1 | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: triangular [[0.5, 2], [0, -0.5]], q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: direct sum d = 4, q = 2, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: direct sum d = 4, q = 2: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC1 | Oa: direct sum d = 4, q = 4, n = 2000: Q = I at every Q-step (bitwise); E_max seen = 0 | true | true | PASS
+AC1 | Oa: direct sum d = 4, q = 4: worst |l_i - A_ii t| / (16 eps max(1, |A_ii| t)) over every Q-step | 0 | <= 1 | PASS
+AC2 | Oa: skew F1 omega = 1, N = 1 (d = 2), q = 2, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 0.001328 | 0.1706 | <= 1 (E_max <= 0.01) | PASS
+AC2 | Oa: skew F1 omega = 1, N = 1 (d = 2), q = 4, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 5.708e-06 | 0.002104 | <= 1 (E_max <= 0.01) | PASS
+AC2 | Oa: skew F1 omega = 1, N = 2 (d = 4), q = 2, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0.001825 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 0.001374 | 0.1688 | <= 1 (E_max <= 0.01) | PASS
+AC2 | Oa: skew F1 omega = 1, N = 2 (d = 4), q = 4, 4 frames, t to 100: worst |l_i| / (8 eps t) | 0.001921 | <= 1 | PASS
+AC2 | Oa: same: worst max|Q(t) - exp(A t) Q0| / min(B_lin, 0.25) (cap of plan U11); E_max seen 2.566e-05 | 0.001408 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: inverted oscillator lam = 0.8 (d = 2), q = 2, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.001017) | 0.03607 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: inverted oscillator lam = 0.8 (d = 2), q = 4, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 3.356e-06) | 0.001524 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: coupled hyperbolic lam = (0.8, 0.35), d = 4, q = 2, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.004491) | 0.001237 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: coupled hyperbolic lam = (0.8, 0.35), d = 4, q = 4, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.0004892) | 0.0005086 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: degenerate lam = (0.5, 0.5), d = 4 (every l_i individually, not their sum), q = 2, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 0.00283) | 0.002903 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: degenerate lam = (0.5, 0.5), d = 4 (every l_i individually, not their sum), q = 4, 4 frames x 2 h x 2 t: worst max_i |l_i - l_i,ref| / B_lin (E_max seen 3.793e-05) | 0.001682 | <= 1 (E_max <= 0.01) | PASS
+AC3 | Oa: degenerate case, l_2,ref - l_1,ref over the 4 frames at t = 10 (frame dependence of the individual values; the reference is the same Gram determinant) | ["-0.294", "-1.437", "1.042", "0.7071"] | report | INFO
+AC4 | Oa: fixture a, q = 2, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 8.173e-06, 1.431e-06, 7.422e-07, 2.307e-07, 6.314e-08); pairs with Delta ||A||_F <= 0.35 gated, Delta ||A||_F of the coarse steps 0.1187, 0.05936, 0.02968, 0.01484 | 5.713, 1.927, 3.217, 3.654 | gated pairs (1, 2, 3, 4) each in [1.0, 8] | PASS
+AC4 | Oa: fixture a, q = 2: least-squares slope of ln error against ln h | 1.666 | report (expected 2) | INFO
+AC4 | Oa: fixture a, q = 4, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 1.375e-06, 7.788e-08, 4.63e-09, 2.822e-10, 1.741e-11); pairs with Delta ||A||_F <= 0.35 gated, Delta ||A||_F of the coarse steps 0.2375, 0.1187, 0.05936, 0.02968 | 17.65, 16.82, 16.41, 16.21 | gated pairs (1, 2, 3, 4) each in [4.0, 32] | PASS
+AC4 | Oa: fixture a, q = 4: least-squares slope of ln error against ln h | 4.065 | report (expected 4) | INFO
+AC4 | Oa: fixture b, q = 2, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 0.004701, 0.001024, 0.0002606, 6.599e-05, 1.662e-05); pairs with Delta ||A||_F <= 0.35 gated, Delta ||A||_F of the coarse steps 0.3488, 0.1744, 0.08721, 0.04361 | 4.592, 3.929, 3.949, 3.971 | gated pairs (1, 2, 3, 4) each in [1.0, 8] | PASS
+AC4 | Oa: fixture b, q = 2: least-squares slope of ln error against ln h | 2.024 | report (expected 2) | INFO
+AC4 | Oa: fixture b, q = 4, t = 10, h = 0.1 .. 0.00625: error ratios of consecutive h (errors 0.001956, 8.029e-05, 6.023e-06, 4.066e-07, 2.618e-08); pairs with Delta ||A||_F <= 0.35 gated, Delta ||A||_F of the coarse steps 0.6977, 0.3488, 0.1744, 0.08721 | 24.36, 13.33, 14.81, 15.53 | gated pairs (2, 3, 4) each in [4.0, 32] | PASS
+AC4 | Oa: fixture b, q = 4: ratios of the pre-asymptotic pairs (Delta ||A||_F > 0.35), reported | 24.36 | report | INFO
+AC4 | Oa: fixture b, q = 4: least-squares slope of ln error against ln h | 4 | report (expected 4) | INFO
+AC5 | Oa: A = diag(0.8, -0.8), theta = 0.3, q = 2, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.00528 ; 5.527e-76 ; 0.03222 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 0.3, q = 4, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.003257 ; 0 ; 0.005069 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.0, q = 2, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.008854 ; 9.522e-77 ; 0.0745 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.0, q = 4, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.01814 ; 1.152e-74 ; 0.01457 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.4, q = 2, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.04669 ; 6.231e-77 ; 0.0698 | <= 1 each | PASS
+AC5 | Oa: A = diag(0.8, -0.8), theta = 1.4, q = 4, t <= 20: worst error / bound for l_1 ; l_1 + l_2 ; Q(t) against the rotation by phi(t) | 0.006661 ; 1.785e-75 ; 0.007969 | <= 1 each | PASS
+# section Oa took 9.2 s
+## ---- keepM2-FULL1
+# continuous-qr verification, julia 1.13.2, threads 8, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL1, time 1.795043494e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC3 reported (R3): worst error / B_lin | worst = 0.013340998145486426
+# Info AC3 control: largest l_2 - l_1 over 20 seeded frames, frames where the sorted double fails | best = 0.48747871027181233; bound = 0.02822922821840994; nmiss = 5
+# Info AC4 reported: absolute errors, ratios and fitted slope | ratios = Dict{Any, Any}(("b", 2) => (errs = [0.002099493735643331, 0.0006423391054761745, 0.00020686190843940402, 5.8411445585459975e-5], ratios = [3.2685130295577265, 3.105158945511395, 3.5414618892927545], slope = 1.713760686980748), ("b", 4) => (errs = [0.0012762814498858846, 0.00011187840245651034, 7.3590347877564236e-6, 4.6467980373473446e-7], ratios = [11.40775540106594, 15.202863647641367, 15.836786381956417], slope = 3.8196537040633527), ("a", 4) => (errs = [5.486481063142914e-7, 3.0788682526721367e-8, 1.8235553410785513e-9, 1.1093596143282114e-10], ratios = [17.81979809750294, 16.883876147411705, 16.437909921417425], slope = 4.089338914388467), ("a", 2) => (errs = [0.00028857217326671046, 0.00011698967967831462, 3.458080579431565e-5, 9.290091669600695e-6], ratios = [2.466646408984062, 3.383081365256828, 3.722332031175963], slope = 1.662962451394831))
+# Info AC5 reported (R3): worst error / bound | worst = 0.07449889849044103
+ACFULL1 | file total (680 pass, 0 fail, 0 error, 0 broken, 10.0 s) | 680 | 0 fail, 0 error | PASS
+ACFULL1 | testset ALG right-hand side: on the manifold both forms agree, the penalty and the defect equation of C13, one column (C11) (55 pass, 0 fail or error, 0 broken, 1.6 s) | 0 | 0 | PASS
+ACFULL1 | testset AC1 fixed point Q = I for upper triangular A: bitwise Q, rounding-only growth (48 pass, 0 fail or error, 0 broken, 3.1 s) | 0 | 0 | PASS
+ACFULL1 | testset AC1 negative controls (test-side doubles, no new name) (10 pass, 0 fail or error, 0 broken, 0.8 s) | 0 | 0 | PASS
+ACFULL1 | testset AC2 skew A (oscillator, all omega = 1): l_i = 0 to rounding, Q(t) = exp(A t) Q0 (72 pass, 0 fail or error, 0 broken, 1.0 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3 hyperbolic closed forms: l_i against the 256-bit Gram-determinant reference, individually for the degenerate pair (216 pass, 0 fail or error, 0 broken, 2.1 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3 control: the individual values of the degenerate case depend on the frame; a double that sorts the exponents misses them (no new name) (21 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL1 | testset AC3 oracle: the 256-bit exponential and Gram determinants reproduce the closed forms of C19 (no new name) (3 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+ACFULL1 | testset AC4 order of the Q-scheme: error ratios of consecutive h lie in [2^q / 4, 2 x 2^q] above the rounding floor (11 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+ACFULL1 | testset AC5 rotated frame, A = diag(0.8, -0.8): l_1, the sum and Q(t) against the closed form (240 pass, 0 fail or error, 0 broken, 0.0 s) | 0 | 0 | PASS
+ACFULL1 | testset AC5 negative control: S of the wrong sign fails l_1 and Q (the sum is blind to it, U3; test-side double, no new name) (4 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+# section FULL1 took 10.1 s
+## ---- keepM2-FULL3
+# continuous-qr verification, julia 1.13.2, threads 8, base seed 20261012 + 44000, CQ_FULL_RUN = true, groups FULL3, time 1.795043511e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes
+# Info AC11 reported | max_ratio_to_allowance = 10.711361543024653; within_allowance = 191; mean_lambda1_cqr = 0.04795474805823877; mean_lambda1_discrete_B = 0.04565640136179987; max_zero_pair = 0.006133477867217908; max_pairing = 0.00349223854938891; discrete_zero = 0.00517848591701126
+# Info AC12 reported (R3): worst |sum| / B_sum; sum ratio h = 1/20 to 1/40 per (orbit, q) | worst = 0.0002017239757292512; orders = Dict{Any, Any}(("R", 4) => 11.708743359342058, ("C", 2) => 0.81722069962151, ("C", 4) => 14.341064348999403, ("R", 2) => 4.230701169895788)
+# Info AC12 control reported | polar_sum = -3.0143246480873742e-5; scheme_sum = -2.1254189048747207e-6; bound = 0.19151598289351643
+# Info AC13a reported: worst E / bound | worst = 0.0010035298009777017
+# Info AC13b reported (R2) | rec = Any[(q = 2, E_eq = [0.00531122979571208, 0.001267067846998482], ratio = 4.191748538402019), (q = 4, E_eq = [8.648575908154488e-5, 5.146958877877417e-6], ratio = 16.803273764878266)]
+# Info AC14 reported (R3): worst error / B_C | worst = Dict{DataType, Float64}(Float64 => 0.006990594168233504, Double64 => 0.00011162503513904067)
+# Info AC14 control reported | f32_error = 2.8338890433410313e-5; B = 4.6436808996096226e-8
+# Info AC15 reported | orbits_in_agreement = 51; bigfloat_error_over_bound = 0.0001554306927515841228984163818984444936232203330028008199641085206763751526511473
+ACFULL3 | file total (67536 pass, 0 fail, 0 error, 0 broken, 262.4 s) | 67536 | 0 fail, 0 error | PASS
+ACFULL3 | testset AC11 chaotic class: positive lambda_1, agreement with the discrete value, the zero pair and the pairing, independent ensembles (3 pass, 0 fail or error, 0 broken, 52.4 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12 sum identity: |sum l_i| <= B_sum(T) and its order in Delta (8 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC12 negative control: a double that restores Q to its polar factor each step passes the sum bound without any penalty (test-side, no new name; spec point U5) (1 pass, 0 fail or error, 0 broken, 0.7 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13a injected defect decays: coupled hyperbolic fixture (form 84, k = d) and two columns of orbit C (form 92, k = 2) (300 pass, 0 fail or error, 0 broken, 1.6 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13b equilibrium defect: E_max seen is below the tolerance and scales like Delta^q (6 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13c injected fault: Q scaled by 1.05 (E = 0.1) at step 500 raises the orthogonality error at the next Q-step, nothing stored (4 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC13d explicit stability limits of C14: E diverges above nu Delta = 1 (order 2) and 1.39 (order 4), not at 0.9 of it (4 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14 same-orbit rounding: |l_i - l_i,ref| <= B_C(t) at every 50th Q-step, Float64 and Double64, reference in BigFloat(256) at the realized points (67200 pass, 0 fail or error, 0 broken, 201.8 s) | 0 | 0 | PASS
+ACFULL3 | testset AC14 negative control: a double with the product Q^T A Q in single precision exceeds B_C (test-side, no new name) (1 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+ACFULL3 | testset AC15 precision ladder: Float64, Double64 and BigFloat(256) agree; BigFloat against its own 512-bit reference (9 pass, 0 fail or error, 0 broken, 4.8 s) | 0 | 0 | PASS
+# section FULL3 took 262.5 s

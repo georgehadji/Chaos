@@ -199,8 +199,8 @@ end
         map = clv_std(T); x0 = SVector{2, T}(T(1.3), T(0.7)); W0 = clv_frame(clv_seed(10, 8), 1, 2, 2, T); C0 = clv_rand_C(StableRNG(clv_seed(10, 9)), 2, T)
         go(clvobj, nf, nb) = propagate_clv_orbit(clvobj, x0, nf, 100, nb; k = 2, seed = 1, W0 = W0, C0 = C0, outputs = ())
         c0 = ClvGinelli(map); a = clv_alloc_bytes(go, c0, 100, 100); b = clv_alloc_bytes(go, c0, 300, 100)
-        @test a == b                                                                                       # the forward transient stores nothing: zero bytes per handoff
+        @test abs(b - a) <= 256                                                                            # the forward transient stores nothing; 256 bytes absorb @allocated noise of the result arrays (D123), 200 handoffs at 16 bytes each would add 3200
         cc = ClvGinelli(map; storage = :checkpoint, block = 200); a2 = clv_alloc_bytes(go, cc, 100, 100); b2 = clv_alloc_bytes(go, cc, 100, 300)
-        @test 0 <= b2 - a2 <= sizeof(T) * (2 + 2 * 2) + 256                                                # one more checkpoint (state and frame) at most; per-handoff bytes would be far above
+        @test -256 <= b2 - a2 <= sizeof(T) * (2 + 2 * 2) + 256                                             # one more checkpoint (state and frame) at most, +-256 bytes of @allocated noise (D123); per-handoff bytes would be far above
     end
 end

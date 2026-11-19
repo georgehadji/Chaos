@@ -121,3 +121,7 @@ StableRNGs. `clv_seed(ac, sub) = 20261012 + 45000 + 50 ac + sub`; frames through
 ## Stage 04 note
 
 Criterion 13 (static null-space algorithm in 256 bits), the recorded lines R1 to R6, the full sizes (`CLV_FULL_RUN`: 20 starts, n_f = n_b = 2000, 200 starts for AC7 c) and the p = 4 error check of AC4 at the full set run there. Stage 03 must not loosen a bound in this file without an amendment; the bounds changed against the spec are U3 to U8 and are listed so the owner can accept or reject them at the checkpoint.
+
+## Amendment D123 (stage 03, owner: "Amend AC10c")
+
+AC10c: `a == b` replaced by `abs(b - a) <= 256`, and `0 <= b2 - a2 <= 48 + 256` by `-256 <= b2 - a2 <= 48 + 256` (Float64; `sizeof(T) * 6 + 256` in general). Reason: `@allocated` noise of the result arrays (up to 144 bytes between identical runs, measured at stage 03); 200 extra handoffs with any per-handoff allocation would add at least 3200 bytes, so the test still separates the fault. Decision log D123.

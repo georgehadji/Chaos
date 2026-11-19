@@ -11,12 +11,13 @@ const CLV_STREAM_LABEL = 0x434c56434f454646          # distinguishes the stream 
 Covariant-Lyapunov-vector estimator (Ginelli's method). `tau >= 1` map steps per handoff; `h` the time per map step (1 for a map), used only to give
 the exponents per unit time (`Dt = tau h`); `orthonormalizer` any delivered [`Orthonormalizer`](@ref) of the forward phase; `storage` is `:store`
 (all R factors in memory) or `:checkpoint` (state and frame at the start of each block of `block >= 1` handoffs, the blocks recomputed backwards).
-`tau < 1`, an unknown `storage` or `:checkpoint` with `block < 1` throw `ArgumentError`.
+`tau < 1`, an `h` that is not finite and positive, an unknown `storage` or `:checkpoint` with `block < 1` throw `ArgumentError`. `h` is kept
+as given and converted to the element type of the run, so a `BigFloat` or `Rational` step keeps its precision (Amendment D124).
 """
-struct ClvGinelli{M, A <: Orthonormalizer}
+struct ClvGinelli{M, A <: Orthonormalizer, H <: Real}
     map::M
     tau::Int
-    h::Float64
+    h::H                                          # kept as given, converted to the element type at use (Amendment D124, M2)
     alg::A
     storage::Symbol
     block::Int
@@ -24,9 +25,10 @@ end
 
 function ClvGinelli(map; tau::Integer = 1, h::Real = 1.0, orthonormalizer::Orthonormalizer = HouseholderQR(), storage::Symbol = :store, block::Integer = 0)
     tau >= 1 || throw(ArgumentError("tau must be at least 1, got $tau"))
+    (isfinite(h) && h > 0) || throw(ArgumentError("h must be finite and positive, got $h"))   # Amendment D124 (M1)
     storage in (:store, :checkpoint) || throw(ArgumentError("storage must be :store or :checkpoint, got :$storage"))
     storage === :checkpoint && block < 1 && throw(ArgumentError("the checkpoint block must be at least 1, got $block"))
-    return ClvGinelli(map, Int(tau), Float64(h), orthonormalizer, storage, Int(block))
+    return ClvGinelli(map, Int(tau), h, orthonormalizer, storage, Int(block))
 end
 
 """
@@ -207,7 +209,7 @@ function _clv_out(clv::ClvGinelli, ::Type{T}, d::Int, k::Int, ns::Int, outputs, 
     sets = angle_sets === nothing ? nothing : (collect(Int, angle_sets[1]), collect(Int, angle_sets[2]))
     m = sets === nothing ? 0 : min(length(sets[1]), length(sets[2]))
     big = sink === nothing
-    return ClvOut(zeros(T, k, k), zeros(T, k, k), zeros(T, k), T(clv.tau * clv.h), sink, sets,
+    return ClvOut(zeros(T, k, k), zeros(T, k, k), zeros(T, k), T(clv.tau) * T(clv.h), sink, sets,
                   big ? zeros(T, k, k, ns + 1) : zeros(T, 0, 0, 0), big ? nan(k, ns + 1) : zeros(T, 0, 0), big ? zeros(T, k, k, ns + 1) : zeros(T, 0, 0, 0),
                   big && :V in outputs ? zeros(T, d, k, ns + 1) : zeros(T, 0, 0, 0), big && :G in outputs ? zeros(T, d, k, ns + 1) : zeros(T, 0, 0, 0),
                   big && :R in outputs ? nan(k, k, ns + 1) : zeros(T, 0, 0, 0), sets === nothing || !big ? zeros(T, 0, 0) : nan(m, ns + 1),

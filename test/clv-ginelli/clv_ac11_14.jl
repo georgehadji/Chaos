@@ -10,11 +10,11 @@
         push!(cases, (label = "F3 C", map = clv_im(T), x0 = map_to(T, clv_orbit_C()), tau = 20, h = CLV_H, nf = 60, ns = clv_size(20, 100), nb = 60))
         for (ic, c) in enumerate(cases)
             setprecision(BigFloat, CLV_BITS) do
-                d = dimension(c.map); Dt = c.tau * c.h; W0 = clv_frame(clv_seed(11, 10 + ic), 1, d, d, T); C0 = clv_rand_C(StableRNG(clv_seed(11, 40 + ic)), d, T)
+                d = dimension(c.map); Dt = T(c.tau) * T(c.h); W0 = clv_frame(clv_seed(11, 10 + ic), 1, d, d, T); C0 = clv_rand_C(StableRNG(clv_seed(11, 40 + ic)), d, T)
                 res = clv_go(c.map, c.x0, c.nf, c.ns, c.nb; tau = c.tau, h = c.h, W0 = W0, C0 = C0)
                 pts = clv_orbit(c.map, c.x0, (c.nf + c.ns + c.nb) * c.tau)
                 ref = clv_ref_run(clv_bigmap(c.map), pts, c.tau, c.nf, c.ns, c.nb, W0, C0, BigFloat)
-                # spec c_v = 1e3: realized ratio 1.6 on F3 orbit C, so c_v = 1e4 (plan U8)
+                # D124: Dt is the module's, tau h in the element type. spec c_v = 1e3: realized ratio 1.6 on F3 orbit C, so c_v = 1e4 (plan U8)
                 Bv = 1.0e4 * clv_eps(T) * (1 + clv_Gmax(res.R, c.ns)); wv = 0.0; wl = 0.0
                 for n in 0:c.ns
                     Vr = clv_refV(ref, n)
@@ -135,4 +135,18 @@ end
     cpu = propagate_clv(ClvGinelli(clv_std(T)), [SVector{2, T}(1.3, 0.7)], 5, 5, 5; k = 2, seed = 1, backend = :cpu)
     @test gpu.provenance.backend === :cpu && occursin("CPU-only", string(gpu.provenance.backend_fallback_reason)) && isempty(string(cpu.provenance.backend_fallback_reason))
     @test gpu.results[1].C == cpu.results[1].C
+end
+
+@testset "D124 step length h: finite and positive, kept in the element type (review M1, M2)" begin
+    _ = (ClvGinelli, propagate_clv_orbit)
+    m = clv_std(Float64)
+    for h in (0.0, -1.0, NaN, Inf)
+        @test_throws ArgumentError ClvGinelli(m; h = h)
+    end
+    @test ClvGinelli(m; h = big"0.05").h isa BigFloat && ClvGinelli(m; h = 1 // 20).h === 1 // 20
+    T = Double64; mT = clv_std(T); x0 = SVector{2, T}(T(1.3), T(0.7)); W0 = clv_frame(clv_seed(14, 30), 1, 2, 2, T); C0 = clv_eye(2, 2, T)
+    run(h) = propagate_clv_orbit(ClvGinelli(mT; tau = 20, h = h), x0, 10, 10, 10; k = 2, seed = 1, W0 = W0, C0 = C0)
+    r1 = run(1.0); r2 = run(0.05); e = 8 * eps(T)
+    @test all(abs(r2.lambda[i, n] * T(20) * T(0.05) - r1.lambda[i, n] * T(20)) <= e * max(1, abs(r1.lambda[i, n] * 20)) for i in 1:2, n in 1:11)   # local exponents: Dt = tau h in T
+    @test all(abs(r2.lambda_fwd[i] * T(0.05) - r1.lambda_fwd[i]) <= e * max(1, abs(r1.lambda_fwd[i])) for i in 1:2)                            # forward exponents: the same h
 end

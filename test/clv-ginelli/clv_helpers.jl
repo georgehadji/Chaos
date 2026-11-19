@@ -290,13 +290,14 @@ function clv_go(map, x0, nf, ns, nb; tau = 1, h = 1.0, k = nothing, W0 = nothing
     return propagate_clv_orbit(clv, x0, nf, ns, nb; k = kk, seed = 1, W0 = W0, C0 = C0, outputs = outputs, kw...)
 end
 # Pilot exponents (per unit time) of a map by the reference algorithm, Float64, window of `ns` handoffs from x0, and the transient n* of the independence criterion.
-function clv_pilot(map, x0, tau::Integer, h; ns::Integer = 300)
+function clv_pilot(map, x0, tau::Integer, h; ns::Integer = 1000)   # D124: 1000 handoffs (300 gave lambda_1 < lambda_2 on a sticky F3 start)
     d = length(x0); pts = clv_orbit(map, x0, tau * (ns + 1))
     G0 = clv_frame(1, 1, d, d, Float64); C0 = clv_eye(d, d, Float64)
     return clv_ref_run(map, pts, tau, 0, ns, 1, G0, C0, Float64).lnR ./ (ns * tau * h)
 end
-# n* = ceil(c / (g_min Dt)) with c = 40 (spec proposes 25; test-side reading U3), g_min the smallest gap of the pilot spectrum, the pair (2, 3) of a Hamiltonian flow skipped; capped at nmax.
-function clv_nstar(lam, Dt; skip23::Bool = false, c = 40.0, nmax = clv_size(3000, 6000))
+# n* = ceil(c / (g_min Dt)) with c = 120 (spec proposes 25; U3 40; D124 120: F3 start 19 reached 3.3e-8 at c = 40, 6.8e-14 at 120), g_min the smallest gap of the pilot spectrum,
+# the pair (2, 3) of a Hamiltonian flow skipped; capped at nmax.
+function clv_nstar(lam, Dt; skip23::Bool = false, c = 120.0, nmax = clv_size(3000, 6000))
     gaps = [lam[i] - lam[i + 1] for i in 1:(length(lam) - 1)]
     skip23 && deleteat!(gaps, 2)
     return min(nmax, ceil(Int, c / (minimum(gaps) * Dt)))

@@ -125,3 +125,11 @@ Criterion 13 (static null-space algorithm in 256 bits), the recorded lines R1 to
 ## Amendment D123 (stage 03, owner: "Amend AC10c")
 
 AC10c: `a == b` replaced by `abs(b - a) <= 256`, and `0 <= b2 - a2 <= 48 + 256` by `-256 <= b2 - a2 <= 48 + 256` (Float64; `sizeof(T) * 6 + 256` in general). Reason: `@allocated` noise of the result arrays (up to 144 bytes between identical runs, measured at stage 03); 200 extra handoffs with any per-handoff allocation would add at least 3200 bytes, so the test still separates the fault. Decision log D123.
+
+## Amendment D124 (stage 04, owner: "Amend + fix M1-M2")
+
+- U3 restated: the pilot spectrum of `clv_pilot` runs 1000 handoffs (was 300) and the transient constant of `clv_nstar` is c = 120 (was 40); cap unchanged (3000 package, 6000 full). Reason (stage 04 report): at the full size the 300-handoff pilot gave lambda_1 < lambda_2 on F3 start 4 (negative n*, AC3b, AC5, AC7 errored), and F3 start 19 reached 3.3e-8 at c = 40 against 1e-10 (6.8e-14 at 3 n*).
+- Criterion 13 (verify only): module comparison at c = 120, the 1e-30 comparison at c = 180.
+- AC3c and AC11 rebuild ln Lambda as the per-unit-time exponent times Dt = T(tau) T(h), the module's Dt after M2 (was the Float64 product tau h).
+- New testset "D124 step length h": `ArgumentError` for h in {0, -1, NaN, Inf}; a `BigFloat` or `Rational` h kept; Double64, tau = 20: local and forward exponents at h = 0.05 times T(h) equal those at h = 1 within 8 eps.
+- AC5 (a): the bound adds the rounding of log|omega| near a tangency of the pair, 64 eps (1 / |omega_n| + 1 / |omega_{n+1}|). Found by the FULL1 rerun under D124: F3 chaotic start 6 has |omega(v_2, v_3)| down to 3.6e-6, ratio 7.99 without the term, 0.049 with it.

@@ -168,7 +168,7 @@ end
     for T in (Float64, Double64), sysname in (:std, :f3)
         setprecision(BigFloat, CLV_BITS) do
             map = sysname === :std ? clv_std(T) : clv_im(T); mapB = clv_bigmap(map); d = dimension(map)
-            tau = sysname === :std ? 1 : 20; h = sysname === :std ? 1.0 : CLV_H; ns = sysname === :std ? 80 : 60; Dt = tau * h
+            tau = sysname === :std ? 1 : 20; h = sysname === :std ? 1.0 : CLV_H; ns = sysname === :std ? 80 : 60; Dt = T(tau) * T(h)   # D124: the module's Dt, tau h in the element type
             x0 = sysname === :std ? SVector{2, T}(T(1.3), T(0.7)) : SVector{4, T}(map_to(T, clv_chaotic_starts(1, 1)[1]))
             W0 = clv_frame(clv_seed(3, 30), 1, d, d, T); C0 = clv_rand_C(StableRNG(clv_seed(3, 31)), d, T)
             res = clv_go(map, x0, sysname === :std ? 60 : 150, ns, sysname === :std ? 60 : 150; tau = tau, h = h, W0 = W0, C0 = C0)
@@ -236,7 +236,9 @@ end
             bnd = 512 * clv_eps(T) * (1 + lomax + lmax)                                   # spec 64 eps (1 + ...): realized 0.95 of it, widened 8x (plan U7)
             for n in 0:(ns_ - 1), i in 1:(d ÷ 2)
                 e = abs(Lam(n, i) + Lam(n, d + 1 - i) - Float64(log(abs(om(n, i, d + 1 - i))) - log(abs(om(n + 1, i, d + 1 - i)))))
-                worst["a"] = max(worst["a"], e / bnd); e <= bnd || (nbad += 1)                                    # (a), valid for any starting C
+                # D124: rounding of log|omega| near a tangency of the pair, 64 eps / |omega| at both samples (F3 start 6: |omega_23| 3.6e-6, ratio 7.99 without it, 0.049 with it)
+                bn = bnd + 64 * clv_eps(T) * (1 / abs(Float64(om(n, i, d + 1 - i))) + 1 / abs(Float64(om(n + 1, i, d + 1 - i))))
+                worst["a"] = max(worst["a"], e / bn); e <= bn || (nbad += 1)                                      # (a), valid for any starting C
             end
             kk = d
             ldet(n) = sum(log(res.C[i, i, n + 1]) for i in 1:kk); dmax = maximum(n -> abs(ldet(n)), 0:ns_)

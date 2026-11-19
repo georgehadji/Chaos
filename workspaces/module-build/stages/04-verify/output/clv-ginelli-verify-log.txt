@@ -1,0 +1,445 @@
+##### group FULL1
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups FULL1, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+# Info AC1 realized ratios (error / bound) | worstV = 0.19535840653308023; worstL = 0.03865771622085595; nrun = 30
+# Info AC2 realized ratios (error / bound) | worst = Dict("mean" => 0.9999472911566188, "a" => 0.026428148471020783, "b" => 0.03761544601221213, "c" => 0.030940594059405937); ncases = 43
+# Info AC3a worst relative slope deviation | worst = 0.006386622986215285
+# Info AC3b | s.name = "standard map"; Nb = 5
+# Info AC3b | s.name = "coupled maps"; Nb = 26
+# Info AC3b | s.name = "F3 chaotic 1"; Nb = 1420
+# Info AC3b | s.name = "F3 chaotic 2"; Nb = 1066
+# Info AC3b | s.name = "F3 chaotic 3"; Nb = 830
+# Info AC3c worst ratio error / bound | worst = 0.24694780312294182
+# Info AC4 absolute errors (h = 1/10, 1/20, 1/40) | key = :o2; errs = [0.0003898977819575988, 9.753932714849375e-5, 2.4388890624705087e-5]
+# Info AC4 absolute errors (h = 1/10, 1/20, 1/40) | key = :o4; errs = [7.563892190324721e-7, 4.74431205216342e-8, 2.967836190519867e-9]
+FULL1 | file total (44514 pass, 0 fail, 2 error, 0 broken, 29.6 s) | 44514 | 0 fail, 0 error | FAIL
+FULL1 | testset AC1 constant-Jacobian CLVs: fixtures a to d, identity and seeded frame (3091 pass, 0 fail or error, 0 broken, 11.8 s) | 0 | 0 | PASS
+FULL1 | testset AC1 negative controls: the forward Gram-Schmidt vectors, the forward s (8 pass, 0 fail or error, 0 broken, 1.0 s) | 0 | 0 | PASS
+FULL1 | testset AC2 covariance, normalisation, local exponents and telescoping on the  (41287 pass, 0 fail or error, 0 broken, 6.7 s) | 0 | 0 | PASS
+FULL1 | testset AC2 negative control: a 1-norm normalisation breaks the product ||R c| (2 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+FULL1 | testset AC3a backward convergence rate on fixtures a and b: slope of ln error  (12 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+FULL1 | testset AC3b independence of the starting frame, the starting C and tau at com (105 pass, 1 fail or error, 0 broken, 2.4 s) | 1 | 0 | FAIL
+FULL1 | testset AC3c covariance chain: ln ||M_{m,n} v_i(n)|| against the sum of the lo (1 pass, 0 fail or error, 0 broken, 4.9 s) | 0 | 0 | PASS
+FULL1 | testset AC4 order in h of the CLV error on the separable linear flow: order 2  (6 pass, 0 fail or error, 0 broken, 0.7 s) | 0 | 0 | PASS
+FULL1 | testset AC5 symplectic pair identity, non-partner orthogonality and the determ (0 pass, 1 fail or error, 0 broken, 1.1 s) | 1 | 0 | FAIL
+FULL1 | testset AC5 negative control: a wrong normalisation of the growth factor fails (2 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+# section FULL1 took 30.0 s
+##### group FULL2
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups FULL2, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+# Info AC6b worst ratio error / (16 eps) | worst = 0.625
+FULL2 | file total (9045 pass, 0 fail, 1 error, 0 broken, 24.8 s) | 9045 | 0 fail, 0 error | FAIL
+FULL2 | testset AC6a closed-form angles: the cat map (pi/2) and the non-normal symplec (168 pass, 0 fail or error, 0 broken, 10.2 s) | 0 | 0 | PASS
+FULL2 | testset AC6b pairwise cosines from C agree with those of V = G C within 16 eps (7236 pass, 0 fail or error, 0 broken, 1.8 s) | 0 | 0 | PASS
+FULL2 | testset AC6c planted tangency: the angle equals arctan(delta) to relative 1e-2 (72 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+FULL2 | testset AC7 flow geometry on F3: f(z) lies in span(v_2, v_3), grad H is orthog (1503 pass, 1 fail or error, 0 broken, 4.0 s) | 1 | 0 | FAIL
+FULL2 | testset AC8 bitwise equality of the checkpointed and the store-all runs, h_b i (5 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+FULL2 | testset AC8b number of interval-map evaluations: n_f + N (store-all) and n_f + (5 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+FULL2 | testset AC8c memory formula: bytes of the stored R factors, frames and working (8 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+FULL2 | testset AC8d streaming sink: samples delivered one at a time in decreasing n,  (3 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+FULL2 | testset AC9 first k columns of C, V and Lambda are those of the k = d run, bit (14 pass, 0 fail or error, 0 broken, 3.4 s) | 0 | 0 | PASS
+FULL2 | testset AC9c starting coefficient matrix: upper triangular, positive diagonal, (10 pass, 0 fail or error, 0 broken, 0.6 s) | 0 | 0 | PASS
+FULL2 | testset AC10a execution invariance: 1 against 4 tasks, chunk sizes 64 and 1000 (13 pass, 0 fail or error, 0 broken, 0.7 s) | 0 | 0 | PASS
+FULL2 | testset AC10b forward exponents are bitwise those of the delivered discrete sp (4 pass, 0 fail or error, 0 broken, 1.0 s) | 0 | 0 | PASS
+FULL2 | testset AC10c no allocation per handoff in the forward and backward loops, Flo (4 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+# section FULL2 took 25.2 s
+##### group FULL3
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups FULL3, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+# Info AC11 realized ratios error / B_v (R3) | worst = Dict{Any, Float64}((Double64, "std 16") => 1.4456830687077811e-6, (Double64, "std 18") => 5.664342406062267e-6, (Double64, "std 20") => 1.9155616957423066e-6, (Double64, "F3 C") => 0.0037970105585535346, (Double64, "std 4") => 1.3426348050963627e-6, (Double64, "std 15") => 2.648701258307941e-6, (Double64, "std 2") => 4.338133224646597e-6, (Double64, "std 19") => 6.587946798784342e-6, (Float64, "std 18") => 0.0010097456389836256, (Float64, "std 2") => 4.6038213653923745e-5, (Double64, "std 9") => 2.1585937285330193e-6, (Float64, "std 7") => 4.313209564397902e-5, (Float64, "std 9") => 6.46142258356918e-5, (Float64, "std 12") => 7.329025215397589e-5, (Float64, "std 16") => 0.00017392844576150025, (Double64, "std 7") => 1.8236232376645201e-6, (Double64, "std 10") => 3.3085309039961034e-5, (Double64, "std 14") => 1.7256365055656819e-6, (Float64, "std 13") => 6.358998329376238e-5, (Float64, "s
+FULL3 | file total (144 pass, 0 fail, 0 error, 0 broken, 23.8 s) | 144 | 0 fail, 0 error | PASS
+FULL3 | testset AC11 precision ladder: Float64 and Double64 CLVs and local exponents a (1 pass, 0 fail or error, 0 broken, 14.9 s) | 0 | 0 | PASS
+FULL3 | testset AC11b the convergence of criterion 3 (b) holds in BigFloat(256): two s (1 pass, 0 fail or error, 0 broken, 2.2 s) | 0 | 0 | PASS
+FULL3 | testset AC12a time reversal on the linear fixtures: the CLVs of the inverse ma (101 pass, 0 fail or error, 0 broken, 4.0 s) | 0 | 0 | PASS
+FULL3 | testset AC12b time reversal on the standard map K = 5 in BigFloat(256): the re (2 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+FULL3 | testset AC14a non-finite start, frame and orbit state: health errors with kind (4 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+FULL3 | testset AC14b forward factorisation breakdown: a singular tangent gives the de (2 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+FULL3 | testset AC14c backward breakdown: R_22 below the representable inverse overflo (2 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+FULL3 | testset AC14d argument errors before any work: k, n_s, n_f, n_b, tau, h_b, sto (9 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+FULL3 | testset AC14e run record: every parameter of Algorithm 'Parameters recorded pe (22 pass, 0 fail or error, 0 broken, 0.6 s) | 0 | 0 | PASS
+# section FULL3 took 23.9 s
+##### group FULL1p
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups FULL1p, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+# DIAGNOSTIC: clv_pilot redefined with ns = 1000 handoffs (default was 300)
+# Info AC1 realized ratios (error / bound) | worstV = 0.19535840653308023; worstL = 0.03865771622085595; nrun = 30
+# Info AC2 realized ratios (error / bound) | worst = Dict("mean" => 0.9999472911566188, "a" => 0.026428148471020783, "b" => 0.03761544601221213, "c" => 0.030940594059405937); ncases = 43
+# Info AC3a worst relative slope deviation | worst = 0.006386622986215285
+# Info AC3b | s.name = "standard map"; Nb = 5
+# Info AC3b | s.name = "coupled maps"; Nb = 29
+# Info AC3b | s.name = "F3 chaotic 1"; Nb = 1500
+# Info AC3b | s.name = "F3 chaotic 2"; Nb = 590
+# Info AC3b | s.name = "F3 chaotic 3"; Nb = 628
+# Info AC3b | s.name = "F3 chaotic 4"; Nb = 5653
+# Info AC3b | s.name = "F3 chaotic 5"; Nb = 656
+# Info AC3b | s.name = "F3 chaotic 6"; Nb = 677
+# Info AC3b | s.name = "F3 chaotic 7"; Nb = 790
+# Info AC3b | s.name = "F3 chaotic 8"; Nb = 5828
+# Info AC3b | s.name = "F3 chaotic 9"; Nb = 627
+# Info AC3b | s.name = "F3 chaotic 10"; Nb = 703
+# Info AC3b | s.name = "F3 chaotic 11"; Nb = 863
+# Info AC3b | s.name = "F3 chaotic 12"; Nb = 1294
+# Info AC3b | s.name = "F3 chaotic 13"; Nb = 1165
+# Info AC3b | s.name = "F3 chaotic 14"; Nb = 1953
+# Info AC3b | s.name = "F3 chaotic 15"; Nb = 1452
+# Info AC3b | s.name = "F3 chaotic 16"; Nb = 596
+# Info AC3b | s.name = "F3 chaotic 17"; Nb = 2223
+# Info AC3b | s.name = "F3 chaotic 18"; Nb = 707
+# Info AC3b | s.name = "F3 chaotic 19"; Nb = 776
+# Info AC3b | s.name = "F3 chaotic 20"; Nb = 1442
+# Info AC3b worst distance | worst = 3.3254912212733146e-8
+# Info AC3c worst ratio error / bound | worst = 0.24694780312294182
+# Info AC4 absolute errors (h = 1/10, 1/20, 1/40) | key = :o2; errs = [0.0003898977819575988, 9.753932714849375e-5, 2.4388890624705087e-5]
+# Info AC4 absolute errors (h = 1/10, 1/20, 1/40) | key = :o4; errs = [7.563892190324721e-7, 4.74431205216342e-8, 2.967836190519867e-9]
+# Info AC5 realized ratios (error / bound; (b) against 1e-9) | worst = Dict("a" => 0.24826021141004484, "b" => 0.2989533928062697, "a0" => 0.0, "c" => 0.18305567303047052)
+FULL1p | file total (44858 pass, 14 fail, 0 error, 0 broken, 36.3 s) | 44858 | 0 fail, 0 error | FAIL
+FULL1p | testset AC1 constant-Jacobian CLVs: fixtures a to d, identity and seeded frame (3091 pass, 0 fail or error, 0 broken, 11.7 s) | 0 | 0 | PASS
+FULL1p | testset AC1 negative controls: the forward Gram-Schmidt vectors, the forward s (8 pass, 0 fail or error, 0 broken, 1.0 s) | 0 | 0 | PASS
+FULL1p | testset AC2 covariance, normalisation, local exponents and telescoping on the  (41287 pass, 0 fail or error, 0 broken, 6.8 s) | 0 | 0 | PASS
+FULL1p | testset AC2 negative control: a 1-norm normalisation breaks the product ||R c| (2 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+FULL1p | testset AC3a backward convergence rate on fixtures a and b: slope of ln error  (12 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+FULL1p | testset AC3b independence of the starting frame, the starting C and tau at com (448 pass, 14 fail or error, 0 broken, 7.2 s) | 14 | 0 | FAIL
+FULL1p | testset AC3c covariance chain: ln ||M_{m,n} v_i(n)|| against the sum of the lo (1 pass, 0 fail or error, 0 broken, 4.6 s) | 0 | 0 | PASS
+FULL1p | testset AC4 order in h of the CLV error on the separable linear flow: order 2  (6 pass, 0 fail or error, 0 broken, 0.7 s) | 0 | 0 | PASS
+FULL1p | testset AC5 symplectic pair identity, non-partner orthogonality and the determ (1 pass, 0 fail or error, 0 broken, 3.2 s) | 0 | 0 | PASS
+FULL1p | testset AC5 negative control: a wrong normalisation of the growth factor fails (2 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+# section FULL1p took 36.6 s
+##### group FULL2p
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups FULL2p, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+# DIAGNOSTIC: clv_pilot redefined with ns = 1000 handoffs (default was 300)
+# Info AC6b worst ratio error / (16 eps) | worst = 0.625
+# Info AC7 worst sine/cosine and forward-exponent pass fraction | worst = 1.2309428580821261e-9; nok = 1.0
+FULL2p | file total (17563 pass, 0 fail, 0 error, 0 broken, 44.8 s) | 17563 | 0 fail, 0 error | PASS
+FULL2p | testset AC6a closed-form angles: the cat map (pi/2) and the non-normal symplec (168 pass, 0 fail or error, 0 broken, 10.2 s) | 0 | 0 | PASS
+FULL2p | testset AC6b pairwise cosines from C agree with those of V = G C within 16 eps (7236 pass, 0 fail or error, 0 broken, 1.8 s) | 0 | 0 | PASS
+FULL2p | testset AC6c planted tangency: the angle equals arctan(delta) to relative 1e-2 (72 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+FULL2p | testset AC7 flow geometry on F3: f(z) lies in span(v_2, v_3), grad H is orthog (10021 pass, 0 fail or error, 0 broken, 24.5 s) | 0 | 0 | PASS
+FULL2p | testset AC8 bitwise equality of the checkpointed and the store-all runs, h_b i (5 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+FULL2p | testset AC8b number of interval-map evaluations: n_f + N (store-all) and n_f + (5 pass, 0 fail or error, 0 broken, 0.3 s) | 0 | 0 | PASS
+FULL2p | testset AC8c memory formula: bytes of the stored R factors, frames and working (8 pass, 0 fail or error, 0 broken, 0.2 s) | 0 | 0 | PASS
+FULL2p | testset AC8d streaming sink: samples delivered one at a time in decreasing n,  (3 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+FULL2p | testset AC9 first k columns of C, V and Lambda are those of the k = d run, bit (14 pass, 0 fail or error, 0 broken, 3.2 s) | 0 | 0 | PASS
+FULL2p | testset AC9c starting coefficient matrix: upper triangular, positive diagonal, (10 pass, 0 fail or error, 0 broken, 0.6 s) | 0 | 0 | PASS
+FULL2p | testset AC10a execution invariance: 1 against 4 tasks, chunk sizes 64 and 1000 (13 pass, 0 fail or error, 0 broken, 0.6 s) | 0 | 0 | PASS
+FULL2p | testset AC10b forward exponents are bitwise those of the delivered discrete sp (4 pass, 0 fail or error, 0 broken, 1.1 s) | 0 | 0 | PASS
+FULL2p | testset AC10c no allocation per handoff in the forward and backward loops, Flo (4 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+# section FULL2p took 44.9 s
+##### group AC3bd
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups AC3bd, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC3b-diag | F3 chaotic start 1 max distance at 1, 2, 3 x N_b (N_b = 1500) | 2.059e-13 | 2.059e-13, 6.955e-14, 1.957e-13 ; pilot-1000 lambda 0.03163,0.004279,-0.004614,-0.0313 ; pilot-6000 lambda 0.02672,0.001099,-0.001155,-0.02667 | PASS
+AC3b-diag | F3 chaotic start 2 max distance at 1, 2, 3 x N_b (N_b = 590) | 1.231e-13 | 1.231e-13, 2.484e-14, 9.009e-14 ; pilot-1000 lambda 0.07468,0.006836,-0.005136,-0.07638 ; pilot-6000 lambda 0.06142,0.001563,-0.001279,-0.0617 | PASS
+AC3b-diag | F3 chaotic start 3 max distance at 1, 2, 3 x N_b (N_b = 628) | 1.264e-11 | 1.264e-11, 3.066e-14, 1.171e-14 ; pilot-1000 lambda 0.06811,0.004331,-0.003204,-0.06924 ; pilot-6000 lambda 0.05719,0.001015,-0.0008268,-0.05738 | PASS
+AC3b-diag | F3 chaotic start 4 max distance at 1, 2, 3 x N_b (N_b = 5653) | 3.485e-13 | 3.485e-13, 1.139e-13, 1.21e-12 ; pilot-1000 lambda 0.01196,0.004884,-0.003944,-0.0129 ; pilot-6000 lambda 0.01803,0.001046,-0.0008891,-0.01819 | PASS
+AC3b-diag | F3 chaotic start 5 max distance at 1, 2, 3 x N_b (N_b = 656) | 1.147e-14 | 1.147e-14, 4.997e-15, 2.636e-14 ; pilot-1000 lambda 0.06477,0.003729,-0.00254,-0.06596 ; pilot-6000 lambda 0.06102,0.001339,-0.001141,-0.06122 | PASS
+AC3b-diag | F3 chaotic start 6 max distance at 1, 2, 3 x N_b (N_b = 677) | 4.449e-14 | 4.449e-14, 7.265e-15, 6.558e-14 ; pilot-1000 lambda 0.06386,0.004701,-0.002567,-0.06599 ; pilot-6000 lambda 0.05581,0.001078,-0.0007221,-0.05617 | PASS
+AC3b-diag | F3 chaotic start 7 max distance at 1, 2, 3 x N_b (N_b = 790) | 2.275e-14 | 2.275e-14, 2.142e-14, 4.375e-14 ; pilot-1000 lambda 0.05843,0.004641,-0.006203,-0.05687 ; pilot-6000 lambda 0.05869,0.0008301,-0.001091,-0.05843 | PASS
+AC3b-diag | F3 chaotic start 8 max distance at 1, 2, 3 x N_b (N_b = 5828) | 4.824e-13 | 4.824e-13, 1.218e-12, 4.628e-13 ; pilot-1000 lambda 0.01227,0.003836,-0.00462,-0.01148 ; pilot-6000 lambda 0.01381,0.0008099,-0.0009407,-0.01368 | PASS
+AC3b-diag | F3 chaotic start 9 max distance at 1, 2, 3 x N_b (N_b = 627) | 4.597e-15 | 4.597e-15, 2.941e-15, 2.471e-13 ; pilot-1000 lambda 0.06883,0.005029,-0.004559,-0.0693 ; pilot-6000 lambda 0.04443,0.001193,-0.001115,-0.0445 | PASS
+AC3b-diag | F3 chaotic start 10 max distance at 1, 2, 3 x N_b (N_b = 703) | 1.851e-14 | 1.851e-14, 4.003e-14, 1.158e-13 ; pilot-1000 lambda 0.06542,0.008476,-0.004746,-0.06915 ; pilot-6000 lambda 0.06625,0.00163,-0.001009,-0.06687 | PASS
+AC3b-diag | F3 chaotic start 11 max distance at 1, 2, 3 x N_b (N_b = 863) | 6.889e-11 | 6.889e-11, 2.176e-13, 1.16e-13 ; pilot-1000 lambda 0.0535,0.007142,-0.006318,-0.05433 ; pilot-6000 lambda 0.05583,0.001393,-0.001256,-0.05597 | PASS
+AC3b-diag | F3 chaotic start 12 max distance at 1, 2, 3 x N_b (N_b = 1294) | 5.101e-12 | 5.101e-12, 1.758e-13, 1.799e-13 ; pilot-1000 lambda 0.03554,0.004613,-0.004265,-0.03589 ; pilot-6000 lambda 0.0403,0.001022,-0.0009639,-0.04036 | PASS
+AC3b-diag | F3 chaotic start 13 max distance at 1, 2, 3 x N_b (N_b = 1165) | 2.177e-13 | 2.177e-13, 1.197e-13, 1.394e-13 ; pilot-1000 lambda 0.03792,0.003565,-0.002866,-0.03862 ; pilot-6000 lambda 0.03585,0.0008956,-0.0007792,-0.03597 | PASS
+AC3b-diag | F3 chaotic start 14 max distance at 1, 2, 3 x N_b (N_b = 1953) | 1.384e-13 | 1.384e-13, 2.675e-13, 5.833e-13 ; pilot-1000 lambda 0.02554,0.005058,-0.004678,-0.02592 ; pilot-6000 lambda 0.02043,0.001231,-0.001167,-0.02049 | PASS
+AC3b-diag | F3 chaotic start 15 max distance at 1, 2, 3 x N_b (N_b = 1452) | 9.457e-14 | 9.457e-14, 1.588e-13, 9.932e-14 ; pilot-1000 lambda 0.03133,0.003338,-0.003555,-0.03111 ; pilot-6000 lambda 0.02102,0.0009894,-0.001026,-0.02099 | PASS
+AC3b-diag | F3 chaotic start 16 max distance at 1, 2, 3 x N_b (N_b = 596) | 2.948e-14 | 2.948e-14, 1.729e-14, 1.289e-13 ; pilot-1000 lambda 0.07317,0.006029,-0.005017,-0.07419 ; pilot-6000 lambda 0.05472,0.001119,-0.00095,-0.05489 | PASS
+AC3b-diag | F3 chaotic start 17 max distance at 1, 2, 3 x N_b (N_b = 2223) | 3.688e-12 | 3.688e-12, 2.192e-13, 1.167e-13 ; pilot-1000 lambda 0.0255,0.007501,-0.004051,-0.02895 ; pilot-6000 lambda 0.01936,0.001641,-0.001066,-0.01993 | PASS
+AC3b-diag | F3 chaotic start 18 max distance at 1, 2, 3 x N_b (N_b = 707) | 4.484e-15 | 4.484e-15, 1.084e-14, 7.999e-15 ; pilot-1000 lambda 0.06041,0.003224,-0.003512,-0.06012 ; pilot-6000 lambda 0.05632,0.0009011,-0.0009491,-0.05627 | PASS
+AC3b-diag | F3 chaotic start 19 max distance at 1, 2, 3 x N_b (N_b = 776) | 3.325e-08 | 3.325e-08, 2.812e-10, 6.789e-14 ; pilot-1000 lambda 0.05559,0.003837,-0.003927,-0.0555 ; pilot-6000 lambda 0.03447,0.001093,-0.001108,-0.03445 | FAIL
+AC3b-diag | F3 chaotic start 20 max distance at 1, 2, 3 x N_b (N_b = 1442) | 1.974e-14 | 1.974e-14, 2.722e-14, 2.161e-13 ; pilot-1000 lambda 0.03361,0.005856,-0.005114,-0.03435 ; pilot-6000 lambda 0.05504,0.001205,-0.001082,-0.05516 | PASS
+# section AC3bd took 37.1 s
+##### group Od13a
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Od13a, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC13 | std start 1 (the single start) pilot exponents (per unit time, Float64, 300 handoffs) | 1.037 | 1.037, -1.037 ; n* = 40 | INFO
+AC13 | std start 1 (the single start) module Float64 vs static, max delta (n_f = n_b = 40) | 1.123e-13 | <= 1.0e-8 | PASS
+AC13 | std start 1 (the single start) 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 3.681e-37 | reported (transient n*, not 1e-30) | INFO
+R1 | std start 1 (the single start) Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.07273 | 0.93 / 0.000776 / 0.51 / 0.0371 (value = static over Ginelli 256 time) | INFO
+AC13 | std start 1 (the single start) module Double64 vs static, max delta (n_f = n_b = 40) | 1.543e-30 | <= 1.0e-8 | PASS
+AC13 | std start 1 (the single start) 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 1.945e-39 | reported (transient n*, not 1e-30) | INFO
+R1 | std start 1 (the single start) Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.05308 | 2.18 / 0.000623 / 0.027 / 0.00143 (value = static over Ginelli 256 time) | INFO
+AC13 | std start 1 (the single start) module BigFloat(256) vs static, max delta (n_f = n_b = 100) | 5.431e-73 | <= 1.0e-30 | PASS
+AC13 | std start 1 (the single start) 256-bit Ginelli (clv_ref) vs static, max delta | 5.43e-73 | <= 1.0e-30 | PASS
+R1 | std start 1 (the single start) BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.08526 | 1.09 / 0.000966 / 0.0266 / 0.00227 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 2 pilot exponents (per unit time, Float64, 300 handoffs) | 0.7817 | 0.7817, -0.7817 ; n* = 40 | INFO
+AC13 | std chaotic start 2 module Float64 vs static, max delta (n_f = n_b = 40) | 7.683e-10 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 2 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 7.683e-10 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 2 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.08992 | 0.000109 / 0.000472 / 0.013 / 0.00117 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 2 module Double64 vs static, max delta (n_f = n_b = 40) | 5.823e-23 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 2 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 5.823e-23 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 2 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.938 | 0.000502 / 0.000509 / 0.00123 / 0.00116 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 2 module BigFloat(256) vs static, max delta (n_f = n_b = 100) | 2.47e-76 | <= 1.0e-30 | PASS
+AC13 | std chaotic start 2 256-bit Ginelli (clv_ref) vs static, max delta | 1.349e-76 | <= 1.0e-30 | PASS
+R1 | std chaotic start 2 BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.8591 | 0.00695 / 0.000871 / 0.00198 / 0.0017 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 3 pilot exponents (per unit time, Float64, 300 handoffs) | 0.9591 | 0.9591, -0.9591 ; n* = 40 | INFO
+AC13 | std chaotic start 3 module Float64 vs static, max delta (n_f = n_b = 40) | 8.326e-15 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 3 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 8.019e-34 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 3 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.8754 | 0.000124 / 0.000522 / 0.00157 / 0.00138 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 3 module Double64 vs static, max delta (n_f = n_b = 40) | 2.299e-31 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 3 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 1.367e-35 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 3 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9781 | 0.0005 / 0.00054 / 0.00144 / 0.00141 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 3 module BigFloat(256) vs static, max delta (n_f = n_b = 100) | 9.754e-77 | <= 1.0e-30 | PASS
+AC13 | std chaotic start 3 256-bit Ginelli (clv_ref) vs static, max delta | 5.258e-77 | <= 1.0e-30 | PASS
+R1 | std chaotic start 3 BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.04878 | 0.0063 / 0.00101 / 0.0406 / 0.00198 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 4 pilot exponents (per unit time, Float64, 300 handoffs) | 1.035 | 1.035, -1.035 ; n* = 40 | INFO
+AC13 | std chaotic start 4 module Float64 vs static, max delta (n_f = n_b = 40) | 7.092e-16 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 4 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 6.833e-34 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 4 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9225 | 0.000125 / 0.000497 / 0.00136 / 0.00125 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 4 module Double64 vs static, max delta (n_f = n_b = 40) | 1.079e-30 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 4 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 1.772e-37 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 4 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9738 | 0.00047 / 0.000473 / 0.00131 / 0.00128 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 5 pilot exponents (per unit time, Float64, 300 handoffs) | 0.9848 | 0.9848, -0.9848 ; n* = 40 | INFO
+AC13 | std chaotic start 5 module Float64 vs static, max delta (n_f = n_b = 40) | 7.756e-16 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 5 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 1.738e-29 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 5 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.012 | 0.000112 / 0.000521 / 0.00138 / 0.00139 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 5 module Double64 vs static, max delta (n_f = n_b = 40) | 5.946e-20 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 5 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 5.946e-20 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 5 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.974 | 0.00047 / 0.000509 / 0.00137 / 0.00133 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 6 pilot exponents (per unit time, Float64, 300 handoffs) | 0.9939 | 0.9939, -0.9939 ; n* = 40 | INFO
+AC13 | std chaotic start 6 module Float64 vs static, max delta (n_f = n_b = 40) | 3.742e-15 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 6 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 3.439e-29 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 6 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9923 | 0.000123 / 0.000486 / 0.00142 / 0.00141 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 6 module Double64 vs static, max delta (n_f = n_b = 40) | 6.186e-32 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 6 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 2.796e-34 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 6 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9722 | 0.000483 / 0.000531 / 0.00135 / 0.00132 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 7 pilot exponents (per unit time, Float64, 300 handoffs) | 0.9596 | 0.9596, -0.9596 ; n* = 40 | INFO
+AC13 | std chaotic start 7 module Float64 vs static, max delta (n_f = n_b = 40) | 1.628e-14 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 7 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 1.429e-29 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 7 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.141 | 0.000133 / 0.00051 / 0.00159 / 0.00181 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 7 module Double64 vs static, max delta (n_f = n_b = 40) | 1.306e-28 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 7 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 1.303e-28 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 7 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9249 | 0.000528 / 0.000518 / 0.00139 / 0.00129 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 8 pilot exponents (per unit time, Float64, 300 handoffs) | 0.9998 | 0.9998, -0.9998 ; n* = 40 | INFO
+AC13 | std chaotic start 8 module Float64 vs static, max delta (n_f = n_b = 40) | 5.633e-15 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 8 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 1.588e-28 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 8 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.129 | 0.000125 / 0.000528 / 0.00133 / 0.0015 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 8 module Double64 vs static, max delta (n_f = n_b = 40) | 5.835e-29 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 8 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 5.834e-29 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 8 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.135 | 0.000458 / 0.000611 / 0.0017 / 0.00193 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 9 pilot exponents (per unit time, Float64, 300 handoffs) | 1.025 | 1.025, -1.025 ; n* = 40 | INFO
+AC13 | std chaotic start 9 module Float64 vs static, max delta (n_f = n_b = 40) | 1.546e-15 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 9 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 9.639e-33 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 9 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.102 | 0.000123 / 0.000583 / 0.00188 / 0.00207 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 9 module Double64 vs static, max delta (n_f = n_b = 40) | 1.551e-31 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 9 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 1.093e-34 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 9 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.1261 | 0.000485 / 0.000636 / 0.00918 / 0.00116 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 10 pilot exponents (per unit time, Float64, 300 handoffs) | 1.036 | 1.036, -1.036 ; n* = 40 | INFO
+AC13 | std chaotic start 10 module Float64 vs static, max delta (n_f = n_b = 40) | 1.319e-15 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 10 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 2.719e-29 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 10 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.901 | 0.000111 / 0.000562 / 0.00147 / 0.00133 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 10 module Double64 vs static, max delta (n_f = n_b = 40) | 1.5e-31 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 10 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 6.149e-32 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 10 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9628 | 0.000484 / 0.000507 / 0.00138 / 0.00133 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 11 pilot exponents (per unit time, Float64, 300 handoffs) | 0.9276 | 0.9276, -0.9276 ; n* = 40 | INFO
+AC13 | std chaotic start 11 module Float64 vs static, max delta (n_f = n_b = 40) | 1.755e-15 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 11 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 2.96e-19 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 11 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.6879 | 0.000124 / 0.000527 / 0.00197 / 0.00135 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 11 module Double64 vs static, max delta (n_f = n_b = 40) | 2.96e-19 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 11 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 40) | 2.96e-19 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 11 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.005 | 0.000484 / 0.000514 / 0.00133 / 0.00133 (value = static over Ginelli 256 time) | INFO
+AC13 | standard map starts compared (1 + 10 chaotic) | 11 | 11 | PASS
+# section Od13a took 10.4 s
+##### group Od13b
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Od13b, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC13 | coupled maps d = 4 pilot exponents (per unit time, Float64, 300 handoffs) | 0.7828 | 0.7828, 0.3409, -0.3406, -0.7831 ; n* = 91 | INFO
+AC13 | coupled maps d = 4 module Float64 vs static, max delta (n_f = n_b = 91) | 1.365e-12 | <= 1.0e-8 | PASS
+AC13 | coupled maps d = 4 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 91) | 1.361e-12 | reported (transient n*, not 1e-30) | INFO
+R1 | coupled maps d = 4 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.2567 | 1.1 / 0.0342 / 0.455 / 0.117 (value = static over Ginelli 256 time) | INFO
+AC13 | coupled maps d = 4 module Double64 vs static, max delta (n_f = n_b = 91) | 6.023e-05 | <= 1.0e-8 | FAIL
+AC13 | coupled maps d = 4 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 91) | 6.023e-05 | reported (transient n*, not 1e-30) | INFO
+R1 | coupled maps d = 4 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.5192 | 2.27 / 0.00461 / 0.0429 / 0.0222 (value = static over Ginelli 256 time) | INFO
+AC13 | coupled maps d = 4 [diagnostic, 2 x n*] module Double64 vs static, max delta (n_f = n_b = 182) | 2.228e-17 | <= 1.0e-8 | INFO
+AC13 | coupled maps d = 4 [diagnostic, 2 x n*] 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 182) | 2.228e-17 | reported (transient n*, not 1e-30) | INFO
+R1 | coupled maps d = 4 [diagnostic, 2 x n*] Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 3.648 | 0.00419 / 0.0078 / 0.0152 / 0.0555 (value = static over Ginelli 256 time) | INFO
+AC13 | coupled maps d = 4 module BigFloat(256) vs static, max delta (n_f = n_b = 204) | 1.25e-20 | <= 1.0e-30 | FAIL
+AC13 | coupled maps d = 4 256-bit Ginelli (clv_ref) vs static, max delta | 1.25e-20 | <= 1.0e-30 | FAIL
+R1 | coupled maps d = 4 BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.7394 | 1.56 / 0.00811 / 0.048 / 0.0355 (value = static over Ginelli 256 time) | INFO
+AC13 | coupled maps d = 4 [diagnostic, 2 x n256] module BigFloat(256) vs static, max delta (n_f = n_b = 408) | 1.436e-43 | <= 1.0e-30 | INFO
+AC13 | coupled maps d = 4 [diagnostic, 2 x n256] 256-bit Ginelli (clv_ref) vs static, max delta | 1.436e-43 | <= 1.0e-30 | INFO
+R1 | coupled maps d = 4 [diagnostic, 2 x n256] BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.701 | 0.0905 / 0.0218 / 0.0442 / 0.0751 (value = static over Ginelli 256 time) | INFO
+# section Od13b took 11.5 s
+##### group Od13c
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Od13c, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC13 | F3 orbit C pilot exponents (per unit time, Float64, 300 handoffs) | 0.03119 | 0.03119, 0.004799, -0.004085, -0.0319 ; n* = 1516 | INFO
+AC13 | F3 orbit C module Float64 vs static, max delta (n_f = n_b = 1516) | 7.148e-12 | <= 1.0e-8 | PASS
+AC13 | F3 orbit C 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 1516) | 1.749e-14 | reported (transient n*, not 1e-30) | INFO
+R1 | F3 orbit C Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.4418 | 1.2 / 14 / 0.549 / 0.243 (value = static over Ginelli 256 time) | INFO
+# section Od13c took 21.1 s
+##### group Od13d
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Od13d, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC13 | F3 orbit C pilot exponents (per unit time, Float64, 300 handoffs) | 0.03119 | 0.03119, 0.004799, -0.004085, -0.0319 ; n* = 1516 | INFO
+AC13 | F3 orbit C module Double64 vs static, max delta (n_f = n_b = 1516) | 1.656e-15 | <= 1.0e-8 | PASS
+AC13 | F3 orbit C 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 1516) | 1.656e-15 | reported (transient n*, not 1e-30) | INFO
+R1 | F3 orbit C Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.4718 | 4.49 / 13.6 / 0.564 / 0.266 (value = static over Ginelli 256 time) | INFO
+# section Od13d took 24.9 s
+##### group Od13e
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Od13e, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC13 | F3 orbit C pilot exponents (per unit time, Float64, 1000 handoffs) | 0.03119 | 0.03119, 0.004799, -0.004085, -0.0319 ; n256 = 3411 | INFO
+AC13 | F3 orbit C module BigFloat(256) vs static, max delta (n_f = n_b = 3411) | 1.524e-33 | <= 1.0e-30 | PASS
+AC13 | F3 orbit C 256-bit Ginelli (clv_ref) vs static, max delta | 1.524e-33 | <= 1.0e-30 | PASS
+R1 | F3 orbit C BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.4113 | 34.1 / 24.4 / 0.651 / 0.268 (value = static over Ginelli 256 time) | INFO
+# section Od13e took 67.3 s
+##### group Oe
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Oe, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+R6 | start 1 window mean lambda_1 (1e6 steps, per step) against KuptsovParlitz2012 printed value 0.225 | 0.2242 | printed 3 digits: 0.225 | INFO
+R6 | start 1 window mean lambda_2 (1e6 steps, per step) against KuptsovParlitz2012 printed value 0.188 | 0.1874 | printed 3 digits: 0.188 | INFO
+R6 | start 1 window mean lambda_3 (1e6 steps, per step) against KuptsovParlitz2012 printed value -2.716 | -2.714 | printed 3 digits: -2.716 | INFO
+R6 | start 1 forward exponents (lambda_fwd) sum minus ln b | 0 | reported (spec: 1e-12) | INFO
+R6 | start 1 CLV window mean sum minus ln b (raw) | -7.21e-07 | reported (carries the boundary term of V14 (c)) | INFO
+R6 | start 1 CLV window mean sum minus ln b minus boundary term (ln det C_0 - ln det C_ns)/ns | 1.428e-16 | reported (spec: 1e-12) | INFO
+R6 | start 1 forward lambda_fwd | 0.2242 | 0.2242, 0.1874, -2.714 | INFO
+R6 | start 1 seconds for 1e6 steps | 1.393 | - | INFO
+R6 | start 1 independent plain-QR exponents of the same 1e6-step window, max difference to lambda_fwd | 4.502e-07 | plain QR: 0.2242, 0.1874, -2.714 | INFO
+R6 | start 2 window mean lambda_1 (1e6 steps, per step) against KuptsovParlitz2012 printed value 0.225 | 0.2244 | printed 3 digits: 0.225 | INFO
+R6 | start 2 window mean lambda_2 (1e6 steps, per step) against KuptsovParlitz2012 printed value 0.188 | 0.1876 | printed 3 digits: 0.188 | INFO
+R6 | start 2 window mean lambda_3 (1e6 steps, per step) against KuptsovParlitz2012 printed value -2.716 | -2.715 | printed 3 digits: -2.716 | INFO
+R6 | start 2 forward exponents (lambda_fwd) sum minus ln b | 0 | reported (spec: 1e-12) | INFO
+R6 | start 2 CLV window mean sum minus ln b (raw) | -1.765e-06 | reported (carries the boundary term of V14 (c)) | INFO
+R6 | start 2 CLV window mean sum minus ln b minus boundary term (ln det C_0 - ln det C_ns)/ns | -5.683e-16 | reported (spec: 1e-12) | INFO
+R6 | start 2 forward lambda_fwd | 0.2244 | 0.2244, 0.1876, -2.715 | INFO
+R6 | start 2 seconds for 1e6 steps | 0.442 | - | INFO
+R6 | mean over 8 random starts of the 1e6-step window means, lambda_1 (standard error in the bound column) | 0.2243 | printed 0.225 ; standard error 6.268e-05 | INFO
+R6 | mean over 8 random starts of the 1e6-step window means, lambda_2 (standard error in the bound column) | 0.1876 | printed 0.188 ; standard error 9.401e-05 | INFO
+R6 | mean over 8 random starts of the 1e6-step window means, lambda_3 (standard error in the bound column) | -2.714 | printed -2.716 ; standard error 0.0001452 | INFO
+O-e | Ginelli2013 pp.25 to 26 (minimum angle scales as 1/N in the FPU chain and the Henon chain): system not in the catalog, not run | 0 | reported only | INFO
+# section Oe took 8.0 s
+##### group R1
+# clv-ginelli verification, julia 1.13.2, threads 1, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups R1, time 1.795110681e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+R1 | standard map k = 2 Float64 delivered spectrum (forward reference), 9000 handoffs, seconds | 0.0009666 | - | INFO
+R1 | standard map k = 2 Float64 module store-all no outputs, seconds | 0.001075 | - | INFO
+R1 | standard map k = 2 Float64 module store-all outputs (:V), seconds | 0.001122 | - | INFO
+R1 | standard map k = 2 Float64 module checkpointed (block 900) seconds | 0.001504 | - | INFO
+R1 | standard map k = 2 Float64 forward / backward ratio (backward = store-all minus forward reference) | 8.917 | reported 2.4 (6 without the phase-space expansion), Ginelli2013 p.15 (V18) | INFO
+R1 | standard map k = 2 Float64 checkpointed / store-all | 1.399 | reported about 2 (V17) | INFO
+R1 | coupled maps k = 4 Float64 delivered spectrum (forward reference), 9000 handoffs, seconds | 0.004374 | - | INFO
+R1 | coupled maps k = 4 Float64 module store-all no outputs, seconds | 0.004946 | - | INFO
+R1 | coupled maps k = 4 Float64 module store-all outputs (:V), seconds | 0.005131 | - | INFO
+R1 | coupled maps k = 4 Float64 module checkpointed (block 900) seconds | 0.006998 | - | INFO
+R1 | coupled maps k = 4 Float64 forward / backward ratio (backward = store-all minus forward reference) | 7.655 | reported 2.4 (6 without the phase-space expansion), Ginelli2013 p.15 (V18) | INFO
+R1 | coupled maps k = 4 Float64 checkpointed / store-all | 1.415 | reported about 2 (V17) | INFO
+R1 | F3 orbit C k = 4 Float64 delivered spectrum (forward reference), 900 handoffs, seconds | 0.01452 | - | INFO
+R1 | F3 orbit C k = 4 Float64 module store-all no outputs, seconds | 0.01584 | - | INFO
+R1 | F3 orbit C k = 4 Float64 module store-all outputs (:V), seconds | 0.01411 | - | INFO
+R1 | F3 orbit C k = 4 Float64 module checkpointed (block 90) seconds | 0.02469 | - | INFO
+R1 | F3 orbit C k = 4 Float64 forward / backward ratio (backward = store-all minus forward reference) | 11 | reported 2.4 (6 without the phase-space expansion), Ginelli2013 p.15 (V18) | INFO
+R1 | F3 orbit C k = 4 Float64 checkpointed / store-all | 1.559 | reported about 2 (V17) | INFO
+R1 | standard map k = 2 Double64 delivered spectrum (forward reference), 9000 handoffs, seconds | 0.01938 | - | INFO
+R1 | standard map k = 2 Double64 module store-all no outputs, seconds | 0.0199 | - | INFO
+R1 | standard map k = 2 Double64 module store-all outputs (:V), seconds | 0.02018 | - | INFO
+R1 | standard map k = 2 Double64 module checkpointed (block 900) seconds | 0.02986 | - | INFO
+R1 | standard map k = 2 Double64 forward / backward ratio (backward = store-all minus forward reference) | 37.52 | reported 2.4 (6 without the phase-space expansion), Ginelli2013 p.15 (V18) | INFO
+R1 | standard map k = 2 Double64 checkpointed / store-all | 1.501 | reported about 2 (V17) | INFO
+R1 | coupled maps k = 4 Double64 delivered spectrum (forward reference), 9000 handoffs, seconds | 0.09955 | - | INFO
+R1 | coupled maps k = 4 Double64 module store-all no outputs, seconds | 0.07489 | - | INFO
+R1 | coupled maps k = 4 Double64 module store-all outputs (:V), seconds | 0.07957 | - | INFO
+R1 | coupled maps k = 4 Double64 module checkpointed (block 900) seconds | 0.134 | - | INFO
+R1 | coupled maps k = 4 Double64 forward / backward ratio (backward = store-all minus forward reference) | Inf | reported 2.4 (6 without the phase-space expansion), Ginelli2013 p.15 (V18) | INFO
+R1 | coupled maps k = 4 Double64 checkpointed / store-all | 1.789 | reported about 2 (V17) | INFO
+R1 | F3 orbit C k = 4 Double64 delivered spectrum (forward reference), 900 handoffs, seconds | 0.2753 | - | INFO
+R1 | F3 orbit C k = 4 Double64 module store-all no outputs, seconds | 0.208 | - | INFO
+R1 | F3 orbit C k = 4 Double64 module store-all outputs (:V), seconds | 0.2381 | - | INFO
+R1 | F3 orbit C k = 4 Double64 module checkpointed (block 90) seconds | 0.3704 | - | INFO
+R1 | F3 orbit C k = 4 Double64 forward / backward ratio (backward = store-all minus forward reference) | Inf | reported 2.4 (6 without the phase-space expansion), Ginelli2013 p.15 (V18) | INFO
+R1 | F3 orbit C k = 4 Double64 checkpointed / store-all | 1.781 | reported about 2 (V17) | INFO
+# section R1 took 15.2 s
+##### group R2
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups R2, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+R2 | standard map K = 5 minimum principal angle, samples, seconds | 100001 | 1.1 s (400 transient handoffs each) | INFO
+R2 | standard map K = 5 minimum principal angle: min, median, max | 2.454e-06 | 0.8176, 1.571 | INFO
+R2 | standard map K = 5 fraction of samples with minimum principal angle below 0.1 | 0.04574 | - | INFO
+R2 | standard map K = 5 fraction of samples with minimum principal angle below 0.01 | 0.00501 | - | INFO
+R2 | standard map K = 5 fraction of samples with minimum principal angle below 0.001 | 0.00055 | - | INFO
+R2 | standard map K = 5 fraction of samples with minimum principal angle below 0.0001 | 0.00016 | - | INFO
+R2 | standard map K = 5 fraction of samples with minimum principal angle below 1.0e-5 | 1e-05 | - | INFO
+R2 | standard map K = 5 log-log slope of the empirical CDF of the minimum angle on 1e-4 .. 1e-1 (P(theta < x) ~ x^slope) | 0.8601 | - | INFO
+R2 | standard map K = 5 pair (1,2) angle: min, fraction below 1e-2, fraction below 1e-3 | 2.454e-06 | 0.00501, 0.00055 | INFO
+R2 | coupled maps d = 4 minimum principal angle, samples, seconds | 100001 | 1.3 s (400 transient handoffs each) | INFO
+R2 | coupled maps d = 4 minimum principal angle: min, median, max | 1.048e-05 | 0.4693, 1.551 | INFO
+R2 | coupled maps d = 4 fraction of samples with minimum principal angle below 0.1 | 0.1105 | - | INFO
+R2 | coupled maps d = 4 fraction of samples with minimum principal angle below 0.01 | 0.01004 | - | INFO
+R2 | coupled maps d = 4 fraction of samples with minimum principal angle below 0.001 | 0.00083 | - | INFO
+R2 | coupled maps d = 4 fraction of samples with minimum principal angle below 0.0001 | 6e-05 | - | INFO
+R2 | coupled maps d = 4 fraction of samples with minimum principal angle below 1.0e-5 | 0 | - | INFO
+R2 | coupled maps d = 4 log-log slope of the empirical CDF of the minimum angle on 1e-4 .. 1e-1 (P(theta < x) ~ x^slope) | 1.071 | - | INFO
+R2 | coupled maps d = 4 pair (1,2) angle: min, fraction below 1e-2, fraction below 1e-3 | 8.186e-05 | 0.00702, 0.00067 | INFO
+R2 | coupled maps d = 4 pair (1,3) angle: min, fraction below 1e-2, fraction below 1e-3 | 0.02583 | 0, 0 | INFO
+R2 | coupled maps d = 4 pair (1,4) angle: min, fraction below 1e-2, fraction below 1e-3 | 0.02374 | 0, 0 | INFO
+R2 | coupled maps d = 4 pair (2,3) angle: min, fraction below 1e-2, fraction below 1e-3 | 0.0001106 | 0.00436, 0.00029 | INFO
+R2 | coupled maps d = 4 pair (2,4) angle: min, fraction below 1e-2, fraction below 1e-3 | 0.01249 | 0, 0 | INFO
+R2 | coupled maps d = 4 pair (3,4) angle: min, fraction below 1e-2, fraction below 1e-3 | 9.896e-05 | 0.00653, 0.00066 | INFO
+R2 | F3 orbit C minimum principal angle, samples, seconds | 100001 | 2.9 s (5000 transient handoffs each) | INFO
+R2 | F3 orbit C minimum principal angle: min, median, max | 0.0003087 | 0.6751, 1.571 | INFO
+R2 | F3 orbit C fraction of samples with minimum principal angle below 0.1 | 0.09419 | - | INFO
+R2 | F3 orbit C fraction of samples with minimum principal angle below 0.01 | 0.02008 | - | INFO
+R2 | F3 orbit C fraction of samples with minimum principal angle below 0.001 | 0.00113 | - | INFO
+R2 | F3 orbit C fraction of samples with minimum principal angle below 0.0001 | 0 | - | INFO
+R2 | F3 orbit C fraction of samples with minimum principal angle below 1.0e-5 | 0 | - | INFO
+R2 | F3 orbit C log-log slope of the empirical CDF of the minimum angle on 1e-4 .. 1e-1 (P(theta < x) ~ x^slope) | 1.069 | - | INFO
+R2 | F3 orbit C pair (1,2) angle: min, fraction below 1e-2, fraction below 1e-3 | 0.01262 | 0, 0 | INFO
+R2 | F3 orbit C pair (1,3) angle: min, fraction below 1e-2, fraction below 1e-3 | 0.0174 | 0, 0 | INFO
+R2 | F3 orbit C pair (1,4) angle: min, fraction below 1e-2, fraction below 1e-3 | 0.0003087 | 0.02008, 0.00113 | INFO
+R2 | F3 orbit C pair (2,3) angle: min, fraction below 1e-2, fraction below 1e-3 | 0.0001188 | 0.9422, 0.5711 | INFO
+R2 | F3 orbit C pair (2,4) angle: min, fraction below 1e-2, fraction below 1e-3 | 0.01794 | 0, 0 | INFO
+R2 | F3 orbit C pair (3,4) angle: min, fraction below 1e-2, fraction below 1e-3 | 0.01776 | 0, 0 | INFO
+# section R2 took 6.9 s
+##### group R3idx
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups R3idx, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+R3 | Float64 F3 orbit C per vector index i: max delta(v_i) / B_v | 0.7922 | 0.3424, 0.7922, 0.55, 0.001993 ; worst index 2 | INFO
+R3 | Float64 F3 orbit C per index i: max |ln Lambda_i error| / B_v | 0.14 | 0.1088, 0.1297, 0.14, 0.0008034 ; worst index 3 | INFO
+R3 | Float64 standard map (20 starts) per vector index i: max delta(v_i) / B_v | 0.000304 | 0.000304, 0.0001959 ; worst index 1 | INFO
+R3 | Float64 standard map (20 starts) per index i: max |ln Lambda_i error| / B_v | 0.000513 | 0.0004261, 0.000513 ; worst index 2 | INFO
+R3 | Double64 F3 orbit C per vector index i: max delta(v_i) / B_v | 0.005057 | 0.00228, 0.005057, 0.004239, 2.332e-05 ; worst index 2 | INFO
+R3 | Double64 F3 orbit C per index i: max |ln Lambda_i error| / B_v | 0.001083 | 0.0008527, 0.0008277, 0.001083, 1.114e-05 ; worst index 3 | INFO
+R3 | Double64 standard map (20 starts) per vector index i: max delta(v_i) / B_v | 0.001004 | 0.001004, 7.459e-05 ; worst index 1 | INFO
+R3 | Double64 standard map (20 starts) per index i: max |ln Lambda_i error| / B_v | 0.001629 | 0.001629, 9.225e-05 ; worst index 1 | INFO
+# section R3idx took 11.3 s
+##### group R4
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups R4, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+R4 | standard map start 1 g_min Dt = 1.906: n needed for 1e-10 (ladder resolution about 15 percent) | 11 | 40/(g Dt) = 20.99 ; 25/(g Dt) = 13.12 ; needed/25-prediction = 0.8386 ; needed/40-prediction = 0.5241 | INFO
+R4 | standard map start 2 g_min Dt = 1.952: n needed for 1e-10 (ladder resolution about 15 percent) | 11 | 40/(g Dt) = 20.49 ; 25/(g Dt) = 12.81 ; needed/25-prediction = 0.859 ; needed/40-prediction = 0.5369 | INFO
+R4 | standard map start 3 g_min Dt = 1.985: n needed for 1e-10 (ladder resolution about 15 percent) | 12 | 40/(g Dt) = 20.15 ; 25/(g Dt) = 12.6 ; needed/25-prediction = 0.9526 ; needed/40-prediction = 0.5954 | INFO
+R4 | standard map start 4 g_min Dt = 1.9: n needed for 1e-10 (ladder resolution about 15 percent) | 11 | 40/(g Dt) = 21.05 ; 25/(g Dt) = 13.16 ; needed/25-prediction = 0.836 ; needed/40-prediction = 0.5225 | INFO
+R4 | coupled maps start 1 g_min Dt = 0.2686: n needed for 1e-10 (ladder resolution about 15 percent) | 139 | 40/(g Dt) = 148.9 ; 25/(g Dt) = 93.08 ; needed/25-prediction = 1.493 ; needed/40-prediction = 0.9333 | INFO
+R4 | coupled maps start 2 g_min Dt = 0.2931: n needed for 1e-10 (ladder resolution about 15 percent) | 139 | 40/(g Dt) = 136.5 ; 25/(g Dt) = 85.28 ; needed/25-prediction = 1.63 ; needed/40-prediction = 1.019 | INFO
+R4 | coupled maps start 3 g_min Dt = 0.2611: n needed for 1e-10 (ladder resolution about 15 percent) | 139 | 40/(g Dt) = 153.2 ; 25/(g Dt) = 95.74 ; needed/25-prediction = 1.452 ; needed/40-prediction = 0.9074 | INFO
+R4 | F3 chaotic start 1 g_min Dt = 0.02668: n needed for 1e-10 (ladder resolution about 15 percent) | 1417 | 40/(g Dt) = 1499 ; 25/(g Dt) = 937 ; needed/25-prediction = 1.512 ; needed/40-prediction = 0.9452 | INFO
+R4 | F3 chaotic start 2 g_min Dt = 0.06784: n needed for 1e-10 (ladder resolution about 15 percent) | 427 | 40/(g Dt) = 589.6 ; 25/(g Dt) = 368.5 ; needed/25-prediction = 1.159 ; needed/40-prediction = 0.7242 | INFO
+R4 | F3 chaotic start 3 g_min Dt = 0.06378: n needed for 1e-10 (ladder resolution about 15 percent) | 427 | 40/(g Dt) = 627.1 ; 25/(g Dt) = 392 ; needed/25-prediction = 1.089 ; needed/40-prediction = 0.6809 | INFO
+R4 | F3 chaotic start 4 g_min Dt = 0.007077: n needed for 1e-10 (ladder resolution about 15 percent) | 2112 | 40/(g Dt) = 5652 ; 25/(g Dt) = 3533 ; needed/25-prediction = 0.5978 ; needed/40-prediction = 0.3736 | INFO
+R4 | F3 chaotic start 5 g_min Dt = 0.06105: n needed for 1e-10 (ladder resolution about 15 percent) | 558 | 40/(g Dt) = 655.3 ; 25/(g Dt) = 409.5 ; needed/25-prediction = 1.363 ; needed/40-prediction = 0.8516 | INFO
+R4 | F3 orbit C g_min Dt = 0.02639: n needed for 1e-10 (ladder resolution about 15 percent) | 1417 | 40/(g Dt) = 1516 ; 25/(g Dt) = 947.3 ; needed/25-prediction = 1.496 ; needed/40-prediction = 0.9349 | INFO
+# section R4 took 28.7 s
+##### group R5
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups R5, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+R5 | standard map: max |ln Lambda_i(tau = 5) - sum of five tau = 1 sub-interval values| over samples and i (n_f = n_b = 200) | 4.909e-09 | reported (intrinsic: rounding only) | INFO
+R5 | coupled maps: same, tau 1 against 5 (n_f = n_b = 200) | 4.851e-11 | reported | INFO
+R5 | F3 chaotic start: max |ln Lambda_i(tau = 20) - sum of two tau = 10 values| (n_f = n_b = 3000) | 3.085e-14 | reported | INFO
+R5 | standard map: max |lambda_i(n) Householder - lambda_i(n) RGS| over samples (n_f = n_b = 200) | 1.08e-14 | reported (intrinsic: rounding only) | INFO
+R5 | standard map: max delta CLV Householder against RGS | 1.562e-15 | reported | INFO
+R5 | F3 chaotic start: max |lambda_i(n) Householder - lambda_i(n) RGS| over samples (n_f = n_b = 3000) | 1.643e-14 | reported (intrinsic: rounding only) | INFO
+R5 | F3 chaotic start: max delta CLV Householder against RGS | 2.943e-14 | reported | INFO
+# section R5 took 5.2 s
+##### group THR
+# clv-ginelli verification, julia 1.13.2, threads 8, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups THR, time 1.795110549e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC10 | threads of this process | 8 | >= 2 | PASS
+AC10 | 1024 orbits: ntasks 1 against ntasks N, bitwise (C, V, lambda, final state, forward exponents), chunk 64 against 1000 | 0 | 0 differences | PASS
+AC10 | 1024 orbits: chunk 64 against 1000 with N tasks, bitwise | 0 | 0 differences | PASS
+AC10 | one-thread process (-t 1) against the N-thread process, bitwise over 1024 orbits | 0 | 0 differences | PASS
+# section THR took 13.2 s
+##### group FIG
+# clv-ginelli verification, julia 1.13.2, threads 1, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups FIG, time 1.795110723e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+# FIG: wrote clv-ginelli-convergence.png and clv-ginelli-angles.png in the stage 04 output folder
+# section FIG took 17.1 s

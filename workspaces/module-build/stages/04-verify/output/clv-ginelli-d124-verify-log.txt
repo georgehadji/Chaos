@@ -1,0 +1,211 @@
+# clv-ginelli Amendment D124 reruns, 2026-11-19 (verify/clv-ginelli.jl, one process per group, -t 2, run in parallel: loaded-machine times). FULL1 rerun after the AC5 (a) term (first FULL1 run: AC5 118 fail, worst (a) 7.99).
+## group FULL1
+# clv-ginelli verification, julia 1.13.2, threads 2, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups FULL1, time 1.795113674e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+# Info AC1 realized ratios (error / bound) | worstV = 0.19535840653308023; worstL = 0.03865771622085595; nrun = 30
+# Info AC2 realized ratios (error / bound) | worst = Dict("mean" => 0.9999472911566188, "a" => 0.026428148471020783, "b" => 0.03761544601221213, "c" => 0.030940594059405937); ncases = 43
+# Info AC3a worst relative slope deviation | worst = 0.006386622986215285
+# Info AC3b | s.name = "standard map"; Nb = 13
+# Info AC3b | s.name = "coupled maps"; Nb = 86
+# Info AC3b | s.name = "F3 chaotic 1"; Nb = 4498
+# Info AC3b | s.name = "F3 chaotic 2"; Nb = 1769
+# Info AC3b | s.name = "F3 chaotic 3"; Nb = 1882
+# Info AC3b | s.name = "F3 chaotic 4"; Nb = 6000
+# Info AC3b | s.name = "F3 chaotic 5"; Nb = 1966
+# Info AC3b | s.name = "F3 chaotic 6"; Nb = 2029
+# Info AC3b | s.name = "F3 chaotic 7"; Nb = 2369
+# Info AC3b | s.name = "F3 chaotic 8"; Nb = 6000
+# Info AC3b | s.name = "F3 chaotic 9"; Nb = 1881
+# Info AC3b | s.name = "F3 chaotic 10"; Nb = 2108
+# Info AC3b | s.name = "F3 chaotic 11"; Nb = 2589
+# Info AC3b | s.name = "F3 chaotic 12"; Nb = 3881
+# Info AC3b | s.name = "F3 chaotic 13"; Nb = 3494
+# Info AC3b | s.name = "F3 chaotic 14"; Nb = 5859
+# Info AC3b | s.name = "F3 chaotic 15"; Nb = 4356
+# Info AC3b | s.name = "F3 chaotic 16"; Nb = 1788
+# Info AC3b | s.name = "F3 chaotic 17"; Nb = 6000
+# Info AC3b | s.name = "F3 chaotic 18"; Nb = 2120
+# Info AC3b | s.name = "F3 chaotic 19"; Nb = 2327
+# Info AC3b | s.name = "F3 chaotic 20"; Nb = 4324
+# Info AC3b worst distance | worst = 7.327292221022763e-12
+# Info AC3c worst ratio error / bound | worst = 0.24694780312294182
+# Info AC4 absolute errors (h = 1/10, 1/20, 1/40) | key = :o2; errs = [0.0003898977819575988, 9.753932714849375e-5, 2.4388890624705087e-5]
+# Info AC4 absolute errors (h = 1/10, 1/20, 1/40) | key = :o4; errs = [7.563892190324721e-7, 4.74431205216342e-8, 2.967836190519867e-9]
+# Info AC5 realized ratios (error / bound; (b) against 1e-9) | worst = Dict("a" => 0.049262484296117216, "b" => 0.0004042878854806862, "a0" => 0.0, "c" => 0.15280069684394698)
+FULL1 | file total (44872 pass, 0 fail, 0 error, 0 broken, 89.7 s) | 44872 | 0 fail, 0 error | PASS
+FULL1 | testset AC1 constant-Jacobian CLVs: fixtures a to d, identity and seeded frame (3091 pass, 0 fail or error, 0 broken, 24.6 s) | 0 | 0 | PASS
+FULL1 | testset AC1 negative controls: the forward Gram-Schmidt vectors, the forward s (8 pass, 0 fail or error, 0 broken, 2.0 s) | 0 | 0 | PASS
+FULL1 | testset AC2 covariance, normalisation, local exponents and telescoping on the  (41287 pass, 0 fail or error, 0 broken, 12.0 s) | 0 | 0 | PASS
+FULL1 | testset AC2 negative control: a 1-norm normalisation breaks the product ||R c| (2 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+FULL1 | testset AC3a backward convergence rate on fixtures a and b: slope of ln error  (12 pass, 0 fail or error, 0 broken, 0.7 s) | 0 | 0 | PASS
+FULL1 | testset AC3b independence of the starting frame, the starting C and tau at com (462 pass, 0 fail or error, 0 broken, 25.5 s) | 0 | 0 | PASS
+FULL1 | testset AC3c covariance chain: ln ||M_{m,n} v_i(n)|| against the sum of the lo (1 pass, 0 fail or error, 0 broken, 10.6 s) | 0 | 0 | PASS
+FULL1 | testset AC4 order in h of the CLV error on the separable linear flow: order 2  (6 pass, 0 fail or error, 0 broken, 1.7 s) | 0 | 0 | PASS
+FULL1 | testset AC5 symplectic pair identity, non-partner orthogonality and the determ (1 pass, 0 fail or error, 0 broken, 11.3 s) | 0 | 0 | PASS
+FULL1 | testset AC5 negative control: a wrong normalisation of the growth factor fails (2 pass, 0 fail or error, 0 broken, 0.1 s) | 0 | 0 | PASS
+# section FULL1 took 89.9 s
+## group FULL2
+# clv-ginelli verification, julia 1.13.2, threads 2, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups FULL2, time 1.795113306e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+# Info AC6b worst ratio error / (16 eps) | worst = 0.625
+# Info AC7 worst sine/cosine and forward-exponent pass fraction | worst = 1.2107564521080251e-12; nok = 1.0
+FULL2 | file total (17563 pass, 0 fail, 0 error, 0 broken, 89.0 s) | 17563 | 0 fail, 0 error | PASS
+FULL2 | testset AC6a closed-form angles: the cat map (pi/2) and the non-normal symplec (168 pass, 0 fail or error, 0 broken, 16.2 s) | 0 | 0 | PASS
+FULL2 | testset AC6b pairwise cosines from C agree with those of V = G C within 16 eps (7236 pass, 0 fail or error, 0 broken, 3.7 s) | 0 | 0 | PASS
+FULL2 | testset AC6c planted tangency: the angle equals arctan(delta) to relative 1e-2 (72 pass, 0 fail or error, 0 broken, 0.8 s) | 0 | 0 | PASS
+FULL2 | testset AC7 flow geometry on F3: f(z) lies in span(v_2, v_3), grad H is orthog (10021 pass, 0 fail or error, 0 broken, 49.2 s) | 0 | 0 | PASS
+FULL2 | testset AC8 bitwise equality of the checkpointed and the store-all runs, h_b i (5 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+FULL2 | testset AC8b number of interval-map evaluations: n_f + N (store-all) and n_f + (5 pass, 0 fail or error, 0 broken, 0.7 s) | 0 | 0 | PASS
+FULL2 | testset AC8c memory formula: bytes of the stored R factors, frames and working (8 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+FULL2 | testset AC8d streaming sink: samples delivered one at a time in decreasing n,  (3 pass, 0 fail or error, 0 broken, 1.3 s) | 0 | 0 | PASS
+FULL2 | testset AC9 first k columns of C, V and Lambda are those of the k = d run, bit (14 pass, 0 fail or error, 0 broken, 8.0 s) | 0 | 0 | PASS
+FULL2 | testset AC9c starting coefficient matrix: upper triangular, positive diagonal, (10 pass, 0 fail or error, 0 broken, 1.4 s) | 0 | 0 | PASS
+FULL2 | testset AC10a execution invariance: 1 against 4 tasks, chunk sizes 64 and 1000 (13 pass, 0 fail or error, 0 broken, 1.4 s) | 0 | 0 | PASS
+FULL2 | testset AC10b forward exponents are bitwise those of the delivered discrete sp (4 pass, 0 fail or error, 0 broken, 2.5 s) | 0 | 0 | PASS
+FULL2 | testset AC10c no allocation per handoff in the forward and backward loops, Flo (4 pass, 0 fail or error, 0 broken, 1.0 s) | 0 | 0 | PASS
+# section FULL2 took 89.2 s
+## group FULL3
+# clv-ginelli verification, julia 1.13.2, threads 2, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups FULL3, time 1.795113306e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+# Info AC11 realized ratios error / B_v (R3) | worst = Dict{Any, Float64}((Double64, "std 16") => 1.4456830687077811e-6, (Double64, "std 18") => 5.664342406062267e-6, (Double64, "std 20") => 1.9155616957423066e-6, (Double64, "F3 C") => 0.0037970105585535346, (Double64, "std 4") => 1.3426348050963627e-6, (Double64, "std 15") => 2.648701258307941e-6, (Double64, "std 2") => 4.338133224646597e-6, (Double64, "std 19") => 6.587946798784342e-6, (Float64, "std 18") => 0.0010097456389836256, (Float64, "std 2") => 4.6038213653923745e-5, (Double64, "std 9") => 2.1585937285330193e-6, (Float64, "std 7") => 4.313209564397902e-5, (Float64, "std 9") => 6.46142258356918e-5, (Float64, "std 12") => 7.329025215397589e-5, (Float64, "std 16") => 0.00017392844576150025, (Double64, "std 7") => 1.8236232376645201e-6, (Double64, "std 10") => 3.3085309039961034e-5, (Double64, "std 14") => 1.7256365055656819e-6, (Float64, "std 13") => 6.358998329376238e-5, (Float64, "s
+FULL3 | file total (151 pass, 0 fail, 0 error, 0 broken, 44.2 s) | 151 | 0 fail, 0 error | PASS
+FULL3 | testset AC11 precision ladder: Float64 and Double64 CLVs and local exponents a (1 pass, 0 fail or error, 0 broken, 25.3 s) | 0 | 0 | PASS
+FULL3 | testset AC11b the convergence of criterion 3 (b) holds in BigFloat(256): two s (1 pass, 0 fail or error, 0 broken, 4.0 s) | 0 | 0 | PASS
+FULL3 | testset AC12a time reversal on the linear fixtures: the CLVs of the inverse ma (101 pass, 0 fail or error, 0 broken, 9.2 s) | 0 | 0 | PASS
+FULL3 | testset AC12b time reversal on the standard map K = 5 in BigFloat(256): the re (2 pass, 0 fail or error, 0 broken, 1.1 s) | 0 | 0 | PASS
+FULL3 | testset AC14a non-finite start, frame and orbit state: health errors with kind (4 pass, 0 fail or error, 0 broken, 0.7 s) | 0 | 0 | PASS
+FULL3 | testset AC14b forward factorisation breakdown: a singular tangent gives the de (2 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+FULL3 | testset AC14c backward breakdown: R_22 below the representable inverse overflo (2 pass, 0 fail or error, 0 broken, 0.5 s) | 0 | 0 | PASS
+FULL3 | testset AC14d argument errors before any work: k, n_s, n_f, n_b, tau, h_b, sto (9 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+FULL3 | testset AC14e run record: every parameter of Algorithm 'Parameters recorded pe (22 pass, 0 fail or error, 0 broken, 1.2 s) | 0 | 0 | PASS
+FULL3 | testset D124 step length h: finite and positive, kept in the element type (rev (7 pass, 0 fail or error, 0 broken, 0.4 s) | 0 | 0 | PASS
+# section FULL3 took 44.5 s
+## group Od13a
+# clv-ginelli verification, julia 1.13.2, threads 2, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Od13a, time 1.795113306e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC13 | std start 1 (the single start) pilot exponents (per unit time, Float64, 1000 handoffs) | 1.042 | 1.042, -1.042 ; n* = 58 | INFO
+AC13 | std start 1 (the single start) module Float64 vs static, max delta (n_f = n_b = 58) | 1.123e-13 | <= 1.0e-8 | PASS
+AC13 | std start 1 (the single start) 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 58) | 2.865e-53 | reported (transient n*, not 1e-30) | INFO
+R1 | std start 1 (the single start) Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.07296 | 1.56 / 0.00107 / 0.865 / 0.0631 (value = static over Ginelli 256 time) | INFO
+AC13 | std start 1 (the single start) module Double64 vs static, max delta (n_f = n_b = 58) | 1.543e-30 | <= 1.0e-8 | PASS
+AC13 | std start 1 (the single start) 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 58) | 6.481e-45 | reported (transient n*, not 1e-30) | INFO
+R1 | std start 1 (the single start) Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.06481 | 4.24 / 0.000968 / 0.0306 / 0.00198 (value = static over Ginelli 256 time) | INFO
+AC13 | std start 1 (the single start) module BigFloat(256) vs static, max delta (n_f = n_b = 100) | 5.431e-73 | <= 1.0e-30 | PASS
+AC13 | std start 1 (the single start) 256-bit Ginelli (clv_ref) vs static, max delta | 5.43e-73 | <= 1.0e-30 | PASS
+R1 | std start 1 (the single start) BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.08569 | 2.23 / 0.0016 / 0.0387 / 0.00331 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 2 pilot exponents (per unit time, Float64, 1000 handoffs) | 0.9039 | 0.9039, -0.9039 ; n* = 67 | INFO
+AC13 | std chaotic start 2 module Float64 vs static, max delta (n_f = n_b = 67) | 2.273e-11 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 2 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 67) | 2.169e-11 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 2 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.263 | 0.000163 / 0.00103 / 0.00275 / 0.00347 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 2 module Double64 vs static, max delta (n_f = n_b = 67) | 4.465e-31 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 2 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 67) | 1.55e-65 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 2 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9492 | 0.00121 / 0.0016 / 0.00378 / 0.00358 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 2 module BigFloat(256) vs static, max delta (n_f = n_b = 100) | 2.47e-76 | <= 1.0e-30 | PASS
+AC13 | std chaotic start 2 256-bit Ginelli (clv_ref) vs static, max delta | 1.349e-76 | <= 1.0e-30 | PASS
+R1 | std chaotic start 2 BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.8999 | 0.0133 / 0.00199 / 0.00457 / 0.00411 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 3 pilot exponents (per unit time, Float64, 1000 handoffs) | 0.8632 | 0.8632, -0.8632 ; n* = 70 | INFO
+AC13 | std chaotic start 3 module Float64 vs static, max delta (n_f = n_b = 70) | 8.326e-15 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 3 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 70) | 1.179e-59 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 3 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 21.54 | 0.000184 / 0.00156 / 0.00377 / 0.0812 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 3 module Double64 vs static, max delta (n_f = n_b = 70) | 1.566e-31 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 3 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 70) | 1.781e-65 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 3 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.8597 | 0.00117 / 0.0015 / 0.00365 / 0.00314 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 3 module BigFloat(256) vs static, max delta (n_f = n_b = 105) | 5.462e-77 | <= 1.0e-30 | PASS
+AC13 | std chaotic start 3 256-bit Ginelli (clv_ref) vs static, max delta | 5.258e-77 | <= 1.0e-30 | PASS
+R1 | std chaotic start 3 BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9205 | 0.0121 / 0.0019 / 0.00446 / 0.00411 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 4 pilot exponents (per unit time, Float64, 1000 handoffs) | 1.009 | 1.009, -1.009 ; n* = 60 | INFO
+AC13 | std chaotic start 4 module Float64 vs static, max delta (n_f = n_b = 60) | 8.599e-16 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 4 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 60) | 1.892e-52 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 4 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9183 | 0.000142 / 0.00106 / 0.00344 / 0.00316 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 4 module Double64 vs static, max delta (n_f = n_b = 60) | 1.079e-30 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 4 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 60) | 2.49e-55 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 4 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9217 | 0.00114 / 0.00145 / 0.00335 / 0.00309 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 5 pilot exponents (per unit time, Float64, 1000 handoffs) | 1.036 | 1.036, -1.036 ; n* = 58 | INFO
+AC13 | std chaotic start 5 module Float64 vs static, max delta (n_f = n_b = 58) | 8.614e-16 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 5 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 58) | 2.239e-46 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 5 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.871 | 0.000202 / 0.00117 / 0.00331 / 0.00288 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 5 module Double64 vs static, max delta (n_f = n_b = 58) | 1.341e-25 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 5 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 58) | 1.341e-25 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 5 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9856 | 0.000979 / 0.00133 / 0.00311 / 0.00307 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 6 pilot exponents (per unit time, Float64, 1000 handoffs) | 0.9804 | 0.9804, -0.9804 ; n* = 62 | INFO
+AC13 | std chaotic start 6 module Float64 vs static, max delta (n_f = n_b = 62) | 3.957e-14 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 6 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 62) | 1.093e-54 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 6 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.8569 | 0.000187 / 0.00143 / 0.00372 / 0.00319 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 6 module Double64 vs static, max delta (n_f = n_b = 62) | 6.115e-32 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 6 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 62) | 5.956e-48 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 6 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9295 | 0.00111 / 0.0014 / 0.00342 / 0.00318 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 7 pilot exponents (per unit time, Float64, 1000 handoffs) | 0.7927 | 0.7927, -0.7927 ; n* = 76 | INFO
+AC13 | std chaotic start 7 module Float64 vs static, max delta (n_f = n_b = 76) | 1.628e-14 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 7 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 76) | 1.901e-51 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 7 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.8311 | 0.000182 / 0.00155 / 0.00378 / 0.00314 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 7 module Double64 vs static, max delta (n_f = n_b = 76) | 1.83e-31 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 7 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 76) | 1.367e-49 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 7 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.062 | 0.00115 / 0.00149 / 0.00353 / 0.00374 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 8 pilot exponents (per unit time, Float64, 1000 handoffs) | 1.008 | 1.008, -1.008 ; n* = 60 | INFO
+AC13 | std chaotic start 8 module Float64 vs static, max delta (n_f = n_b = 60) | 9.462e-15 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 8 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 60) | 5.881e-52 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 8 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.1192 | 0.000211 / 0.00115 / 0.0216 / 0.00257 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 8 module Double64 vs static, max delta (n_f = n_b = 60) | 1.234e-30 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 8 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 60) | 9.427e-52 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 8 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9602 | 0.000893 / 0.00124 / 0.00279 / 0.00268 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 9 pilot exponents (per unit time, Float64, 1000 handoffs) | 1.019 | 1.019, -1.019 ; n* = 59 | INFO
+AC13 | std chaotic start 9 module Float64 vs static, max delta (n_f = n_b = 59) | 4.748e-15 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 9 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 59) | 1.08e-48 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 9 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.7123 | 0.000164 / 0.00109 / 0.00373 / 0.00266 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 9 module Double64 vs static, max delta (n_f = n_b = 59) | 1.476e-31 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 9 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 59) | 2.471e-45 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 9 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.031 | 0.000932 / 0.00125 / 0.00303 / 0.00313 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 10 pilot exponents (per unit time, Float64, 1000 handoffs) | 1.046 | 1.046, -1.046 ; n* = 58 | INFO
+AC13 | std chaotic start 10 module Float64 vs static, max delta (n_f = n_b = 58) | 1.98e-15 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 10 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 58) | 3.918e-53 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 10 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9152 | 0.000187 / 0.00111 / 0.00301 / 0.00276 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 10 module Double64 vs static, max delta (n_f = n_b = 58) | 1.5e-31 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 10 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 58) | 1.612e-55 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 10 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.8006 | 0.00105 / 0.00122 / 0.00314 / 0.00252 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 11 pilot exponents (per unit time, Float64, 1000 handoffs) | 0.9696 | 0.9696, -0.9696 ; n* = 62 | INFO
+AC13 | std chaotic start 11 module Float64 vs static, max delta (n_f = n_b = 62) | 9.592e-16 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 11 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 62) | 1.114e-33 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 11 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9017 | 0.000225 / 0.00121 / 0.00306 / 0.00276 (value = static over Ginelli 256 time) | INFO
+AC13 | std chaotic start 11 module Double64 vs static, max delta (n_f = n_b = 62) | 6.252e-32 | <= 1.0e-8 | PASS
+AC13 | std chaotic start 11 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 62) | 7.207e-35 | reported (transient n*, not 1e-30) | INFO
+R1 | std chaotic start 11 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.9158 | 0.0012 / 0.00147 / 0.00363 / 0.00332 (value = static over Ginelli 256 time) | INFO
+AC13 | standard map starts compared (1 + 10 chaotic) | 11 | 11 | PASS
+# section Od13a took 18.6 s
+## group Od13
+# clv-ginelli verification, julia 1.13.2, threads 2, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Od13b, time 1.795113306e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC13 | coupled maps d = 4 pilot exponents (per unit time, Float64, 1000 handoffs) | 0.8254 | 0.8254, 0.4472, -0.4471, -0.8255 ; n* = 318 | INFO
+AC13 | coupled maps d = 4 module Float64 vs static, max delta (n_f = n_b = 318) | 7.601e-11 | <= 1.0e-8 | PASS
+AC13 | coupled maps d = 4 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 318) | 3.582e-52 | reported (transient n*, not 1e-30) | INFO
+R1 | coupled maps d = 4 Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.2229 | 1.92 / 0.0915 / 0.941 / 0.21 (value = static over Ginelli 256 time) | INFO
+AC13 | coupled maps d = 4 module Double64 vs static, max delta (n_f = n_b = 318) | 8.092e-28 | <= 1.0e-8 | PASS
+AC13 | coupled maps d = 4 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 318) | 8.179e-28 | reported (transient n*, not 1e-30) | INFO
+R1 | coupled maps d = 4 Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.6478 | 4.29 / 0.0296 / 0.125 / 0.0809 (value = static over Ginelli 256 time) | INFO
+AC13 | coupled maps d = 4 module BigFloat(256) vs static, max delta (n_f = n_b = 476) | 4.016e-46 | <= 1.0e-30 | PASS
+AC13 | coupled maps d = 4 256-bit Ginelli (clv_ref) vs static, max delta | 4.016e-46 | <= 1.0e-30 | PASS
+R1 | coupled maps d = 4 BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 1.25 | 3.17 / 0.0265 / 0.0899 / 0.112 (value = static over Ginelli 256 time) | INFO
+# section Od13b took 20.4 s
+## group Od13c
+# clv-ginelli verification, julia 1.13.2, threads 2, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Od13c, time 1.795113306e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC13 | F3 orbit C pilot exponents (per unit time, Float64, 1000 handoffs) | 0.03119 | 0.03119, 0.004799, -0.004085, -0.0319 ; n* = 4547 | INFO
+AC13 | F3 orbit C module Float64 vs static, max delta (n_f = n_b = 4547) | 6.508e-12 | <= 1.0e-8 | PASS
+AC13 | F3 orbit C 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 4547) | 1.621e-36 | reported (transient n*, not 1e-30) | INFO
+R1 | F3 orbit C Float64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.6419 | 2.18 / 74.9 / 1.76 / 1.13 (value = static over Ginelli 256 time) | INFO
+# section Od13c took 88.5 s
+## group Od13d
+# clv-ginelli verification, julia 1.13.2, threads 2, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Od13d, time 1.795113306e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC13 | F3 orbit C pilot exponents (per unit time, Float64, 1000 handoffs) | 0.03119 | 0.03119, 0.004799, -0.004085, -0.0319 ; n* = 4547 | INFO
+AC13 | F3 orbit C module Double64 vs static, max delta (n_f = n_b = 4547) | 5.4e-30 | <= 1.0e-8 | PASS
+AC13 | F3 orbit C 256-bit Ginelli (clv_ref) vs static, max delta (n_f = n_b = 4547) | 3.461e-72 | reported (transient n*, not 1e-30) | INFO
+R1 | F3 orbit C Double64 seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.5585 | 11.8 / 74 / 1.28 / 0.716 (value = static over Ginelli 256 time) | INFO
+# section Od13d took 97.7 s
+## group Od13e
+# clv-ginelli verification, julia 1.13.2, threads 2, base seed 20261012 + 45000, CLV_FULL_RUN = true, groups Od13e, time 1.795113306e9 (unix)
+# timings in this log were taken on a machine that may be loaded by other processes (several groups run in parallel processes)
+AC13 | F3 orbit C pilot exponents (per unit time, Float64, 1000 handoffs) | 0.03119 | 0.03119, 0.004799, -0.004085, -0.0319 ; n256 = 6821 | INFO
+AC13 | F3 orbit C module BigFloat(256) vs static, max delta (n_f = n_b = 6821) | 1.116e-72 | <= 1.0e-30 | PASS
+AC13 | F3 orbit C 256-bit Ginelli (clv_ref) vs static, max delta | 1.159e-72 | <= 1.0e-30 | PASS
+R1 | F3 orbit C BigFloat seconds: module / tangents 256 / Ginelli 256 (clv_ref) / static | 0.6321 | 125 / 93.9 / 1.42 / 0.895 (value = static over Ginelli 256 time) | INFO
+# section Od13e took 241.6 s

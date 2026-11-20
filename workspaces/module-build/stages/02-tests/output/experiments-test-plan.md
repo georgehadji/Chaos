@@ -816,3 +816,201 @@ Not testable in the suite: O27 (real-runner fixture campaign through `bin/chaosl
 RED confirmed by the whole package suite (`Pkg.test()`, default environment, 28 min 13 s): 1404601 pass, 1 error (D96a, `ArgumentError: collection must be non-empty` in `_indicator_manifest`), 1 broken (existing, weighted-birkhoff). D86b "a block without specs" fails under `--project=verify` (17 of 18 chunk hashes) and passes in the default environment: environmental, not a D96 effect. Approved by the owner on 2026-11-03.
 
 Test correction found at stage 03 (owner decision 2026-11-03): D96a compared the manifest budget of each spec with the raw fixture budget (Float64 and Double64). The block keeps only the precisions of the arms holding the spec (D86 item 1, `run_indicator.jl`), and the fixture's arms use Float64 only, so the expectation was wrong, not the code. The check now compares with the Float64 line alone (`ex_d96.jl`, one line).
+
+## Amendment D125 (stage 02, 2026-11-20)
+
+Status: draft for the stage 02 checkpoint. Spec: `experiments-spec.md`, "Amendment D125" (approved at stage 01, commit 0ba20e1). No file under `src/` and none under `data/` is touched; no existing test is edited; `runtests.jl` gains one registration block at its end.
+
+### Files
+
+| File | Lines | Holds |
+|------|-------|-------|
+| `test/experiments/ex_d125_helpers.jl` | 388 | seeds, spec-text references (E46 to E56 streams, class bits, Lambda_q, floor, draw, exact control exponents), fixtures A and B, hand panel, run builders, lower-layer references |
+| `test/experiments/ex_d125_ref.jl` | 118 | reference screening by the verified Benettin on the identical orbit, reference cell, panel and generic panel check |
+| `test/experiments/ex_d125_golden_fn.jl`, `ex_d125_golden.jl` | 69, 75 | golden capture function (shared by the generating script and the test) and the generated values |
+| `test/experiments/ex_d125_a.jl` | 73 | D125a (golden) and D125u |
+| `test/experiments/ex_d125_grammar.jl` | 171 | D125b, D125i |
+| `test/experiments/ex_d125_panel.jl` | 206 | D125d to D125h |
+| `test/experiments/ex_d125_items.jl` | 261 | D125c, D125j, D125k, D125l, D125m |
+| `test/experiments/ex_d125_est.jl` | 167 | D125n, D125o |
+| `test/experiments/ex_d125_store.jl` | 174 | D125p to D125t |
+
+Registered after the D96 line in `runtests.jl`, in the order helpers, ref, golden_fn, a, grammar, panel, items, est, store (comment "Amendment D125"). Every file is below 400 lines.
+
+### Golden records (D125a, O28, I40)
+
+Mechanism: `d125_golden_capture(study; plan, log)` reads the tracked preregistration and panel of a study (under `workspaces/study/`, never `data/`), builds the plan with the fixed code version `d125-golden-code` (the real chunk hashes and the round-log digest depend on the hash of `src/`, so they cannot be reproduced after any source change; the plan structure can), and records SHA-256 of: the preregistration and panel bytes, the plan hash and text, the item hashes, the chunk keys and chunk hashes, the item texts of a seeded sample of min(10^4, n) items, the block hash and the indicator manifest. The values were captured with the code of commit 0ba20e1 (before any D125 source change) and are stored in `ex_d125_golden.jl`. Study p2 runs on the p1 panel. For p3-abstention the tracked round log names the code version of its day, so the test writes a synthetic log for `d125-golden-code` (stored in the golden file as `p3_log`) and the plan is built against it. Counts: p1 15569 items in 1363 chunks, p2 26964 in 695, p3 45148 in 1080. The tests PASS now and must pass after stage 03. The rebuild of the real panels (37 minutes for p1) runs only with `CHAOSLAB_D125_FULL=1` (the criterion's `[full]` tag, stage 04). The fixture goldens of D86b, D94b and D96b stay asserted in their own files.
+
+### Criterion to test
+
+| Criterion | Test (file) | Expected now |
+|-----------|-------------|--------------|
+| D125a | `D125a golden records`, `real manifests ... agree`, `fixture goldens ... unchanged`, `rebuilt real panels (full)` (a) | PASS (4 testsets, 52 assertions) |
+| D125b | `D125b valid panel inputs ...` (fixtures A and B, read back), `D125b malformed panel inputs ...` (59 cases through `EX.panel_inputs`, 8 through `build_panel` with 0 files) (grammar) | RED: `panel input classes: unknown key` |
+| D125c | `D125c systems ...` (items): exact parameters at three precisions (0 ulp against 1024 bits), Y3 mu = 0 and chain eps = 0 against the standard map bitwise over 1000 steps, wrapped lift, flow loop of the integrator step bitwise for both fixture integrators, wrapped request on a flow refused | 16 PASS (lower layers), 1 FAIL (the refusal, RED) |
+| D125d | `D125d screening points`, `D125d starts of the flow cell` (panel): `EX.systems_points`, `EX.systems_flow_starts`, KS bound, energy defect, empty window refused | RED: UndefVarError |
+| D125e | `class predicates ...`, `Lambda_q by the nearest rank` (35 assertions), `class bits ... 200 points per cell kind` (panel) | RED: UndefVarError, unknown key |
+| D125f | `draw and subset D ...`, `built panel equals the reference draw ...` (panel) | RED |
+| D125g | `controls` (panel): `EX.control_exponents`, 1024-bit comparison, multiplicity, refusal, panel records | RED |
+| D125h | `determinism of the panel and forbidden content` (panel): ntasks 1, 4, 23, chunk 64, 4096, 7, sidecars, fixture B | RED |
+| D125i | `D125i valid blocks ...`, `D125i malformed blocks ...` (grammar): about 60 malformed blocks, at least 2 per estimator kind, merge by id | RED: `run.integrator: unknown key` |
+| D125j | `D125j items, hashes, frames and plan` (items): hand count 54 items in 29 chunks, byte-exact item text, hash sensitivity (frame, step, cell), five frames and the same label merging, frame rule bitwise for k = 2, 4, d, plan for 1, 4 and all threads and key order, old items unchanged when an arm is added, unused estimator refused | RED |
+| D125k | `D125k full spectrum ...` (items): (a) prefix at sampled grid steps, 0 difference for L1, L3, L4, L4b, L5; (b) spread over the QR family at most 16 d^2 eps / (tau h); (c) L1 against L5 at most 16 eps (N + G_1) / (N h); (d) identical orbit; (e) Double64 and BigFloat(256) against Float64 over the setup check steps; (f) `EX.hot_loop_bytes` 0 for four kind and dimension pairs | RED |
+| D125l | `D125l diagnostics for d` (items): eps_pair and eps_sum on 1000 spectra (d = 4, 6, 10), thresholds with the factor d, flags above and below, drift reading momentum components | RED: UndefVarError (1000 errors) |
+| D125m | `D125m indicators ...` (items): SALI, FLI, MEGNO, GALI, OFLI finals bitwise on the fixture orbits; six refused chain or key cases; OFLI frame parallel to the field | RED |
+| D125n | `D125n continuous QR items` (est): library loop bitwise at every target (orders 2 and 4, k = 1, 2, d), targets, refusals (tau, horizon, map cell), state equals L5, unit, guard, sixth reason | RED |
+| D125o | `transients of synthetic pilot spectra` (22 cases) and `items equal the library ...` (est): n*, n_f, n_b, U and the two error kinds; library equality; summary against the recomputation from the series; checkpoint equals store; threads 1 and 4; `clv_bytes`; failing orbit | RED |
+| D125p | `D125p backend` (store): cpu, auto and gpu with and without a simulated device, byte-identical datasets, empty reason for cpu, sixth reason otherwise, no tenth reason | RED |
+| D125q | `D125q store and resume` (store): two killed-and-resumed campaigns (resumed with 1 and 3 threads), stale panel, layout of R40 by the raw reader | RED |
+| D125r | `D125r memory` (store): bytes(orbit) by hand for five items, capacity for three free-memory values, refusal naming kind, bytes and free memory, capacity independence | RED |
+| D125s | `D125s health and controls` (store): non-finite value (both attempts and first attempt only), control rule for y5 at d = 4 and 6 and the chain origin, shifts at the first and last exponent, zero exponent | RED |
+| D125t | `D125t manifest and pilot` (store): new keys, old keys unchanged for a plan without a new item, pilot starts on the pilot stream, cost rows per kind, rerun bitwise | RED |
+| D125u | `D125u layering and entry point` (a): `Experiments.jl` imports `..Integrators` (RED), no study name in the module, no Analysis import, entry point free of D125 names (pass) | 3 PASS, 1 FAIL |
+| D125v | stage 05 (documents) | not a package test |
+| D125w, D125x | stage 04 (verify) | not in the suite |
+
+Every criterion D125a to D125u is encoded. Limits of the encoding, stated: D125k(f) and D125e/D125k at the study's N are not run at full size (fixtures only); D125m uses the 3 orbits of each kind of the hand panel, not 50 per kind (the 50-orbit sample is a stage 04 item); D125o runs 22 synthetic pilot spectra and one chaotic F3 start per orbit of the fixture (3 orbits); D125t checks the CPU reference rerun by a second campaign into another store, not through `bin/` (stage 04).
+
+### New API assumed by the tests
+
+Submodule `Chaoslab.Experiments` (names are the tests'; stage 03 may rename them and the test-side amendment then changes the names only): `panel_inputs` with scheme `systems` and the keys `classes`, `rules`, `cell`, `control`; `systems_points`, `systems_flow_starts`, `screen_floor`, `class_bits`, `screen_ratio`, `cell_quantile`, `systems_draw`, `systems_dsubset`, `control_exponents`; `seeded_frame(T, run_seed, orbit, label, Val(d), Val(k))`; `eps_pair`, `eps_sum`, `diagnostic_thresholds(d, T; G_max, tau, M_max)`, `diagnostics_flag(name, values, threshold)`, `drift_flag(kind, states, bound)`; `check_ofli_frame(flow, start, frame)`; `clv_transients(lambda, spec, tau, h)` returning `(nstar, nf, nb, U)` or throwing; `hot_loop_bytes(kind, d)`; the run block tables `[[run.integrator]]`, `[[run.estimator]]` and the arm keys `cells`, `vectors`, `frames`, `integrators`, `estimators`; plan item fields `system`, `start` (comma-joined decimal texts), `frame`, `integrator` (canonical text), `kind`, `horizon`; `orbit_bytes` and `group_capacity` extended to exponent items and estimators; `run_pilot` report fields `starts[].cell`, `starts[].start`, `cost[].system_kind`; the chunk layout of R40 (`orbits/<id>/estimators/<spec>/series`, `.../lambda_fwd`, `.../theta_summary`, `.../theta_hist`, `.../theta_min`, root attributes `frame`, `integrator`, `step_time`, `exponent_unit`, `cell`, `kind`, `order`, `orthogonality_tol`, orbit attributes `n_star`, `n_f`, `n_b`, `unstable_count`, `pilot_lambda`, `window_start_state`, `window_end_state`).
+
+Risk, stated: because every campaign-level testset stops at the first refusal of the run block today, the references of D125j to D125t after that point (item text order, dataset names, the clv summary recomputation, the manifest keys) have not run against an implementation. Only the lower-layer references (D125c, the library calls for cqr and clv, the screening reference of D125e on the identical orbit) were exercised. Test-side corrections at the stage 03 checkpoint are expected for names and layout, as in D86 and D94.
+
+### Test-side readings (U-points, for the checkpoint)
+
+1. Panel orbit keys and the pool sidecar are pinned by the tests: orbit keys `id, cell, class, system, param, start, start_dec, control, control_kind, point_id, draw_index, in_D, run_seed, orbit_seed` and for controls `dimension, exact_exponents`; the sidecar `<panel>.pools.toml` holds per cell `points`, `bits_sha256` and run-length lists `regular, chaotic, weak, strong`; a provenance sidecar exists.
+2. `setup_check_steps` is keyed by the class ids of the panel and by `control` (the base keys were the study's cell kinds).
+3. The binary64 `p1` of a flow start is evaluated in binary64 from the binary64 q2, p2 and E (E47 leaves the evaluation precision open); I49 then holds by the defect bound of 16 eps max(1, E).
+4. Frame label "a" is `initial_deviations(run seed, orbit id)` with the run seed of the panel orbit; another label uses the first 8 bytes of SHA-256 of `chaoslab-frame-1|<orbit>|<label>` big-endian as the orbit argument.
+5. Item text line order: the D53 lines with `start=` after `param=`, then `direction=seeded`, `frame=`, `integrator=` (flows only), then the closing lines of E27. E55 names the lines, not their order.
+6. The `chaoslab-screen-md-1|<seed>|<cell>` streams are read with the D94 reading (256-bit uniforms, partial Fisher-Yates); the deviation seed of screening uses the text with the suffix `|dev` and the point index as orbit.
+7. The pilot stream draws the first `orbits_per_k` starts per cell (the existing key serves the cells).
+8. The wrapped-versus-lifted bound of D125c is a generous multiple of 16 eps per step and wrap count; the coupled-maps spec's own bound is not quoted in the criterion.
+9. D125k(c): B_S of the Benettin spec as amended by D35 is read as 16 eps (N + G_1) with G_1 the growth of the first exponent.
+10. E58: the sum and pair thresholds are the diagnostics spec's `sum_threshold(16, T, G_max, tau, M_max)` times d. See the calibration: the pair diagnostic cannot meet any threshold of that order (inconsistency 2).
+11. The cqr guard default of the fixture is 1e-2 (the library's `E_max`); the realized defect of one leapfrog step at h = 1/16 is 9e-4.
+12. The clv memory formula (E62) uses `n_b = transient_cap` as the worst case.
+13. `l` of the library's cqr series is stored as the exponent per unit time (the series `n` counts map steps).
+14. The estimator `vectors` key is the number of columns k; `vectors = "d"` on an arm sets k = d for exponent methods.
+
+### Calibration (K24, verify-only seeds)
+
+Samples: 200 starts per cell kind, seeds `EX_SEED + 65000 + j` (disjoint from the package seeds `EX_SEED + 63000 + ...`), N = 1000, kinds Y3 (two parameter sets), chain N = 2 open, N = 3 ring, N = 5 ring, F3 with leapfrog and with Kahan-Li order 8. Scratch scripts are in the session scratch folder `d125-red/` (not kept in the repository). Realized ratio = maximum over the 200 starts of the running maximum divided by the threshold.
+
+| Kind | d | det | symp | orth | sum (factor d) | pair (factor d) | QR spread / (d eps) |
+|------|---|-----|------|------|----------------|-----------------|---------------------|
+| Y3 a | 4 | 0.376 | 0.0035 | 0.422 | 0.00042 | 4.6e10 | 11.5 |
+| Y3 b | 4 | 0.435 | 0.0069 | 0.438 | 0.00043 | 2.5e10 | 16.6 |
+| chain N=2 open | 4 | 0.379 | 0.0121 | 0.422 | 0.00062 | 3.5e10 | 17.5 |
+| chain N=3 ring | 6 | 0.501 | 0.0068 | 0.312 | 0.00030 | 1.0e10 | 16.6 |
+| chain N=5 ring | 10 | 0.643 | 0.0025 | 0.206 | 0.00026 | 6.1e9 | 45 |
+| F3 leapfrog | 4 | 0.250 | 0.0156 | 0.406 | 0.00099 | 4.8e10 | 0.11 |
+| F3 Kahan-Li 8 | 4 | 0.751 | 0.0627 | 0.406 | 0.00114 | 4.1e10 | 1.28 |
+
+Mechanisms. det, symp, orth: rounding of the d x d products; ratios 0.2 to 0.75 of the thresholds, the factor (d/2)^2 of the symplecticity threshold is far from binding; the largest det ratio (0.751, F3 Kahan-Li) has the thinnest margin and is kept as it is. sum: the sum of the d exponents is a sum of d roundings; the ratio with the factor d is at most 0.0011 (without the factor 0.0046), so the factor d is generous and the test pins it as the spec proposes. pair: the finite-time pairing error of lambda_i(N) + lambda_(d+1-i)(N) is of order 1/N, not of order eps, so a rounding-level threshold is exceeded by 6e9 to 1.8e11 (ratios without the factor: 6.1e10 to 1.9e11); with the base rule "an exceedance fails the chunk" every chunk with d > 2 would fail (inconsistency 2, owner decision needed: record the pair diagnostic as data without a threshold for d > 2, or use a threshold of the 1/N form). The QR spread over L3, L4, L4b, L5 on the identical orbit is at most 45 d eps at d = 10, that is 0.28 of the bound 16 d^2 eps / (tau h) of D125k(b); for F3 it is below 2 d eps. D125k(c) is not calibrated beyond the Benettin bound of the lyap-benettin spec.
+
+Finite-time controls (R42 item 4). Errors of the finite-time exponents of the exact-exponent controls against the exact list, panel orbit ids 1 to 12, k = d (QR): N = 100: y5 d = 4 0.0448, y5 d = 6 0.0298, chain N = 2 0.0417, chain with K = 0 (exact zero) 0.0460, L1 at most 0.0454; N = 160: 0.0280, 0.0186, 0.0260, 0.0317. The fixture `control_bound` is 0.05: the realized ratio is at most 0.92 at N = 100 and 0.63 at N = 160; the mechanism is the term ln(c) / N of the finite-time exponent (c depends on the frame), not rounding. The D125s tests use N = 160; the control arm of the shared fixture campaign uses N = 100. A 200-frame sample at N = 100 had errors up to 8 / N = 0.08, so a control bound below 16 / N is not met by every frame (inconsistency 1).
+
+Not calibrated (stated): the study's N = 2^20 sample of 200 starts per cell kind is not feasible at stage 02 (wall time) and is a stage 04 item (D125w, D125x); the bounds above use N = 1000. The cqr and clv items have no numeric bound in the tests (bitwise equality with the library).
+
+### Seeds
+
+Testset D125<letter> draws from `StableRNG(d125_seed(letter, sub))` with `d125_seed = EX_SEED + 63000 + 50 (letter - 'a' + 1) + sub`, sub < 50 (block 63050 to 63999, a fresh block: the D53, D86 and D94 suites use 27000, 29000 and 31000 to 33000). The two panel fixtures carry their own seeds, `EX_SEED` (A) and 777 (B), stated in `ex_d125_helpers.jl`. The calibration samples are at `EX_SEED + 65000 + j` and `EX_SEED + 65500 + j` (verify-only, not used by any package test).
+
+### Spec and code inconsistencies found
+
+1. (Closed by D126.) Control bound: the spec's tolerance of 64 d eps_53 max(1, |exact|) for exact-exponent controls is not attainable for finite-time exponents (errors up to 8 / N at N = 100, about 1e12 times that value); the tests read the block's `control_bound` (R42 item 4) and calibrate it as above.
+2. (Closed by D126.) E58 pair threshold: see the calibration; a rounding-level threshold with the factor d is exceeded by 6e9 to 1.8e11 on the start samples of every kind with d > 2.
+3. E56 says "per-orbit run seed"; the panel carries the run seed per orbit, equal to the block seed (reading U4).
+4. The Y3 force of the coupled-maps code is p - nu sin x1' while the standard map of the code is p' = p + K sin x; the decoupled-limit test uses K = -nu in the conjugation of item 6 of the coupled-maps spec. The criterion text of D125c does not name the sign.
+5. `orbit_bytes` and `group_capacity` raise for non-indicator items today; D125r and D125k(f) rely on their extension (stage 03).
+
+### RED log (experiments suite)
+
+RED run of the D125 files (the three groups below ran in parallel, each inside a wrapping testset so that a failing testset does not stop the file; `julia -t 4`, scratch environment with the package as a path dependency):
+
+| Group (files) | Pass | Fail | Error | Total | Time |
+|---------------|------|------|-------|-------|------|
+| A: `ex_d125_a.jl` | 55 | 1 | 0 | 56 | 3m18s |
+| B: `ex_d125_grammar.jl`, `ex_d125_panel.jl`, `ex_d125_items.jl` | 19 | 4 | 1051 | 1074 | 6m16s |
+| C: `ex_d125_est.jl`, `ex_d125_store.jl` | 1 | 0 | 8 | 9 | 2m55s |
+| Total | 75 | 5 | 1059 | 1139 | |
+
+Per testset (pass / fail / error): D125a golden 42 / 0 / 0, manifests 6 / 0 / 0, fixture goldens 3 / 0 / 0, rebuilt panels 1 / 0 / 0 (skipped by the flag, counts as one pass); D125u 3 / 1 / 0; D125b valid 0 / 0 / 1; D125b malformed 1 / 2 / 1; D125i valid 0 / 0 / 1; D125i malformed 2 / 1 / 1; D125d points 0 / 0 / 1; D125d flow starts 0 / 0 / 1; D125e predicates 0 / 0 / 2; D125e Lambda_q 0 / 0 / 35; D125e class bits 0 / 0 / 1; D125f draw 0 / 0 / 1; D125f built panel 0 / 0 / 1; D125g 0 / 0 / 1; D125h 0 / 0 / 1; D125c 16 / 1 / 0; D125j 0 / 0 / 1; D125k 0 / 0 / 1; D125l 0 / 0 / 1000; D125m 0 / 0 / 1; D125n 0 / 0 / 1; D125o transients 1 / 0 / 1; D125o items 0 / 0 / 1; D125p, D125q, D125r, D125s, D125t 0 / 0 / 1 each.
+
+Error kinds (all are missing functionality; no error comes from a test bug that was visible):
+- `ArgumentError: panel input classes: unknown key` (the reader of the panel block does not know scheme `systems`): D125b (2 testsets), D125e class bits, D125f built panel, D125h.
+- `ArgumentError: run block run.integrator: unknown key` (the run block reader does not know the new tables): D125i (2), D125j, D125k, D125m, D125n, D125o items, D125p, D125q, D125r, D125s, D125t.
+- `UndefVarError` of an `EX` name: `systems_points` (D125d), `systems_flow_starts` (D125d), `screen_floor` and `class_bits` (D125e), `cell_quantile` (35 in D125e), `systems_draw` (D125f), `control_exponents` (D125g), `eps_pair` (999) and `diagnostic_thresholds` (D125l), `clv_transients` (D125o).
+- Failed assertions (a value is false, no exception): the malformed-input checks of D125b (2) and D125i (1) (the old reader refuses with another message, so the key is not named), the wrapped-flow refusal of D125c, and the `using ..Integrators` import of D125u.
+
+Passing now (must pass before and after stage 03): the 52 assertions of D125a, the 16 lower-layer assertions of D125c (exact parameters at three precisions, Y3 and chain decoupled limits over 1000 steps, wrapped lift, flow loop of both fixture integrators), 3 of D125u and the case-count assertion of D125o (22 synthetic pilot spectra).
+
+Pre-existing experiments suite: all 41 pre-existing experiments files (`runtests.jl` without the D125 block, run file by file inside one wrapping testset, `julia -t 4`): 9288 pass, 0 fail, 0 error, 148 min (the machine was loaded by another long Julia process; uncontended the base took about 7 minutes). A single run of the whole `runtests.jl` was started first and abandoned because it was too slow under that load; it gave no result.
+
+Independence from `data/`: no D125 test, golden or helper reads or writes `data/` (the golden capture reads `workspaces/study/` only). The D125p backend test uses a simulated device (`ExDev`, `ExFakeDevice`) and no benchmark record; it asserts the reason strings of `Chaoslab.FALLBACK_REASONS`, not a record table. The pre-existing `ex_record.jl` writes its own `data/gpu-benchmark.toml` under a temporary root (not edited here). The package function `gpu_record` (`run_campaign.jl`) reads `<repo>/data/gpu-benchmark.toml` when a device probes non-empty, so the D125p cases with the simulated device `FakeGPU` can read the rewritten file through it; the new kinds run on the CPU whatever the record says (R41), so the asserted datasets, backend and reason do not depend on its content, but this was not run against the rewritten file.
+
+### D126 (stage 02, 2026-11-20, owner: "Ναι, D126")
+
+Spec: `experiments-spec.md`, "Amendment D126" (finite-time forms of the E58 pairing threshold for d > 2 and of the exact-exponent control tolerance). No file under `src/` or `data/` is touched.
+
+Changed and new tests:
+
+| File | Change |
+|------|--------|
+| `test/experiments/ex_d125_helpers.jl` | two constants, `D126_PAIR_CONST` = 37.0 and `D126_CTL_CONST` = 56.0, pinned from the table below (not changed after the data); 3 lines |
+| `test/experiments/ex_d125_items.jl` (D125l) | `EX.diagnostic_thresholds(d, T; G_max, tau, M_max, n, h, pair_const)` (new keywords `n` = first recorded grid step, `h`, `pair_const`); `th.pair == pair_const / (n tau h) + d sum_threshold(16, T, G_max, tau, M_max)` for d = 4, 6, 10 and h = 1, 0.05; the flag test uses the same call. Still RED (`EX.diagnostic_thresholds` is undefined); `th.sum` stays the factor d form |
+| `test/experiments/ex_d126_bounds.jl` (new, 64 lines) | D126a (pairing bound on lower-layer runs) and D126b (control tolerance on lower-layer runs), both pass before stage 03 |
+| `test/experiments/runtests.jl` | one `include` after the D125 block |
+
+D125g keeps its tests (exact values, multiplicity, panel records): the tolerance of the L5 item of a control is exercised by D126b, which supersedes the unattainable 64 d eps form. D125s keeps `control_bound` (0.05 in the fixture, unchanged). Registered seeds: D126a `d125_seed('x')` (64200 to 64249), D126b uses the fixture frames 1 to 12 (no random stream); the calibration samples are verify-only and disjoint from every package seed (`EX_SEED + 63000` to `EX_SEED + 64299`).
+
+Calibration (K24). Pairing: C_pair = (|lambda_i + lambda_(d+1-i)| maximum over i - R_sum) N tau h, with R_sum = d `sum_threshold(16, Float64, G_max, 1, M_max)` of the run; per-step units (C is the same per unit time: both sides scale by 1 / h). Controls: C_ctl = (maximum over i of |lambda_i - exact_i| - 64 d eps_53 max(1, |exact_i|)) N. Samples: pairing seeds `EX_SEED + 65000 + j`; controls frame ids 5001 to 5000 + starts with `EX_RUN_SEED`. Scratch scripts `cal3.jl`, `ctl3.jl`, `ctlk0.jl`, `run_D126.jl` are in the session scratch folder `d126-cal/` (not kept in the repository). Worst C over the horizons run (N = 200, 1600, 1e4 at 200 starts per kind; N = 204800 at 200 starts for Y3 (both sets) and chain N = 2 and 24 for the others; N = 2^20 at 16 starts for the first three kinds, the rest did not finish in the time of this session):
+
+| Kind | d | N run | tau h | starts | worst C_pair | pair_const | ratio |
+|------|---|-------|-------|--------|--------------|------------|-------|
+| Y3, set a | 4 | 200 to 204800, 2^20 | 1 | 200 (2^20: 16) | 9.104 | 37 | 0.246 |
+| Y3, set b | 4 | same | 1 | 200 (2^20: 16) | 6.532 | 37 | 0.177 |
+| chain N = 2 open | 4 | same | 1 | 200 (2^20: 16) | 7.217 | 37 | 0.195 |
+| chain N = 3 ring | 6 | 200 to 204800 | 1 | 200 (204800: 24) | 7.43 | 37 | 0.201 |
+| chain N = 5 ring | 10 | 200 to 204800 | 1 | 200 (204800: 24) | 8.63 | 37 | 0.233 |
+| F3 leapfrog | 4 | 200 to 204800 | 1/16 | 200 (204800: 24) | 3.39 | 37 | 0.092 |
+| F3 Kahan-Li 8 | 4 | 200 to 204800 | 1/16 | 200 (204800: 24) | 3.47 | 37 | 0.094 |
+
+The worst C of a kind is the same at every N of the 200-start runs (same starts, same frames): 9.104 for Y3 a at N = 200, 1600, 1e4 and 204800, which confirms the 1 / N law (the maximum pair itself runs from 0.0455 at N = 200 to 4.45e-5 at N = 204800). The sum diagnostic needed no change: worst ratio of `eps_sum` to d times the sum threshold 0.0022 (hh-kl, N = 200), and `max(0, eps_sum - R_sum)` was 0 on every start.
+
+| Control | d | N run | starts | worst C_ctl (L5, k = d) | L1 (k = 1) | control_const | ratio |
+|---------|---|-------|--------|-------------------------|------------|---------------|-------|
+| y5, mu = 3, 5/2 | 4 | 200 to 204800 (2^20: 24 starts) | 200 | 9.274 | 5.301 | 56 | 0.166 |
+| y5, mu = 2, 3/2, 4 | 6 | 200 to 204800 | 200 | 8.38 | 6.245 | 56 | 0.150 |
+| chain N = 2, K = 1.5 | 4 | 200 to 204800 | 200 | 4.653 | 2.118 | 56 | 0.083 |
+| chain N = 2, K = 0 (exact zero) | 4 | 200 / 1600 / 1e4 / 204800 / 2^20 | 200 | 5.30 / 7.38 / 9.21 / 12.23 / 13.86 | 12.23 (204800) | 56 | 0.248 at 2^20 |
+
+L3 equals L5 in every row. For the zero exponent the worst C grows by 1.0 per unit of ln N (the Jordan block of the K = 0 chain, mechanism in the spec), so the constant is calibrated at the largest study horizon N_1 = 2^20; the others are N-independent. The realized error at N_1 is 1.4e-5 (zero exponent) and 1e-5 (hyperbolic), 1.4e3 times the study's control gate of 1e-8 (finding 1 of the spec).
+
+Smallest study N. The grid starts at n_1 = 200 in the draft (budget list B), so the pair threshold of a chunk is 0.185 per step; at N = 200 the realized pairing errors are 0.0098 to 0.0455 (ratio 0.05 to 0.25 of 0.185, rounding term included), so the bound is tight (4 x margin by construction) at the smallest N and, for the final value at N_1 = 2^20, loose by about 5e3. A study that wants the bound tight at N_1 would have to test the final value only, not the running maximum; D126 keeps the running maximum of D53 R2.
+
+Not run: N = 2^20 at 200 starts per kind (too slow on the loaded session machine: three of the calibration processes ran at once), the F3 kinds and the chains N = 3 and 5 at N = 2^20 (stage 04 item, D126d). The constants use the 200-start samples at N <= 204800 and the ln N growth law, which the 2^20 control run (200 starts, zero exponent, 13.86) confirms.
+
+Results of the files changed (`julia -t 4`, scratch environment `env05`):
+
+| Run | Pass | Fail | Error | Total | Time |
+|-----|------|------|-------|-------|------|
+| `ex_d126_bounds.jl` (D126a, D126b) | 635 | 0 | 0 | 635 | 2m47s |
+| `ex_d125_items.jl` (changed D125l; D125c, j, k, m as before) | 16 | 1 | 1003 | 1020 | 3m58s |
+| `ex_d125_a.jl` (golden D125a, D125u) | 55 | 1 | 0 | 56 | 4m28s |
+
+D126a and D126b pass in full (635 assertions: D126a 200 pair checks plus the final ratio and the exceedance check, D126b 12 frames x 3 methods x 4 controls x 3 horizons with k exponents each). The items file keeps its RED log counts of this section (D125c 16 / 1 / 0, D125j, k, m 0 / 0 / 1 each, D125l 0 / 0 / 1000): D125l still errors at `EX.eps_pair` (the call now reports `MethodError: no method matching eps_pair(::Vector{Float64})`, the `Diagnostics` function of the library, not the `UndefVarError` of the RED log; the experiments module has no `eps_pair` for a vector either way), so the new `th.pair` form is encoded and not yet exercised. The golden file is unchanged: D125a 42 + 6 + 3 + 1 pass (0 differences), D125u 3 pass and the same 1 RED failure (`using ..Integrators`).
+
+Inconsistencies 1 and 2 above are closed by D126: the control tolerance and the pair threshold are the finite-time forms of the amendment, tested by D126a and D126b. U10 is superseded for `th.pair` (the pair threshold is no longer d times the sum threshold; the sum threshold keeps the factor d).
+
+#### D126e negative controls (stage 02 checkpoint, owner: "Ναι πρόσθεσε")
+
+| File | Testset | What it shows |
+|------|---------|---------------|
+| `test/experiments/ex_d126_bounds.jl` (+51 lines, `d126_blockmap`) | D126e | (a) blocks of y5 (mu = 3, 5/2) scaled by s = 1.01 and 1/s: determinant 1, planted pair defect 2 ln s = 0.0199 per step; measured defect within `D126_PAIR_CONST / N` of it, sum at rounding level, rejected by the D126a bound at N = 1e5 (bound 3.7e-4), accepted at N = 1000 (bound 0.037, below the detection limit, recorded); the unscaled map passes at both. (b) y5 with claimed exponents of mu = 301/100 (offset 3.3e-3): rejected by the D126b tolerance at N = 1e5 (5.6e-4), accepted at N = 1000 (0.056); the true exponents pass at both |
+
+No random draw (linear maps, start 0, frames 1 to 4 from `EX_RUN_SEED`). Mechanism of the limit: a per-step defect delta is seen once delta > C / (N tau h); the bound is not changed after the data. Run (`julia -t 4`, env05, 2026-11-20): `ex_d126_bounds.jl` 683 pass, 0 fail, 0 error (635 D126a and D126b, 48 D126e), 1m47s.
+
+D125m at full size (50 orbits per kind, criterion text) is a stage 04 [full] item of the verify script; the package test keeps 3 orbits per kind (limit of the encoding, above).

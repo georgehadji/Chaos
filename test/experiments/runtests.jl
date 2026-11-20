@@ -46,3 +46,15 @@ include(joinpath(@__DIR__, "ex_d94_plan.jl"))      # D94i, D94l, D94m
 include(joinpath(@__DIR__, "ex_d94_run.jl"))       # D94n, D94o
 # Amendment D96 (indicator specs held only by closure arms)
 include(joinpath(@__DIR__, "ex_d96.jl"))   # D96a, D96b
+# Amendment D125 (higher-dimensional maps and flows): helpers, reference, golden records, then the criteria D125a to D125u
+include(joinpath(@__DIR__, "ex_d125_helpers.jl"))
+include(joinpath(@__DIR__, "ex_d125_ref.jl"))
+include(joinpath(@__DIR__, "ex_d125_golden_fn.jl"))
+include(joinpath(@__DIR__, "ex_d125_a.jl"))        # D125a (golden), D125u
+include(joinpath(@__DIR__, "ex_d125_grammar.jl"))  # D125b, D125i
+include(joinpath(@__DIR__, "ex_d125_panel.jl"))    # D125d to D125h
+include(joinpath(@__DIR__, "ex_d125_items.jl"))    # D125c, D125j to D125m
+include(joinpath(@__DIR__, "ex_d125_est.jl"))      # D125n, D125o
+include(joinpath(@__DIR__, "ex_d125_store.jl"))    # D125p to D125t
+# Amendment D126 (finite-time forms of the E58 pairing threshold and of the control tolerance; lower-layer, passes before stage 03)
+include(joinpath(@__DIR__, "ex_d126_bounds.jl"))  # D126a, D126b
